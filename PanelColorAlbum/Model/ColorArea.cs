@@ -62,19 +62,32 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Определение покраски. Попадание точки в зону окраски
-      public static Paint GetPaint(List<ColorArea> colors, Point3d pt)
+      public static Paint GetPaint(Extents3d boundsTile,  List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {
-         Paint paint = null;
-         foreach (ColorArea colorArea in colors)
+         Paint paint = GetPaintFromColorAreas(boundsTile, colorAreasForeground);
+         if (paint == null)
          {
-            var bounds = colorArea.Bounds;            
-            if (Geometry.IsPointInBounds(pt, bounds))
+            if (colorAreasBackground != null)
             {
-               paint = colorArea.Paint;
-               break;               
+               paint = GetPaintFromColorAreas(boundsTile, colorAreasBackground);
             }
          }
-         return paint; 
+         return paint;
+      }
+
+      private static Paint GetPaintFromColorAreas(Extents3d boundsTile, List<ColorArea> colorAreas)
+      {         
+         // Центр плитки
+         Point3d ptCentretile = new Point3d((boundsTile.MaxPoint.X + boundsTile.MinPoint.X) * 0.5,  
+                                            (boundsTile.MaxPoint.Y + boundsTile.MinPoint.Y) * 0.5, 0);
+         foreach (ColorArea colorArea in colorAreas)
+         {                         
+            if (Geometry.IsPointInBounds(ptCentretile, colorArea.Bounds))             
+            {
+               return colorArea.Paint;               
+            }
+         }
+         return null;
       }
 
       private Extents3d GetBounds(BlockReference blRef)

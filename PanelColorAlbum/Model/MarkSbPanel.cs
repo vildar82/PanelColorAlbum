@@ -11,9 +11,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class MarkSbPanel
    {
       private string _markSb;
+      private string _markSbBlockName;
       private ObjectId _idBtr;
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
+      private List<Paint> _paints;
       private List<MarkArPanel> _marksAR;
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
       private List<ColorArea> _colorAreas;
@@ -21,6 +23,31 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       public List<Tile> Tiles
       {
          get { return _tiles; }
+      }
+
+      public List<Paint> Paints
+      {
+         get { return _paints; }
+      }
+
+      public List<MarkArPanel> MarksAR
+      {
+         get { return _marksAR; }
+      }
+
+      public string MarkSbBlockName
+      {
+         get
+         {
+            if (_markSbBlockName == null)
+               _markSbBlockName = GetMarkSbBlockName(_markSb);
+            return _markSbBlockName;
+         }         
+      }
+
+      public ObjectId IdBtr
+      {
+         get { return _idBtr; }
       }
 
       // Конструктор. Скрытый.
@@ -33,27 +60,27 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          //Проверка пересенений зон покраски (не должно быть пересечений)
          CheckIntersectColorAreas();
          // Список плиток (в определении блока марки СБ)
-         _tiles = GetTiles();
+         GetTiles();
       }
 
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
-      public static MarkSbPanel GetMarkSbPanel(BlockReference blRefPanel, List<MarkSbPanel> marks, BlockTable bt)
+      public static MarkSbPanel GetMarkSb(BlockReference blRefPanel, List<MarkSbPanel> marksSb, BlockTable bt)
       {
          MarkSbPanel markSb = null;
          string markSbName = GetMarkSbName(blRefPanel);
          if (markSbName != string.Empty)
          {
-            markSb = marks.Find(m => m._markSb == markSbName);
+            markSb = marksSb.Find(m => m._markSb == markSbName);
             if (markSb == null)
             {
                // Блок Марки СБ
                Database db = HostApplicationServices.WorkingDatabase;
-               string blNameMarkSB = Album.options.BlockPanelPrefixName + "_" + markSbName;
-               if (bt.Has(blNameMarkSB))
+               string markSbBlName = GetMarkSbBlockName(markSbName);
+               if (bt.Has(markSbBlName))
                {
-                  var idMarkSbBtr = bt[blNameMarkSB];
+                  var idMarkSbBtr = bt[markSbBlName];
                   markSb = new MarkSbPanel(idMarkSbBtr, markSbName);
-                  marks.Add(markSb);
+                  marksSb.Add(markSb);
                }
                else
                {
@@ -62,6 +89,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             }            
          }
          return markSb;
+      }
+
+      public static string GetMarkSbBlockName(string markSb)
+      {
+         return Album.options.BlockPanelPrefixName + "_" + markSb;
       }
 
       // определение имени марки СБ
@@ -89,14 +121,15 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          MarkArPanel panelAR = HasPanelAR(paintAR);
          if (panelAR == null )
          {
-            panelAR = new MarkArPanel(paintAR, GetMarkArNextName());            
+            panelAR = new MarkArPanel(paintAR, GetMarkArNextName());
+            _marksAR.Add(panelAR);
          }
          panelAR.AddBlockRefPanel(blRefPanel);
       }
 
       private string GetMarkArNextName()
       {
-         return _marksAR.Count.ToString(); 
+         return "АР-" + _marksAR.Count.ToString(); 
       }
 
       // Поиск покраски марки АР в списке _marksAR
@@ -117,9 +150,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Получение списка плиток в определении блока
-      private List<Tile> GetTiles()
+      private void  GetTiles()
       {
-         List<Tile> tiles = new List<Tile>();
+         _tiles = new List<Tile>();
+         _paints = new List<Paint>();
          using (var t = _idBtr.Database.TransactionManager.StartTransaction())
          {
             var btrMarkSb = t.GetObject(_idBtr, OpenMode.ForRead) as BlockTableRecord;
@@ -131,16 +165,26 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                   if (blRefTile.Name == Album.options.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
+
                      //TODO: Определение покраски плитки
-                     ColorArea.GetPaint(_colorAreas, tile.InsPoint ); 
-                     tiles.Add(tile);
+                     Paint paint =ColorArea.GetPaint(tile.Bounds, _colorAreas, null); 
+                     _tiles.Add(tile);
+                     _paints.Add(paint);
                   }
                }
             }
             t.Commit();
+         }         
+      }
+
+      // Замена вхождений блоков СБ на АР
+      public void ReplaceBlocksSbOnAr()
+      {
+         foreach (var markAr in _marksAR)
+         {
+            markAr.ReplaceBlocksSbOnAr(); 
          }
-         return tiles;
-      }      
+      }
 
       private void CheckIntersectColorAreas()
       {

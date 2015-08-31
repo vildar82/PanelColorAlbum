@@ -10,29 +10,20 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
    // Плитка
    public class Tile
-   {
-      // Краска
-      private Paint _paint;
+   {      
       // Id внутри определения блока панели (марки СБ).
       private ObjectId _idBlRef;
-      // Коорд. точки вставки блока плитки в блоке панели.
-      private Point3d _insPoint;      
+      Extents3d _bounds;      
 
-      public Paint Paint
+      public Extents3d Bounds
       {
-         get { return _paint; }         
-      }
-
-      public Point3d InsPoint
-      {
-         get { return _insPoint; }
-         set { _insPoint = value; }
+         get { return _bounds; }
       }
 
       public Tile(BlockReference blRefTile)
       {
          _idBlRef = blRefTile.ObjectId;
-         _insPoint = blRefTile.Position;
+         _bounds = blRefTile.Bounds.Value;
       }      
    }
 }

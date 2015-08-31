@@ -10,13 +10,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
    public static class Geometry
    {
-      // Попадает ли точка в границы
+      // Попадает ли точка внутрь границы
       public static bool IsPointInBounds(Point3d pt, Extents3d bounds)
       {
          bool res = false;
 
-         if (pt.X >= bounds.MinPoint.X && pt.Y >= bounds.MinPoint.Y &&
-            pt.X <= bounds.MaxPoint.X && pt.Y <= bounds.MaxPoint.Y)
+         if (pt.X > bounds.MinPoint.X && pt.Y > bounds.MinPoint.Y &&
+            pt.X < bounds.MaxPoint.X && pt.Y < bounds.MaxPoint.Y)
          {
             res = true;
          }

@@ -12,6 +12,32 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class Panel
    {
       // Исходное вхождение блока на чертеже. Которое нужно будет заменить на блок МаркиАР
-      private ObjectId _idBlRef;
+      private ObjectId _idBlRefSb;
+      private ObjectId _idBlRefAr;
+      private Point3d _insPt;
+      private Matrix3d _transform;
+
+      public Panel (BlockReference blRefPanel)
+      {
+         _idBlRefSb = blRefPanel.ObjectId;
+         _insPt = blRefPanel.Position;
+         _transform = blRefPanel.BlockTransform;           
+      }
+
+      // Замена вхождения блока СБ на АР
+      public void ReplaceBlockOnAr(MarkArPanel markAr)
+      {
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction() )
+         {
+            var ms = t.GetObject(Album._msId, OpenMode.ForWrite) as BlockTableRecord;
+            var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite) as BlockReference;
+            var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtr);
+            blRefMarkSb.Erase(true);
+            _idBlRefAr =ms.AppendEntity(blRefPanelAr);
+            t.AddNewlyCreatedDBObject(blRefPanelAr, true);
+            t.Commit();
+         } 
+      }
    }
 }
