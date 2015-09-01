@@ -16,5 +16,38 @@ namespace Vil.Acad.Lib
             return btr.Name;
          }
       }
-   }
+
+      /// <summary>
+      /// Копирование определения блока и добавление его в таблицу блоков.
+      /// </summary>
+      /// <param name="idBtr">Копируемый блок</param>
+      /// <param name="name">Имя для нового блока</param>
+      /// <returns>Новый блок</returns>
+      public static ObjectId CopyBtr(ObjectId idBtr, string name)
+      {
+         ObjectId idBtrCopy = ObjectId.Null;
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {            
+            var btrSource = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;            
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForWrite) as BlockTable;
+                        
+            var btrCopy = btrSource.Clone() as BlockTableRecord;
+            //TODO: проверка имени блока
+            btrCopy.Name = name;
+            idBtrCopy = bt.Add(btrCopy);
+            t.AddNewlyCreatedDBObject(btrCopy, true);
+            // Копирование объектов блока
+            ObjectIdCollection ids = new ObjectIdCollection();
+            foreach (ObjectId idEnt in btrSource)
+            {
+               ids.Add(idEnt);
+            }
+            IdMapping map = new IdMapping();
+            db.DeepCloneObjects(ids, idBtrCopy, map, true);
+            t.Commit();
+         }
+         return idBtrCopy;
+      }
+   }   
 }

@@ -15,27 +15,27 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       private List<Paint> _paints;
       private List<Panel> _panels;
       private string _markAR;
-      private ObjectId _idBtr;
+      private ObjectId _idBtrAr;
 
       public string MarkAR
       {
          get { return _markAR; }
       }
 
-      public ObjectId IdBtr
+      public ObjectId IdBtrAr
       {
-         get { return _idBtr; }
+         get { return _idBtrAr; }
       }
 
       public MarkArPanel(List<Paint> paintAR, string markAr)
       {
          _paints = paintAR;
          _markAR = markAr;
-         _panels = new List<Panel>();                  
+         _panels = new List<Panel>();
       }
 
-      public string GetMarkArBlockName (MarkSbPanel markSb)
-      {         
+      public string GetMarkArBlockName(MarkSbPanel markSb)
+      {
          return markSb.MarkSbBlockName + "_" + _markAR;
       }
 
@@ -47,9 +47,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          int i = 0;
          foreach (Tile tileMarSb in markSb.Tiles)
          {
-            Paint paintSb = markSb.Paints[i];
-            i++;
-            Paint paintAR = null;
+            Paint paintSb = markSb.Paints[i++];
+            Paint paintAR;
             if (paintSb == null)
             {
                // Опрделение покраски по зонам
@@ -72,13 +71,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       private static Extents3d GetBoundsTileInBlockRef(BlockReference blRefPanel, Tile tile)
       {
-         Point3d ptBlRef = blRefPanel.Position;         
+         Point3d ptBlRef = blRefPanel.Position;
          Point3d ptMin = new Point3d(ptBlRef.X + tile.Bounds.MinPoint.X, ptBlRef.Y + tile.Bounds.MinPoint.Y, 0);
          Point3d ptMax = new Point3d(ptBlRef.X + tile.Bounds.MaxPoint.X, ptBlRef.Y + tile.Bounds.MaxPoint.Y, 0);
          Extents3d boundsTileInBlRef = new Extents3d(ptMin, ptMax);
          return boundsTileInBlRef;
       }
-      
+
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
          //TODO: Добавление ссылки на блок этой марки покраски
@@ -99,46 +98,49 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForWrite) as BlockTable;
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             string markArBlockName = GetMarkArBlockName(markSB);
             // Проверка нет ли уже определения блока панели Марки АР в таблице блоков чертежа
-            if (bt.Has (markArBlockName))
+            if (bt.Has(markArBlockName))
             {
                //TODO: Ошибка. Не должно быть определений блоков Марки АР.
                Debug.Assert(false, "Не должно быть определений блоков Марки АР.");
             }
             var btrMarkSb = t.GetObject(markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
-            IdMapping map = new IdMapping();
-            var btrMarkAr = btrMarkSb.DeepClone(bt, map, false) as BlockTableRecord;
-            btrMarkAr.Name = markArBlockName;
+            // Копирование определения блока
+            _idBtrAr = Lib.Blocks.CopyBtr(markSB.IdBtr, markArBlockName);             
+            var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference" )
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefTile = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
-                  if (blRefTile.Name == Album.options.BlockTileName  )
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                  if (blRef.Name == Album.Options.BlockTileName)
                   {
-                     var tileSb = markSB.Tiles[i];
-                     var paintAr = _paints[i];
-                     blRefTile.UpgradeOpen();
-                     blRefTile.Layer = paintAr.LayerName;  
-                     i++;
+                     // это блок плитки. Красим ее (слоем).
+                     var paintAr = _paints[i++];                     
+                     blRef.UpgradeOpen();
+                     blRef.Layer = paintAr.LayerName;
+                  }
+                  else if (Lib.Blocks.EffectiveName(blRef) == Album.Options.BlockColorAreaName)
+                  {
+                     // Блок зоны покраски. Удаляем его
+                     blRef.UpgradeOpen();
+                     blRef.Erase(true);
                   }
                }
-            }            
-            _idBtr = bt.Add(btrMarkAr);
-            t.AddNewlyCreatedDBObject(btrMarkAr, true);
+            }                        
             t.Commit();
          }
       }
 
       // Замена вхождений блоков СБ на блоки АР
-      public  void ReplaceBlocksSbOnAr()
+      public void ReplaceBlocksSbOnAr()
       {
          foreach (var panel in _panels)
          {
-            panel.ReplaceBlockOnAr(this); 
+            panel.ReplaceBlockSbToAr(this);
          }
       }
    }

@@ -25,14 +25,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Замена вхождения блока СБ на АР
-      public void ReplaceBlockOnAr(MarkArPanel markAr)
+      public void ReplaceBlockSbToAr(MarkArPanel markAr)
       {
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction() )
          {
-            var ms = t.GetObject(Album._msId, OpenMode.ForWrite) as BlockTableRecord;
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
             var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite) as BlockReference;
-            var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtr);
+            var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
             blRefMarkSb.Erase(true);
             _idBlRefAr =ms.AppendEntity(blRefPanelAr);
             t.AddNewlyCreatedDBObject(blRefPanelAr, true);
