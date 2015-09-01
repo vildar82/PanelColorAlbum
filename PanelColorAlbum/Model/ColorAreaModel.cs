@@ -34,7 +34,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                  var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false , true) as BlockReference;
                   if (Lib.Blocks.EffectiveName(blRefColorArea) == Album.Options.BlockColorAreaName)
                   {
                      ColorArea colorArea = new ColorArea(blRefColorArea);
@@ -52,9 +52,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          _colorAreasBackground = new List<ColorArea>();
          _colorAreasForeground = new List<ColorArea>();
-         bool foregroundArea = false;
+         bool foregroundArea;
          foreach (var colorArea in colorAreas.ToArray())
          {
+            foregroundArea = false;
             // Если точка MinPoint или MaxPoint находится внутри другой зоны, то это передняя зона.
             foreach (var colorAreaOther in colorAreas)
             {

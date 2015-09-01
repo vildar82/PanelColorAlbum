@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access" MembersFormat="NameAndType">
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Album">
     <Position X="2.5" Y="0.5" Width="1.75" />
     <TypeIdentifier>
@@ -31,7 +31,7 @@
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.MarkArPanel">
     <Position X="6.25" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAgAABEAAEgQAAAggEAAEAAAAigAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAgAABEAAEoAAAAggEAAEAAAAggAA=</HashCode>
       <FileName>Model\MarkArPanel.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -73,7 +73,7 @@
   <Class Name="Vil.Acad.Lib.Blocks">
     <Position X="13.75" Y="1.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Model\Lib.cs</FileName>
     </TypeIdentifier>
   </Class>

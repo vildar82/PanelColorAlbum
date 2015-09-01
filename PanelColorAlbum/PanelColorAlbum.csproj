@@ -65,6 +65,7 @@
     <Compile Include="Model\ColorArea.cs" />
     <Compile Include="Model\ColorAreaModel.cs" />
     <Compile Include="Model\Geometry.cs" />
+    <Compile Include="Model\Inspector.cs" />
     <Compile Include="Model\Lib.cs" />
     <Compile Include="Model\MarkArPanel.cs" />
     <Compile Include="Model\MarkSbPanel.cs" />

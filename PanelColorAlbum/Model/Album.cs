@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -49,6 +50,22 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Определение зон покраски в Модели
          _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
 
+         // Сброс блоков панелей Марки АР на панели марки СБ.
+         if (!Resetblocks())
+         {
+            // Ошибки при сбросе блоков. В ком строке описаны причины. Нужно исправить чертеж.
+            return;
+         }
+
+         // Проверка чертежа
+         Inspector inspector = new Inspector();
+         if (!inspector.CheckDrawing())
+         {
+            Editor ed = _doc.Editor;
+            ed.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше."); 
+            return;
+         }
+
          // Определение покраски панелей.
          _marksSb = MarkSbPanel.GetMarksSB(_colorAreaModel);
 
@@ -60,11 +77,80 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
-      public void Resetblocks()
+      public bool Resetblocks()
       {
          // Для покраски панелей, нужно, чтобы в чертеже были расставлены блоки панелей Марки СБ.
          // Поэтому, при изменении зон покраски, перед повторным запуском команды покраски панелей и создания альбома,
          // нужно восстановить блоки Марки СБ (вместо Марок АР).
+         // Блоки панелей Марки АР - удалить.
+
+         bool res = true;
+
+         using (var t = _db.TransactionManager.StartTransaction() )
+         {            
+            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+            
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  if (MarkSbPanel.IsBlockNamePanel(blRef.Name))
+                  {                     
+                     // Если это панель марки АР, то заменяем на панель марки СБ.                     
+                     if (MarkSbPanel.IsBlockNamePanelMarkAr (blRef.Name) )
+                     {
+                        string markSb = MarkSbPanel.GetMarkSbName(blRef.Name);
+                        string markSbBlName = MarkSbPanel.GetMarkSbBlockName(markSb);
+                        if (!bt.Has(markSbBlName))
+                        {
+                           // Нет определения блока марки СБ.
+                           // Такое возможно, если после покраски панелей, сделать очистку чертежа (блоки марки СБ удалятся).
+                           //TODO: Создать блоки марки СБ из Марки АР. Но, зоны покраски внутри бков АР удалены.
+                           MarkSbPanel.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);
+                           Editor ed = _doc.Editor;
+                           ed.WriteMessage("\nНет определения блока для панели Марки СБ " + markSbBlName +
+                                          ". Оно создано из панели Марки АР " + blRef.Name + ". Зоны покраски внутри блока не определены." +
+                                          "Необходимо проверить блоки и заново запустить программу.");
+                           // Надо чтобы проектировщик проверил эти блоки, может в них нужно добавить зоны покраски (т.к. в блоках марки АР их нет).
+                           res = false;
+                        }
+                        var blRefMarkSb = new BlockReference(blRef.Position, bt[markSbBlName]);
+                        blRefMarkSb.SetDatabaseDefaults();
+                        blRefMarkSb.Layer = "0";
+                        ms.UpgradeOpen();
+                        ms.AppendEntity(blRefMarkSb);
+                        t.AddNewlyCreatedDBObject(blRefMarkSb, true);
+                     }
+                  }
+               }
+            }
+            // Удаление определений блоков Марок АР.
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (MarkSbPanel.IsBlockNamePanel(btr.Name))
+               {                  
+                  // Если это блок панели Марки АР
+                  if (MarkSbPanel.IsBlockNamePanelMarkAr (btr.Name))
+                  {
+                     // Блок Марки АР.
+                     var idsBlRef = btr.GetBlockReferenceIds(false, true);
+                     foreach (ObjectId idBlRef in idsBlRef)
+                     {
+                        var blRef = t.GetObject(idBlRef, OpenMode.ForWrite, false, true) as BlockReference;
+                        blRef.Erase(true);
+                     }
+                     // Удаление определение блока Марки АР
+                     btr.UpgradeOpen();
+                     btr.Erase(true);
+                  }
+               }
+            }
+            t.Commit();
+         }
+         return res;
       }
       // Создание определений блоков панелей марки АР
       private void CreatePanelsMarkAR()

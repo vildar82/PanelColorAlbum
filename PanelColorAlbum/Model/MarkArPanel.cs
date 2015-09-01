@@ -12,20 +12,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    // Марка АР покраски панели
    public class MarkArPanel
    {
+      private ObjectId _idBtrAr;
+      private string _markAR;
       private List<Paint> _paints;
       private List<Panel> _panels;
-      private string _markAR;
-      private ObjectId _idBtrAr;
-
-      public string MarkAR
-      {
-         get { return _markAR; }
-      }
-
-      public ObjectId IdBtrAr
-      {
-         get { return _idBtrAr; }
-      }
 
       public MarkArPanel(List<Paint> paintAR, string markAr)
       {
@@ -34,10 +24,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          _panels = new List<Panel>();
       }
 
-      public string GetMarkArBlockName(MarkSbPanel markSb)
-      {
-         return markSb.MarkSbBlockName + "_" + _markAR;
-      }
+      public ObjectId IdBtrAr { get { return _idBtrAr; } }
+
+      public string MarkAR { get { return _markAR; } }
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
@@ -69,26 +58,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          return paintsAR;
       }
 
-      private static Extents3d GetBoundsTileInBlockRef(BlockReference blRefPanel, Tile tile)
-      {
-         Point3d ptBlRef = blRefPanel.Position;
-         Point3d ptMin = new Point3d(ptBlRef.X + tile.Bounds.MinPoint.X, ptBlRef.Y + tile.Bounds.MinPoint.Y, 0);
-         Point3d ptMax = new Point3d(ptBlRef.X + tile.Bounds.MaxPoint.X, ptBlRef.Y + tile.Bounds.MaxPoint.Y, 0);
-         Extents3d boundsTileInBlRef = new Extents3d(ptMin, ptMax);
-         return boundsTileInBlRef;
-      }
-
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
          //TODO: Добавление ссылки на блок этой марки покраски
          Panel panel = new Panel(blRefPanel);
          _panels.Add(panel);
-      }
-
-      public bool EqualPaint(List<Paint> paintAR)
-      {
-         // ??? сработает такое сравнение списков покраски?
-         return paintAR.SequenceEqual(_paints);
       }
 
       // Создание определения блока Марки АР
@@ -108,33 +82,48 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             }
             var btrMarkSb = t.GetObject(markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
-            _idBtrAr = Lib.Blocks.CopyBtr(markSB.IdBtr, markArBlockName);             
+            _idBtrAr = Lib.Blocks.CopyBtr(markSB.IdBtr, markArBlockName);
             var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
                   if (blRef.Name == Album.Options.BlockTileName)
                   {
-                     // это блок плитки. Красим ее (слоем).
+                     // это блок плитки. Покраска плитки.
                      var paintAr = _paints[i++];                     
-                     blRef.UpgradeOpen();
-                     blRef.Layer = paintAr.LayerName;
+                     if (paintAr == null)
+                     {
+                        blRef.Layer = "0";
+                     }
+                     else
+                     {
+                        blRef.Layer = paintAr.LayerName;
+                     }                     
                   }
                   else if (Lib.Blocks.EffectiveName(blRef) == Album.Options.BlockColorAreaName)
                   {
-                     // Блок зоны покраски. Удаляем его
-                     blRef.UpgradeOpen();
+                     // Блок зоны покраски. Удаляем его                     
                      blRef.Erase(true);
                   }
                }
-            }                        
+            }
             t.Commit();
          }
       }
 
+      public bool EqualPaint(List<Paint> paintAR)
+      {
+         // ??? сработает такое сравнение списков покраски?
+         return paintAR.SequenceEqual(_paints);
+      }
+
+      public string GetMarkArBlockName(MarkSbPanel markSb)
+      {
+         return markSb.MarkSbBlockName + "_" + _markAR;
+      }
       // Замена вхождений блоков СБ на блоки АР
       public void ReplaceBlocksSbOnAr()
       {
@@ -142,6 +131,15 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          {
             panel.ReplaceBlockSbToAr(this);
          }
+      }
+
+      private static Extents3d GetBoundsTileInBlockRef(BlockReference blRefPanel, Tile tile)
+      {
+         Point3d ptBlRef = blRefPanel.Position;
+         Point3d ptMin = new Point3d(ptBlRef.X + tile.Bounds.MinPoint.X, ptBlRef.Y + tile.Bounds.MinPoint.Y, 0);
+         Point3d ptMax = new Point3d(ptBlRef.X + tile.Bounds.MaxPoint.X, ptBlRef.Y + tile.Bounds.MaxPoint.Y, 0);
+         Extents3d boundsTileInBlRef = new Extents3d(ptMin, ptMax);
+         return boundsTileInBlRef;
       }
    }
 }

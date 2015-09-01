@@ -31,8 +31,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          using (var t = db.TransactionManager.StartTransaction() )
          {
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite) as BlockReference;
+            var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true ) as BlockReference;
             var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
+            blRefPanelAr.SetDatabaseDefaults();
+            blRefPanelAr.Layer = "0";
             blRefMarkSb.Erase(true);
             _idBlRefAr =ms.AppendEntity(blRefPanelAr);
             t.AddNewlyCreatedDBObject(blRefPanelAr, true);

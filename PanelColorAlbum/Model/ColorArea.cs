@@ -11,9 +11,17 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    // Зона покраски
    public class ColorArea
    {
-      private ObjectId _idblRef;
       private Extents3d _bounds;
+      private ObjectId _idblRef;
       private Paint _paint;
+
+      public ColorArea(BlockReference blRef)
+      {
+         _idblRef = blRef.ObjectId;
+         // Определение габаритов
+         _bounds = GetBounds(blRef);
+         _paint = Album.FindPaint(blRef.Layer);
+      }
 
       public Extents3d Bounds
       {
@@ -24,15 +32,6 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          get { return _paint; }
       }
-
-      public ColorArea(BlockReference blRef)
-      {
-         _idblRef = blRef.ObjectId;
-         // Определение габаритов
-         _bounds = GetBounds(blRef);
-         _paint = Album.FindPaint(blRef.Layer);
-      }
-
       // Определение покраски. Попадание точки в зону окраски
       public static Paint GetPaint(Extents3d boundsTile, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {
