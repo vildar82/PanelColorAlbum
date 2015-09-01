@@ -16,7 +16,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands : IExtensionApplication
    {
-      Album album;
+      Album _album;
 
       // Покраска панелей в Моделе (по блокам зон покраски)
       [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
@@ -25,13 +25,26 @@ namespace Vil.Acad.AR.PanelColorAlbum
          Document doc = Application.DocumentManager.MdiActiveDocument;
          using (var DocLock = doc.LockDocument())
          {
-            if (album == null)
+            if (_album == null)
             {
-               album = new Album();
+               _album = new Album();
             }
-            album.PaintPanels();
+            _album.PaintPanels();
          }
       }
+
+      // Покраска панелей в Моделе (по блокам зон покраски)
+      [CommandMethod("PIK", "ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      public void ResetPanelsCommand()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         using (var DocLock = doc.LockDocument())
+         {
+            Album album = new Album();
+            album.Resetblocks();
+         }
+      }
+
 
       void IExtensionApplication.Initialize()
       {
