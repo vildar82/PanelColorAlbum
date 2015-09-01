@@ -33,7 +33,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
          }
       }
 
-      // Покраска панелей в Моделе (по блокам зон покраски)
+      // Удалекние блоков панелей марки АР и их замена на блоки панелей марок СБ.
       [CommandMethod("PIK", "ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void ResetPanelsCommand()
       {
