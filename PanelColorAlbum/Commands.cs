@@ -46,7 +46,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
       }
 
       // Создание альбома колористических решений панелей (Альбома панелей).
-      [CommandMethod("PIK", "AlbumPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      [CommandMethod("AlbumPanels")]
       public void AlbumPanelsCommand()
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;

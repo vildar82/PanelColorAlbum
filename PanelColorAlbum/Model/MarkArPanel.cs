@@ -14,7 +14,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    {
       private ObjectId _idBtrAr;
       private string _markAR;
-      private string _markARFullName;
+      private string _markARPanelFullName;
       private string _markArBlockName;
       private List<Paint> _paints;
       private List<Panel> _panels;
@@ -43,17 +43,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       /// <summary>
       /// Полное имя панели (Марка СБ + Марка АР)
       /// </summary>
-      public string MarkARFullName
-      {
-         get
-         {
-            if (_markARFullName == null)
-            {
-               _markARFullName = GetMarkArFullName();
-            }
-            return _markARFullName;
-         }
-      }
+      public string MarkARPanelFullName { get { return _markARPanelFullName; } }
 
       public List<TileCalc> TilesCalc
       {
@@ -127,17 +117,16 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            string markArBlockName = GetMarkArBlockName(markSB.MarkSbBlockName);
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;            
             // Проверка нет ли уже определения блока панели Марки АР в таблице блоков чертежа
-            if (bt.Has(markArBlockName))
+            if (bt.Has(_markArBlockName))
             {
                //TODO: Ошибка. Не должно быть определений блоков Марки АР.
                Debug.Assert(false, "Не должно быть определений блоков Марки АР.");
             }
             var btrMarkSb = t.GetObject(markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
-            _idBtrAr = Lib.Blocks.CopyBtr(markSB.IdBtr, markArBlockName);
+            _idBtrAr = Lib.Blocks.CopyBtr(markSB.IdBtr, _markArBlockName);
             var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)
@@ -173,27 +162,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          // ??? сработает такое сравнение списков покраски?
          return paintAR.SequenceEqual(_paints);
-      }
-
-      private string GetMarkArBlockName(string markSbBlockName)
-      {
-         if (_markArBlockName == null)
-         {
-            _markArBlockName = markSbBlockName + "_" + _markAR;
-         }
-         return _markArBlockName;
-      }
-      private string GetMarkArFullName()
-      {
-         return _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);
-      }
+      }     
 
       private void DefMarkArNames(MarkSbPanel markSB, BlockReference bkRefMarkAR)
-      {
-         
-         _markAR = "";
-         _markARFullName ="";
-         _markArBlockName ="";
+      {         
+         _markAR = "АР-" + markSB.MarksAR.Count.ToString();
+         _markArBlockName = bkRefMarkAR.Name + "_" + _markAR;
+         _markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);         
       }
 
       // Замена вхождений блоков СБ на блоки АР

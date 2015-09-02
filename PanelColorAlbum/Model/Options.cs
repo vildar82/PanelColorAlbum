@@ -11,7 +11,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       public string BlockPanelPrefixName = "АКР_Панель";
       public string BlockColorAreaName = "АКР_Зона-покраски";
       public string BlockTileName = "АКР_Плитка";
-      public string SheetTemplateFile = @"c:\temp\САПР\Плитка\Покраска плитки зонами\Sheet.dwg";
+      //public string SheetTemplateFile = @"c:\temp\САПР\Плитка\Покраска плитки зонами\Sheet.dwg";
+      public string SheetTemplateFile = @"c:\temp\Sheet.dwg";
       public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
    }
 }

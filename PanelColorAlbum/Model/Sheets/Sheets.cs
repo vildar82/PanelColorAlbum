@@ -57,7 +57,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          // Папка альбома панеелей
          string albumFolderName = "Альбом панелей";
-         _albumDir = new DirectoryInfo(Path.Combine (_album.Doc.Name, albumFolderName));
+         string curDwgFacadeFolder = Path.GetDirectoryName(_album.Doc.Name);
+         _albumDir = new DirectoryInfo(Path.Combine (curDwgFacadeFolder, albumFolderName));
          if (_albumDir.Exists)
          {
             // Что делать? Удалить? спросить уу пользователя?

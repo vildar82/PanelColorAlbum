@@ -26,26 +26,27 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateSheetMarkSB(_markSB, albumFolder);
 
-         // Создание листов Марок АР
+         Database dbFacade = HostApplicationServices.WorkingDatabase; 
+         // Создание листов Марок АР         
          using (Database dbMarkSB = new Database(false, true))
          {
             dbMarkSB.ReadDwgFile(_fileMarkSB.FullName, FileShare.ReadWrite, false, "");
-            dbMarkSB.CloseInput(true);
-            //dbMarkSB.SaveAs(_fileMarkSB.FullName, DwgVersion.Current);
+            dbMarkSB.CloseInput(true);            
 
-            // Копирование всех определений блоков марки АР в файл Марки СБ
-            CopyBtrMarksARToSheetMarkSB(_markSB, dbMarkSB);
+            //// Копирование всех определений блоков марки АР в файл Марки СБ
+            //CopyBtrMarksARToSheetMarkSB(_markSB, dbMarkSB);
 
-            // Создание листов Марок АР
-            Point3d pt = Point3d.Origin; 
-            foreach (var markAR in markSB.MarksAR)
-            {               
-               SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);
-               _sheetsMarkAR.Add(sheetMarkAR);
-               // Точка для вставки следующего блока Марки АР
-               pt = new Point3d(pt.X + 10000, pt.Y, 0);
-            }
-            dbMarkSB.Save();
+            //// Создание листов Марок АР
+            //Point3d pt = Point3d.Origin; 
+            //foreach (var markAR in markSB.MarksAR)
+            //{               
+            //   SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);
+            //   _sheetsMarkAR.Add(sheetMarkAR);
+            //   // Точка для вставки следующего блока Марки АР
+            //   pt = new Point3d(pt.X + 10000, pt.Y, 0);
+            //}
+            //HostApplicationServices.WorkingDatabase = dbFacade;
+            dbMarkSB.SaveAs(_fileMarkSB.FullName,DwgVersion.Current);            
          }
       }
 
@@ -65,7 +66,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Создание файла Марки СБ
       private FileInfo CreateSheetMarkSB(MarkSbPanel markSB, DirectoryInfo albumFolder)
       {
-         return _fileSheetTemplate.CopyTo(Path.Combine(albumFolder.FullName, markSB.MarkSb));
+         return _fileSheetTemplate.CopyTo(Path.Combine(albumFolder.FullName, markSB.MarkSb + ".dwg"));
       }
    }
 }

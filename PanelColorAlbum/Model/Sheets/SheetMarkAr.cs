@@ -30,7 +30,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB);
             // Создание листа для Марки АР на Фасаде.
-            var idLayoutMarkAR = CreateLayoutMarkAR();
+            var idLayoutMarkAR = CreateLayoutMarkAR(dbMarkSB);
             // Направение видового экрана на блок марки АР.
             var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t);
             // Заполнение таблицы
@@ -57,7 +57,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
 
          // Заголовок
-         table.Cells[0, 0].TextString = "Расход плитки на панель " + _markAR.MarkARFullName;
+         table.Cells[0, 0].TextString = "Расход плитки на панель " + _markAR.MarkARPanelFullName;
          // Подсчет плитки
          int row = 2;
 
@@ -123,19 +123,36 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Поиск видового экрана на листе
       private ObjectId GetViewport(ObjectId idLayoutMarkAR, Transaction t)
       {
+         ObjectId idVp = ObjectId.Null; 
          var layoutMarkAR = t.GetObject(idLayoutMarkAR, OpenMode.ForRead) as Layout;
-         var idsVPid = layoutMarkAR.GetViewports();
-         return idsVPid[0];
-      }
+         //var idsVPid = layoutMarkAR.GetViewports(); // 0
+         var btrLayout = t.GetObject(layoutMarkAR.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
+         foreach (ObjectId idEnt in btrLayout)
+         {
+            if (idEnt.ObjectClass.Name != "AcDbViewport") continue;
+            var vp = t.GetObject(idEnt, OpenMode.ForRead) as Viewport;
+            if (vp.Layer != "АР_Видовые экраны") continue;
+            idVp = idEnt;
+            break;                                 
+         }
+         return idVp;
+      }      
 
       // Создание листа для Марки АР
-      private ObjectId CreateLayoutMarkAR()
+      private ObjectId CreateLayoutMarkAR(Database dbMarkSB)
       {
+         ObjectId idLayoutMarAr = ObjectId.Null;
          // Копирование листа шаблона
+         Database dbOrig = HostApplicationServices.WorkingDatabase;
+         HostApplicationServices.WorkingDatabase = dbMarkSB;
+
          LayoutManager lm = LayoutManager.Current;
          string layoutNameMarkAR = GetMarkArBlockName();
          lm.CopyLayout(Album.Options.SheetTemplateLayoutNameForMarkAR, layoutNameMarkAR);
-         return lm.GetLayoutId(layoutNameMarkAR);
+         idLayoutMarAr = lm.GetLayoutId(layoutNameMarkAR);
+
+         HostApplicationServices.WorkingDatabase = dbOrig;
+         return idLayoutMarAr;
       }
       
       // Определение имени листа для Марки АР   
@@ -152,7 +169,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             var blRefMarkAR = new BlockReference(_pt, bt[_markAR.MarkArBlockName]);
             using (var ms = bt[BlockTableRecord.ModelSpace].GetObject(OpenMode.ForWrite) as BlockTableRecord)
             {
-               idBlRefMarkAR= ms.AppendEntity(blRefMarkAR);
+               idBlRefMarkAR= ms.AppendEntity(blRefMarkAR);               
             }
          }
          return idBlRefMarkAR;
@@ -184,10 +201,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          vp.ViewCenter = new Point2d((maxPoint.X - minPoint.X) / 2 + minPoint.X, (maxPoint.Y - minPoint.Y) / 2 + minPoint.Y).Add(new Vector2d(0, -0.15));
          vp.ViewHeight = maxPoint.Y - minPoint.Y + 0.3;
 
-         vp.Locked = true;              // ВЭ блокируется
-         vp.Draw();                     // перерисовать ВЭ
-         vp.On = true;                  // включен и видим
-         vp.Visible = true;                  
+         //vp.Locked = true;              // ВЭ блокируется         
+         //vp.On = true;                  // включен и видим
+         //vp.Visible = true;                  
       }            
    }
 }
