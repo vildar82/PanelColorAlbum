@@ -14,15 +14,18 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    {
       private ObjectId _idBtrAr;
       private string _markAR;
+      private string _markARFullName;
+      private string _markArBlockName;
       private List<Paint> _paints;
       private List<Panel> _panels;
+      private List<TileCalc> _tilesCalc;
 
-      public MarkArPanel(List<Paint> paintAR, string markAr)
+      public MarkArPanel(List<Paint> paintAR, MarkSbPanel markSb, BlockReference blRefMarkAr)
       {
          _paints = paintAR;
-         _markAR = markAr;
+         DefMarkArNames(markSb, blRefMarkAr);
          _panels = new List<Panel>();
-      }
+      }      
 
       public ObjectId IdBtrAr { get { return _idBtrAr; } }
 
@@ -34,6 +37,51 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       /// Блоки панели с такой покраской
       /// </summary>
       public List<Panel> Panels { get { return _panels; } }
+
+      public string MarkArBlockName { get { return _markArBlockName; } }
+
+      /// <summary>
+      /// Полное имя панели (Марка СБ + Марка АР)
+      /// </summary>
+      public string MarkARFullName
+      {
+         get
+         {
+            if (_markARFullName == null)
+            {
+               _markARFullName = GetMarkArFullName();
+            }
+            return _markARFullName;
+         }
+      }
+
+      public List<TileCalc> TilesCalc
+      {
+         get
+         {
+            if (_tilesCalc == null)
+            {
+               _tilesCalc = CalculateTiles();
+            }
+            return _tilesCalc;
+         }
+      }
+
+      // Подсчет плитки
+      private List<TileCalc> CalculateTiles()
+      {
+         List<TileCalc> tilesCalc = new List<TileCalc>();
+         var paintsSameColor = _paints.GroupBy(p => p.LayerName);
+         foreach (var item in paintsSameColor)
+         {
+            TileCalc tileCalc = new TileCalc();
+            tileCalc.ColorMark = item.Key;
+            tileCalc.Count = item.Count();
+            tileCalc.Pattern = item.First().Color;
+            tilesCalc.Add(tileCalc);
+         }         
+         return tilesCalc;
+      }
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
@@ -80,7 +128,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            string markArBlockName = GetMarkArBlockName(markSB);
+            string markArBlockName = GetMarkArBlockName(markSB.MarkSbBlockName);
             // Проверка нет ли уже определения блока панели Марки АР в таблице блоков чертежа
             if (bt.Has(markArBlockName))
             {
@@ -127,10 +175,27 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          return paintAR.SequenceEqual(_paints);
       }
 
-      public string GetMarkArBlockName(MarkSbPanel markSb)
+      private string GetMarkArBlockName(string markSbBlockName)
       {
-         return markSb.MarkSbBlockName + "_" + _markAR;
+         if (_markArBlockName == null)
+         {
+            _markArBlockName = markSbBlockName + "_" + _markAR;
+         }
+         return _markArBlockName;
       }
+      private string GetMarkArFullName()
+      {
+         return _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);
+      }
+
+      private void DefMarkArNames(MarkSbPanel markSB, BlockReference bkRefMarkAR)
+      {
+         
+         _markAR = "";
+         _markARFullName ="";
+         _markArBlockName ="";
+      }
+
       // Замена вхождений блоков СБ на блоки АР
       public void ReplaceBlocksSbOnAr()
       {

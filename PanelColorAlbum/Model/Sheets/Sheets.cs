@@ -18,6 +18,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       public Sheets (Album album)
       {
          _album = album;
+         _sheetsMarkSB = new List<SheetMarkSB>();
       }
 
       // Создание альбома панелей

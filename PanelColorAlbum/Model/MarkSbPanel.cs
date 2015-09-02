@@ -73,7 +73,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                   //TODO: Определение покраски панели (Марки АР)
                   List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, colorAreaModel.ColorAreasForeground, colorAreaModel.ColorAreasBackground);
                   // Добавление панели АР в список панелей для Марки СБ
-                  markSb.AddPanelAR(paintAR, blRefPanel);
+                  markSb.AddPanelAR(paintAR, blRefPanel, markSb);
                }
             }
             t.Commit();
@@ -188,13 +188,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Добавление панели АР по списку ее покраски
-      private void AddPanelAR(List<Paint> paintAR, BlockReference blRefPanel)
+      private void AddPanelAR(List<Paint> paintAR, BlockReference blRefPanel, MarkSbPanel markSb)
       {
          // Проверка нет ли уже такой марки покраси АР
          MarkArPanel panelAR = HasPanelAR(paintAR);
          if (panelAR == null)
          {
-            panelAR = new MarkArPanel(paintAR, GetMarkArNextName());
+            panelAR = new MarkArPanel(paintAR, markSb, blRefPanel);
             _marksAR.Add(panelAR);
          }
          panelAR.AddBlockRefPanel(blRefPanel);

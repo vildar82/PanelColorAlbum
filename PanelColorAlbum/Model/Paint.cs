@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autodesk.AutoCAD.Colors;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -10,16 +11,23 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class Paint
    {
       // Имя слоя. (для каждой краски свой слой с именем марки краски)
-      private string _layerName;  
+      private string _layerName;
+      private Color _color;
       
-      public Paint (string layerName)
+      public Paint (string layerName, Color color)
       {
          _layerName = layerName;
+         _color = color;
       }
 
       public string LayerName
       {
          get { return _layerName; }         
+      }
+
+      public Color Color
+      {
+         get { return _color; }
       }
    }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 
@@ -39,7 +40,17 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          Paint paint = _colors.Find(c => c.LayerName == layerName);
          if (paint == null)
          {
-            paint = new Paint(layerName);
+            // Определение цвета слоя
+            Database db = HostApplicationServices.WorkingDatabase;
+            Color color = null;
+            using (var lt = db.LayerTableId.GetObject(OpenMode.ForRead) as LayerTable)
+            {
+               using (var ltr = lt[layerName].GetObject(OpenMode.ForRead) as LayerTableRecord)
+               {
+                  color = ltr.Color; 
+               }
+            }
+            paint = new Paint(layerName, color);
             _colors.Add(paint);
          }
          return paint;
@@ -65,9 +76,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Проверка чертежа
          Inspector inspector = new Inspector();
          if (!inspector.CheckDrawing())
-         {
-            Editor ed = _doc.Editor;
-            ed.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше."); 
+         {            
+            _doc.Editor.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше."); 
             return;
          }
 
@@ -75,7 +85,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel);
 
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
-         inspector.CheckAllTileArePainted(_marksSB);
+         if (!inspector.CheckAllTileArePainted(_marksSB))
+         {
+            _doc.Editor.WriteMessage("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");
+            return;
+         }
 
          // Создание определений блоков панелей покраски МаркиАР       
          CreatePanelsMarkAR();

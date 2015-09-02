@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -11,15 +13,53 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class SheetMarkSB
    {
       // Файл панели Марки СБ с листами Маркок АР.
-      List<MarkArPanel> _sheetsMarkAR;
+      MarkSbPanel _markSB;
+      List<SheetMarkAr> _sheetsMarkAR;
       FileInfo _fileMarkSB;
       FileInfo _fileSheetTemplate;
 
-      public SheetMarkSB (MarkSbPanel markSB, DirectoryInfo albumFolder, FileInfo fileTemplateSheet)
+      public SheetMarkSB(MarkSbPanel markSB, DirectoryInfo albumFolder, FileInfo fileTemplateSheet)
       {
+         _markSB = markSB;
+         _sheetsMarkAR = new List<SheetMarkAr>();
          _fileSheetTemplate = fileTemplateSheet;
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
-         _fileMarkSB = CreateSheetMarkSB(markSB, albumFolder);
+         _fileMarkSB = CreateSheetMarkSB(_markSB, albumFolder);
+
+         // Создание листов Марок АР
+         using (Database dbMarkSB = new Database(false, true))
+         {
+            dbMarkSB.ReadDwgFile(_fileMarkSB.FullName, FileShare.ReadWrite, false, "");
+            dbMarkSB.CloseInput(true);
+            //dbMarkSB.SaveAs(_fileMarkSB.FullName, DwgVersion.Current);
+
+            // Копирование всех определений блоков марки АР в файл Марки СБ
+            CopyBtrMarksARToSheetMarkSB(_markSB, dbMarkSB);
+
+            // Создание листов Марок АР
+            Point3d pt = Point3d.Origin; 
+            foreach (var markAR in markSB.MarksAR)
+            {               
+               SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);
+               _sheetsMarkAR.Add(sheetMarkAR);
+               // Точка для вставки следующего блока Марки АР
+               pt = new Point3d(pt.X + 10000, pt.Y, 0);
+            }
+            dbMarkSB.Save();
+         }
+      }
+
+      // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
+      private void CopyBtrMarksARToSheetMarkSB(MarkSbPanel markSB, Database dbMarkSB)
+      {
+         Database dbSource = markSB.IdBtr.Database;
+         var idsCopy = new ObjectIdCollection();
+         foreach (var markAr in markSB.MarksAR)
+         {
+            idsCopy.Add(markAr.IdBtrAr);
+         }
+         IdMapping map = new IdMapping();
+         dbSource.WblockCloneObjects(idsCopy, dbMarkSB.BlockTableId, map, DuplicateRecordCloning.Replace, false);
       }
 
       // Создание файла Марки СБ

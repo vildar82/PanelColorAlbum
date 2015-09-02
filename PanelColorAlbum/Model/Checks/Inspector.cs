@@ -53,6 +53,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       private bool CheckBtrMarkAr(BlockTable bt, Transaction t)
       {
          bool res = true;
+         _markArBtrNames = new List<string>();
          foreach (var idBtr in bt)
          {
             var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;            
@@ -69,6 +70,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       public bool  CheckAllTileArePainted(List<MarkSbPanel> marksSb)
       {
          bool res = true;
+         _notPaintedTilesInMarkAR = new List<ErrorObject>();
          foreach (var markSb in marksSb)
          {
             if (markSb.MarksAR.Count == 0)
@@ -83,7 +85,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                {
                   if (paint == null)
                   {
-                     // Плитка не покрашена!                     
+                     // Плитка не покрашена! 
+                     string errMsg = "Не вся плитка покрашена в блоке " + markAr.MarkArBlockName;
+                     ErrorObject errObj = new ErrorObject(errMsg, ObjectId.Null);                     
+                     _notPaintedTilesInMarkAR.Add(errObj);
+                     _ed.WriteMessage("\n" + errMsg);
+                     res = false;
+                     break;
                   }
                }
             }
