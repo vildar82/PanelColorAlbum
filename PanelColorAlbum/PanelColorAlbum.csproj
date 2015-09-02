@@ -62,16 +62,20 @@
   <ItemGroup>
     <Compile Include="Commands.cs" />
     <Compile Include="Model\Album.cs" />
+    <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\ColorArea.cs" />
     <Compile Include="Model\ColorAreaModel.cs" />
     <Compile Include="Model\Geometry.cs" />
-    <Compile Include="Model\Inspector.cs" />
+    <Compile Include="Model\Checks\Inspector.cs" />
     <Compile Include="Model\Lib.cs" />
     <Compile Include="Model\MarkArPanel.cs" />
     <Compile Include="Model\MarkSbPanel.cs" />
     <Compile Include="Model\Options.cs" />
     <Compile Include="Model\Paint.cs" />
     <Compile Include="Model\Panel.cs" />
+    <Compile Include="Model\Sheets\SheetMarkAr.cs" />
+    <Compile Include="Model\Sheets\SheetMarkSB.cs" />
+    <Compile Include="Model\Sheets\Sheets.cs" />
     <Compile Include="Model\Test.cs" />
     <Compile Include="Model\Tile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +83,7 @@
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

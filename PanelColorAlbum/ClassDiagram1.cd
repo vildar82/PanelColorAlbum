@@ -31,7 +31,7 @@
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.MarkArPanel">
     <Position X="6.25" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAgAABEAAEoAAAAggEAAEAAAAggAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAgAABEAAEoAAAAggFAAEAAAAogAA=</HashCode>
       <FileName>Model\MarkArPanel.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -80,7 +80,7 @@
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Commands">
     <Position X="0.5" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAEAAAAAAAAAAACAAAAAABAAIAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAACAAAAAAJAAAAAAAAAgAAAA=</HashCode>
       <FileName>Commands.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -88,7 +88,7 @@
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.MarkSbPanel">
     <Position X="4.25" Y="0.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>BAAAAAAAAAJEABAAgAABAIAAAVAAACKAEAAAAAFKgCA=</HashCode>
+      <HashCode>BAIAAAAAAAJEABAAgAQBAIAAAVAAIDKAEAAAAAFKgCA=</HashCode>
       <FileName>Model\MarkSbPanel.cs</FileName>
     </TypeIdentifier>
   </Class>

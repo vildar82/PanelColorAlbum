@@ -45,6 +45,23 @@ namespace Vil.Acad.AR.PanelColorAlbum
          }
       }
 
+      // Создание альбома колористических решений панелей (Альбома панелей).
+      [CommandMethod("PIK", "AlbumPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      public void AlbumPanelsCommand()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         using (var DocLock = doc.LockDocument())
+         {
+            if (_album == null)
+            {
+               doc.Editor.WriteMessage("\nСначала нужно выполнить команду PaintPanels для покраски плитки.");               
+            }
+            else
+            {
+               _album.CreateAlbum(); 
+            }
+         }
+      }
 
       void IExtensionApplication.Initialize()
       {
@@ -56,7 +73,10 @@ namespace Vil.Acad.AR.PanelColorAlbum
             return;
          }
          Editor ed = doc.Editor;
-         string msg = "\n Команда PaintPanels - покраска блоков панелей.";
+         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." +                      
+                      "\nКоманды: PaintPanels - покраска блоков панелей." +
+                      "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
+                      "\nAlbumPanels - создание альбома панелей.";
          ed.WriteMessage(msg);
       }
 

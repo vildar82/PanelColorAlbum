@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.Lib
 {
@@ -49,5 +50,23 @@ namespace Vil.Acad.Lib
          }
          return idBtrCopy;
       }
+
+      /// <summary>
+      /// Проверка дублирования вхождений блоков
+      /// </summary>
+      /// <param name="blk1"></param>
+      /// <param name="blk2"></param>
+      /// <returns></returns>
+      public static bool Duplicate(this BlockReference blk1, BlockReference blk2)
+      {
+         Tolerance tol = new Tolerance(1e-6, 1e-6);
+         return
+             blk1.OwnerId == blk2.OwnerId &&
+             blk1.Name == blk2.Name &&
+             blk1.Layer == blk2.Layer &&
+             Math.Round(blk1.Rotation, 5) == Math.Round(blk2.Rotation, 5) &&
+             blk1.Position.IsEqualTo(blk2.Position, tol) &&
+             blk1.ScaleFactors.IsEqualTo(blk2.ScaleFactors, tol);
+      }      
    }   
 }

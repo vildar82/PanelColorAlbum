@@ -18,7 +18,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       private ColorAreaModel _colorAreaModel;
       private Database _db;
       private Document _doc;
-      private List<MarkSbPanel> _marksSb;
+      private List<MarkSbPanel> _marksSB;
 
       public Album()
       {
@@ -28,6 +28,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       public static Options Options { get { return _options; } }
+
+      public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
+
+      public Document Doc { get { return _doc; } }
+
       // Поиск цвета в списке цветов альбома
       public static Paint FindPaint(string layerName)
       {
@@ -67,13 +72,31 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
 
          // Определение покраски панелей.
-         _marksSb = MarkSbPanel.GetMarksSB(_colorAreaModel);
+         _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel);
+
+         // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
+         inspector.CheckAllTileArePainted(_marksSB);
 
          // Создание определений блоков панелей покраски МаркиАР       
          CreatePanelsMarkAR();
 
          // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
          ReplaceBlocksMarkSbOnMarkAr();
+      }
+
+      // Создание альбома панелей
+      public void CreateAlbum()
+      {
+         // Создание папки с файлами марок СБ, в которых создать листы панелей Марок АР.
+         if (_marksSB.Count==0)
+         {
+            _doc.Editor.WriteMessage("\nНе определены панели марок СБ.");  
+         }
+         else
+         {            
+            Sheets sheets = new Sheets(this);
+            sheets.CreateAlbum(); 
+         }
       }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
@@ -155,7 +178,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Создание определений блоков панелей марки АР
       private void CreatePanelsMarkAR()
       {
-         foreach (var markSB in _marksSb)
+         foreach (var markSB in _marksSB)
          {
             foreach (var markAR in markSB.MarksAR)
             {
@@ -167,7 +190,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Замена вхождений блоков панелей Марки СБ на панели Марки АР
       private void ReplaceBlocksMarkSbOnMarkAr()
       {
-         foreach (var markSb in _marksSb)
+         foreach (var markSb in _marksSB)
          {
             markSb.ReplaceBlocksSbOnAr();
          }

@@ -28,6 +28,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public string MarkAR { get { return _markAR; } }
 
+      public List<Paint> Paints { get { return _paints; } }      
+
+      /// <summary>
+      /// Блоки панели с такой покраской
+      /// </summary>
+      public List<Panel> Panels { get { return _panels; } }
+
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {

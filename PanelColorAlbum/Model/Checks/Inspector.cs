@@ -15,6 +15,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       Database _db;
       Editor _ed;
       List<string> _markArBtrNames;
+      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
+      List<ErrorObject> _notPaintedTilesInMarkAR;
 
       public Inspector ()
       {
@@ -32,7 +34,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
 
             // 1. Не должно быть блоков Марки АР.
-            _markArBtrNames = CheckBtrMarkAr(bt, t);
+            CheckBtrMarkAr(bt, t);
 
             t.Commit();
          }
@@ -48,18 +50,45 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Проверка наличия определений блоков Марки АР
-      private List<string> CheckBtrMarkAr(BlockTable bt, Transaction t)
+      private bool CheckBtrMarkAr(BlockTable bt, Transaction t)
       {
-         List<string> btrsMarkAr = new List<string>();
+         bool res = true;
          foreach (var idBtr in bt)
          {
             var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;            
             if (MarkSbPanel.IsBlockNamePanelMarkAr(btr.Name))
             {               
-               btrsMarkAr.Add(btr.Name);
+               _markArBtrNames.Add(btr.Name);
+               res = false;
             }
          }
-         return btrsMarkAr;
+         return res;
+      }
+
+      // Проверка, все ли плитки покрашены
+      public bool  CheckAllTileArePainted(List<MarkSbPanel> marksSb)
+      {
+         bool res = true;
+         foreach (var markSb in marksSb)
+         {
+            if (markSb.MarksAR.Count == 0)
+            {
+               // Такого не должно быть. Марка СБ есть, а марок АР нет.
+               _ed.WriteMessage(string.Format("\nЕсть Марка СБ {0}, а Марки АР не определены. Ошибка в программе(.", markSb.MarkSb));
+            }
+
+            foreach (var markAr in markSb.MarksAR)
+            {
+               foreach (var paint in markAr.Paints)
+               {
+                  if (paint == null)
+                  {
+                     // Плитка не покрашена!                     
+                  }
+               }
+            }
+         }
+         return res;
       }
    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
@@ -45,6 +46,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }
 
+      public string MarkSb { get { return _markSb; } }                  
+
       // Определение покраски панелей текущего чертежа (в Модели)
       public static List<MarkSbPanel> GetMarksSB(ColorAreaModel colorAreaModel)
       {
@@ -76,7 +79,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             t.Commit();
          }
          return _marksSb;
-      }
+      }      
 
       // Замена вхождений блоков СБ на АР
       public void ReplaceBlocksSbOnAr()
