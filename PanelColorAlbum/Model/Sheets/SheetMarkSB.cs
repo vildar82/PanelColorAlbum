@@ -42,7 +42,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);               
                _sheetsMarkAR.Add(sheetMarkAR);
                // Точка для вставки следующего блока Марки АР
-               pt = new Point3d(pt.X + 10000, pt.Y, 0);
+               pt = new Point3d(pt.X + 15000, pt.Y, 0);
             }
 
             //// Удаление шаблона листа из фала Марки СБ

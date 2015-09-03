@@ -25,7 +25,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          _options = new Options();
          _doc = Application.DocumentManager.MdiActiveDocument;
-         _db = _doc.Database;
+         _db = _doc.Database;         
       }
 
       public static Options Options { get { return _options; } }
@@ -113,9 +113,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
          else
          {            
-            Sheets sheets = new Sheets(this);
+            Sheets sheets = new Sheets(this);            
+            res = sheets.CreateAlbum();
             _doc.Editor.WriteMessage("\nСоздана папка альбома панелей: " + sheets.AlbumDir);
-            res = sheets.CreateAlbum(); 
          }
          return res;
       }
