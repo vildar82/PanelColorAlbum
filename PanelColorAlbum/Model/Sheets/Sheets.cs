@@ -11,9 +11,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class Sheets
    {
       private Album _album;
-      DirectoryInfo _albumDir;
-      FileInfo _fileTemplateSheet;
+      string _albumDir;
+      string _fileTemplateSheet;
       List<SheetMarkSB> _sheetsMarkSB;
+
+      public string AlbumDir { get { return _albumDir; } }
 
       public Sheets (Album album)
       {
@@ -27,14 +29,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          bool res = true;
          // Проверка наличия файла шаблона листов
          _fileTemplateSheet = GetFileTemplateSheet();
-         if (!_fileTemplateSheet.Exists)
+         if (!File.Exists(_fileTemplateSheet))
          {
             // Не найден файл шаблона листа. Продолжение невозможно.
-            _album.Doc.Editor.WriteMessage("\nНе найден файл шаблона для листов панелей - " + _fileTemplateSheet.FullName);
+            _album.Doc.Editor.WriteMessage("\nНе найден файл шаблона для листов панелей - " + _fileTemplateSheet);
             return false;
          }
 
-         // Создаение папки для альбома панелей
+         // Создаение папки для альбома панелей         
          CreateAlbumFolder();
 
          foreach (var markSB in _album.MarksSB)
@@ -43,13 +45,12 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             SheetMarkSB sheetMarkSb = new SheetMarkSB(markSB, _albumDir, _fileTemplateSheet);
             _sheetsMarkSB.Add(sheetMarkSb);
          }
-
          return res;
       }
 
-      private FileInfo GetFileTemplateSheet()
+      private string  GetFileTemplateSheet()
       {
-         return new FileInfo(Album.Options.SheetTemplateFile);         
+         return Album.Options.SheetTemplateFile;         
       }     
 
       // Создание папки Альбома панелей
@@ -58,13 +59,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Папка альбома панеелей
          string albumFolderName = "Альбом панелей";
          string curDwgFacadeFolder = Path.GetDirectoryName(_album.Doc.Name);
-         _albumDir = new DirectoryInfo(Path.Combine (curDwgFacadeFolder, albumFolderName));
-         if (_albumDir.Exists)
+         _albumDir = Path.Combine (curDwgFacadeFolder, albumFolderName);
+         if (Directory.Exists(_albumDir))
          {
             // Что делать? Удалить? спросить уу пользователя?
-            _albumDir.Delete(true);
+            Directory.Delete(_albumDir, true);            
          }
-         _albumDir.Create();
+         Directory.CreateDirectory(_albumDir);
       }
    }
 }

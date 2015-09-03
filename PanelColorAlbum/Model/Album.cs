@@ -57,8 +57,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Покраска панелей в модели (по блокам зон покраски)
-      public void PaintPanels()
+      public bool PaintPanels()
       {
+         bool res = true;
          // В Модели должны быть расставлены панели Марки СБ и зоны покраски.
          // сброс списка цветов.
          _colors = new List<Paint>();
@@ -70,7 +71,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          if (!Resetblocks())
          {
             // Ошибки при сбросе блоков. В ком строке описаны причины. Нужно исправить чертеж.
-            return;
+            return false;
          }
 
          // Проверка чертежа
@@ -78,7 +79,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          if (!inspector.CheckDrawing())
          {            
             _doc.Editor.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше."); 
-            return;
+            return false;
          }
 
          // Определение покраски панелей.
@@ -88,7 +89,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          if (!inspector.CheckAllTileArePainted(_marksSB))
          {
             _doc.Editor.WriteMessage("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");
-            return;
+            return false;
          }
 
          // Создание определений блоков панелей покраски МаркиАР       
@@ -96,21 +97,27 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
          // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
          ReplaceBlocksMarkSbOnMarkAr();
+
+         return res;
       }
 
       // Создание альбома панелей
-      public void CreateAlbum()
+      public bool CreateAlbum()
       {
+         bool res = true;
          // Создание папки с файлами марок СБ, в которых создать листы панелей Марок АР.
          if (_marksSB.Count==0)
          {
+            res = false;
             _doc.Editor.WriteMessage("\nНе определены панели марок СБ.");  
          }
          else
          {            
             Sheets sheets = new Sheets(this);
-            sheets.CreateAlbum(); 
+            _doc.Editor.WriteMessage("\nСоздана папка альбома панелей: " + sheets.AlbumDir);
+            res = sheets.CreateAlbum(); 
          }
+         return res;
       }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
