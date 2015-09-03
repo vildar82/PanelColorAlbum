@@ -35,8 +35,9 @@ namespace Vil.Acad.Lib
             }
             else
             {  
-               var btrCopy = btrSource.Clone() as BlockTableRecord;               
+               var btrCopy = btrSource.Clone () as BlockTableRecord;               
                btrCopy.Name = name;
+               bt.UpgradeOpen();
                idBtrCopy = bt.Add(btrCopy);
                t.AddNewlyCreatedDBObject(btrCopy, true);
                // Копирование объектов блока
@@ -46,7 +47,7 @@ namespace Vil.Acad.Lib
                   ids.Add(idEnt);
                }
                IdMapping map = new IdMapping();
-               db.DeepCloneObjects(ids, idBtrCopy, map, true);
+               db.DeepCloneObjects(ids, idBtrCopy, map, false);
             }
             t.Commit();
          }

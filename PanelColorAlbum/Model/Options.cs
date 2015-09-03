@@ -2,7 +2,7 @@
 {
    public class Options
    {
-      public string BlockPanelPrefixName = "АКР_Панель";
+      public string BlockPanelPrefixName = "АКР_Панель_";
       public string BlockColorAreaName = "АКР_Зона-покраски";
       public string BlockTileName = "АКР_Плитка";
       /// <summary>

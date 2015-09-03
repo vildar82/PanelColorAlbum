@@ -162,9 +162,19 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          return res;
       }
 
+      /// <summary>
+      /// Возвращает марку панели из имени блока панели (для панелей Марки СБ и Марок АР).
+      /// </summary>
+      /// <param name="blName">Имя блока панели</param>
+      /// <returns>марка панели (СБ или СБ+АР)</returns>
+      public static string GetPanelMarkFromBlockName(string blName)
+      {
+         return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
+      }
+
       public static string GetMarkSbBlockName(string markSb)
       {
-         return Album.Options.BlockPanelPrefixName + "_" + markSb;
+         return Album.Options.BlockPanelPrefixName + markSb;
       }
 
       // Определение марки СБ
@@ -174,7 +184,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          if (IsBlockNamePanel(blName))
          {
             // Хвостовая часть
-            markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);
+            markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length);
             // Если есть "_", то после него идет уже МаркаАР. Она нам не нужна.
             var unders = markSb.Split('_');
             if (unders.Length > 1)

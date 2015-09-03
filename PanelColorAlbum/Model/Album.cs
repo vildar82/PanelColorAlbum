@@ -95,8 +95,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Создание определений блоков панелей покраски МаркиАР
          res = CreatePanelsMarkAR();
 
-         //// Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
-         //ReplaceBlocksMarkSbOnMarkAr();
+         // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
+         ReplaceBlocksMarkSbOnMarkAr();
 
          // Добавление подписей к панелям
          CaptionPanels();
@@ -232,9 +232,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             bool hasMark = false;
             foreach (ObjectId idBtr in bt)
             {
-               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;               
                if (MarkSbPanel.IsBlockNamePanel(btr.Name))
                {
+                  string panelMark = MarkSbPanel.GetPanelMarkFromBlockName(btr.Name);
                   foreach (ObjectId idEnt in btr)
                   {
                      if (idEnt.ObjectClass.Name == "AcDbText")
@@ -242,10 +243,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                         var text = t.GetObject(idEnt, OpenMode.ForRead) as DBText;
                         if (text.Layer == Album.Options.LayerForMarks)
                         {
-                           if (text.TextString != btr.Name)
+                           if (text.TextString != panelMark)
                            {
                               text.UpgradeOpen();
-                              text.TextString = btr.Name;
+                              text.TextString = panelMark;
                               //Марка найдена
                               hasMark = true;
                               break;
@@ -257,8 +258,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                   if (!hasMark)
                   {
                      DBText text = new DBText();
-                     text.TextString = btr.Name;
-                     text.Height = 200;
+                     text.TextString = panelMark;
+                     text.Height = 250;
                      text.Annotative = AnnotativeStates.False;
                      text.Layer = GetLayerForMark();
                      text.Position = Point3d.Origin;

@@ -170,7 +170,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          _markAR = "АР-" + markSB.MarksAR.Count.ToString();
          _markArBlockName = bkRefMarkAR.Name + "_" + _markAR;
-         _markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);
+         _markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
       }
 
       // Замена вхождений блоков СБ на блоки АР
