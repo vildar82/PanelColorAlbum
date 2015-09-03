@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -16,8 +11,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
       private MarkArPanel _markAR;
+
       private Point3d _pt;
-      private Database _dbMarkSB;      
+      private Database _dbMarkSB;
 
       // Создание листа Марки АР
       public SheetMarkAr(MarkArPanel markAR, Database dbMarkSB, Point3d pt)
@@ -53,7 +49,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
          // Расчет плитки
          var tilesCalc = _markAR.TilesCalc;
-         // Установка размера таблицы. 
+         // Установка размера таблицы.
          if (table.Rows.Count < tilesCalc.Count + 3)
          {
             table.SetSize(tilesCalc.Count + 3, table.Columns.Count);
@@ -66,17 +62,17 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
          // Заполнение строк таблицы
          foreach (var tileCalc in tilesCalc)
-         {            
+         {
             table.Cells[row, 1].TextString = tileCalc.ColorMark;
             table.Cells[row, 2].BackgroundColor = tileCalc.Pattern;
-            table.Cells[row, 3].TextString = tileCalc.Count.ToString ();
+            table.Cells[row, 3].TextString = tileCalc.Count.ToString();
             table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
             table.Cells[row, 4].TextString = tileCalc.TotalArea.ToString();
             table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
             row++;
          }
 
-         // Строка итогов.         
+         // Строка итогов.
          var totalCount = tilesCalc.Sum(c => c.Count);
          var totalArea = tilesCalc.Sum(c => c.TotalArea);
          // Объединить строку итогов (1,2 и 3 столбцы).
@@ -84,7 +80,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          table.Cells[row, 0].TextString = "Итого на панель";
          table.Cells[row, 0].Alignment = CellAlignment.MiddleCenter;
          table.Cells[row, 3].TextString = totalCount.ToString();
-         table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter; 
+         table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
          table.Cells[row, 4].TextString = totalArea.ToString();
          table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
       }
@@ -109,19 +105,19 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Направление видового экрана на блок Марки АР
       private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t)
       {
-         ObjectId idBtrLayout = ObjectId.Null; 
+         ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
          var idVP = GetViewport(idLayoutMarkAR, t);
          var vp = t.GetObject(idVP, OpenMode.ForWrite) as Viewport;
-         idBtrLayout = vp.OwnerId; 
+         idBtrLayout = vp.OwnerId;
          var blRef = t.GetObject(idBlRefMarkAR, OpenMode.ForRead) as BlockReference;
-         // Определение границ блока 
+         // Определение границ блока
          Extents3d bounds = GetBoundsBlRefMarkAR(blRef);
          ViewPortDirection(vp, bounds);
          return idBtrLayout;
       }
 
-      // Определение границ блока 
+      // Определение границ блока
       private Extents3d GetBoundsBlRefMarkAR(BlockReference blRef)
       {
          return blRef.Bounds.Value;
@@ -130,7 +126,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Поиск видового экрана на листе
       private ObjectId GetViewport(ObjectId idLayoutMarkAR, Transaction t)
       {
-         ObjectId idVp = ObjectId.Null; 
+         ObjectId idVp = ObjectId.Null;
          var layoutMarkAR = t.GetObject(idLayoutMarkAR, OpenMode.ForRead) as Layout;
          //var idsVPid = layoutMarkAR.GetViewports(); // 0
          var btrLayout = t.GetObject(layoutMarkAR.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
@@ -140,10 +136,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             var vp = t.GetObject(idEnt, OpenMode.ForRead) as Viewport;
             if (vp.Layer != "АР_Видовые экраны") continue;
             idVp = idEnt;
-            break;                                 
+            break;
          }
          return idVp;
-      }      
+      }
 
       // Создание листа для Марки АР
       private ObjectId CreateLayoutMarkAR()
@@ -152,7 +148,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Копирование листа шаблона
          Database dbOrig = HostApplicationServices.WorkingDatabase;
          HostApplicationServices.WorkingDatabase = _dbMarkSB;
-         LayoutManager lm = LayoutManager.Current;         
+         LayoutManager lm = LayoutManager.Current;
          if (lm.CurrentLayout == Album.Options.SheetTemplateLayoutNameForMarkAR)
          {
             lm.RenameLayout(lm.CurrentLayout, _markAR.MarkARPanelFullName);
@@ -168,7 +164,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       private ObjectId InsertBlRefMarkAR()
       {
-         ObjectId idBlRefMarkAR = ObjectId.Null; 
+         ObjectId idBlRefMarkAR = ObjectId.Null;
          using (var bt = _dbMarkSB.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             using (var blRefMarkAR = new BlockReference(_pt, bt[_markAR.MarkArBlockName]))
@@ -191,12 +187,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       /* maxPoint - правая верхняя точка ВЭ в пространстве модели                                                         */
       /* startPoint - стартовая точка ВЭ: центр видового экрана                                                           */
       /*------------------------------------------------------------------------------------------------------------------*/
+
       private void ViewPortDirection(Viewport vp, Extents3d bounds)
       {
          Point3d maxPoint = bounds.MaxPoint;
          Point3d minPoint = bounds.MinPoint;
          //Point3d startPoint = new Point3d((bounds.MaxPoint.X + bounds.MinPoint.X) * 0.5,
-                                          //(bounds.MaxPoint.Y + bounds.MinPoint.Y) * 0.5, 0);
+         //(bounds.MaxPoint.Y + bounds.MinPoint.Y) * 0.5, 0);
 
          // формирование размеров видового экрана в листе
          //vp.CenterPoint = startPoint.Add(new Vector3d(0, -0.15, 0));
@@ -208,13 +205,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          vp.ViewCenter = new Point2d((maxPoint.X - minPoint.X) / 2 + minPoint.X, (maxPoint.Y - minPoint.Y) / 2 + minPoint.Y).Add(new Vector2d(0, -0.15));
          vp.ViewHeight = maxPoint.Y - minPoint.Y + 0.3;
 
-         //vp.Locked = true;              // ВЭ блокируется         
+         //vp.Locked = true;              // ВЭ блокируется
          //vp.On = true;                  // включен и видим
-         //vp.Visible = true;  
+         //vp.Visible = true;
          ObjectContextManager ocm = _dbMarkSB.ObjectContextManager;
          ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
          vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
          vp.CustomScale = 0.04;
-      }            
+      }
    }
 }

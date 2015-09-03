@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -15,17 +13,19 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    {
       // Набор цветов используемых в альбоме.
       private static List<Paint> _colors;
+
       private static Options _options;
       private ColorAreaModel _colorAreaModel;
       private Database _db;
       private Document _doc;
       private List<MarkSbPanel> _marksSB;
+      private ObjectId _idLayerMarks = ObjectId.Null;
 
       public Album()
       {
          _options = new Options();
          _doc = Application.DocumentManager.MdiActiveDocument;
-         _db = _doc.Database;         
+         _db = _doc.Database;
       }
 
       public static Options Options { get { return _options; } }
@@ -47,7 +47,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             {
                using (var ltr = lt[layerName].GetObject(OpenMode.ForRead) as LayerTableRecord)
                {
-                  color = ltr.Color; 
+                  color = ltr.Color;
                }
             }
             paint = new Paint(layerName, color);
@@ -77,8 +77,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Проверка чертежа
          Inspector inspector = new Inspector();
          if (!inspector.CheckDrawing())
-         {            
-            _doc.Editor.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше."); 
+         {
+            _doc.Editor.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше.");
             return false;
          }
 
@@ -92,11 +92,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             return false;
          }
 
-         // Создание определений блоков панелей покраски МаркиАР       
-         CreatePanelsMarkAR();
+         // Создание определений блоков панелей покраски МаркиАР
+         res = CreatePanelsMarkAR();
 
-         // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
-         ReplaceBlocksMarkSbOnMarkAr();
+         //// Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
+         //ReplaceBlocksMarkSbOnMarkAr();
+
+         // Добавление подписей к панелям
+         CaptionPanels();
 
          return res;
       }
@@ -106,14 +109,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          bool res = true;
          // Создание папки с файлами марок СБ, в которых создать листы панелей Марок АР.
-         if (_marksSB.Count==0)
+         if (_marksSB.Count == 0)
          {
             res = false;
-            _doc.Editor.WriteMessage("\nНе определены панели марок СБ.");  
+            _doc.Editor.WriteMessage("\nНе определены панели марок СБ.");
          }
          else
-         {            
-            Sheets sheets = new Sheets(this);            
+         {
+            Sheets sheets = new Sheets(this);
             res = sheets.CreateAlbum();
             _doc.Editor.WriteMessage("\nСоздана папка альбома панелей: " + sheets.AlbumDir);
          }
@@ -130,20 +133,20 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
          bool res = true;
 
-         using (var t = _db.TransactionManager.StartTransaction() )
-         {            
+         using (var t = _db.TransactionManager.StartTransaction())
+         {
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
             var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-            
+
             foreach (ObjectId idEnt in ms)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   if (MarkSbPanel.IsBlockNamePanel(blRef.Name))
-                  {                     
-                     // Если это панель марки АР, то заменяем на панель марки СБ.                     
-                     if (MarkSbPanel.IsBlockNamePanelMarkAr (blRef.Name) )
+                  {
+                     // Если это панель марки АР, то заменяем на панель марки СБ.
+                     if (MarkSbPanel.IsBlockNamePanelMarkAr(blRef.Name))
                      {
                         string markSb = MarkSbPanel.GetMarkSbName(blRef.Name);
                         string markSbBlName = MarkSbPanel.GetMarkSbBlockName(markSb);
@@ -151,7 +154,6 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                         {
                            // Нет определения блока марки СБ.
                            // Такое возможно, если после покраски панелей, сделать очистку чертежа (блоки марки СБ удалятся).
-                           //TODO: Создать блоки марки СБ из Марки АР. Но, зоны покраски внутри бков АР удалены.
                            MarkSbPanel.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);
                            Editor ed = _doc.Editor;
                            ed.WriteMessage("\nНет определения блока для панели Марки СБ " + markSbBlName +
@@ -175,9 +177,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
                if (MarkSbPanel.IsBlockNamePanel(btr.Name))
-               {                  
+               {
                   // Если это блок панели Марки АР
-                  if (MarkSbPanel.IsBlockNamePanelMarkAr (btr.Name))
+                  if (MarkSbPanel.IsBlockNamePanelMarkAr(btr.Name))
                   {
                      // Блок Марки АР.
                      var idsBlRef = btr.GetBlockReferenceIds(false, true);
@@ -196,16 +198,19 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
          return res;
       }
+
       // Создание определений блоков панелей марки АР
-      private void CreatePanelsMarkAR()
+      private bool CreatePanelsMarkAR()
       {
+         bool res = true;
          foreach (var markSB in _marksSB)
          {
             foreach (var markAR in markSB.MarksAR)
             {
-               markAR.CreateBlock(markSB);
+               res = markAR.CreateBlock(markSB);
             }
          }
+         return res;
       }
 
       // Замена вхождений блоков панелей Марки СБ на панели Марки АР
@@ -215,6 +220,86 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          {
             markSb.ReplaceBlocksSbOnAr();
          }
+      }
+
+      // Добавление подписи имени марки панели в блоки панелей в чертеже
+      public void CaptionPanels()
+      {
+         // Подпись в виде текста на слое АР_Марки
+         using (var t = _db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            bool hasMark = false;
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (MarkSbPanel.IsBlockNamePanel(btr.Name))
+               {
+                  foreach (ObjectId idEnt in btr)
+                  {
+                     if (idEnt.ObjectClass.Name == "AcDbText")
+                     {
+                        var text = t.GetObject(idEnt, OpenMode.ForRead) as DBText;
+                        if (text.Layer == Album.Options.LayerForMarks)
+                        {
+                           if (text.TextString != btr.Name)
+                           {
+                              text.UpgradeOpen();
+                              text.TextString = btr.Name;
+                              //Марка найдена
+                              hasMark = true;
+                              break;
+                           } 
+                        }
+                     }
+                  }
+                  // Если марки нет, то создаем ее.
+                  if (!hasMark)
+                  {
+                     DBText text = new DBText();
+                     text.TextString = btr.Name;
+                     text.Height = 200;
+                     text.Annotative = AnnotativeStates.False;
+                     text.Layer = GetLayerForMark();
+                     text.Position = Point3d.Origin;
+                     // Точка вставки и выравнивание ???
+                     btr.UpgradeOpen();
+                     btr.AppendEntity(text);
+                     t.AddNewlyCreatedDBObject(text, true);
+                  }
+               }
+            }
+            t.Commit();
+         }
+      }
+
+      // Получение слоя для марок (АР_Марки)
+      private string GetLayerForMark()
+      {         
+         // Если уже был создан слой, то возвращаем его. Опасно, т.к. перед повторным запуском команды покраски, могут удалить/переименовать слой марок.
+         if (_idLayerMarks == ObjectId.Null)
+         {            
+            using (var t = _db.TransactionManager.StartTransaction() )
+            {
+               var lt = t.GetObject(_db.LayerTableId, OpenMode.ForRead) as LayerTable;
+               if (lt.Has(Album.Options.LayerForMarks))
+               {
+                  _idLayerMarks = lt[Album.Options.LayerForMarks];
+               }
+               else
+               {
+                  // Если слоя нет, то он создается.
+                  var ltrMarks = new LayerTableRecord();
+                  ltrMarks.Name = Album.Options.LayerForMarks;
+                  ltrMarks.IsPlottable = false;
+                  lt.UpgradeOpen();
+                  _idLayerMarks = lt.Add(ltrMarks);
+                  t.AddNewlyCreatedDBObject(ltrMarks, true);                  
+               }
+               t.Commit();
+            }
+         }
+         return Album.Options.LayerForMarks;
       }
    }
 }

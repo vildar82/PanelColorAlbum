@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -13,10 +9,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class SheetMarkSB
    {
       // Файл панели Марки СБ с листами Маркок АР.
-      MarkSbPanel _markSB;
-      List<SheetMarkAr> _sheetsMarkAR;
-      string _fileMarkSB;
-      string _fileSheetTemplate;      
+      private MarkSbPanel _markSB;
+
+      private List<SheetMarkAr> _sheetsMarkAR;
+      private string _fileMarkSB;
+      private string _fileSheetTemplate;
 
       public SheetMarkSB(MarkSbPanel markSB, string albumFolder, string fileTemplateSheet)
       {
@@ -26,7 +23,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateSheetMarkSB(_markSB, albumFolder);
 
-         // Создание листов Марок АР         
+         // Создание листов Марок АР
          using (Database dbMarkSB = new Database(false, true))
          {
             dbMarkSB.ReadDwgFile(_fileMarkSB, FileShare.ReadWrite, false, "");
@@ -39,7 +36,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             Point3d pt = Point3d.Origin;
             foreach (var markAR in markSB.MarksAR)
             {
-               SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);               
+               SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);
                _sheetsMarkAR.Add(sheetMarkAR);
                // Точка для вставки следующего блока Марки АР
                pt = new Point3d(pt.X + 15000, pt.Y, 0);
@@ -53,13 +50,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       //private void DeleteTemplateLayout(Database dbMarkSB)
-      //{         
+      //{
       //   Database dbOrig = HostApplicationServices.WorkingDatabase;
       //   HostApplicationServices.WorkingDatabase = dbMarkSB;
       //   LayoutManager lm = LayoutManager.Current;
       //   lm.CurrentLayout = _markSB.MarksAR[0].MarkARPanelFullName;
-      //   lm.DeleteLayout (Album.Options.SheetTemplateLayoutNameForMarkAR);         
-      //   HostApplicationServices.WorkingDatabase = dbOrig;         
+      //   lm.DeleteLayout (Album.Options.SheetTemplateLayoutNameForMarkAR);
+      //   HostApplicationServices.WorkingDatabase = dbOrig;
       //}
 
       // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
@@ -76,7 +73,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Создание файла Марки СБ
-      private string CreateSheetMarkSB(MarkSbPanel markSB, string  albumFolder)
+      private string CreateSheetMarkSB(MarkSbPanel markSB, string albumFolder)
       {
          string fileDest = Path.Combine(albumFolder, markSB.MarkSb + ".dwg");
          File.Copy(_fileSheetTemplate, fileDest);

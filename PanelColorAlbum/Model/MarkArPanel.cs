@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
@@ -25,13 +23,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          _paints = paintAR;
          DefMarkArNames(markSb, blRefMarkAr);
          _panels = new List<Panel>();
-      }      
+      }
 
       public ObjectId IdBtrAr { get { return _idBtrAr; } }
 
       public string MarkAR { get { return _markAR; } }
 
-      public List<Paint> Paints { get { return _paints; } }      
+      public List<Paint> Paints { get { return _paints; } }
 
       /// <summary>
       /// Блоки панели с такой покраской
@@ -69,7 +67,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             tileCalc.Count = item.Count();
             tileCalc.Pattern = item.First().Color;
             tilesCalc.Add(tileCalc);
-         }         
+         }
          return tilesCalc;
       }
 
@@ -90,8 +88,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                paintAR = ColorArea.GetPaint(boundsTileInBlRef, colorAreasForeground, colorAreasBackground);
                if (paintAR == null)
                {
-                  //TODO: Ошибка. Не удалось определить покраску плитки.                  
-                  Debug.Assert(paintAR == null, "Не удалось определить покраску плитки.");
+                  //Ошибка. Не удалось определить покраску плитки.???
+                  //В итоге, будет проверка, все ли плитки покрашены. Поэтому тут можно ничего ене делать.
                }
             }
             else
@@ -105,24 +103,27 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
-         //TODO: Добавление ссылки на блок этой марки покраски
          Panel panel = new Panel(blRefPanel);
          _panels.Add(panel);
       }
 
       // Создание определения блока Марки АР
-      public void CreateBlock(MarkSbPanel markSB)
+      public bool CreateBlock(MarkSbPanel markSB)
       {
+         bool res = true;
          // Создание копии блока маркиСБ, с покраской блоков плиток
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;            
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             // Проверка нет ли уже определения блока панели Марки АР в таблице блоков чертежа
             if (bt.Has(_markArBlockName))
             {
-               //TODO: Ошибка. Не должно быть определений блоков Марки АР.
-               Debug.Assert(false, "Не должно быть определений блоков Марки АР.");
+               //Ошибка. Не должно быть определений блоков Марки АР.
+               Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
+               ed.WriteMessage("\nВ чертеже не должно быть блоков Марки АР - " + _markArBlockName);
+               ed.WriteMessage("\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");
+               return false;
             }
             var btrMarkSb = t.GetObject(markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
@@ -137,7 +138,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                   if (blRef.Name == Album.Options.BlockTileName)
                   {
                      // это блок плитки. Покраска плитки.
-                     var paintAr = _paints[i++];                     
+                     var paintAr = _paints[i++];
                      if (paintAr == null)
                      {
                         blRef.Layer = "0";
@@ -145,30 +146,31 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                      else
                      {
                         blRef.Layer = paintAr.LayerName;
-                     }                     
+                     }
                   }
                   else if (Lib.Blocks.EffectiveName(blRef) == Album.Options.BlockColorAreaName)
                   {
-                     // Блок зоны покраски. Удаляем его                     
+                     // Блок зоны покраски. Удаляем его
                      blRef.Erase(true);
                   }
                }
             }
             t.Commit();
          }
+         return res;
       }
 
       public bool EqualPaint(List<Paint> paintAR)
       {
          // ??? сработает такое сравнение списков покраски?
          return paintAR.SequenceEqual(_paints);
-      }     
+      }
 
       private void DefMarkArNames(MarkSbPanel markSB, BlockReference bkRefMarkAR)
-      {         
+      {
          _markAR = "АР-" + markSB.MarksAR.Count.ToString();
          _markArBlockName = bkRefMarkAR.Name + "_" + _markAR;
-         _markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);         
+         _markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length + 1);
       }
 
       // Замена вхождений блоков СБ на блоки АР

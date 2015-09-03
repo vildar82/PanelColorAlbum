@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -11,13 +7,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class Sheets
    {
       private Album _album;
-      string _albumDir;
-      string _fileTemplateSheet;
-      List<SheetMarkSB> _sheetsMarkSB;
+      private string _albumDir;
+      private string _fileTemplateSheet;
+      private List<SheetMarkSB> _sheetsMarkSB;
 
       public string AlbumDir { get { return _albumDir; } }
 
-      public Sheets (Album album)
+      public Sheets(Album album)
       {
          _album = album;
          _sheetsMarkSB = new List<SheetMarkSB>();
@@ -36,22 +32,22 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             return false;
          }
 
-         // Создаение папки для альбома панелей         
+         // Создаение папки для альбома панелей
          CreateAlbumFolder();
 
          foreach (var markSB in _album.MarksSB)
          {
-            // Создание листов 
+            // Создание листов
             SheetMarkSB sheetMarkSb = new SheetMarkSB(markSB, _albumDir, _fileTemplateSheet);
             _sheetsMarkSB.Add(sheetMarkSb);
          }
          return res;
       }
 
-      private string  GetFileTemplateSheet()
+      private string GetFileTemplateSheet()
       {
-         return Album.Options.SheetTemplateFile;         
-      }     
+         return Album.Options.SheetTemplateFile;
+      }
 
       // Создание папки Альбома панелей
       private void CreateAlbumFolder()
@@ -59,11 +55,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Папка альбома панеелей
          string albumFolderName = "Альбом панелей";
          string curDwgFacadeFolder = Path.GetDirectoryName(_album.Doc.Name);
-         _albumDir = Path.Combine (curDwgFacadeFolder, albumFolderName);
+         _albumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
          if (Directory.Exists(_albumDir))
          {
             // Что делать? Удалить? спросить уу пользователя?
-            Directory.Delete(_albumDir, true);            
+            Directory.Delete(_albumDir, true);
          }
          Directory.CreateDirectory(_albumDir);
       }

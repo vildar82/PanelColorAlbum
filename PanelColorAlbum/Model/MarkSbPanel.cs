@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
@@ -10,6 +8,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    {
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
       private List<ColorArea> _colorAreas;
+
       private ObjectId _idBtr;
       private List<MarkArPanel> _marksAR;
       private string _markSb;
@@ -18,6 +17,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
+
       // Конструктор. Скрытый.
       private MarkSbPanel(ObjectId idBtrMarkSb, string markSbName, string markSbBlockName)
       {
@@ -26,16 +26,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          _markSbBlockName = markSbBlockName;
          _marksAR = new List<MarkArPanel>();
          _colorAreas = ColorAreaModel.GetColorAreas(_idBtr);
-         //TODO: Проверка пересенений зон покраски (не должно быть пересечений)
-         //??
+         //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
+         //???
 
          // Список плиток (в определении блока марки СБ)
          GetTiles();
       }
 
       public ObjectId IdBtr { get { return _idBtr; } }
-
-     
 
       public List<MarkArPanel> MarksAR { get { return _marksAR; } }
 
@@ -46,7 +44,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }
 
-      public string MarkSb { get { return _markSb; } }                  
+      public string MarkSb { get { return _markSb; } }
 
       // Определение покраски панелей текущего чертежа (в Модели)
       public static List<MarkSbPanel> GetMarksSB(ColorAreaModel colorAreaModel)
@@ -62,7 +60,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefPanel = t.GetObject(idEnt, OpenMode.ForRead, false , true) as BlockReference;
+                  var blRefPanel = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   // Определение Марки СБ панели. Если ее еще нет, то она создается и добавляется в список _marks.
                   MarkSbPanel markSb = GetMarkSb(blRefPanel, _marksSb, bt);
                   if (markSb == null)
@@ -79,7 +77,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             t.Commit();
          }
          return _marksSb;
-      }      
+      }
 
       // Замена вхождений блоков СБ на АР
       public void ReplaceBlocksSbOnAr()
@@ -126,29 +124,29 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          var idBtrMarkSb = Lib.Blocks.CopyBtr(idBtrMarkAr, markSbBlName);
          // Перенос блоков плиток на слой 0
-         Database db = HostApplicationServices.WorkingDatabase; 
-         using (var t =db.TransactionManager.StartTransaction ()  )
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
          {
             var btrMarkSb = t.GetObject(idBtrMarkSb, OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btrMarkSb)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true ) as BlockReference;
+                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
                   if (blRef.Name == Album.Options.BlockTileName)
-                  {                     
+                  {
                      blRef.Layer = "0";
                   }
                }
             }
             t.Commit();
-         }         
+         }
       }
 
       // Проверка, это блок панели, по имени (Марки СБ или Марки АР)
       public static bool IsBlockNamePanel(string blName)
       {
-         return blName.StartsWith(Album.Options.BlockPanelPrefixName);         
+         return blName.StartsWith(Album.Options.BlockPanelPrefixName);
       }
 
       // Проверка, это имя блоки марки АР, по имени блока.
@@ -199,6 +197,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
          panelAR.AddBlockRefPanel(blRefPanel);
       }
+
       private string GetMarkArNextName()
       {
          return "АР-" + _marksAR.Count.ToString();
@@ -216,7 +215,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false , true) as BlockReference;
+                  var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   if (blRefTile.Name == Album.Options.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);

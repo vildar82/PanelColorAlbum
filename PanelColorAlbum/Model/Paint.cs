@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.Colors;
+﻿using Autodesk.AutoCAD.Colors;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -12,9 +7,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    {
       // Имя слоя. (для каждой краски свой слой с именем марки краски)
       private string _layerName;
+
       private Color _color;
-      
-      public Paint (string layerName, Color color)
+
+      public Paint(string layerName, Color color)
       {
          _layerName = layerName;
          _color = color;
@@ -22,7 +18,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public string LayerName
       {
-         get { return _layerName; }         
+         get { return _layerName; }
       }
 
       public Color Color

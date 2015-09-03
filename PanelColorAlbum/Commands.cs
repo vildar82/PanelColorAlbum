@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Vil.Acad.AR.PanelColorAlbum.Model;
@@ -16,10 +11,10 @@ namespace Vil.Acad.AR.PanelColorAlbum
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands : IExtensionApplication
    {
-      Album _album;
+      private Album _album;
 
       // Покраска панелей в Моделе (по блокам зон покраски)
-      [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]      
       public void PaintPanelsCommand()
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;
@@ -36,6 +31,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
                if (res)
                {
                   msg = "\nПокраска панелей выполнена успешно.";
+                  doc.Editor.Regen();   
                }
                else
                {
@@ -46,7 +42,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
-            }            
+            }
          }
       }
 
@@ -75,7 +71,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
-            }            
+            }
          }
       }
 
@@ -88,7 +84,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
          {
             if (_album == null)
             {
-               doc.Editor.WriteMessage("\nСначала нужно выполнить команду PaintPanels для покраски плитки.");               
+               doc.Editor.WriteMessage("\nСначала нужно выполнить команду PaintPanels для покраски плитки.");
             }
             else
             {
@@ -109,7 +105,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
                catch (System.Exception ex)
                {
                   doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
-               }               
+               }
             }
          }
       }
@@ -117,14 +113,13 @@ namespace Vil.Acad.AR.PanelColorAlbum
       void IExtensionApplication.Initialize()
       {
          // Загрузка сборки в автокад.
-         //TODO Написать описание команд в ком строке.     
          Document doc = Application.DocumentManager.MdiActiveDocument;
          if (doc == null)
          {
             return;
          }
          Editor ed = doc.Editor;
-         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." +                      
+         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." +
                       "\nКоманды: PaintPanels - покраска блоков панелей." +
                       "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
                       "\nAlbumPanels - создание альбома панелей.";
@@ -132,7 +127,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
       }
 
       void IExtensionApplication.Terminate()
-      {         
+      {
       }
    }
 }

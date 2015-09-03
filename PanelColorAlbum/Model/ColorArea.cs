@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -32,6 +28,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       {
          get { return _paint; }
       }
+
       // Определение покраски. Попадание точки в зону окраски
       public static Paint GetPaint(Extents3d boundsTile, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {

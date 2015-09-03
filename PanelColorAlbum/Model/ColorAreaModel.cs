@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
@@ -15,7 +11,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public ColorAreaModel(ObjectId ms)
       {
-         var colorAreas= GetColorAreas(ms);
+         var colorAreas = GetColorAreas(ms);
          DefColorAreaGrounds(colorAreas);
       }
 
@@ -24,9 +20,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       // Определение зон покраски в определении блока
       public static List<ColorArea> GetColorAreas(ObjectId idBtr)
-      {         
+      {
          List<ColorArea> colorAreas = new List<ColorArea>();
-         //TODO: Определение зон покраски в определении блока Марки СБ
          using (var t = idBtr.Database.TransactionManager.StartTransaction())
          {
             var btrMarkSb = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
@@ -34,7 +29,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false , true) as BlockReference;
+                  var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   if (Lib.Blocks.EffectiveName(blRefColorArea) == Album.Options.BlockColorAreaName)
                   {
                      ColorArea colorArea = new ColorArea(blRefColorArea);
