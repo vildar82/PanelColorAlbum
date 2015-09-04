@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.Lib
+namespace Vil.Acad.AR.PanelColorAlbum.Model.Lib
 {
    public static class Blocks
    {
@@ -60,7 +61,7 @@ namespace Vil.Acad.Lib
       /// <param name="blk1"></param>
       /// <param name="blk2"></param>
       /// <returns></returns>
-      public static bool Duplicate(this BlockReference blk1, BlockReference blk2)
+      public static bool IsDuplicate(this BlockReference blk1, BlockReference blk2)
       {
          Tolerance tol = new Tolerance(1e-6, 1e-6);
          return
@@ -70,6 +71,21 @@ namespace Vil.Acad.Lib
              Math.Round(blk1.Rotation, 5) == Math.Round(blk2.Rotation, 5) &&
              blk1.Position.IsEqualTo(blk2.Position, tol) &&
              blk1.ScaleFactors.IsEqualTo(blk2.ScaleFactors, tol);
+      }
+
+      /// <summary>
+      /// Получение валидной строки для имени блока. С замоной всех ненужных символов на .
+      /// </summary>
+      /// <param name="name">Имя для блока</param>
+      /// <returns>Валидная строка имени</returns>
+      public static string GetValidNameForBlock (string name)
+      {
+         string res = name;
+         //string testString = "<>/?\";:*|,='";
+         Regex pattern = new Regex("[<>/?\";:*|,=']");
+         res = pattern.Replace(name, ".");
+         res = res.Replace('\\', '.');
+         return res;
       }
    }
 }

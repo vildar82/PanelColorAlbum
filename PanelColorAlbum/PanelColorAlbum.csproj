@@ -65,9 +65,10 @@
     <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\ColorArea.cs" />
     <Compile Include="Model\ColorAreaModel.cs" />
-    <Compile Include="Model\Geometry.cs" />
+    <Compile Include="Model\Lib\DoubleEqualityComparer.cs" />
+    <Compile Include="Model\Lib\Geometry.cs" />
     <Compile Include="Model\Checks\Inspector.cs" />
-    <Compile Include="Model\Lib.cs" />
+    <Compile Include="Model\Lib\Blocks.cs" />
     <Compile Include="Model\MarkArPanel.cs" />
     <Compile Include="Model\MarkSbPanel.cs" />
     <Compile Include="Model\Options.cs" />
@@ -75,7 +76,8 @@
     <Compile Include="Model\Panel.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />
     <Compile Include="Model\Sheets\SheetMarkSB.cs" />
-    <Compile Include="Model\Sheets\Sheets.cs" />
+    <Compile Include="Model\Sheets\SheetsSet.cs" />
+    <Compile Include="Model\Storey.cs" />
     <Compile Include="Model\Test.cs" />
     <Compile Include="Model\Tile.cs" />
     <Compile Include="Model\TileCalc.cs" />

@@ -3,7 +3,7 @@ using System.IO;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 {
    // Листы Марки СБ
    public class SheetMarkSB

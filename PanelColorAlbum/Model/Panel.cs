@@ -6,18 +6,33 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    // Панель Марки АР
    public class Panel
    {
-      // Исходное вхождение блока на чертеже. Которое нужно будет заменить на блок МаркиАР
+      // Исходное вхождение блока на чертеже (Марки СБ). Которое нужно будет заменить на блок МаркиАР
       private ObjectId _idBlRefSb;
-
+      // Вхождение блок Марки АР после выполнения операции замены блоков мрарки СБ на АР (после определения всех Марок Ар).
       private ObjectId _idBlRefAr;
+      // Точка вставки блока исходного (Марки СБ)
       private Point3d _insPt;
-      private Matrix3d _transform;
+      //// Матрица трансформации исходного блоко Марки СБ (наверно не нужна будет).
+      //private Matrix3d _transform;
+      // Этаж панели
+      private Storey _storey;
+
+      /// <summary>
+      /// Точка вставки блока панели
+      /// </summary>
+      public Point3d InsPt { get { return _insPt; } }
+
+      public Storey Storey
+      {
+         get { return _storey; }
+         set { _storey = value; }
+      }
 
       public Panel(BlockReference blRefPanel)
       {
          _idBlRefSb = blRefPanel.ObjectId;
          _insPt = blRefPanel.Position;
-         _transform = blRefPanel.BlockTransform;
+         //_transform = blRefPanel.BlockTransform;
       }
 
       // Замена вхождения блока СБ на АР
@@ -30,7 +45,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
             var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
             blRefPanelAr.SetDatabaseDefaults();
-            blRefPanelAr.Layer = "0";
+            blRefPanelAr.Layer = blRefMarkSb.Layer;
             blRefMarkSb.Erase(true);
             _idBlRefAr = ms.AppendEntity(blRefPanelAr);
             t.AddNewlyCreatedDBObject(blRefPanelAr, true);

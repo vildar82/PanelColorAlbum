@@ -1,12 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access" MembersFormat="NameAndType">
-  <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Album">
-    <Position X="2.5" Y="0.5" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAoAAAAQAAAAAAAYAAQAAAAAAAQAAAAAAABAJDAAA=</HashCode>
-      <FileName>Model\Album.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.ColorArea">
     <Position X="11.75" Y="0.5" Width="1.75" />
     <TypeIdentifier>
@@ -21,38 +14,38 @@
       <FileName>Model\ColorAreaModel.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Geometry">
+  <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Lib.Geometry">
     <Position X="13.75" Y="0.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
-      <FileName>Model\Geometry.cs</FileName>
+      <FileName>Model\Lib\Geometry.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.MarkArPanel">
     <Position X="6.25" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAgAABEAAEoAAAAggFAAEAAAAogAA=</HashCode>
+      <HashCode>ADAAAAAAAQACAAAIgAABEEBAoAAAAggFAAEAAAAogIA=</HashCode>
       <FileName>Model\MarkArPanel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Options">
     <Position X="0.5" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAgAAAAAAAAAAQAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAgAAAAAAAEgAIABAAAgAAAAAAAAAAQAAA=</HashCode>
       <FileName>Model\Options.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Paint">
     <Position X="9.75" Y="2.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAACAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAAAAAAAABAAAAAAgAACAAA=</HashCode>
       <FileName>Model\Paint.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Panel">
     <Position X="8" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAACAAAQAAAAgACAAAAAAAAAAAABAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAkACAAAAIAAAAAAARAAAAA=</HashCode>
       <FileName>Model\Panel.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -70,17 +63,17 @@
       <FileName>Model\Tile.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Vil.Acad.Lib.Blocks">
+  <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Lib.Blocks">
     <Position X="13.75" Y="1.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
-      <FileName>Model\Lib.cs</FileName>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAIAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Model\Lib\Blocks.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Commands">
     <Position X="0.5" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAEAAAAAAAAAAACAAAAAAJAAAAAAAAAgAAAA=</HashCode>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAACAQAAAAJAAAAAAAAAgAAAA=</HashCode>
       <FileName>Commands.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -88,8 +81,15 @@
   <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.MarkSbPanel">
     <Position X="4.25" Y="0.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>BAIAAAAAAAJEABAAgAQBAIAAAVAAIDKAEAAAAAFKgCA=</HashCode>
+      <HashCode>BAIhBAAAAAJEABAAgAQBEIAAAVAAIDKAEAAAAAFKgCA=</HashCode>
       <FileName>Model\MarkSbPanel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vil.Acad.AR.PanelColorAlbum.Model.Album">
+    <Position X="2.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>EAAA4AgAAQABAAACAIAAQAIACAgAUAAAAAAABAJDEAA=</HashCode>
+      <FileName>Model\Album.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

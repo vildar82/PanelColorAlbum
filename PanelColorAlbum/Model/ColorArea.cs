@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {

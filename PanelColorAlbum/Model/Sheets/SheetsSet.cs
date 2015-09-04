@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 {
    // Ведомость альбома панелей
-   public class Sheets
+   public class SheetsSet
    {
       private Album _album;
       private string _albumDir;
@@ -13,7 +13,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public string AlbumDir { get { return _albumDir; } }
 
-      public Sheets(Album album)
+      public SheetsSet(Album album)
       {
          _album = album;
          _sheetsMarkSB = new List<SheetMarkSB>();

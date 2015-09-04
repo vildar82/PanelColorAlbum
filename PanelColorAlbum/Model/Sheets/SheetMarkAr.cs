@@ -2,7 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 {
    // Лист Марки АР.
    public class SheetMarkAr
@@ -44,14 +44,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       private void CreateTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t)
       {
          // Поиск таблицы на листе
-         Table table = FindTable(idBtrLayoutMarkAR, t);
-         table.SetSize(3, 5);
+         Table table = FindTable(idBtrLayoutMarkAR, t);         
 
          // Расчет плитки
          var tilesCalc = _markAR.TilesCalc;
          // Установка размера таблицы.
-         if (table.Rows.Count < tilesCalc.Count + 3)
+         if (table.Rows.Count >3)
          {
+            table.DeleteRows(3, table.Rows.Count - 3);
             table.SetSize(tilesCalc.Count + 3, table.Columns.Count);
          }
 
@@ -151,13 +151,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          LayoutManager lm = LayoutManager.Current;
          if (lm.CurrentLayout == Album.Options.SheetTemplateLayoutNameForMarkAR)
          {
-            lm.RenameLayout(lm.CurrentLayout, _markAR.MarkARPanelFullName);
+            lm.RenameLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
          }
          else
          {
-            lm.CopyLayout(lm.CurrentLayout, _markAR.MarkARPanelFullName);
+            lm.CopyLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
          }
-         idLayoutMarAr = lm.GetLayoutId(_markAR.MarkARPanelFullName);
+         idLayoutMarAr = lm.GetLayoutId(_markAR.MarkARPanelFullValidName);
          HostApplicationServices.WorkingDatabase = dbOrig;
          return idLayoutMarAr;
       }

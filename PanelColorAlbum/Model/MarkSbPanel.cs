@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
@@ -11,19 +13,23 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       private ObjectId _idBtr;
       private List<MarkArPanel> _marksAR;
+      // Список тех же панелей марки АР, что и в _marksAR, но с архитектурными индексами. В списке _marksAR марки тоже будут архитектурными. Этот словарь просто для проверки уникальности марок.
+      private Dictionary<string, MarkArPanel> _marksArArchitectIndex;
       private string _markSb;
       private string _markSbBlockName;
       private List<Paint> _paints;
+      private bool _isUpperStoreyPanel;
 
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
 
       // Конструктор. Скрытый.
-      private MarkSbPanel(ObjectId idBtrMarkSb, string markSbName, string markSbBlockName)
+      private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName)
       {
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
+         _isUpperStoreyPanel = (blRefPanel.Layer == Album.Options.LayerUpperStoreyPanels);
          _marksAR = new List<MarkArPanel>();
          _colorAreas = ColorAreaModel.GetColorAreas(_idBtr);
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
@@ -45,6 +51,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       public List<Tile> Tiles { get { return _tiles; } }
 
       public string MarkSb { get { return _markSb; } }
+
+      /// <summary>
+      /// Это панель чердака? true - да, false - нет.
+      /// </summary>
+      public bool IsUpperStoreyPanel { get { return _isUpperStoreyPanel; } }
 
       // Определение покраски панелей текущего чертежа (в Модели)
       public static List<MarkSbPanel> GetMarksSB(ColorAreaModel colorAreaModel)
@@ -68,7 +79,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                      // Значит это не блок панели. Пропускаем.
                      continue;
                   }
-                  //TODO: Определение покраски панели (Марки АР)
+                  //Определение покраски панели (Марки АР)
                   List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, colorAreaModel.ColorAreasForeground, colorAreaModel.ColorAreasBackground);
                   // Добавление панели АР в список панелей для Марки СБ
                   markSb.AddPanelAR(paintAR, blRefPanel, markSb);
@@ -97,6 +108,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             string markSbName = GetMarkSbName(blRefPanel.Name);
             if (markSbName != string.Empty)
             {
+               // Поиск панели Марки СБ в коллекции панелей по имени марки СБ.
                markSb = marksSb.Find(m => m._markSb == markSbName);
                if (markSb == null)
                {
@@ -106,17 +118,65 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                   if (bt.Has(markSbBlName))
                   {
                      var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSbPanel(idMarkSbBtr, markSbName, markSbBlName);
+                     markSb = new MarkSbPanel(blRefPanel, idMarkSbBtr, markSbName, markSbBlName);
                      marksSb.Add(markSb);
                   }
                   else
                   {
                      //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
+                     //???
                   }
                }
             }
          }
          return markSb;
+      }
+
+      // Определение архитектурных Марок АР (Э1_Яр1)
+      public void DefineArchitectMarks(string _abbreviateProject)
+      {
+         _marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
+         if (_isUpperStoreyPanel)
+         {
+            // Панели чердака
+            // (ЭЧ-#_Яр1)            
+            if (_marksAR.Count == 1)
+            {
+               // Если одна марка покраски
+               string markArchitect = string.Format("(ЭЧ_{0})", _abbreviateProject);
+               _marksArArchitectIndex.Add(markArchitect, _marksAR[0]);
+               _marksAR[0].MarkArArch = markArchitect;
+            }
+            else
+            {
+               // Если несколько марок покраски
+               int i = 1;
+               foreach (var markAR in _marksAR)
+               {
+                  string markArchitect = string.Format("(ЭЧ-{0}_{1})", i++, _abbreviateProject);
+                  _marksArArchitectIndex.Add(markArchitect, markAR);
+                  markAR.MarkArArch = markArchitect;
+               }
+            }
+         }
+         else
+         {
+            // Панели этажей                                    
+            foreach (var markAR in _marksAR)
+            {
+               int i = 1;
+               string markArchitect;
+               var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
+               string floor = String.Join(",", floors);
+               markArchitect = string.Format("(Э{0}_{1})", floor, _abbreviateProject);
+               if (_marksArArchitectIndex.ContainsKey(markArchitect))
+               {
+                  markArchitect = string.Format("(Э{0}-{1}_{2})", floor, i++, _abbreviateProject);
+               }
+               _marksArArchitectIndex.Add(markArchitect, markAR);
+               markAR.MarkArArch = markArchitect;
+            }
+         }
       }
 
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
@@ -167,13 +227,33 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       /// </summary>
       /// <param name="blName">Имя блока панели</param>
       /// <returns>марка панели (СБ или СБ+АР)</returns>
-      public static string GetPanelMarkFromBlockName(string blName)
+      public static string GetPanelMarkFromBlockName(string blName, List<MarkSbPanel> marksSB)
       {
-         return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
+         //return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
+         string panelMark = string.Empty; 
+         // Найти имя марки панели СБ или АР
+         foreach (var markSB in marksSB)
+         {
+            if (markSB.MarkSbBlockName == blName)
+            {
+               panelMark = markSB.MarkSb;
+            }
+            else
+            {
+               foreach (var markAR in markSB.MarksAR )
+               {
+                  if (markAR.MarkArBlockName == blName)
+                  {
+                     panelMark = markAR.MarkARPanelFullName; 
+                  }
+               }
+            }
+         }
+         return panelMark;         
       }
 
       public static string GetMarkSbBlockName(string markSb)
-      {
+      {         
          return Album.Options.BlockPanelPrefixName + markSb;
       }
 
@@ -185,12 +265,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          {
             // Хвостовая часть
             markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length);
-            // Если есть "_", то после него идет уже МаркаАР. Она нам не нужна.
-            var unders = markSb.Split('_');
-            if (unders.Length > 1)
+            if (markSb.EndsWith (")"))
             {
-               markSb = unders[0];
-            }
+               int lastDirectBracket = markSb.LastIndexOf('(');
+               if (lastDirectBracket>0)
+               {
+                  markSb = markSb.Substring(0, lastDirectBracket);
+               }
+            }            
          }
          return markSb;
       }
@@ -229,7 +311,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                   if (blRefTile.Name == Album.Options.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
-                     //TODO: Определение покраски плитки
+                     //Определение покраски плитки
                      Paint paint = ColorArea.GetPaint(tile.Bounds, _colorAreas, null);
                      _tiles.Add(tile);
                      _paints.Add(paint);
@@ -243,7 +325,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Поиск покраски марки АР в списке _marksAR
       private MarkArPanel HasPanelAR(List<Paint> paintAR)
       {
-         //TODO: Поиск панели АР по покраске
+         //Поиск панели АР по покраске
          MarkArPanel resPanelAR = null;
          //Сравнение списков покраски
          foreach (MarkArPanel panelAR in _marksAR)

@@ -14,8 +14,12 @@
       /// </summary>
       public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
       /// <summary>
-      /// Слоя для подписей марок панелей
+      /// Слой для подписей марок панелей
       /// </summary>
-      public string LayerForMarks = "АР_Марки";
+      public string LayerMarks = "АР_Марки";
+      /// <summary>
+      /// Слой для панелей чердака. Панель на этом слое считается панелью чердака.
+      /// </summary>
+      public string LayerUpperStoreyPanels = "АР_Чердак";
    }
 }

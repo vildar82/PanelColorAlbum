@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model
 {
@@ -11,23 +13,50 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
    public class MarkArPanel
    {
       private ObjectId _idBtrAr;
-      private string _markAR;
+      // Временная марка покраски
+      private string _markArTemp;
+      // Определенная марка покраски архитектурная
+      private string _markArArch;
       private string _markARPanelFullName;
+      private string _markARPanelFullValidName;
       private string _markArBlockName;
       private List<Paint> _paints;
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
+      private MarkSbPanel _markSB;
 
       public MarkArPanel(List<Paint> paintAR, MarkSbPanel markSb, BlockReference blRefMarkAr)
       {
+         _markSB = markSb;
          _paints = paintAR;
-         DefMarkArNames(markSb, blRefMarkAr);
+         DefMarkArTempNames(markSb, blRefMarkAr.Name);
          _panels = new List<Panel>();
       }
 
       public ObjectId IdBtrAr { get { return _idBtrAr; } }
 
-      public string MarkAR { get { return _markAR; } }
+      public string MarkArArch {
+         get { return _markArArch; }
+         set
+         {
+            // Переименовать _markARPanelFullName и _markArBlockName
+            _markArArch = value;
+            _markARPanelFullName = _markSB.MarkSb + _markArArch;
+            _markArBlockName = _markSB.MarkSbBlockName + Blocks.GetValidNameForBlock (_markArArch);
+         }
+      }
+      
+      public string MarkARPanelFullValidName
+      {
+         get
+         {
+            if (_markARPanelFullValidName == null)
+            {
+               _markARPanelFullValidName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
+            }
+            return _markARPanelFullValidName;
+         }         
+      }
 
       public List<Paint> Paints { get { return _paints; } }
 
@@ -158,7 +187,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             t.Commit();
          }
          return res;
-      }
+      }     
 
       public bool EqualPaint(List<Paint> paintAR)
       {
@@ -166,11 +195,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          return paintAR.SequenceEqual(_paints);
       }
 
-      private void DefMarkArNames(MarkSbPanel markSB, BlockReference bkRefMarkAR)
+      private void DefMarkArTempNames(MarkSbPanel markSB, string blName)
       {
-         _markAR = "АР-" + markSB.MarksAR.Count.ToString();
-         _markArBlockName = bkRefMarkAR.Name + "_" + _markAR;
-         _markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
+         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
+         //_markArBlockName = blName + "_" + _markAR;
+         //_markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
       }
 
       // Замена вхождений блоков СБ на блоки АР
@@ -182,6 +211,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
       }
 
+      // Определение границы плитки во вхождении блока
       private static Extents3d GetBoundsTileInBlockRef(BlockReference blRefPanel, Tile tile)
       {
          Point3d ptBlRef = blRefPanel.Position;

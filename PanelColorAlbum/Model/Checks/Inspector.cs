@@ -4,7 +4,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.PanelColorAlbum.Model.Checks
 {
    public class Inspector
    {
@@ -79,12 +79,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
             foreach (var markAr in markSb.MarksAR)
             {
+               bool isAllTilePainted = true;
                foreach (var paint in markAr.Paints)
                {
                   if (paint == null)
                   {
                      // Плитка не покрашена!
-                     string errMsg = "Не вся плитка покрашена в блоке " + markAr.MarkArBlockName;
+                     isAllTilePainted = false;
+                     string errMsg = "Не вся плитка покрашена в блоке " + markSb.MarkSb;
                      ErrorObject errObj = new ErrorObject(errMsg, ObjectId.Null);
                      _notPaintedTilesInMarkAR.Add(errObj);
                      _ed.WriteMessage("\n" + errMsg);
@@ -92,6 +94,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                      break;
                   }
                }
+               if (!isAllTilePainted) break;               
             }
          }
          return res;

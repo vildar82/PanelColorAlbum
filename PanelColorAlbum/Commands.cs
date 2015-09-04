@@ -24,8 +24,8 @@ namespace Vil.Acad.AR.PanelColorAlbum
             {
                _album = new Album();
             }
-            try
-            {
+            //try
+            //{
                bool res = _album.PaintPanels();
                string msg;
                if (res)
@@ -38,11 +38,11 @@ namespace Vil.Acad.AR.PanelColorAlbum
                   msg = "\nПокраска панелей не выполнена. Ошибки читай выше";
                }
                doc.Editor.WriteMessage(msg);
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
-            }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //   doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
+            //}
          }
       }
 
@@ -52,11 +52,10 @@ namespace Vil.Acad.AR.PanelColorAlbum
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;
          using (var DocLock = doc.LockDocument())
-         {
-            Album album = new Album();
+         {            
             try
             {
-               bool res = album.Resetblocks();
+               bool res = Album.Resetblocks();
                string msg;
                if (res)
                {
@@ -88,8 +87,8 @@ namespace Vil.Acad.AR.PanelColorAlbum
             }
             else
             {
-               try
-               {
+               //try
+               //{
                   bool res = _album.CreateAlbum();
                   string msg;
                   if (res)
@@ -101,11 +100,11 @@ namespace Vil.Acad.AR.PanelColorAlbum
                      msg = "\nАльбом панелей не выполнен. Ошибки читай выше";
                   }
                   doc.Editor.WriteMessage(msg);
-               }
-               catch (System.Exception ex)
-               {
-                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
-               }
+               //}
+               //catch (System.Exception ex)
+               //{
+               //   doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
+               //}
             }
          }
       }
