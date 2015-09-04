@@ -19,7 +19,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       private string _markArArch;
       private string _markARPanelFullName;
       private string _markARPanelFullValidName;
-      private string _markArBlockName;
+      private string _markArBlockName;      
+
       private List<Paint> _paints;
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;

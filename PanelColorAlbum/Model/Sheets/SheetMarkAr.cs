@@ -1,26 +1,51 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 {
-   // Лист Марки АР.
-   public class SheetMarkAr
+   // Лист Марки АР (на фасаде и в форме)
+   public class SheetMarkAr : IComparable<SheetMarkAr>
    {
       // Блок Марки АР.
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
       private MarkArPanel _markAR;
-
-      private Point3d _pt;
+      private Point3d _ptInsertBlRefMarkAR;
       private Database _dbMarkSB;
+      // Данные для заполнения штампа
+      private readonly string _sheetName; // Наименование листа
+      private readonly string _sheetViewFacade; // Раскладка плитки на фасаде.
+      private readonly string _sheetViewForm; // Раскладка плитки в форме.
+      private int _sheetNumber;
 
-      // Создание листа Марки АР
-      public SheetMarkAr(MarkArPanel markAR, Database dbMarkSB, Point3d pt)
+      public string MarkAR
+      {
+         get { return _markAR.MarkArArch; }
+      }
+
+      public int SheetNumber
+      {
+         get { return _sheetNumber; }
+         set { _sheetNumber = value; }
+      }
+
+      public SheetMarkAr(MarkArPanel markAR)
+      {
+         _markAR = markAR;
+         _sheetName = string.Format("Наружная стеновая панель {0}", markAR.MarkARPanelFullName);
+         _sheetViewFacade = "Раскладка плитки на фасаде";
+         _sheetViewForm = "Раскладка плитки в форме";
+      }
+
+      // Создание листа в файле марки СБ.
+      private void CreateLayout(MarkArPanel markAR, Database dbMarkSB, Point3d pt)
       {
          _dbMarkSB = dbMarkSB;
          _markAR = markAR;
-         _pt = pt;
+         _ptInsertBlRefMarkAR = pt;
          // Определения блоков марок АР уже скопированы.
 
          using (var t = dbMarkSB.TransactionManager.StartTransaction())
@@ -28,7 +53,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR();
             //Создание листа для Марки АР ("на Фасаде").
-            var idLayoutMarkAR = CreateLayoutMarkAR();
+            //var idLayoutMarkAR = CreateLayoutMarkAR();
+            var idLayoutMarkAR = Blocks.CopyLayout(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, _markAR.MarkARPanelFullValidName);
             // Направение видового экрана на блок марки АР.
             var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t);
             // Заполнение таблицы
@@ -141,33 +167,33 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          return idVp;
       }
 
-      // Создание листа для Марки АР
-      private ObjectId CreateLayoutMarkAR()
-      {
-         ObjectId idLayoutMarAr = ObjectId.Null;
-         // Копирование листа шаблона
-         Database dbOrig = HostApplicationServices.WorkingDatabase;
-         HostApplicationServices.WorkingDatabase = _dbMarkSB;
-         LayoutManager lm = LayoutManager.Current;
-         if (lm.CurrentLayout == Album.Options.SheetTemplateLayoutNameForMarkAR)
-         {
-            lm.RenameLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
-         }
-         else
-         {
-            lm.CopyLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
-         }
-         idLayoutMarAr = lm.GetLayoutId(_markAR.MarkARPanelFullValidName);
-         HostApplicationServices.WorkingDatabase = dbOrig;
-         return idLayoutMarAr;
-      }
+      //// Создание листа для Марки АР
+      //private ObjectId CreateLayoutMarkAR()
+      //{
+      //   ObjectId idLayoutMarAr = ObjectId.Null;
+      //   // Копирование листа шаблона
+      //   Database dbOrig = HostApplicationServices.WorkingDatabase;
+      //   HostApplicationServices.WorkingDatabase = _dbMarkSB;
+      //   LayoutManager lm = LayoutManager.Current;
+      //   if (lm.CurrentLayout == Album.Options.SheetTemplateLayoutNameForMarkAR)
+      //   {
+      //      lm.RenameLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
+      //   }
+      //   else
+      //   {
+      //      lm.CopyLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
+      //   }
+      //   idLayoutMarAr = lm.GetLayoutId(_markAR.MarkARPanelFullValidName);
+      //   HostApplicationServices.WorkingDatabase = dbOrig;
+      //   return idLayoutMarAr;
+      //}
 
       private ObjectId InsertBlRefMarkAR()
       {
          ObjectId idBlRefMarkAR = ObjectId.Null;
          using (var bt = _dbMarkSB.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
-            using (var blRefMarkAR = new BlockReference(_pt, bt[_markAR.MarkArBlockName]))
+            using (var blRefMarkAR = new BlockReference(_ptInsertBlRefMarkAR, bt[_markAR.MarkArBlockName]))
             {
                using (var ms = bt[BlockTableRecord.ModelSpace].GetObject(OpenMode.ForWrite) as BlockTableRecord)
                {
@@ -212,6 +238,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
          vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
          vp.CustomScale = 0.04;
+      }
+
+      public int CompareTo(SheetMarkAr other)
+      {
+         return MarkAR.CompareTo(other.MarkAR);
       }
    }
 }

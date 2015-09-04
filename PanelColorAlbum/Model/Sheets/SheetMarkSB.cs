@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 {
    // Листы Марки СБ
-   public class SheetMarkSB
+   public class SheetMarkSB :IComparable<SheetMarkSB>
    {
       // Файл панели Марки СБ с листами Маркок АР.
       private MarkSbPanel _markSB;
@@ -15,11 +17,31 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       private string _fileMarkSB;
       private string _fileSheetTemplate;
 
-      public SheetMarkSB(MarkSbPanel markSB, string albumFolder, string fileTemplateSheet)
+      public string MarkSB
+      {
+         get { return _markSB.MarkSb; }
+      }
+
+      public List<SheetMarkAr> SheetsMarkAR { get { return _sheetsMarkAR; } }
+
+      // Создание листа марки СБ
+      public SheetMarkSB(MarkSbPanel markSB)
       {
          _markSB = markSB;
-         _sheetsMarkAR = new List<SheetMarkAr>();
-         _fileSheetTemplate = fileTemplateSheet;
+         _sheetsMarkAR = new List<SheetMarkAr>(); 
+         // Обработка Марок АР
+         foreach (var markAR in _markSB.MarksAR)
+         {
+            SheetMarkAr sheetAR = new SheetMarkAr(markAR);
+            _sheetsMarkAR.Add(sheetAR);
+         }
+         // Сортировка листов Марок АР
+         _sheetsMarkAR.Sort(); 
+      }
+
+      // Создание файла марки СБ
+      public void CreateFileMarkSB()
+      {         
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateSheetMarkSB(_markSB, albumFolder);
 
@@ -34,10 +56,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 
             // Создание листов Марок АР
             Point3d pt = Point3d.Origin;
-            foreach (var markAR in markSB.MarksAR)
+            foreach (var sheetMarkAR in _sheetsMarkAR)
             {
-               SheetMarkAr sheetMarkAR = new SheetMarkAr(markAR, dbMarkSB, pt);
-               _sheetsMarkAR.Add(sheetMarkAR);
+               sheetMarkAR.CreateSheet(pt); 
                // Точка для вставки следующего блока Марки АР
                pt = new Point3d(pt.X + 15000, pt.Y, 0);
             }
@@ -47,7 +68,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 
             dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
          }
-      }
+      }      
 
       //private void DeleteTemplateLayout(Database dbMarkSB)
       //{
@@ -78,6 +99,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          string fileDest = Path.Combine(albumFolder, markSB.MarkSb + ".dwg");
          File.Copy(_fileSheetTemplate, fileDest);
          return fileDest;
+      }
+
+      public int CompareTo(SheetMarkSB other)
+      {
+         return _markSB.MarkSb.CompareTo(other.MarkSB);
       }
    }
 }

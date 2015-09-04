@@ -24,25 +24,16 @@ namespace Vil.Acad.AR.PanelColorAlbum
             {
                _album = new Album();
             }
-            //try
-            //{
-               bool res = _album.PaintPanels();
-               string msg;
-               if (res)
-               {
-                  msg = "\nПокраска панелей выполнена успешно.";
-                  doc.Editor.Regen();   
-               }
-               else
-               {
-                  msg = "\nПокраска панелей не выполнена. Ошибки читай выше";
-               }
-               doc.Editor.WriteMessage(msg);
-            //}
-            //catch (System.Exception ex)
-            //{
-            //   doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
-            //}
+            try
+            {
+               _album.PaintPanels();
+               doc.Editor.Regen();
+               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
+            }
          }
       }
 
@@ -55,17 +46,8 @@ namespace Vil.Acad.AR.PanelColorAlbum
          {            
             try
             {
-               bool res = Album.Resetblocks();
-               string msg;
-               if (res)
-               {
-                  msg = "\nСброс блоков выполнен успешно.";
-               }
-               else
-               {
-                  msg = "\nСброс блоков не выполнен. Ошибки читай выше";
-               }
-               doc.Editor.WriteMessage(msg);
+               Album.Resetblocks();                              
+               doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
             }
             catch (System.Exception ex)
             {
@@ -89,17 +71,8 @@ namespace Vil.Acad.AR.PanelColorAlbum
             {
                //try
                //{
-                  bool res = _album.CreateAlbum();
-                  string msg;
-                  if (res)
-                  {
-                     msg = "\nАльбом панелей выполнен успешно.";
-                  }
-                  else
-                  {
-                     msg = "\nАльбом панелей не выполнен. Ошибки читай выше";
-                  }
-                  doc.Editor.WriteMessage(msg);
+                  _album.CreateAlbum();                                                         
+                  doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно.");
                //}
                //catch (System.Exception ex)
                //{

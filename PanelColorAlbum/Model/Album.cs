@@ -60,6 +60,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public Document Doc { get { return _doc; } }
 
+      public string AbbreviateProject { get { return _abbreviateProject; } }
+
       // Поиск цвета в списке цветов альбома
       public static Paint FindPaint(string layerName)
       {
@@ -83,13 +85,12 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Покраска панелей в модели (по блокам зон покраски)
-      public bool PaintPanels()
+      public void PaintPanels()
       {
          // Определение марок покраски панелей (Марок АР).
          // Создание определениц блоков марок АР.
          // Покраска панелей в чертеже.
-
-         bool res = true;
+         
          // В Модели должны быть расставлены панели Марки СБ и зоны покраски.
          // сброс списка цветов.
          _colors = new List<Paint>();
@@ -98,18 +99,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
-         if (!Resetblocks())
-         {
-            // Ошибки при сбросе блоков. В ком строке описаны причины. Нужно исправить чертеж.
-            return false;
-         }
+         Resetblocks();
 
          // Проверка чертежа
          Inspector inspector = new Inspector();
          if (!inspector.CheckDrawing())
          {
-            _doc.Editor.WriteMessage("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше.");
-            return false;
+            throw new Exception("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше.");
          }
 
          // Определение покраски панелей.
@@ -118,23 +114,20 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
          if (!inspector.CheckAllTileArePainted(_marksSB))
          {
-            _doc.Editor.WriteMessage("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");
-            return false;
+            throw new Exception ("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");            
          }
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
          RenamePanelsToArchitectIndex();
 
          // Создание определений блоков панелей покраски МаркиАР
-         res = CreatePanelsMarkAR();
+         CreatePanelsMarkAR();
 
          // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
          ReplaceBlocksMarkSbOnMarkAr();
 
          // Добавление подписей к панелям
-         CaptionPanels();
-
-         return res;
+         CaptionPanels();         
       }
 
       // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
@@ -194,33 +187,28 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       }
 
       // Создание альбома панелей
-      public bool CreateAlbum()
-      {
-         bool res = true;
-         // Создание папки с файлами марок СБ, в которых создать листы панелей Марок АР.
+      public void CreateAlbum()
+      {         
          if (_marksSB.Count == 0)
-         {
-            res = false;
-            _doc.Editor.WriteMessage("\nНе определены панели марок СБ.");
+         {            
+            throw new Exception ("Не определены панели марок СБ.");
          }
          else
          {
             SheetsSet sheets = new SheetsSet(this);
-            res = sheets.CreateAlbum();
-            _doc.Editor.WriteMessage("\nСоздана папка альбома панелей: " + sheets.AlbumDir);
-         }
-         return res;
+            sheets.CreateAlbum();
+            throw new Exception("Создана папка альбома панелей: " + sheets.AlbumDir);
+         }         
       }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
-      public static bool Resetblocks()
+      public static void Resetblocks()
       {
          // Для покраски панелей, нужно, чтобы в чертеже были расставлены блоки панелей Марки СБ.
          // Поэтому, при изменении зон покраски, перед повторным запуском команды покраски панелей и создания альбома,
          // нужно восстановить блоки Марки СБ (вместо Марок АР).
          // Блоки панелей Марки АР - удалить.
-
-         bool res = true;
+                  
          Document doc = Application.DocumentManager.MdiActiveDocument;
          Database db = doc.Database;
          Editor ed = doc.Editor; 
@@ -246,11 +234,12 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
                            // Нет определения блока марки СБ.
                            // Такое возможно, если после покраски панелей, сделать очистку чертежа (блоки марки СБ удалятся).
                            MarkSbPanel.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);                           
-                           ed.WriteMessage("\nНет определения блока для панели Марки СБ " + markSbBlName +
+                           string errMsg = "\nНет определения блока для панели Марки СБ " + markSbBlName +
                                           ". Оно создано из панели Марки АР " + blRef.Name + ". Зоны покраски внутри блока не определены." +
-                                          "Необходимо проверить блоки и заново запустить программу.");
+                                          "Необходимо проверить блоки и заново запустить программу.";
+                           throw new Exception(errMsg);
                            // Надо чтобы проектировщик проверил эти блоки, может в них нужно добавить зоны покраски (т.к. в блоках марки АР их нет).
-                           res = false;
+
                         }
                         var blRefMarkSb = new BlockReference(blRef.Position, bt[markSbBlName]);
                         blRefMarkSb.SetDatabaseDefaults();
@@ -286,7 +275,6 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
             }
             t.Commit();
          }
-         return res;
       }
 
       // Создание определений блоков панелей марки АР

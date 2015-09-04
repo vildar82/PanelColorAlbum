@@ -87,5 +87,28 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Lib
          res = res.Replace('\\', '.');
          return res;
       }
+
+      /// <summary>
+      /// Копирование листа
+      /// </summary>
+      /// <returns>ID Layout</returns>
+      public static ObjectId CopyLayout(Database db,string layerSource, string layerCopy)
+      {
+         ObjectId idLayoutCopy = ObjectId.Null;         
+         Database dbOrig = HostApplicationServices.WorkingDatabase;
+         HostApplicationServices.WorkingDatabase = db;
+         LayoutManager lm = LayoutManager.Current;         
+         try
+         {
+            // попытка скопировать лист. Будет ошибка если такой лист уже существует.            
+            lm.CopyLayout(layerSource, layerCopy);
+         }
+         catch
+         {
+         }
+         idLayoutCopy = lm.GetLayoutId(layerCopy);
+         HostApplicationServices.WorkingDatabase = dbOrig;
+         return idLayoutCopy;
+      }
    }
 }
