@@ -13,18 +13,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
       private MarkArPanel _markAR;
-      private Point3d _ptInsertBlRefMarkAR;
-      private Database _dbMarkSB;
+      private Point3d _ptInsertBlRefMarkAR;      
       // Данные для заполнения штампа
-      private readonly string _sheetName; // Наименование листа
-      private readonly string _sheetViewFacade; // Раскладка плитки на фасаде.
-      private readonly string _sheetViewForm; // Раскладка плитки в форме.
+      private readonly string _sheetName; // Наименование листа      
       private int _sheetNumber;
 
-      public string MarkAR
-      {
-         get { return _markAR.MarkArArch; }
-      }
+      public string MarkArArch { get { return _markAR.MarkArArch; } }
+      public string MarkArFullName { get { return _markAR.MarkARPanelFullName; } }
+      public string LayoutName { get { return _markAR.MarkARPanelFullValidName; } }
 
       public int SheetNumber
       {
@@ -35,28 +31,32 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
-         _sheetName = string.Format("Наружная стеновая панель {0}", markAR.MarkARPanelFullName);
-         _sheetViewFacade = "Раскладка плитки на фасаде";
-         _sheetViewForm = "Раскладка плитки в форме";
+         _sheetName = string.Format("Наружная стеновая панель {0}", markAR.MarkARPanelFullName);         
       }
 
       // Создание листа в файле марки СБ.
-      private void CreateLayout(MarkArPanel markAR, Database dbMarkSB, Point3d pt)
-      {
-         _dbMarkSB = dbMarkSB;
-         _markAR = markAR;
+      public void CreateLayout(Database dbMarkSB, Point3d pt)
+      {  
          _ptInsertBlRefMarkAR = pt;
          // Определения блоков марок АР уже скопированы.
 
          using (var t = dbMarkSB.TransactionManager.StartTransaction())
          {
             // Вставка блока Марки АР.
-            var idBlRefMarkAR = InsertBlRefMarkAR();
+            var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB);
             //Создание листа для Марки АР ("на Фасаде").
             //var idLayoutMarkAR = CreateLayoutMarkAR();
-            var idLayoutMarkAR = Blocks.CopyLayout(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, _markAR.MarkARPanelFullValidName);
+            var idLayoutMarkAR = Blocks.CopyLayout(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
+            // Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
+            if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead)as DBDictionary).Count == 3)
+            {
+               Blocks.ConvertLayoutNames(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
+               HostApplicationServices.WorkingDatabase = dbMarkSB;
+               LayoutManager lm = LayoutManager.Current;
+               idLayoutMarkAR =lm.GetLayoutId(LayoutName);    
+            }
             // Направение видового экрана на блок марки АР.
-            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t);
+            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB);
             // Заполнение таблицы
             CreateTableTiles(idBtrLayoutMarkAR, t);
 
@@ -64,7 +64,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 
             t.Commit();
          }
-      }
+      }     
 
       // Создание и Заполнение таблицы расхода плитки
       private void CreateTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t)
@@ -82,7 +82,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          }
 
          // Заголовок
-         table.Cells[0, 0].TextString = "Расход плитки на панель " + _markAR.MarkARPanelFullName;
+         table.Cells[0, 0].TextString = "Расход плитки на панель " + MarkArFullName;
          // Подсчет плитки
          int row = 2;
 
@@ -129,7 +129,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       }
 
       // Направление видового экрана на блок Марки АР
-      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t)
+      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t, Database dbMarkSB)
       {
          ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
@@ -139,7 +139,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          var blRef = t.GetObject(idBlRefMarkAR, OpenMode.ForRead) as BlockReference;
          // Определение границ блока
          Extents3d bounds = GetBoundsBlRefMarkAR(blRef);
-         ViewPortDirection(vp, bounds);
+         ViewPortDirection(vp, bounds, dbMarkSB);
          return idBtrLayout;
       }
 
@@ -188,10 +188,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       //   return idLayoutMarAr;
       //}
 
-      private ObjectId InsertBlRefMarkAR()
+      private ObjectId InsertBlRefMarkAR(Database dbMarkSB)
       {
          ObjectId idBlRefMarkAR = ObjectId.Null;
-         using (var bt = _dbMarkSB.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
+         using (var bt = dbMarkSB.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             using (var blRefMarkAR = new BlockReference(_ptInsertBlRefMarkAR, bt[_markAR.MarkArBlockName]))
             {
@@ -214,7 +214,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       /* startPoint - стартовая точка ВЭ: центр видового экрана                                                           */
       /*------------------------------------------------------------------------------------------------------------------*/
 
-      private void ViewPortDirection(Viewport vp, Extents3d bounds)
+      private void ViewPortDirection(Viewport vp, Extents3d bounds, Database dbMarkSB)
       {
          Point3d maxPoint = bounds.MaxPoint;
          Point3d minPoint = bounds.MinPoint;
@@ -234,7 +234,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          //vp.Locked = true;              // ВЭ блокируется
          //vp.On = true;                  // включен и видим
          //vp.Visible = true;
-         ObjectContextManager ocm = _dbMarkSB.ObjectContextManager;
+         ObjectContextManager ocm = dbMarkSB.ObjectContextManager;
          ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
          vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
          vp.CustomScale = 0.04;
@@ -242,7 +242,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
 
       public int CompareTo(SheetMarkAr other)
       {
-         return MarkAR.CompareTo(other.MarkAR);
+         return MarkArArch.CompareTo(other.MarkArArch);
       }
    }
 }

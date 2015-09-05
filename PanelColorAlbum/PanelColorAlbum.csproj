@@ -76,6 +76,7 @@
     <Compile Include="Model\Panel.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />
     <Compile Include="Model\Sheets\SheetMarkSB.cs" />
+    <Compile Include="Model\Sheets\SheetsContent.cs" />
     <Compile Include="Model\Sheets\SheetsSet.cs" />
     <Compile Include="Model\Storey.cs" />
     <Compile Include="Model\Test.cs" />

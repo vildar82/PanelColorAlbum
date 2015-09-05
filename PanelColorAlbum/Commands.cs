@@ -24,16 +24,16 @@ namespace Vil.Acad.AR.PanelColorAlbum
             {
                _album = new Album();
             }
-            try
-            {
+            //try
+            //{
                _album.PaintPanels();
                doc.Editor.Regen();
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
-            }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //   doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
+            //}
          }
       }
 
@@ -44,15 +44,15 @@ namespace Vil.Acad.AR.PanelColorAlbum
          Document doc = Application.DocumentManager.MdiActiveDocument;
          using (var DocLock = doc.LockDocument())
          {            
-            try
-            {
+            //try
+            //{
                Album.Resetblocks();                              
                doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
-            }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //   doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
+            //}
          }
       }
 
@@ -72,7 +72,7 @@ namespace Vil.Acad.AR.PanelColorAlbum
                //try
                //{
                   _album.CreateAlbum();                                                         
-                  doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно.");
+                  doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.SheetsSet.AlbumDir);
                //}
                //catch (System.Exception ex)
                //{

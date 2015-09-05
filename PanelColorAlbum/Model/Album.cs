@@ -25,6 +25,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       // Сокращенное имя проеккта
       private string _abbreviateProject;
       private List<MarkSbPanel> _marksSB;
+      private SheetsSet _sheetsSet;
       private ObjectId _idLayerMarks = ObjectId.Null;
 
       public Album()
@@ -61,6 +62,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
       public Document Doc { get { return _doc; } }
 
       public string AbbreviateProject { get { return _abbreviateProject; } }
+
+      public SheetsSet SheetsSet { get { return _sheetsSet; } }
 
       // Поиск цвета в списке цветов альбома
       public static Paint FindPaint(string layerName)
@@ -195,9 +198,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          }
          else
          {
-            SheetsSet sheets = new SheetsSet(this);
-            sheets.CreateAlbum();
-            throw new Exception("Создана папка альбома панелей: " + sheets.AlbumDir);
+            _sheetsSet = new SheetsSet(this);
+            _sheetsSet.CreateAlbum();            
          }         
       }
 

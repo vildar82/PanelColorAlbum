@@ -95,20 +95,32 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Lib
       public static ObjectId CopyLayout(Database db,string layerSource, string layerCopy)
       {
          ObjectId idLayoutCopy = ObjectId.Null;         
-         Database dbOrig = HostApplicationServices.WorkingDatabase;
+         Database dbOrig = HostApplicationServices.WorkingDatabase;         
          HostApplicationServices.WorkingDatabase = db;
-         LayoutManager lm = LayoutManager.Current;         
-         try
-         {
-            // попытка скопировать лист. Будет ошибка если такой лист уже существует.            
-            lm.CopyLayout(layerSource, layerCopy);
-         }
-         catch
-         {
-         }
+         LayoutManager lm = LayoutManager.Current;      
+         // Нужно проверить имена. Вдруг нет листа источника, или уже есть копируемый лист.             
+         lm.CopyLayout(layerSource, layerCopy);         
          idLayoutCopy = lm.GetLayoutId(layerCopy);
          HostApplicationServices.WorkingDatabase = dbOrig;
          return idLayoutCopy;
+      }
+
+      /// <summary>
+      /// Смена имен листов. Лист с с именем name1 станет name2, и наоборот.
+      /// </summary>
+      /// <param name="db"></param>
+      /// <param name="name1"></param>
+      /// <param name="name2"></param>
+      public static void ConvertLayoutNames(Database db, string name1, string name2)
+      {
+         Database dbOrig = HostApplicationServices.WorkingDatabase;
+         HostApplicationServices.WorkingDatabase = db;
+         LayoutManager lm = LayoutManager.Current;
+         string tempName1 = name1 + name1;
+         lm.RenameLayout(name1, tempName1);
+         lm.RenameLayout(name2, name1);
+         lm.RenameLayout(tempName1, name2);
+         HostApplicationServices.WorkingDatabase = dbOrig;
       }
    }
 }

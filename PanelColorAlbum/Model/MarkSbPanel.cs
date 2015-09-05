@@ -162,9 +162,9 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          else
          {
             // Панели этажей                                    
+            int i = 1;
             foreach (var markAR in _marksAR)
-            {
-               int i = 1;
+            {               
                string markArchitect;
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
                string floor = String.Join(",", floors);
