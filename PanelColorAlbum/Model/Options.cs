@@ -8,8 +8,8 @@
       /// <summary>
       /// Путь к файлу шаблона МаркиСБ с шаблоном листа для МАрки АР.
       /// </summary>
-      public string SheetTemplateFileMarkSB = @"c:\temp\!Acad_adds\Plugins\NET-VIL\PanelAlbumColor\Шаблоны\АКР_Шаблон_МаркаСБ.dwg";
-      public string SheetTemplateFileContent = @"c:\temp\!Acad_adds\Plugins\NET-VIL\PanelAlbumColor\Шаблоны\АКР_Шаблон_Содержание.dwg";
+      public string SheetTemplateFileMarkSB = "root";
+      public string SheetTemplateFileContent = "root";
       /// <summary>
       /// Имя листа шаблона для Марки АР в файле шаблона листов.
       /// </summary>

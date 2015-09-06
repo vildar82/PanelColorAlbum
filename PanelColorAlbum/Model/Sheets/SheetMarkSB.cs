@@ -39,10 +39,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       }
 
       // Создание файла марки СБ
-      public void CreateFileMarkSB(string albumDir)
+      public void CreateFileMarkSB(SheetsSet sheetSet)
       {         
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
-         _fileMarkSB = CreateSheetMarkSB(_markSB, albumDir);
+         _fileMarkSB = CreateSheetMarkSB(_markSB, sheetSet.AlbumDir, sheetSet.SheetTemplateFileMarkSB);
 
          // Создание листов Марок АР         
          using (Database dbMarkSB = new Database(false, true))
@@ -87,10 +87,10 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       }
 
       // Создание файла Марки СБ
-      private string CreateSheetMarkSB(MarkSbPanel markSB, string albumFolder)
+      private string CreateSheetMarkSB(MarkSbPanel markSB, string albumFolder, string templateFileMarkSB)
       {
          string fileDest = Path.Combine(albumFolder, markSB.MarkSb + ".dwg");
-         File.Copy(Album.Options.SheetTemplateFileMarkSB, fileDest);
+         File.Copy(templateFileMarkSB, fileDest);
          return fileDest;
       }
 

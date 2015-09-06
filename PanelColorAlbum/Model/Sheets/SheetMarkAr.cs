@@ -13,10 +13,11 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
       private MarkArPanel _markAR;
-      private Point3d _ptInsertBlRefMarkAR;      
+      private Point3d _ptInsertBlRefMarkAR;
       // Данные для заполнения штампа
       private readonly string _sheetName; // Наименование листа      
       private int _sheetNumber;
+      private string _sheetNumberInForm;
 
       public string MarkArArch { get { return _markAR.MarkArArch; } }
       public string MarkArFullName { get { return _markAR.MarkARPanelFullName; } }
@@ -28,54 +29,87 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          set { _sheetNumber = value; }
       }
 
+      public string SheetNumberInForm
+      {
+         get { return _sheetNumberInForm; }
+         set { _sheetNumberInForm = value; }
+      }
+
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
-         _sheetName = string.Format("Наружная стеновая панель {0}", markAR.MarkARPanelFullName);         
+         _sheetName = string.Format("Наружная стеновая панель {0}", markAR.MarkARPanelFullName);
       }
 
       // Создание листа в файле марки СБ.
       public void CreateLayout(Database dbMarkSB, Point3d pt)
-      {  
+      {
          _ptInsertBlRefMarkAR = pt;
          // Определения блоков марок АР уже скопированы.
 
          using (var t = dbMarkSB.TransactionManager.StartTransaction())
          {
-            // Вставка блока Марки АР.
-            var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB);
+            //
             //Создание листа для Марки АР ("на Фасаде").
-            //var idLayoutMarkAR = CreateLayoutMarkAR();
+            //            
             var idLayoutMarkAR = Blocks.CopyLayout(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
             // Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
-            if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead)as DBDictionary).Count == 3)
+            if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary).Count == 3)
             {
                Blocks.ConvertLayoutNames(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
                HostApplicationServices.WorkingDatabase = dbMarkSB;
                LayoutManager lm = LayoutManager.Current;
-               idLayoutMarkAR =lm.GetLayoutId(LayoutName);    
+               idLayoutMarkAR = lm.GetLayoutId(LayoutName);
             }
+            // Вставка блока Марки АР.
+            var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);                        
             // Направение видового экрана на блок марки АР.
             var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB);
-            // Заполнение таблицы
-            CreateTableTiles(idBtrLayoutMarkAR, t);
+            // Заполнение таблицы     
+            FillTableTiles(idBtrLayoutMarkAR, t);
+            // Заполнение штампа
+            FillingStampMarkAr(idBtrLayoutMarkAR, true,  t);
 
+            //
             // Создание листа "в Форме" (зеркально)
+            //
+            // Копирование вхождения блока и зеркалирование
+            Point3d ptInsertMarkArForm = new Point3d(_ptInsertBlRefMarkAR.X, _ptInsertBlRefMarkAR.Y - 10000, 0);
+            var idBlRefMarkArForm = InsertBlRefMarkAR(dbMarkSB, ptInsertMarkArForm);
+            // Зеркалирование блока 
+            MirrorMarkArForFormSheet(idBlRefMarkArForm);
+            var idLayoutMarkArForm = Blocks.CopyLayout(dbMarkSB, LayoutName, LayoutName+"з");
+            // Направение видового экрана на блок марки АР(з).
+            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t, dbMarkSB);
+            // Заполнение штампа
+            FillingStampMarkAr(idBtrLayoutMarkArForm, false, t);
 
             t.Commit();
          }
-      }     
+      }
+
+      private void MirrorMarkArForFormSheet(ObjectId idBlRefMarkArForm)
+      {
+         using (var blRefMarkArMirr = idBlRefMarkArForm.GetObject ( OpenMode.ForWrite)as BlockReference)
+         {
+            var boundsBlRef = blRefMarkArMirr.Bounds.Value;
+            Point3d ptCentreX = new Point3d((boundsBlRef.MinPoint.X + boundsBlRef.MaxPoint.X) * 0.5, 0, 0);
+            Line3d lineMirr = new Line3d(ptCentreX, new Point3d(ptCentreX.X, 1000, 0));
+            blRefMarkArMirr.TransformBy(Matrix3d.Mirroring(lineMirr));
+         }
+      }
 
       // Создание и Заполнение таблицы расхода плитки
-      private void CreateTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t)
+      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t)
       {
-         // Поиск таблицы на листе
-         Table table = FindTable(idBtrLayoutMarkAR, t);         
+         var btrLayout = t.GetObject(idBtrLayoutMarkAR, OpenMode.ForRead) as BlockTableRecord;
+         // Поиск таблицы на листе         
+         Table table = FindTable(btrLayout, t);         
 
          // Расчет плитки
          var tilesCalc = _markAR.TilesCalc;
          // Установка размера таблицы.
-         if (table.Rows.Count >3)
+         if (table.Rows.Count > 3)
          {
             table.DeleteRows(3, table.Rows.Count - 3);
             table.SetSize(tilesCalc.Count + 3, table.Columns.Count);
@@ -112,20 +146,32 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       }
 
       // Поиск таблицы на листе
-      private Table FindTable(ObjectId idBtrLayoutMarkAR, Transaction t)
-      {
-         Table table = null;
-         var btrLayout = t.GetObject(idBtrLayoutMarkAR, OpenMode.ForRead) as BlockTableRecord;
+      private Table FindTable(BlockTableRecord btrLayout, Transaction t)
+      {  
          foreach (ObjectId idEnt in btrLayout)
          {
             if (idEnt.ObjectClass.Name == "AcDbTable")
             {
-               table = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Table;
-               break;
+               return  t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Table;               
             }
          }
-
-         return table;
+         throw new Exception("Не найдена заготовка таблицы на листе в файле шаблона Марки СБ.");
+      }
+      // Поиск штампа на листе
+      private BlockReference FindStamp(BlockTableRecord btrLayout, Transaction t)
+      {
+         foreach (ObjectId idEnt in btrLayout)
+         {
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            {
+               var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+               if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockStampMarkAR)
+               {
+                  return blRefStampContent;
+               }
+            }
+         }
+         throw new Exception("Не найден блок штампа на листе в файле шаблона Марки СБ.");
       }
 
       // Направление видового экрана на блок Марки АР
@@ -188,12 +234,12 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       //   return idLayoutMarAr;
       //}
 
-      private ObjectId InsertBlRefMarkAR(Database dbMarkSB)
+      private ObjectId InsertBlRefMarkAR(Database dbMarkSB, Point3d ptInsert)
       {
          ObjectId idBlRefMarkAR = ObjectId.Null;
          using (var bt = dbMarkSB.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
-            using (var blRefMarkAR = new BlockReference(_ptInsertBlRefMarkAR, bt[_markAR.MarkArBlockName]))
+            using (var blRefMarkAR = new BlockReference(ptInsert, bt[_markAR.MarkArBlockName]))
             {
                using (var ms = bt[BlockTableRecord.ModelSpace].GetObject(OpenMode.ForWrite) as BlockTableRecord)
                {
@@ -243,6 +289,49 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       public int CompareTo(SheetMarkAr other)
       {
          return MarkArArch.CompareTo(other.MarkArArch);
+      }
+
+      // Заполнение штампа содержания.
+      private void FillingStampMarkAr(ObjectId  idBtrLayout, bool isFacadeView, Transaction t)
+      {
+         var btrLayout = t.GetObject(idBtrLayout, OpenMode.ForRead) as BlockTableRecord;
+         var blRefStamp = FindStamp(btrLayout, t);
+         string textView;
+         string textNumber;
+         if (isFacadeView)
+         {
+            textView = "Раскладка плитки на фасаде";
+            textNumber = SheetNumber.ToString();
+         }
+         else
+         {
+            textView = "Раскладка плитки в форме";
+            textNumber = SheetNumberInForm;
+         }
+         
+         var atrs = blRefStamp.AttributeCollection;
+         foreach (ObjectId idAtrRef in atrs)
+         {
+            var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
+            string text = string.Empty;
+            if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
+            {
+               text = _sheetName;
+            }
+            else if (atrRef.Tag.Equals("Лист", StringComparison.OrdinalIgnoreCase))
+            {
+               text = textNumber;
+            }
+            else if (atrRef.Tag.Equals("Вид", StringComparison.OrdinalIgnoreCase))
+            {
+               text = textView;
+            }
+            if (text != string.Empty)
+            {
+               atrRef.UpgradeOpen();
+               atrRef.TextString = text;
+            }
+         }
       }
    }
 }

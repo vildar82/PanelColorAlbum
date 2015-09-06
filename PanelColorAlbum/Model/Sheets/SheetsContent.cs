@@ -12,19 +12,21 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
    // Листы содержания
    public class SheetsContent
    {
+      private SheetsSet _sheetsSet;
       private Album _album;
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _albumDir;
       private int _countContentSheets;
-      private ObjectId _idBlRefStampContentFirstSheet;
+      private BlockReference _blRefStampOnFirstContentSheet;
       private readonly int _countSheetsBeforContent = 2; // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
-      public SheetsContent (Album album, List<SheetMarkSB> sheetsMarkSB, string albumDir)
+      public SheetsContent (SheetsSet sheetsSet)
       {
-         _album = album;
-         _sheetsMarkSB = sheetsMarkSB;
-         _albumDir = albumDir;
+         _sheetsSet = sheetsSet;
+         _album = sheetsSet.Album;
+         _sheetsMarkSB = sheetsSet.SheetsMarkSB;
+         _albumDir = sheetsSet.AlbumDir;
          Contents();
       }
 
@@ -33,7 +35,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       {
          // Создание файла содержания и титульных листов
          string fileContent = Path.Combine(_albumDir, "Содержание" + _album.AbbreviateProject + ".dwg");
-         File.Copy(Album.Options.SheetTemplateFileContent, fileContent);
+         File.Copy(_sheetsSet.SheetTemplateFileContent, fileContent);
 
          // Кол листов содержания = Суммарное кол лисчтов панелей / на кол строк в таблице на одном листе
          // Но на первом листе содержания первые 5 строк заняты (обложка, тит, общие данные, наруж стен панели, том1).
@@ -53,6 +55,8 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
                int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
                // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
                _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
+               // Заполнение штампа на первом листе содержания
+               FillingStampContent(_blRefStampOnFirstContentSheet, curContentLayout, t);
                // текущая строка для записи листа               
                int row = _firstRowInTableForSheets;
                // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
@@ -65,13 +69,13 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
                tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
-               int curSheetArNum = _countContentSheets + 6;// номер для первого листа Марки АР               
+               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР               
                foreach (var sheetMarkSB in _sheetsMarkSB)
                {
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
-                  {
-                     sheetMarkAR.SheetNumber = curSheetArNum++;
+                  {                     
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки на фасаде";
+                     sheetMarkAR.SheetNumber = ++curSheetArNum;
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
@@ -84,6 +88,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
                      }
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки в форме";
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
+                     sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
                      if (row == tableContent.Rows.Count)
@@ -92,9 +97,21 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
                         tableContent.RecomputeTableBlock(true);
                         CopyContentSheet(dbContent, t, ++curContentLayout, out tableContent);
                         row = _firstRowInTableForSheets;
-                     }
+                     }                     
                   }
                }
+
+               //Удаление пустых строк в таблице содержания
+               if (tableContent.Rows.Count > row+1)
+               {
+                  tableContent.DeleteRows(row, tableContent.Rows.Count-row);
+               }
+
+               // Удаление последнего листа содержания (пустой копии)
+               HostApplicationServices.WorkingDatabase = dbContent;
+               LayoutManager lm = LayoutManager.Current;
+               lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForContent + (++_countContentSheets).ToString());
+
                t.Commit();
             }
             HostApplicationServices.WorkingDatabase = dbOrig;
@@ -109,7 +126,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          {
             // Еще не определено кол листов содержания.
             // значит это первый лист содержания.
-            _idBlRefStampContentFirstSheet = blRefStamp.ObjectId;
+            _blRefStampOnFirstContentSheet = blRefStamp;
             // Его заполним вконце 
          }
          else
@@ -119,10 +136,14 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
             {
                var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
                string text = string.Empty; 
-               if (atrRef.Tag .Equals("Наименование", StringComparison.OrdinalIgnoreCase) )
+               if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase) )
                {
-                  if (curContentLayout == _countContentSheets)                  
-                     text = "Общие данные. Ведомость комплекта чертежей (окончание)";                  
+                  if (curContentLayout == 1 && _countContentSheets>1)
+                     text = "Общие данные. Ведомость комплекта чертежей (начало)";
+                  if (curContentLayout == 1 && _countContentSheets == 1)
+                     text = "Общие данные. Ведомость комплекта чертежей.";
+                  else if (curContentLayout == _countContentSheets)
+                     text = "Общие данные. Ведомость комплекта чертежей (окончание)";
                   else                  
                      text = "Общие данные. Ведомость комплекта чертежей (продолжение)";                  
                }
