@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Vil.Acad;
-using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Зоны покраски в Модели
    public class ColorAreaModel

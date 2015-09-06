@@ -1,11 +1,11 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
-using Vil.Acad.AR.PanelColorAlbum.Model;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model;
 
-[assembly: CommandClass(typeof(Vil.Acad.AR.PanelColorAlbum.Commands))]
+[assembly: CommandClass(typeof(Vil.Acad.AR.AlbumPanelColorTiles.Commands))]
 
-namespace Vil.Acad.AR.PanelColorAlbum
+namespace Vil.Acad.AR.AlbumPanelColorTiles
 {
    // Команды автокада.
    // Для каждого документа свой объект Commands (один чертеж - один альбом).

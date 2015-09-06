@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model.Lib
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
 {
    // Сравнение чисел
    public class DoubleEqualityComparer : IEqualityComparer<double>

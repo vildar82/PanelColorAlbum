@@ -5,9 +5,9 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Марка АР покраски панели
    public class MarkArPanel

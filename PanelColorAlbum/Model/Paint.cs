@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.Colors;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Краска
    public class Paint

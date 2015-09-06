@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Панель Марки АР
    public class Panel

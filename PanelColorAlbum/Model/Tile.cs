@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Плитка
    public class Tile

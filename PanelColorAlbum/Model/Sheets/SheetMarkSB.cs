@@ -5,7 +5,7 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
    // Листы Марки СБ
    public class SheetMarkSB :IComparable<SheetMarkSB>

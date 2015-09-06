@@ -3,10 +3,10 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using Autodesk.AutoCAD.DatabaseServices;
-using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 using System.Reflection;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
    // Ведомость альбома панелей
    public class SheetsSet

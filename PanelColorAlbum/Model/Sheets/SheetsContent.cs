@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
-using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
    // Листы содержания
    public class SheetsContent

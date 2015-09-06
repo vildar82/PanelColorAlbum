@@ -2,9 +2,9 @@
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
    // Лист Марки АР (на фасаде и в форме)
    public class SheetMarkAr : IComparable<SheetMarkAr>

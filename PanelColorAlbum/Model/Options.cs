@@ -1,4 +1,4 @@
-﻿namespace Vil.Acad.AR.PanelColorAlbum.Model
+﻿namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    public class Options
    {

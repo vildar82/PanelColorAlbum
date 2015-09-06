@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Панели марки СБ
    public class MarkSbPanel

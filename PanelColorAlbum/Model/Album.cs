@@ -6,11 +6,11 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using Vil.Acad.AR.PanelColorAlbum.Model.Checks;
-using Vil.Acad.AR.PanelColorAlbum.Model.Lib;
-using Vil.Acad.AR.PanelColorAlbum.Model.Sheets;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets;
 
-namespace Vil.Acad.AR.PanelColorAlbum.Model
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Альбом колористических решений.
    public class Album
