@@ -16,8 +16,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
       private Album _album;
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _albumDir;
-      private int _countContentSheets;
-      private BlockReference _blRefStampOnFirstContentSheet;
+      private int _countContentSheets;      
       private readonly int _countSheetsBeforContent = 2; // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
@@ -50,20 +49,21 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
             {
                int curContentLayout = 1;
                Table tableContent;
-               CopyContentSheet(dbContent, t, curContentLayout, out tableContent);
+               BlockReference blRefStamp;
+               CopyContentSheet(dbContent, t, curContentLayout, out tableContent, out blRefStamp);
                // Определение кол-ва марок АР
                int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
                // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
                _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
                // Заполнение штампа на первом листе содержания
-               FillingStampContent(_blRefStampOnFirstContentSheet, curContentLayout, t);
+               FillingStampContent(blRefStamp, curContentLayout, t);
                // текущая строка для записи листа               
                int row = _firstRowInTableForSheets;
                // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
                tableContent.Cells[row++, 1].TextString = "Обложка";
                tableContent.Cells[row++, 1].TextString = "Титульный лист";
-               tableContent.Cells[row, 1].TextString = "Общие данные. Ведомость комплекта чертежей (начало)";
-               tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets).ToString() : "3";
+               tableContent.Cells[row, 1].TextString = "Общие данные. Ведомость комплекта чертежей";
+               tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets-1).ToString() : "3";
                tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                row++;
                tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
@@ -73,31 +73,20 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
                foreach (var sheetMarkSB in _sheetsMarkSB)
                {
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
-                  {                     
+                  {
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки на фасаде";
                      sheetMarkAR.SheetNumber = ++curSheetArNum;
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
-                     if (row == tableContent.Rows.Count)
-                     {
-                        // Новый лист содержания
-                        tableContent.RecomputeTableBlock(true);
-                        CopyContentSheet(dbContent, t, ++curContentLayout, out tableContent);
-                        row = _firstRowInTableForSheets;
-                     }
+                     CheckEndOfTable(dbContent, t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
+                     
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки в форме";
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
                      sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
-                     if (row == tableContent.Rows.Count)
-                     {
-                        // Новый лист содержания
-                        tableContent.RecomputeTableBlock(true);
-                        CopyContentSheet(dbContent, t, ++curContentLayout, out tableContent);
-                        row = _firstRowInTableForSheets;
-                     }                     
+                     CheckEndOfTable(dbContent, t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
                   }
                }
 
@@ -119,44 +108,51 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          }
       }
 
-      // Заполнение штампа содержания.
+      private void CheckEndOfTable(Database dbContent, Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
+      {
+         if (row == tableContent.Rows.Count)
+         {
+            // Новый лист содержания
+            tableContent.RecomputeTableBlock(true);
+            CopyContentSheet(dbContent, t, ++curContentLayout, out tableContent, out blRefStamp);
+            FillingStampContent(blRefStamp, curContentLayout, t);
+            row = _firstRowInTableForSheets;
+         }
+      }
+
+      /// <summary>
+      /// Заполнение штампа содержания.
+      /// </summary>
+      /// <param name="blRefStamp"></param>
+      /// <param name="curContentLayout">Текущий лист содержания (без тит и обложек)</param>
+      /// <param name="t"></param>
       private void FillingStampContent(BlockReference blRefStamp, int curContentLayout, Transaction t)
       {
-         if (_countContentSheets == 0)
+         var atrs = blRefStamp.AttributeCollection;
+         foreach (ObjectId idAtrRef in atrs)
          {
-            // Еще не определено кол листов содержания.
-            // значит это первый лист содержания.
-            _blRefStampOnFirstContentSheet = blRefStamp;
-            // Его заполним вконце 
-         }
-         else
-         {
-            var atrs = blRefStamp.AttributeCollection;
-            foreach (ObjectId idAtrRef in atrs)
+            var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
+            string text = string.Empty;
+            if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
             {
-               var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
-               string text = string.Empty; 
-               if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase) )
-               {
-                  if (curContentLayout == 1 && _countContentSheets>1)
-                     text = "Общие данные. Ведомость комплекта чертежей (начало)";
-                  if (curContentLayout == 1 && _countContentSheets == 1)
-                     text = "Общие данные. Ведомость комплекта чертежей.";
-                  else if (curContentLayout == _countContentSheets)
-                     text = "Общие данные. Ведомость комплекта чертежей (окончание)";
-                  else                  
-                     text = "Общие данные. Ведомость комплекта чертежей (продолжение)";                  
-               }
-               else if (atrRef.Tag.Equals("Лист", StringComparison.OrdinalIgnoreCase))
-               {
-                  text = (_countSheetsBeforContent + curContentLayout).ToString();
-               }
-               if (text != string.Empty)
-               {
-                  atrRef.UpgradeOpen();
-                  atrRef.TextString = text; 
-               }               
-            } 
+               if (curContentLayout == 1 & _countContentSheets > 1)
+                  text = "Общие данные. Ведомость комплекта чертежей (начало)";
+               else if (curContentLayout == 1 & _countContentSheets == 1)
+                  text = "Общие данные. Ведомость комплекта чертежей.";
+               else if (curContentLayout == _countContentSheets)
+                  text = "Общие данные. Ведомость комплекта чертежей (окончание)";
+               else
+                  text = "Общие данные. Ведомость комплекта чертежей (продолжение)";
+            }
+            else if (atrRef.Tag.Equals("Лист", StringComparison.OrdinalIgnoreCase))
+            {
+               text = (_countSheetsBeforContent + curContentLayout).ToString();
+            }
+            if (text != string.Empty)
+            {
+               atrRef.UpgradeOpen();
+               atrRef.TextString = text;
+            }
          }
       }
 
@@ -238,14 +234,12 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model.Sheets
          throw new Exception("Не найдена заготовка таблицы в шаблоне содержания.");
       }
 
-      private void CopyContentSheet(Database dbContent, Transaction t, int curContentLayout, out Table tableContent)
+      private void CopyContentSheet(Database dbContent, Transaction t, int curContentLayout, out Table tableContent, out BlockReference blRefStamp)
       {
          Layout layout = GetCurLayoutContentAndCopyNext(curContentLayout, t, dbContent);
          var btrLayoutContent = t.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          tableContent = FindTableContent(btrLayoutContent, t);
-         BlockReference blRefStamp = FindBlRefStampContent(btrLayoutContent, t);
-         // Заполнение штампа содержания.
-         FillingStampContent(blRefStamp, curContentLayout, t);
+         blRefStamp = FindBlRefStampContent(btrLayoutContent, t);         
       }
    }
 }
