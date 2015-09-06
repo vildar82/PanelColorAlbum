@@ -91,10 +91,18 @@ namespace Vil.Acad.AR.PanelColorAlbum
             return;
          }
          Editor ed = doc.Editor;
+         //Album albumForOptions = new Album();
          string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." +
                       "\nКоманды: PaintPanels - покраска блоков панелей." +
                       "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
-                      "\nAlbumPanels - создание альбома панелей.";
+                      "\nAlbumPanels - создание альбома панелей." +
+                      "\nСправка: имена блоков:" +
+                      "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок вконце." +
+                      "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName + 
+                      "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName + 
+                      "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels + 
+                      "\nПанели торцевые на слое - " + Album.Options.LayerPanelEndLeft + " или " + Album.Options.LayerPanelEndRight + 
+                      "\n";            
          ed.WriteMessage(msg);
       }
 

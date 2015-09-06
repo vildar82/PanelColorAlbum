@@ -30,7 +30,7 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
 
       public Album()
       {
-         _options = new Options();
+         //_options = new Options();
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
@@ -55,7 +55,16 @@ namespace Vil.Acad.AR.PanelColorAlbum.Model
          return abbrName;
       }
 
-      public static Options Options { get { return _options; } }
+      public static Options Options {
+         get
+         {
+            if (_options == null)
+            {
+               _options = new Options();
+            }
+            return _options;
+         }
+      }
 
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
 
