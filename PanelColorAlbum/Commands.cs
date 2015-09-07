@@ -14,7 +14,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
       private Album _album;
 
       // Покраска панелей в Моделе (по блокам зон покраски)
-      [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]      
+      [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;
@@ -43,10 +43,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;
          using (var DocLock = doc.LockDocument())
-         {            
+         {
             try
             {
-               Album.Resetblocks();                              
+               Album.Resetblocks();
                doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
             }
             catch (System.Exception ex)
@@ -69,15 +69,15 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             }
             else
             {
-               //try
-               //{
-                  _album.CreateAlbum();                                                         
+               try
+               {
+                  _album.CreateAlbum();
                   doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.SheetsSet.AlbumDir);
-               //}
-               //catch (System.Exception ex)
-               //{
-                  //doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
-               //}
+               }
+               catch (System.Exception ex)
+               {
+                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
+               }
             }
          }
       }
@@ -98,11 +98,11 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                       "\nAlbumPanels - создание альбома панелей." +
                       "\nСправка: имена блоков:" +
                       "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок вконце." +
-                      "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName + 
-                      "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName + 
-                      "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels + 
-                      "\nПанели торцевые на слое - " + Album.Options.LayerPanelEndLeft + " или " + Album.Options.LayerPanelEndRight + 
-                      "\n";            
+                      "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
+                      "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName +
+                      "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels +
+                      "\nПанели торцевые на слое - " + Album.Options.LayerPanelEndLeft + " или " + Album.Options.LayerPanelEndRight +
+                      "\nОбрабатываются только блоки в текущем чертеже. Внешние ссылки не учитываются.";
          ed.WriteMessage(msg);
       }
 

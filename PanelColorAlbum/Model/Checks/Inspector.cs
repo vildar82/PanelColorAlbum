@@ -94,7 +94,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks
                      break;
                   }
                }
-               if (!isAllTilePainted) break;               
+               if (!isAllTilePainted) break;
             }
          }
          return res;

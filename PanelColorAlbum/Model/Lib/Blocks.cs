@@ -35,8 +35,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
                idBtrCopy = bt[name];
             }
             else
-            {  
-               var btrCopy = btrSource.Clone () as BlockTableRecord;               
+            {
+               var btrCopy = btrSource.Clone() as BlockTableRecord;
                btrCopy.Name = name;
                bt.UpgradeOpen();
                idBtrCopy = bt.Add(btrCopy);
@@ -78,7 +78,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
       /// </summary>
       /// <param name="name">Имя для блока</param>
       /// <returns>Валидная строка имени</returns>
-      public static string GetValidNameForBlock (string name)
+      public static string GetValidNameForBlock(string name)
       {
          string res = name;
          //string testString = "<>/?\";:*|,='";
@@ -92,14 +92,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
       /// Копирование листа
       /// </summary>
       /// <returns>ID Layout</returns>
-      public static ObjectId CopyLayout(Database db,string layerSource, string layerCopy)
+      public static ObjectId CopyLayout(Database db, string layerSource, string layerCopy)
       {
-         ObjectId idLayoutCopy = ObjectId.Null;         
-         Database dbOrig = HostApplicationServices.WorkingDatabase;         
+         ObjectId idLayoutCopy = ObjectId.Null;
+         Database dbOrig = HostApplicationServices.WorkingDatabase;
          HostApplicationServices.WorkingDatabase = db;
-         LayoutManager lm = LayoutManager.Current;      
-         // Нужно проверить имена. Вдруг нет листа источника, или уже есть копируемый лист.             
-         lm.CopyLayout(layerSource, layerCopy);         
+         LayoutManager lm = LayoutManager.Current;
+         // Нужно проверить имена. Вдруг нет листа источника, или уже есть копируемый лист.
+         lm.CopyLayout(layerSource, layerCopy);
          idLayoutCopy = lm.GetLayoutId(layerCopy);
          HostApplicationServices.WorkingDatabase = dbOrig;
          return idLayoutCopy;

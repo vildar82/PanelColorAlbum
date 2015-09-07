@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
    // Листы Марки СБ
-   public class SheetMarkSB :IComparable<SheetMarkSB>
+   public class SheetMarkSB : IComparable<SheetMarkSB>
    {
       // Файл панели Марки СБ с листами Маркок АР.
       private MarkSbPanel _markSB;
 
       private List<SheetMarkAr> _sheetsMarkAR;
-      private string _fileMarkSB;      
+      private string _fileMarkSB;
 
       public string MarkSB
       {
@@ -27,7 +26,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       public SheetMarkSB(MarkSbPanel markSB)
       {
          _markSB = markSB;
-         _sheetsMarkAR = new List<SheetMarkAr>(); 
+         _sheetsMarkAR = new List<SheetMarkAr>();
          // Обработка Марок АР
          foreach (var markAR in _markSB.MarksAR)
          {
@@ -35,16 +34,16 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             _sheetsMarkAR.Add(sheetAR);
          }
          // Сортировка листов Марок АР
-         _sheetsMarkAR.Sort(); 
+         _sheetsMarkAR.Sort();
       }
 
       // Создание файла марки СБ
       public void CreateFileMarkSB(SheetsSet sheetSet)
-      {         
+      {
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateSheetMarkSB(_markSB, sheetSet.AlbumDir, sheetSet.SheetTemplateFileMarkSB);
 
-         // Создание листов Марок АР         
+         // Создание листов Марок АР
          using (Database dbMarkSB = new Database(false, true))
          {
             Database dbOrig = _markSB.IdBtr.Database;
@@ -58,20 +57,20 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             Point3d pt = Point3d.Origin;
             foreach (var sheetMarkAR in _sheetsMarkAR)
             {
-               sheetMarkAR.CreateLayout(dbMarkSB, pt); 
+               sheetMarkAR.CreateLayout(dbMarkSB, pt);
                // Точка для вставки следующего блока Марки АР
                pt = new Point3d(pt.X + 15000, pt.Y, 0);
             }
 
-            //// Удаление шаблона листа из фала Марки СБ            
+            //// Удаление шаблона листа из фала Марки СБ
             HostApplicationServices.WorkingDatabase = dbMarkSB;
             LayoutManager lm = LayoutManager.Current;
             lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForMarkAR);
 
             HostApplicationServices.WorkingDatabase = dbOrig;
-            dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);            
+            dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
          }
-      }     
+      }
 
       // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
       private void CopyBtrMarksARToSheetMarkSB(MarkSbPanel markSB, Database dbMarkSB)

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Office.Interop.Excel;
+﻿using Microsoft.Office.Interop.Excel;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
@@ -15,8 +10,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 
          // Открываем приложение
          var excelApp = new Microsoft.Office.Interop.Excel.Application { DisplayAlerts = false };
-         if (excelApp == null)         
-            return;         
+         if (excelApp == null)
+            return;
 
          // Открываем книгу
          Workbook workBook = excelApp.Workbooks.Add();
@@ -32,16 +27,16 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          worksheet.Cells[row, 1].Value = "Марка АР";
          worksheet.Cells[row, 2].Value = "Кол блоков";
 
-         // Записываем данные         
+         // Записываем данные
          foreach (var sheetSb in sheetsSet.SheetsMarkSB)
          {
-            foreach (var sheetAr in sheetSb.SheetsMarkAR )
+            foreach (var sheetAr in sheetSb.SheetsMarkAR)
             {
                row++;
                worksheet.Cells[row, 1].Value = sheetAr.MarkArFullName;
-               worksheet.Cells[row, 2].Value = sheetAr.MarkAR.Panels.Count;  
+               worksheet.Cells[row, 2].Value = sheetAr.MarkAR.Panels.Count;
             }
-         }         
+         }
 
          // Показать ексель.
          // Лучше сохранить файл и закрыть!!!???

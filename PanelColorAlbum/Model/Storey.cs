@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+﻿namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Этаж
    public class Storey
@@ -27,7 +21,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       /// Высотная отметка этажа
       /// </summary>
       /// <param name="y">Отметка этажа</param>
-      public Storey (double y)
+      public Storey(double y)
       {
          _y = y;
       }

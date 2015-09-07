@@ -16,6 +16,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
             res = true;
          }
          return res;
-      }      
+      }
    }
 }

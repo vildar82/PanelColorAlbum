@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using Autodesk.AutoCAD.DatabaseServices;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 using System.Reflection;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
@@ -12,17 +9,16 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
    public class SheetsSet
    {
       private Album _album;
-      private string _albumDir;      
+      private string _albumDir;
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileMarkSB;
-      private string _sheetTemplateFileContent;      
+      private string _sheetTemplateFileContent;
 
       public string AlbumDir { get { return _albumDir; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
       public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
       public Album Album { get { return _album; } }
       public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
-
 
       public SheetsSet(Album album)
       {
@@ -33,10 +29,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       // Создание альбома панелей
       public void CreateAlbum()
       {
-         // Проверка наличия файла шаблона листов  
+         // Проверка наличия файла шаблона листов
          _sheetTemplateFileMarkSB = GetTemplateFile(Album.Options.SheetTemplateFileMarkSB, true);
          _sheetTemplateFileContent = GetTemplateFile(Album.Options.SheetTemplateFileContent, false);
-         if (!File.Exists(_sheetTemplateFileMarkSB))         
+         if (!File.Exists(_sheetTemplateFileMarkSB))
             throw new Exception("\nНе найден файл шаблона для листов панелей - " + _sheetTemplateFileMarkSB);
          if (!File.Exists(_sheetTemplateFileContent))
             throw new Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);
@@ -48,9 +44,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          _sheetsMarkSB = ProcessingSheets(_album.MarksSB);
 
          // Титульные листы и обложеи в одном файле "Содержание".
-         // Создание титульных листов         
+         // Создание титульных листов
          // Листы содержания
-         SheetsContent content = new SheetsContent(this);         
+         SheetsContent content = new SheetsContent(this);
 
          //Создание файлов марок СБ и листов марок АР в них.
          foreach (var sheetMarkSB in _sheetsMarkSB)
@@ -74,7 +70,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName);
          }
          else
-            return optionsPathToTemplate;                
+            return optionsPathToTemplate;
       }
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
@@ -96,11 +92,11 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       private void CreateAlbumFolder()
       {
          // Папка альбома панелей
-         string albumFolderName = "Альбом панелей";         
+         string albumFolderName = "Альбом панелей";
          string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
          _albumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
          if (Directory.Exists(_albumDir))
-         {            
+         {
             Directory.Delete(_albumDir, true);
          }
          Directory.CreateDirectory(_albumDir);

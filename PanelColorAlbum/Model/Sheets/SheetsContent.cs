@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
@@ -16,11 +14,11 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       private Album _album;
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _albumDir;
-      private int _countContentSheets;      
+      private int _countContentSheets;
       private readonly int _countSheetsBeforContent = 2; // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
-      public SheetsContent (SheetsSet sheetsSet)
+      public SheetsContent(SheetsSet sheetsSet)
       {
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
@@ -44,7 +42,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             dbContent.ReadDwgFile(fileContent, FileShare.ReadWrite, false, "");
             dbContent.CloseInput(true);
 
-            //Копирование листа "Содержание" для следующего листа содержания (заполнять буду предыдущий лист содержания).            
+            //Копирование листа "Содержание" для следующего листа содержания (заполнять буду предыдущий лист содержания).
             using (var t = dbContent.TransactionManager.StartTransaction())
             {
                int curContentLayout = 1;
@@ -57,19 +55,19 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
                // Заполнение штампа на первом листе содержания
                FillingStampContent(blRefStamp, curContentLayout, t);
-               // текущая строка для записи листа               
+               // текущая строка для записи листа
                int row = _firstRowInTableForSheets;
                // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
                tableContent.Cells[row++, 1].TextString = "Обложка";
                tableContent.Cells[row++, 1].TextString = "Титульный лист";
                tableContent.Cells[row, 1].TextString = "Общие данные. Ведомость комплекта чертежей";
-               tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets-1).ToString() : "3";
+               tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets - 1).ToString() : "3";
                tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                row++;
                tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
-               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР               
+               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
                foreach (var sheetMarkSB in _sheetsMarkSB)
                {
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
@@ -80,7 +78,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
                      CheckEndOfTable(dbContent, t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
-                     
+
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки в форме";
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
                      sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
@@ -91,9 +89,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                }
 
                //Удаление пустых строк в таблице содержания
-               if (tableContent.Rows.Count > row+1)
+               if (tableContent.Rows.Count > row + 1)
                {
-                  tableContent.DeleteRows(row, tableContent.Rows.Count-row);
+                  tableContent.DeleteRows(row, tableContent.Rows.Count - row);
                }
 
                // Удаление последнего листа содержания (пустой копии)
@@ -187,16 +185,16 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          return marksSB.Sum(sb => sb.SheetsMarkAR.Count);
       }
 
-      // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.      
+      // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
       private static int CalcSheetsContentNumber(int rowsTable, int marksAr)
       {
          int res = 0; // Нужное кол листов содержания
          int rowsToSheetsInTable = rowsTable - 2; // строк в таблице под листы
-         int rowsInFirstSheet = rowsToSheetsInTable - 5;// строк под листы марки АР на первом листе содерж (без облажки тит и т.п )                 
-         int numSheetsMarksAr = marksAr * 2; // кол листов марок АР (листы фасада и форм)         
+         int rowsInFirstSheet = rowsToSheetsInTable - 5;// строк под листы марки АР на первом листе содерж (без облажки тит и т.п )
+         int numSheetsMarksAr = marksAr * 2; // кол листов марок АР (листы фасада и форм)
          numSheetsMarksAr -= rowsInFirstSheet; // вычитаем листы первого листа содержания
          res = 1;
-         res += numSheetsMarksAr / rowsToSheetsInTable; // целое кол листов         
+         res += numSheetsMarksAr / rowsToSheetsInTable; // целое кол листов
          var remaindSheets = numSheetsMarksAr % rowsToSheetsInTable; // остаток листов
          if (remaindSheets > 0)
          {
@@ -211,7 +209,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          {
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+               var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockStampContent)
                {
                   return blRefStampContent;
@@ -239,7 +237,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          Layout layout = GetCurLayoutContentAndCopyNext(curContentLayout, t, dbContent);
          var btrLayoutContent = t.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          tableContent = FindTableContent(btrLayoutContent, t);
-         blRefStamp = FindBlRefStampContent(btrLayoutContent, t);         
+         blRefStamp = FindBlRefStampContent(btrLayoutContent, t);
       }
    }
 }

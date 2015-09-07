@@ -13,8 +13,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 
       private ObjectId _idBtr;
       private List<MarkArPanel> _marksAR;
+
       // Список тех же панелей марки АР, что и в _marksAR, но с архитектурными индексами. В списке _marksAR марки тоже будут архитектурными. Этот словарь просто для проверки уникальности марок.
       private Dictionary<string, MarkArPanel> _marksArArchitectIndex;
+
       private string _markSb;
       private string _markSbBlockName;
       private List<Paint> _paints;
@@ -60,6 +62,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       /// Это панель чердака? true - да, false - нет.
       /// </summary>
       public bool IsUpperStoreyPanel { get { return _isUpperStoreyPanel; } }
+
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
 
@@ -146,7 +149,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          if (_isUpperStoreyPanel)
          {
             // Панели чердака
-            // (ЭЧ-#_Яр1)            
+            // (ЭЧ-#_Яр1)
             if (_marksAR.Count == 1)
             {
                // Если одна марка покраски
@@ -174,7 +177,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                endIndex = "ТЛ";
             else
                endIndex = "ТП";
-            // Панели этажей                                    
+            // Панели этажей
             int i = 1;
             foreach (var markAR in _marksAR)
             {
@@ -184,7 +187,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                markArchitect = string.Format("(Э{0}{1}_{2})", floor, endIndex, _abbreviateProject);
                if (_marksArArchitectIndex.ContainsKey(markArchitect))
                {
-                  markArchitect = string.Format("(Э{0}{1}-{2}_{3})", floor, endIndex,  i++, _abbreviateProject);
+                  markArchitect = string.Format("(Э{0}{1}-{2}_{3})", floor, endIndex, i++, _abbreviateProject);
                }
                _marksArArchitectIndex.Add(markArchitect, markAR);
                markAR.MarkArArch = markArchitect;
@@ -192,10 +195,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
          else
          {
-            // Панели этажей                                    
+            // Панели этажей
             int i = 1;
             foreach (var markAR in _marksAR)
-            {               
+            {
                string markArchitect;
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
                string floor = String.Join(",", floors);
@@ -261,7 +264,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       public static string GetPanelMarkFromBlockName(string blName, List<MarkSbPanel> marksSB)
       {
          //return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
-         string panelMark = string.Empty; 
+         string panelMark = string.Empty;
          // Найти имя марки панели СБ или АР
          foreach (var markSB in marksSB)
          {
@@ -271,20 +274,20 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             }
             else
             {
-               foreach (var markAR in markSB.MarksAR )
+               foreach (var markAR in markSB.MarksAR)
                {
                   if (markAR.MarkArBlockName == blName)
                   {
-                     panelMark = markAR.MarkARPanelFullName; 
+                     panelMark = markAR.MarkARPanelFullName;
                   }
                }
             }
          }
-         return panelMark;         
+         return panelMark;
       }
 
       public static string GetMarkSbBlockName(string markSb)
-      {         
+      {
          return Album.Options.BlockPanelPrefixName + markSb;
       }
 
@@ -296,14 +299,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          {
             // Хвостовая часть
             markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length);
-            if (markSb.EndsWith (")"))
+            if (markSb.EndsWith(")"))
             {
                int lastDirectBracket = markSb.LastIndexOf('(');
-               if (lastDirectBracket>0)
+               if (lastDirectBracket > 0)
                {
                   markSb = markSb.Substring(0, lastDirectBracket);
                }
-            }            
+            }
          }
          return markSb;
       }
