@@ -69,15 +69,15 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             }
             else
             {
-               try
-               {
+               //try
+               //{
                   _album.CreateAlbum();                                                         
                   doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.SheetsSet.AlbumDir);
-               }
-               catch (System.Exception ex)
-               {
-                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
-               }
+               //}
+               //catch (System.Exception ex)
+               //{
+                  //doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
+               //}
             }
          }
       }

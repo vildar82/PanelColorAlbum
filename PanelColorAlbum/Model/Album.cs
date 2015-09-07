@@ -9,6 +9,7 @@ using Autodesk.AutoCAD.Geometry;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets;
+using System.IO;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
@@ -21,7 +22,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private static Options _options;
       private ColorAreaModel _colorAreaModel;
       private Database _db;
-      private Document _doc;
+      private Document _doc;      
       // Сокращенное имя проеккта
       private string _abbreviateProject;
       private List<MarkSbPanel> _marksSB;
@@ -30,8 +31,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 
       public Album()
       {
-         //_options = new Options();
          _doc = Application.DocumentManager.MdiActiveDocument;
+         if (!File.Exists(_doc.Name) )         
+            throw new System.Exception("Нужно сохранить файл.");         
          _db = _doc.Database;
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
          _abbreviateProject =AbbreviateNameProject();
@@ -44,31 +46,25 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          var opt = new PromptStringOptions("Введите сокращенное имя проекта для добавления к имени Марки АР:");
          opt.DefaultValue = defName;
          var res = _doc.Editor.GetString(opt);
-         if (res.Status ==  PromptStatus.OK)
-         {
-            abbrName = res.StringResult;
-         }
-         else
-         {
-            abbrName = defName;
-         }
+         if (res.Status ==  PromptStatus.OK)         
+            abbrName = res.StringResult;         
+         else         
+            abbrName = defName;         
          return abbrName;
       }
 
       public static Options Options {
          get
          {
-            if (_options == null)
-            {
-               _options = new Options();
-            }
+            if (_options == null)            
+               _options = new Options();            
             return _options;
          }
       }
 
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
 
-      public Document Doc { get { return _doc; } }
+      public string  DwgFacade { get { return _doc.Name; } }
 
       public string AbbreviateProject { get { return _abbreviateProject; } }
 

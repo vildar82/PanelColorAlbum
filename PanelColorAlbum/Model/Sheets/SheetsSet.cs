@@ -15,7 +15,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       private string _albumDir;      
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileMarkSB;
-      private string _sheetTemplateFileContent;
+      private string _sheetTemplateFileContent;      
 
       public string AlbumDir { get { return _albumDir; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
@@ -57,6 +57,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          {
             sheetMarkSB.CreateFileMarkSB(this);
          }
+
+         // Еспорт списка панелей в ексель.
+         ExportToExcel.Export(this, _album);
       }
 
       private string GetTemplateFile(string optionsPathToTemplate, bool markSbOrContent)
@@ -93,8 +96,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       private void CreateAlbumFolder()
       {
          // Папка альбома панелей
-         string albumFolderName = "Альбом панелей";
-         string curDwgFacadeFolder = Path.GetDirectoryName(_album.Doc.Name);
+         string albumFolderName = "Альбом панелей";         
+         string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
          _albumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
          if (Directory.Exists(_albumDir))
          {            

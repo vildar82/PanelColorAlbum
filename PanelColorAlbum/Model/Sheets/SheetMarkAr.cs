@@ -35,6 +35,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          set { _sheetNumberInForm = value; }
       }
 
+      public MarkArPanel MarkAR { get { return _markAR; } }
+
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
