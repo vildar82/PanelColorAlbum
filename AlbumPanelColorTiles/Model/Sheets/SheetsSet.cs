@@ -11,21 +11,19 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       private Album _album;
       private string _albumDir;
       private List<SheetMarkSB> _sheetsMarkSB;
-      private string _sheetTemplateFileMarkSB;
       private string _sheetTemplateFileContent;
-
-      public string AlbumDir { get { return _albumDir; } }
-      public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
-      public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
-      public Album Album { get { return _album; } }
-      public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
-
+      private string _sheetTemplateFileMarkSB;
       public SheetsSet(Album album)
       {
          _album = album;
          _sheetsMarkSB = new List<SheetMarkSB>();
       }
 
+      public Album Album { get { return _album; } }
+      public string AlbumDir { get { return _albumDir; } }
+      public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
+      public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
+      public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
       // Создание альбома панелей
       public void CreateAlbum()
       {
@@ -58,6 +56,20 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          ExportToExcel.Export(this, _album);
       }
 
+      // Создание папки Альбома панелей
+      private void CreateAlbumFolder()
+      {
+         // Папка альбома панелей
+         string albumFolderName = "Альбом панелей";
+         string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
+         _albumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
+         if (Directory.Exists(_albumDir))
+         {
+            Directory.Delete(_albumDir, true);
+         }
+         Directory.CreateDirectory(_albumDir);
+      }
+
       private string GetTemplateFile(string optionsPathToTemplate, bool markSbOrContent)
       {
          if (optionsPathToTemplate == "root")
@@ -86,20 +98,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          // Сортировка
          sheetsMarkSb.Sort();
          return sheetsMarkSb;
-      }
-
-      // Создание папки Альбома панелей
-      private void CreateAlbumFolder()
-      {
-         // Папка альбома панелей
-         string albumFolderName = "Альбом панелей";
-         string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
-         _albumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
-         if (Directory.Exists(_albumDir))
-         {
-            Directory.Delete(_albumDir, true);
-         }
-         Directory.CreateDirectory(_albumDir);
       }
    }
 }

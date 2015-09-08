@@ -2,25 +2,17 @@
 {
    public class Options
    {
-      public string BlockPanelPrefixName = "АКР_Панель_";
       public string BlockColorAreaName = "АКР_Зона-покраски";
-      public string BlockTileName = "АКР_Плитка";
-
-      /// <summary>
-      /// Путь к файлу шаблона МаркиСБ с шаблоном листа для МАрки АР.
-      /// </summary>
-      public string SheetTemplateFileMarkSB = "root";
-
-      public string SheetTemplateFileContent = "root";
-
-      /// <summary>
-      /// Имя листа шаблона для Марки АР в файле шаблона листов.
-      /// </summary>
-      public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
-
-      public string SheetTemplateLayoutNameForContent = "Содержание";
+      public string BlockPanelPrefixName = "АКР_Панель_";
       public string BlockStampContent = "АКР_Рамака_Содержание";
       public string BlockStampMarkAR = "АКР_Рамка_МаркаАР";
+      public string BlockTileName = "АКР_Плитка";
+
+      // Суффикс для торцевых панелей слева
+      public string endLeftPanelSuffix = "_тл";
+
+      // Суффикс для торцевых панелей справа
+      public string endRightPanelSuffix = "_тп";
 
       /// <summary>
       /// Слой для подписей марок панелей
@@ -32,10 +24,17 @@
       /// </summary>
       public string LayerUpperStoreyPanels = "АР_Панели_Чердак";
 
-      // Слой для панелей с торцом справа
-      public string LayerPanelEndRight = "АР_Панели_Торец справа";
+      public string SheetTemplateFileContent = "root";
 
-      // Слой для панелей с торцом слева
-      public string LayerPanelEndLeft = "АР_Панели_Торец слева";
+      /// <summary>
+      /// Путь к файлу шаблона МаркиСБ с шаблоном листа для МАрки АР.
+      /// </summary>
+      public string SheetTemplateFileMarkSB = "root";
+      public string SheetTemplateLayoutNameForContent = "Содержание";
+
+      /// <summary>
+      /// Имя листа шаблона для Марки АР в файле шаблона листов.
+      /// </summary>
+      public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
    }
 }

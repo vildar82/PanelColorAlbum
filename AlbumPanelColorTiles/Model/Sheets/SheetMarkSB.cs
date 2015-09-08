@@ -9,19 +9,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
    // Листы Марки СБ
    public class SheetMarkSB : IComparable<SheetMarkSB>
    {
+      private string _fileMarkSB;
+
       // Файл панели Марки СБ с листами Маркок АР.
       private MarkSbPanel _markSB;
 
       private List<SheetMarkAr> _sheetsMarkAR;
-      private string _fileMarkSB;
-
-      public string MarkSB
-      {
-         get { return _markSB.MarkSb; }
-      }
-
-      public List<SheetMarkAr> SheetsMarkAR { get { return _sheetsMarkAR; } }
-
       // Создание листа марки СБ
       public SheetMarkSB(MarkSbPanel markSB)
       {
@@ -35,6 +28,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          }
          // Сортировка листов Марок АР
          _sheetsMarkAR.Sort();
+      }
+
+      public string MarkSB { get { return _markSB.MarkSb; } }
+
+      public List<SheetMarkAr> SheetsMarkAR { get { return _sheetsMarkAR; } }
+      public int CompareTo(SheetMarkSB other)
+      {
+         return _markSB.MarkSb.CompareTo(other.MarkSB);
       }
 
       // Создание файла марки СБ
@@ -91,11 +92,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          string fileDest = Path.Combine(albumFolder, markSB.MarkSb + ".dwg");
          File.Copy(templateFileMarkSB, fileDest);
          return fileDest;
-      }
-
-      public int CompareTo(SheetMarkSB other)
-      {
-         return _markSB.MarkSb.CompareTo(other.MarkSB);
       }
    }
 }

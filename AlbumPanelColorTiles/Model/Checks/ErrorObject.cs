@@ -5,9 +5,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks
    // Объект с ошибками
    public class ErrorObject
    {
-      private ObjectId _idEnt;
       private string _errorMsg;
-
+      private ObjectId _idEnt;
       /// <summary>
       ///
       /// </summary>

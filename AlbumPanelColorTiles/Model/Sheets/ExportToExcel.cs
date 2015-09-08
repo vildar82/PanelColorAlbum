@@ -33,7 +33,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             foreach (var sheetAr in sheetSb.SheetsMarkAR)
             {
                row++;
-               worksheet.Cells[row, 1].Value = sheetAr.MarkArFullName;
+               worksheet.Cells[row, 1].Value = sheetAr.MarkArDocumentation;
                worksheet.Cells[row, 2].Value = sheetAr.MarkAR.Panels.Count;
             }
          }

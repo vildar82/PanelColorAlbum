@@ -6,12 +6,11 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
    // Панель Марки АР
    public class Panel
    {
-      // Исходное вхождение блока на чертеже (Марки СБ). Которое нужно будет заменить на блок МаркиАР
-      private ObjectId _idBlRefSb;
-
       // Вхождение блок Марки АР после выполнения операции замены блоков мрарки СБ на АР (после определения всех Марок Ар).
       private ObjectId _idBlRefAr;
 
+      // Исходное вхождение блока на чертеже (Марки СБ). Которое нужно будет заменить на блок МаркиАР
+      private ObjectId _idBlRefSb;
       // Точка вставки блока исходного (Марки СБ)
       private Point3d _insPt;
 
@@ -19,6 +18,13 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       //private Matrix3d _transform;
       // Этаж панели
       private Storey _storey;
+
+      public Panel(BlockReference blRefPanel)
+      {
+         _idBlRefSb = blRefPanel.ObjectId;
+         _insPt = blRefPanel.Position;
+         //_transform = blRefPanel.BlockTransform;
+      }
 
       /// <summary>
       /// Точка вставки блока панели
@@ -30,14 +36,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          get { return _storey; }
          set { _storey = value; }
       }
-
-      public Panel(BlockReference blRefPanel)
-      {
-         _idBlRefSb = blRefPanel.ObjectId;
-         _insPt = blRefPanel.Position;
-         //_transform = blRefPanel.BlockTransform;
-      }
-
       // Замена вхождения блока СБ на АР
       public void ReplaceBlockSbToAr(MarkArPanel markAr)
       {

@@ -8,8 +8,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks
 {
    public class Inspector
    {
-      private Document _doc;
       private Database _db;
+      private Document _doc;
       private Editor _ed;
       private List<string> _markArBtrNames;
 
@@ -21,6 +21,42 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
          _ed = _doc.Editor;
+      }
+
+      // Проверка, все ли плитки покрашены
+      public bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)
+      {
+         bool res = true;
+         _notPaintedTilesInMarkAR = new List<ErrorObject>();
+         foreach (var markSb in marksSb)
+         {
+            if (markSb.MarksAR.Count == 0)
+            {
+               // Такого не должно быть. Марка СБ есть, а марок АР нет.
+               _ed.WriteMessage(string.Format("\nЕсть Марка СБ {0}, а Марки АР не определены. Ошибка в программе(.", markSb.MarkSb));
+            }
+
+            foreach (var markAr in markSb.MarksAR)
+            {
+               bool isAllTilePainted = true;
+               foreach (var paint in markAr.Paints)
+               {
+                  if (paint == null)
+                  {
+                     // Плитка не покрашена!
+                     isAllTilePainted = false;
+                     string errMsg = "Не вся плитка покрашена в блоке " + markSb.MarkSb;
+                     ErrorObject errObj = new ErrorObject(errMsg, ObjectId.Null);
+                     _notPaintedTilesInMarkAR.Add(errObj);
+                     _ed.WriteMessage("\n" + errMsg);
+                     res = false;
+                     break;
+                  }
+               }
+               if (!isAllTilePainted) break;
+            }
+         }
+         return res;
       }
 
       // Проверка чертежа
@@ -59,42 +95,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks
             {
                _markArBtrNames.Add(btr.Name);
                res = false;
-            }
-         }
-         return res;
-      }
-
-      // Проверка, все ли плитки покрашены
-      public bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)
-      {
-         bool res = true;
-         _notPaintedTilesInMarkAR = new List<ErrorObject>();
-         foreach (var markSb in marksSb)
-         {
-            if (markSb.MarksAR.Count == 0)
-            {
-               // Такого не должно быть. Марка СБ есть, а марок АР нет.
-               _ed.WriteMessage(string.Format("\nЕсть Марка СБ {0}, а Марки АР не определены. Ошибка в программе(.", markSb.MarkSb));
-            }
-
-            foreach (var markAr in markSb.MarksAR)
-            {
-               bool isAllTilePainted = true;
-               foreach (var paint in markAr.Paints)
-               {
-                  if (paint == null)
-                  {
-                     // Плитка не покрашена!
-                     isAllTilePainted = false;
-                     string errMsg = "Не вся плитка покрашена в блоке " + markSb.MarkSb;
-                     ErrorObject errObj = new ErrorObject(errMsg, ObjectId.Null);
-                     _notPaintedTilesInMarkAR.Add(errObj);
-                     _ed.WriteMessage("\n" + errMsg);
-                     res = false;
-                     break;
-                  }
-               }
-               if (!isAllTilePainted) break;
             }
          }
          return res;

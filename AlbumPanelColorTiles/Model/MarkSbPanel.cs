@@ -12,6 +12,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private List<ColorArea> _colorAreas;
 
       private ObjectId _idBtr;
+      private bool _isEndLeftPanel;
+      private bool _isEndRightPanel;
+      private bool _isUpperStoreyPanel;
       private List<MarkArPanel> _marksAR;
 
       // Список тех же панелей марки АР, что и в _marksAR, но с архитектурными индексами. В списке _marksAR марки тоже будут архитектурными. Этот словарь просто для проверки уникальности марок.
@@ -20,10 +23,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private string _markSb;
       private string _markSbBlockName;
       private List<Paint> _paints;
-      private bool _isUpperStoreyPanel;
-      private bool _isEndLeftPanel;
-      private bool _isEndRightPanel;
-
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
 
@@ -34,8 +33,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
          _isUpperStoreyPanel = (blRefPanel.Layer == Album.Options.LayerUpperStoreyPanels);
-         _isEndLeftPanel = (blRefPanel.Layer == Album.Options.LayerPanelEndLeft);
-         _isEndRightPanel = (blRefPanel.Layer == Album.Options.LayerPanelEndRight);
+         _isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix);
+         _isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix);
          _marksAR = new List<MarkArPanel>();
          _colorAreas = ColorAreaModel.GetColorAreas(_idBtr);
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
@@ -47,24 +46,70 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 
       public ObjectId IdBtr { get { return _idBtr; } }
 
+      public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
+      public bool IsEndRightPanel { get { return _isEndRightPanel; } }
+      /// <summary>
+      /// Это панель чердака? true - да, false - нет.
+      /// </summary>
+      public bool IsUpperStoreyPanel { get { return _isUpperStoreyPanel; } }
+
       public List<MarkArPanel> MarksAR { get { return _marksAR; } }
 
+      public string MarkSb { get { return _markSb; } }
       public string MarkSbBlockName { get { return _markSbBlockName; } }
 
       public List<Paint> Paints { get { return _paints; } }
 
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }
+      // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
+      public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
+      {
+         var idBtrMarkSb = Lib.Blocks.CopyBtr(idBtrMarkAr, markSbBlName);
+         // Перенос блоков плиток на слой 0
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var btrMarkSb = t.GetObject(idBtrMarkSb, OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in btrMarkSb)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
+                  if (blRef.Name == Album.Options.BlockTileName)
+                  {
+                     blRef.Layer = "0";
+                  }
+               }
+            }
+            t.Commit();
+         }
+      }
 
-      public string MarkSb { get { return _markSb; } }
+      public static string GetMarkSbBlockName(string markSb)
+      {
+         return Album.Options.BlockPanelPrefixName + markSb;
+      }
 
-      /// <summary>
-      /// Это панель чердака? true - да, false - нет.
-      /// </summary>
-      public bool IsUpperStoreyPanel { get { return _isUpperStoreyPanel; } }
-
-      public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
-      public bool IsEndRightPanel { get { return _isEndRightPanel; } }
+      // Определение марки СБ (может быть с суффиксом торца _тл или _тп). Отбрасывается последняя часть имени в скобках (это марка АР).
+      public static string GetMarkSbName(string blName)
+      {
+         string markSb = string.Empty;
+         if (IsBlockNamePanel(blName))
+         {
+            // Хвостовая часть
+            markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length);
+            if (markSb.EndsWith(")"))
+            {
+               int lastDirectBracket = markSb.LastIndexOf('(');
+               if (lastDirectBracket > 0)
+               {
+                  markSb = markSb.Substring(0, lastDirectBracket);
+               }
+            }
+         }
+         return markSb;
+      }
 
       // Определение покраски панелей текущего чертежа (в Модели)
       public static List<MarkSbPanel> GetMarksSB(ColorAreaModel colorAreaModel)
@@ -99,46 +144,53 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          return _marksSb;
       }
 
-      // Замена вхождений блоков СБ на АР
-      public void ReplaceBlocksSbOnAr()
+      /// <summary>
+      /// Возвращает марку панели из имени блока панели (для панелей Марки СБ и Марок АР).
+      /// </summary>
+      /// <param name="blName">Имя блока панели</param>
+      /// <returns>марка панели (СБ или СБ+АР)</returns>
+      public static string GetPanelMarkFromBlockName(string blName, List<MarkSbPanel> marksSB)
       {
-         foreach (var markAr in _marksAR)
+         //return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
+         string panelMark = string.Empty;
+         // Найти имя марки панели СБ или АР
+         foreach (var markSB in marksSB)
          {
-            markAr.ReplaceBlocksSbOnAr();
-         }
-      }
-
-      // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
-      private static MarkSbPanel GetMarkSb(BlockReference blRefPanel, List<MarkSbPanel> marksSb, BlockTable bt)
-      {
-         MarkSbPanel markSb = null;
-         if (IsBlockNamePanel(blRefPanel.Name))
-         {
-            string markSbName = GetMarkSbName(blRefPanel.Name);
-            if (markSbName != string.Empty)
+            if (markSB.MarkSbBlockName == blName)
             {
-               // Поиск панели Марки СБ в коллекции панелей по имени марки СБ.
-               markSb = marksSb.Find(m => m._markSb == markSbName);
-               if (markSb == null)
+               return markSB.MarkSb;
+            }
+            else
+            {
+               foreach (var markAR in markSB.MarksAR)
                {
-                  // Блок Марки СБ
-                  Database db = HostApplicationServices.WorkingDatabase;
-                  string markSbBlName = GetMarkSbBlockName(markSbName);
-                  if (bt.Has(markSbBlName))
+                  if (markAR.MarkArBlockName == blName)
                   {
-                     var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSbPanel(blRefPanel, idMarkSbBtr, markSbName, markSbBlName);
-                     marksSb.Add(markSb);
-                  }
-                  else
-                  {
-                     //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
-                     //???
+                     return markAR.MarkARPanelFullName;
                   }
                }
             }
          }
-         return markSb;
+         return panelMark;
+      }
+
+      // Проверка, это блок панели, по имени (Марки СБ или Марки АР)
+      public static bool IsBlockNamePanel(string blName)
+      {
+         return blName.StartsWith(Album.Options.BlockPanelPrefixName);
+      }
+
+      // Проверка, это имя блоки марки АР, по имени блока.
+      public static bool IsBlockNamePanelMarkAr(string blName)
+      {
+         bool res = false;
+         if (IsBlockNamePanel(blName))
+         {
+            string markSb = GetMarkSbName(blName); // может быть с суффиксом торца _тп или _тл
+            string markSbBlName = GetMarkSbBlockName(markSb);// может быть с суффиксом торца _тп или _тл
+            res = blName != markSbBlName;
+         }
+         return res;
       }
 
       // Определение архитектурных Марок АР (Э1_Яр1)
@@ -213,104 +265,50 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
-      // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
-      public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
+      // Замена вхождений блоков СБ на АР
+      public void ReplaceBlocksSbOnAr()
       {
-         var idBtrMarkSb = Lib.Blocks.CopyBtr(idBtrMarkAr, markSbBlName);
-         // Перенос блоков плиток на слой 0
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
+         foreach (var markAr in _marksAR)
          {
-            var btrMarkSb = t.GetObject(idBtrMarkSb, OpenMode.ForRead) as BlockTableRecord;
-            foreach (ObjectId idEnt in btrMarkSb)
+            markAr.ReplaceBlocksSbOnAr();
+         }
+      }
+
+      // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
+      private static MarkSbPanel GetMarkSb(BlockReference blRefPanel, List<MarkSbPanel> marksSb, BlockTable bt)
+      {
+         MarkSbPanel markSb = null;
+         if (IsBlockNamePanel(blRefPanel.Name))
+         {
+            string markSbName = GetMarkSbName(blRefPanel.Name);
+            if (markSbName != string.Empty)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               // Это может быть торцевая панель (Марка СБ одна и таже у торцевой и не торцевой панели)
+               // У торцевой панели в имени блока после марки СБ добавляется суффикс _тп или _тл.
+
+               // Поиск панели Марки СБ в коллекции панелей по имени марки СБ.
+               markSb = marksSb.Find(m => m._markSb == markSbName);
+               if (markSb == null)
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.Name == Album.Options.BlockTileName)
+                  // Блок Марки СБ
+                  Database db = HostApplicationServices.WorkingDatabase;
+                  string markSbBlName = GetMarkSbBlockName(markSbName);
+                  if (bt.Has(markSbBlName))
                   {
-                     blRef.Layer = "0";
+                     var idMarkSbBtr = bt[markSbBlName];
+                     markSb = new MarkSbPanel(blRefPanel, idMarkSbBtr, markSbName, markSbBlName);
+                     marksSb.Add(markSb);
                   }
-               }
-            }
-            t.Commit();
-         }
-      }
-
-      // Проверка, это блок панели, по имени (Марки СБ или Марки АР)
-      public static bool IsBlockNamePanel(string blName)
-      {
-         return blName.StartsWith(Album.Options.BlockPanelPrefixName);
-      }
-
-      // Проверка, это имя блоки марки АР, по имени блока.
-      public static bool IsBlockNamePanelMarkAr(string blName)
-      {
-         bool res = false;
-         if (IsBlockNamePanel(blName))
-         {
-            string markSb = GetMarkSbName(blName);
-            string markSbBlName = GetMarkSbBlockName(markSb);
-            res = blName != markSbBlName;
-         }
-         return res;
-      }
-
-      /// <summary>
-      /// Возвращает марку панели из имени блока панели (для панелей Марки СБ и Марок АР).
-      /// </summary>
-      /// <param name="blName">Имя блока панели</param>
-      /// <returns>марка панели (СБ или СБ+АР)</returns>
-      public static string GetPanelMarkFromBlockName(string blName, List<MarkSbPanel> marksSB)
-      {
-         //return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
-         string panelMark = string.Empty;
-         // Найти имя марки панели СБ или АР
-         foreach (var markSB in marksSB)
-         {
-            if (markSB.MarkSbBlockName == blName)
-            {
-               panelMark = markSB.MarkSb;
-            }
-            else
-            {
-               foreach (var markAR in markSB.MarksAR)
-               {
-                  if (markAR.MarkArBlockName == blName)
+                  else
                   {
-                     panelMark = markAR.MarkARPanelFullName;
+                     //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
+                     //???
                   }
-               }
-            }
-         }
-         return panelMark;
-      }
-
-      public static string GetMarkSbBlockName(string markSb)
-      {
-         return Album.Options.BlockPanelPrefixName + markSb;
-      }
-
-      // Определение марки СБ
-      public static string GetMarkSbName(string blName)
-      {
-         string markSb = string.Empty;
-         if (IsBlockNamePanel(blName))
-         {
-            // Хвостовая часть
-            markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length);
-            if (markSb.EndsWith(")"))
-            {
-               int lastDirectBracket = markSb.LastIndexOf('(');
-               if (lastDirectBracket > 0)
-               {
-                  markSb = markSb.Substring(0, lastDirectBracket);
                }
             }
          }
          return markSb;
       }
-
       // Добавление панели АР по списку ее покраски
       private void AddPanelAR(List<Paint> paintAR, BlockReference blRefPanel, MarkSbPanel markSb)
       {

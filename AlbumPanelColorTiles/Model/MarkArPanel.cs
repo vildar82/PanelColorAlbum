@@ -13,21 +13,21 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
    {
       private ObjectId _idBtrAr;
 
-      // Временная марка покраски
-      private string _markArTemp;
-
       // Определенная марка покраски архитектурная
       private string _markArArch;
 
-      private string _markARPanelFullName;
-      private string _markARPanelFullValidName;
       private string _markArBlockName;
 
+      private string _markARPanelFullName;
+
+      private string _markARPanelFullValidName;
+
+      // Временная марка покраски
+      private string _markArTemp;
+      private MarkSbPanel _markSB;
       private List<Paint> _paints;
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
-      private MarkSbPanel _markSB;
-
       public MarkArPanel(List<Paint> paintAR, MarkSbPanel markSb, BlockReference blRefMarkAr)
       {
          _markSB = markSb;
@@ -50,6 +50,13 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
+      public string MarkArBlockName { get { return _markArBlockName; } }
+
+      /// <summary>
+      /// Полное имя панели (Марка СБ + Марка АР)
+      /// </summary>
+      public string MarkARPanelFullName { get { return _markARPanelFullName; } }
+
       public string MarkARPanelFullValidName
       {
          get
@@ -62,20 +69,13 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
+      public MarkSbPanel MarkSB { get { return _markSB; } }
       public List<Paint> Paints { get { return _paints; } }
 
       /// <summary>
       /// Блоки панели с такой покраской
       /// </summary>
       public List<Panel> Panels { get { return _panels; } }
-
-      public string MarkArBlockName { get { return _markArBlockName; } }
-
-      /// <summary>
-      /// Полное имя панели (Марка СБ + Марка АР)
-      /// </summary>
-      public string MarkARPanelFullName { get { return _markARPanelFullName; } }
-
       public List<TileCalc> TilesCalc
       {
          get
@@ -87,23 +87,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             return _tilesCalc;
          }
       }
-
-      // Подсчет плитки
-      private List<TileCalc> CalculateTiles()
-      {
-         List<TileCalc> tilesCalc = new List<TileCalc>();
-         var paintsSameColor = _paints.GroupBy(p => p.LayerName);
-         foreach (var item in paintsSameColor)
-         {
-            TileCalc tileCalc = new TileCalc();
-            tileCalc.ColorMark = item.Key;
-            tileCalc.Count = item.Count();
-            tileCalc.Pattern = item.First().Color;
-            tilesCalc.Add(tileCalc);
-         }
-         return tilesCalc;
-      }
-
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {
@@ -199,13 +182,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          return paintAR.SequenceEqual(_paints);
       }
 
-      private void DefMarkArTempNames(MarkSbPanel markSB, string blName)
-      {
-         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
-         //_markArBlockName = blName + "_" + _markAR;
-         //_markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
-      }
-
       // Замена вхождений блоков СБ на блоки АР
       public void ReplaceBlocksSbOnAr()
       {
@@ -223,6 +199,28 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          Point3d ptMax = new Point3d(ptBlRef.X + tile.Bounds.MaxPoint.X, ptBlRef.Y + tile.Bounds.MaxPoint.Y, 0);
          Extents3d boundsTileInBlRef = new Extents3d(ptMin, ptMax);
          return boundsTileInBlRef;
+      }
+
+      // Подсчет плитки
+      private List<TileCalc> CalculateTiles()
+      {
+         List<TileCalc> tilesCalc = new List<TileCalc>();
+         var paintsSameColor = _paints.GroupBy(p => p.LayerName);
+         foreach (var item in paintsSameColor)
+         {
+            TileCalc tileCalc = new TileCalc();
+            tileCalc.ColorMark = item.Key;
+            tileCalc.Count = item.Count();
+            tileCalc.Pattern = item.First().Color;
+            tilesCalc.Add(tileCalc);
+         }
+         return tilesCalc;
+      }
+      private void DefMarkArTempNames(MarkSbPanel markSB, string blName)
+      {
+         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
+         //_markArBlockName = blName + "_" + _markAR;
+         //_markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
       }
    }
 }

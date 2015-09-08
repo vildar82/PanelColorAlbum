@@ -13,49 +13,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
    {
       private Album _album;
 
-      // Покраска панелей в Моделе (по блокам зон покраски)
-      [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
-      public void PaintPanelsCommand()
-      {
-         Document doc = Application.DocumentManager.MdiActiveDocument;
-         using (var DocLock = doc.LockDocument())
-         {
-            if (_album == null)
-            {
-               _album = new Album();
-            }
-            try
-            {
-               _album.PaintPanels();
-               doc.Editor.Regen();
-               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
-            }
-         }
-      }
-
-      // Удалекние блоков панелей марки АР и их замена на блоки панелей марок СБ.
-      [CommandMethod("PIK", "ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
-      public void ResetPanelsCommand()
-      {
-         Document doc = Application.DocumentManager.MdiActiveDocument;
-         using (var DocLock = doc.LockDocument())
-         {
-            try
-            {
-               Album.Resetblocks();
-               doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
-            }
-         }
-      }
-
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AlbumPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void AlbumPanelsCommand()
@@ -101,13 +58,56 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
                       "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName +
                       "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels +
-                      "\nПанели торцевые на слое - " + Album.Options.LayerPanelEndLeft + " или " + Album.Options.LayerPanelEndRight +
+                      "\nПанели торцевые с суффиксом _тп или _тл после марки СБ в имени блока панели." +
                       "\nОбрабатываются только блоки в текущем чертеже. Внешние ссылки не учитываются.";
          ed.WriteMessage(msg);
       }
 
       void IExtensionApplication.Terminate()
       {
+      }
+
+      // Покраска панелей в Моделе (по блокам зон покраски)
+      [CommandMethod("PIK", "PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      public void PaintPanelsCommand()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         using (var DocLock = doc.LockDocument())
+         {
+            if (_album == null)
+            {
+               _album = new Album();
+            }
+            try
+            {
+               _album.PaintPanels();
+               doc.Editor.Regen();
+               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
+            }
+         }
+      }
+
+      // Удалекние блоков панелей марки АР и их замена на блоки панелей марок СБ.
+      [CommandMethod("PIK", "ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      public void ResetPanelsCommand()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         using (var DocLock = doc.LockDocument())
+         {
+            try
+            {
+               Album.Resetblocks();
+               doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
+            }
+         }
       }
    }
 }
