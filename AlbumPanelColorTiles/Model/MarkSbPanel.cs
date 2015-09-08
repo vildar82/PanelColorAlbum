@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Панели марки СБ
-   public class MarkSbPanel
+   public class MarkSbPanel : IEquatable<MarkSbPanel>
    {
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
       private List<ColorArea> _colorAreas;
@@ -18,9 +18,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private List<MarkArPanel> _marksAR;
 
       // Список тех же панелей марки АР, что и в _marksAR, но с архитектурными индексами. В списке _marksAR марки тоже будут архитектурными. Этот словарь просто для проверки уникальности марок.
-      private Dictionary<string, MarkArPanel> _marksArArchitectIndex;
+      //private Dictionary<string, MarkArPanel> _marksArArchitectIndex;
 
-      private string _markSb;
+      private string _markSb; // может быть с _тп или _тл
+      private string _markSbClean; // без _тп или _тл
       private string _markSbBlockName;
       private List<Paint> _paints;
       // Список плиток в панели Марки СБ
@@ -68,6 +69,26 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }
+
+      public string MarkSbClean
+      {
+         get
+         {
+            if (_markSbClean == null)
+            {
+               if (_isEndLeftPanel || _isEndRightPanel)
+               {
+                  _markSbClean = _markSb.Substring(0, _markSb.Length - 3);
+               }
+               else
+               {
+                  _markSbClean = _markSb;
+               }               
+            }
+            return _markSbClean;
+         }
+      }
+
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
       {
@@ -164,7 +185,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          {
             if (markSB.MarkSbBlockName == blName)
             {
-               return markSB.MarkSb;
+               return markSB.MarkSbClean;
             }
             else
             {
@@ -201,53 +222,53 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 
       // Определение архитектурных Марок АР (Э1_Яр1)
       // Жуткий вид. ??? Переделать!!!
-      public void DefineArchitectMarks(string _abbreviateProject)
+      public void DefineArchitectMarks(List<MarkSbPanel> marksSB, string abbreviateProject)
       {
-         _marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
-         if (_isUpperStoreyPanel)
+         Dictionary<string, MarkArPanel>  marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
+         if (IsUpperStoreyPanel)
          {
             // Панели чердака
             // (ЭЧ-#_Яр1)
-            if (_marksAR.Count == 1)
+            if (MarksAR.Count == 1)
             {
                // Если одна марка покраски
-               string markArchitect = string.Format("(ЭЧ_{0})", _abbreviateProject);
-               _marksArArchitectIndex.Add(markArchitect, _marksAR[0]);
-               _marksAR[0].MarkArArch = markArchitect;
+               string markArchitect = string.Format("(ЭЧ_{0})", abbreviateProject);
+               marksArArchitectIndex.Add(markArchitect, MarksAR[0]);
+               MarksAR[0].MarkArArch = markArchitect;
             }
             else
             {
                // Если несколько марок покраски
                int i = 1;
-               foreach (var markAR in _marksAR)
+               foreach (var markAR in MarksAR)
                {
-                  string markArchitect = string.Format("(ЭЧ-{0}_{1})", i++, _abbreviateProject);
-                  _marksArArchitectIndex.Add(markArchitect, markAR);
+                  string markArchitect = string.Format("(ЭЧ-{0}_{1})", i++, abbreviateProject);
+                  marksArArchitectIndex.Add(markArchitect, markAR);
                   markAR.MarkArArch = markArchitect;
                }
             }
          }
-         else if (_isEndRightPanel || _isEndLeftPanel)
+         else if (IsEndRightPanel || IsEndLeftPanel)
          {
             // Торцевые панели (Э1ТЛ_Яр1)
             string endIndex;
-            if (_isEndLeftPanel)
+            if (IsEndLeftPanel)
                endIndex = "ТЛ";
             else
                endIndex = "ТП";
             // Панели этажей
             int i = 1;
-            foreach (var markAR in _marksAR)
+            foreach (var markAR in MarksAR)
             {
                string markArchitect;
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
                string floor = String.Join(",", floors);
-               markArchitect = string.Format("(Э{0}{1}_{2})", floor, endIndex, _abbreviateProject);
-               if (_marksArArchitectIndex.ContainsKey(markArchitect))
+               markArchitect = string.Format("(Э{0}{1}_{2})", floor, endIndex, abbreviateProject);
+               if (marksArArchitectIndex.ContainsKey(markArchitect))
                {
-                  markArchitect = string.Format("(Э{0}{1}-{2}_{3})", floor, endIndex, i++, _abbreviateProject);
+                  markArchitect = string.Format("(Э{0}{1}-{2}_{3})", floor, endIndex, i++, abbreviateProject);
                }
-               _marksArArchitectIndex.Add(markArchitect, markAR);
+               marksArArchitectIndex.Add(markArchitect, markAR);
                markAR.MarkArArch = markArchitect;
             }
          }
@@ -255,17 +276,17 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          {
             // Панели этажей
             int i = 1;
-            foreach (var markAR in _marksAR)
+            foreach (var markAR in MarksAR)
             {
                string markArchitect;
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
                string floor = String.Join(",", floors);
-               markArchitect = string.Format("(Э{0}_{1})", floor, _abbreviateProject);
-               if (_marksArArchitectIndex.ContainsKey(markArchitect))
+               markArchitect = string.Format("(Э{0}_{1})", floor, abbreviateProject);
+               if (marksArArchitectIndex.ContainsKey(markArchitect))
                {
-                  markArchitect = string.Format("(Э{0}-{1}_{2})", floor, i++, _abbreviateProject);
+                  markArchitect = string.Format("(Э{0}-{1}_{2})", floor, i++, abbreviateProject);
                }
-               _marksArArchitectIndex.Add(markArchitect, markAR);
+               marksArArchitectIndex.Add(markArchitect, markAR);
                markAR.MarkArArch = markArchitect;
             }
          }
@@ -289,9 +310,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             string markSbName = GetMarkSbName(blRefPanel.Name);
             if (markSbName != string.Empty)
             {
-               // Это может быть торцевая панель (Марка СБ одна и таже у торцевой и не торцевой панели)
-               // У торцевой панели в имени блока после марки СБ добавляется суффикс _тп или _тл.
-
                // Поиск панели Марки СБ в коллекции панелей по имени марки СБ.
                markSb = marksSb.Find(m => m._markSb == markSbName);
                if (markSb == null)
@@ -375,6 +393,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             }
          }
          return resPanelAR;
+      }
+
+      public bool Equals(MarkSbPanel other)
+      {
+         return _markSb.Equals(other._markSb) &&
+            _colorAreas.SequenceEqual(other._colorAreas) &&
+            _idBtr.Equals(other._idBtr) &&
+            _marksAR.SequenceEqual(other._marksAR);
       }
    }
 }

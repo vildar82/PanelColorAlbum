@@ -1,9 +1,10 @@
-﻿using Autodesk.AutoCAD.Colors;
+﻿using System;
+using Autodesk.AutoCAD.Colors;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Краска
-   public class Paint
+   public class Paint :IEquatable<Paint>
    {
       private Color _color;
 
@@ -23,6 +24,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       public string LayerName
       {
          get { return _layerName; }
+      }
+
+      public bool Equals(Paint other)
+      {
+         return _layerName.Equals(other._layerName) &&
+            _color.Equals(other._color);
       }
    }
 }

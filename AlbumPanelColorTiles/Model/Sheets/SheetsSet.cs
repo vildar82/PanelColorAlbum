@@ -35,11 +35,15 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          if (!File.Exists(_sheetTemplateFileContent))
             throw new Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);
 
-         // Создаение папки для альбома панелей
-         CreateAlbumFolder();
-
          // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
          _sheetsMarkSB = ProcessingSheets(_album.MarksSB);
+         if (_sheetsMarkSB.Count ==0)
+         {
+            throw new Exception ("Не определены панели марок АР");
+         }
+
+         // Создаение папки для альбома панелей
+         CreateAlbumFolder();         
 
          // Титульные листы и обложеи в одном файле "Содержание".
          // Создание титульных листов

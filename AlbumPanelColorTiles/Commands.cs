@@ -28,6 +28,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             {
                try
                {
+                  _album.ChecksBeforeCreateAlbum();
+                  // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
+                  // Нужно или выполнить перекраску панелей перед созданием альбома
+                  // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.                  
+                  _album.CheckPanelsInDrawingAndMemory();
+                  // Покраска панелей
                   _album.CreateAlbum();
                   doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.SheetsSet.AlbumDir);
                }
@@ -80,6 +86,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                {
                   _album = new Album();
                }
+               else
+               {
+                  // Повторный запуск программы покраски панелей.
+                  // Сброс данных
+                  _album.ResetData(); 
+               }
                _album.PaintPanels();
                doc.Editor.Regen();
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
@@ -93,7 +105,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          }
       }
 
-      // Удалекние блоков панелей марки АР и их замена на блоки панелей марок СБ.
+      // Удаление блоков панелей марки АР и их замена на блоки панелей марок СБ.
       [CommandMethod("PIK", "ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void ResetPanelsCommand()
       {
@@ -102,6 +114,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          {
             try
             {
+               if (_album != null)
+               {
+                  _album.ResetData(); 
+               }
                Album.Resetblocks();
                doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
             }

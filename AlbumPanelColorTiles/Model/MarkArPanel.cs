@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -9,17 +10,14 @@ using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Марка АР покраски панели
-   public class MarkArPanel
+   public class MarkArPanel :IEquatable<MarkArPanel>
    {
       private ObjectId _idBtrAr;
 
       // Определенная марка покраски архитектурная
       private string _markArArch;
-
       private string _markArBlockName;
-
       private string _markARPanelFullName;
-
       private string _markARPanelFullValidName;
 
       // Временная марка покраски
@@ -45,7 +43,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          {
             // Переименовать _markARPanelFullName и _markArBlockName
             _markArArch = value;
-            _markARPanelFullName = _markSB.MarkSb + _markArArch;
+            _markARPanelFullName = _markSB.MarkSbClean + _markArArch;
             _markArBlockName = _markSB.MarkSbBlockName + Blocks.GetValidNameForBlock(_markArArch);
          }
       }
@@ -218,9 +216,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       }
       private void DefMarkArTempNames(MarkSbPanel markSB, string blName)
       {
-         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
-         //_markArBlockName = blName + "_" + _markAR;
-         //_markARPanelFullName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
+         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();         
+      }
+
+      public bool Equals(MarkArPanel other)
+      {
+         return _markArArch.Equals(other._markArArch) &&
+            //_paints.SequenceEqual(other._paints) &&
+            _panels.SequenceEqual(other._panels);
       }
    }
 }

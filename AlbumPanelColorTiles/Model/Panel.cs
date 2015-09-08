@@ -1,10 +1,11 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using System;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Панель Марки АР
-   public class Panel
+   public class Panel :IEquatable<Panel>
    {
       // Вхождение блок Марки АР после выполнения операции замены блоков мрарки СБ на АР (после определения всех Марок Ар).
       private ObjectId _idBlRefAr;
@@ -36,6 +37,13 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          get { return _storey; }
          set { _storey = value; }
       }
+
+      public bool Equals(Panel other)
+      {
+         return _insPt.Equals(other._insPt) &&
+            _storey.Equals(other._storey);
+      }      
+
       // Замена вхождения блока СБ на АР
       public void ReplaceBlockSbToAr(MarkArPanel markAr)
       {

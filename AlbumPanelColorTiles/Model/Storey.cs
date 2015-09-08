@@ -1,7 +1,9 @@
-﻿namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+﻿using System;
+
+namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Этаж
-   public class Storey
+   public class Storey :IEquatable <Storey>
    {
       private string _number;
       private double _y;
@@ -25,5 +27,11 @@
       {
          get { return _y; }
       }
+
+      public bool Equals(Storey other)
+      {
+         return _number.Equals(other._number) &&
+            _y.Equals(other._y);
+      }      
    }
 }

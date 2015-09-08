@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
@@ -6,7 +7,7 @@ using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Зона покраски
-   public class ColorArea
+   public class ColorArea :IEquatable<ColorArea>
    {
       private Extents3d _bounds;
       private ObjectId _idblRef;
@@ -59,6 +60,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          return null;
       }
 
+      public bool Equals(ColorArea other)
+      {
+         return Bounds.MaxPoint.Equals(other.Bounds.MaxPoint) &&
+            Bounds.MinPoint.Equals(other.Bounds.MinPoint);
+      }
+
       private Extents3d GetBounds(BlockReference blRef)
       {
          Extents3d bounds;
@@ -71,6 +78,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             bounds = new Extents3d(Point3d.Origin, Point3d.Origin);
          }
          return bounds;
-      }
+      }      
    }
 }
