@@ -194,15 +194,15 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          }
 
          // Строка итогов.
-         var totalCount = tilesCalc.Sum(c => c.Count);
-         var totalArea = tilesCalc.Sum(c => c.TotalArea);
+         //var totalCount = tilesCalc.Sum(c => c.Count);
+         //var totalArea = tilesCalc.Sum(c => c.TotalArea);
          // Объединить строку итогов (1,2 и 3 столбцы).
          table.MergeCells(CellRange.Create(table, row, 0, row, 2));
          table.Cells[row, 0].TextString = "Итого на панель";
          table.Cells[row, 0].Alignment = CellAlignment.MiddleCenter;
-         table.Cells[row, 3].TextString = totalCount.ToString();
+         table.Cells[row, 3].TextString = _markAR.Paints.Count.ToString();//  totalCount.ToString();
          table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
-         table.Cells[row, 4].TextString = totalArea.ToString();
+         table.Cells[row, 4].TextString = _markAR.MarkSB.TotalAreaTiles.ToString();//totalArea.ToString();
          table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
       }
 

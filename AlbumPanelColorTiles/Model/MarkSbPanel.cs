@@ -59,6 +59,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       public string MarkSbBlockName { get { return _markSbBlockName; } }
 
       public List<Paint> Paints { get { return _paints; } }
+      // Суммарная площадь плитки на панель (расход м2 на панель).
+      public double TotalAreaTiles {
+         get {
+            return Math.Round(_paints.Count * TileCalc.OneTileArea, 2);
+         }
+      }
 
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }

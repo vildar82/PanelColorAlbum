@@ -357,7 +357,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             }
          }
          // Нумерация этажей
-         int i = 1;
+         int i = 2;
          var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
          storeysOrders.ForEach((s) => s.Number = i++.ToString());
          storeysOrders.Last().Number = "П";
