@@ -74,15 +74,17 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          Document doc = Application.DocumentManager.MdiActiveDocument;
          using (var DocLock = doc.LockDocument())
          {
-            if (_album == null)
-            {
-               _album = new Album();
-            }
             try
             {
+               if (_album == null)
+               {
+                  _album = new Album();
+               }
                _album.PaintPanels();
                doc.Editor.Regen();
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+               doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
             }
             catch (System.Exception ex)
             {
