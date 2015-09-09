@@ -18,7 +18,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
    {
       // Набор цветов используемых в альбоме.
       private static List<Paint> _colors;
+
       private static Options _options;
+
       // Сокращенное имя проеккта
       private string _abbreviateProject;
 
@@ -28,6 +30,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private ObjectId _idLayerMarks = ObjectId.Null;
       private List<MarkSbPanel> _marksSB;
       private SheetsSet _sheetsSet;
+
       public Album()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
@@ -48,35 +51,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
-      // Проверка панелей на чертеже и панелей в памяти (this)
-      public void CheckPanelsInDrawingAndMemory()
-      {
-         // Проверка зон покраски
-         var colorAreaModelCheck = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
-         // сравнение фоновых зон
-         if (!colorAreaModelCheck.ColorAreasBackground.SequenceEqual(_colorAreaModel.ColorAreasBackground)) 
-         {
-            throw new Exception("Фоновые зоны изменились. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
-         }
-         // сравнение передних зон (пятен)
-         if (!colorAreaModelCheck.ColorAreasForeground.SequenceEqual(_colorAreaModel.ColorAreasForeground))
-         {
-            throw new Exception("Пятна изменились (зоны покраски). Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
-         }
-
-         // Проверка панелей
-         // Определение покраски панелей.
-         var marksSbCheck = MarkSbPanel.GetMarksSB(_colorAreaModel);
-         RenamePanelsToArchitectIndex(marksSbCheck, _abbreviateProject);
-         if (!marksSbCheck.SequenceEqual (_marksSB) )
-         {
-            throw new Exception("Панели изменились после последнего выполнения команды покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
-         }
-      }
-
       public string AbbreviateProject { get { return _abbreviateProject; } }
+
       public string DwgFacade { get { return _doc.Name; } }
+
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
+
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
 
       // Поиск цвета в списке цветов альбома
@@ -176,17 +156,6 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
-      // Сброс данных расчета панелей
-      public void ResetData()
-      {
-         // Набор цветов используемых в альбоме.
-         _colors = null;
-         _colorAreaModel = null;      
-         ObjectId _idLayerMarks = ObjectId.Null;
-         _marksSB = null;
-         _sheetsSet = null;
-   }
-
       // Добавление подписи имени марки панели в блоки панелей в чертеже
       public void CaptionPanels()
       {
@@ -241,13 +210,31 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
-      // Создание альбома панелей
-      public void CreateAlbum()
-      {         
-         _sheetsSet = new SheetsSet(this);
-         _sheetsSet.CreateAlbum();
-      }
+      // Проверка панелей на чертеже и панелей в памяти (this)
+      public void CheckPanelsInDrawingAndMemory()
+      {
+         // Проверка зон покраски
+         var colorAreaModelCheck = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
+         // сравнение фоновых зон
+         if (!colorAreaModelCheck.ColorAreasBackground.SequenceEqual(_colorAreaModel.ColorAreasBackground))
+         {
+            throw new Exception("Фоновые зоны изменились. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+         }
+         // сравнение передних зон (пятен)
+         if (!colorAreaModelCheck.ColorAreasForeground.SequenceEqual(_colorAreaModel.ColorAreasForeground))
+         {
+            throw new Exception("Пятна изменились (зоны покраски). Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+         }
 
+         // Проверка панелей
+         // Определение покраски панелей.
+         var marksSbCheck = MarkSbPanel.GetMarksSB(_colorAreaModel);
+         RenamePanelsToArchitectIndex(marksSbCheck, _abbreviateProject);
+         if (!marksSbCheck.SequenceEqual(_marksSB))
+         {
+            throw new Exception("Панели изменились после последнего выполнения команды покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+         }
+      }
       public void ChecksBeforeCreateAlbum()
       {
          if (_marksSB == null)
@@ -270,6 +257,13 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
+      // Создание альбома панелей
+      public void CreateAlbum()
+      {
+         _sheetsSet = new SheetsSet(this);
+         _sheetsSet.CreateAlbum();
+      }
+
       // Покраска панелей в модели (по блокам зон покраски)
       public void PaintPanels()
       {
@@ -282,7 +276,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          _colors = new List<Paint>();
 
          // Определение зон покраски в Модели
-         _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));      
+         _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
          Resetblocks();
@@ -316,6 +310,16 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          CaptionPanels();
       }
 
+      // Сброс данных расчета панелей
+      public void ResetData()
+      {
+         // Набор цветов используемых в альбоме.
+         _colors = null;
+         _colorAreaModel = null;
+         ObjectId _idLayerMarks = ObjectId.Null;
+         _marksSB = null;
+         _sheetsSet = null;
+      }
       private string AbbreviateNameProject()
       {
          string abbrName;
@@ -329,6 +333,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             abbrName = defName;
          return abbrName;
       }
+
       // Создание определений блоков панелей марки АР
       private bool CreatePanelsMarkAR()
       {
@@ -427,6 +432,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             markSB.DefineArchitectMarks(marksSB, abbreviateProject);
          }
       }
+
       // Замена вхождений блоков панелей Марки СБ на панели Марки АР
       private void ReplaceBlocksMarkSbOnMarkAr()
       {
