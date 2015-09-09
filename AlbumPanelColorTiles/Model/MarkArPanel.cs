@@ -149,7 +149,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.Name == Album.Options.BlockTileName)
+                  if (Blocks.EffectiveName(blRef) == Album.Options.BlockTileName)
                   {
                      // это блок плитки. Покраска плитки.
                      var paintAr = _paints[i++];
@@ -222,7 +222,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       public bool Equals(MarkArPanel other)
       {
          return _markArArch.Equals(other._markArArch) &&
-            //_paints.SequenceEqual(other._paints) &&
+            _paints.SequenceEqual(other._paints) &&
             _panels.SequenceEqual(other._panels);
       }
    }

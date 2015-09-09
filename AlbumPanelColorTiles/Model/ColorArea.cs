@@ -62,8 +62,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 
       public bool Equals(ColorArea other)
       {
-         return Bounds.MaxPoint.Equals(other.Bounds.MaxPoint) &&
-            Bounds.MinPoint.Equals(other.Bounds.MinPoint);
+         return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
       }
 
       private Extents3d GetBounds(BlockReference blRef)

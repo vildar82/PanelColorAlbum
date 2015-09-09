@@ -1,9 +1,10 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using System;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
    // Плитка
-   public class Tile
+   public class Tile : IEquatable<Tile>
    {
       private Extents3d _bounds;
       // Id внутри определения блока панели (марки СБ).
@@ -18,6 +19,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       public Extents3d Bounds
       {
          get { return _bounds; }
+      }
+
+      public bool Equals(Tile other)
+      {
+         return _idBlRef.Equals (other._idBlRef)  &&
+            _bounds.IsEqualTo(other._bounds, Album.Tolerance);
       }
    }
 }

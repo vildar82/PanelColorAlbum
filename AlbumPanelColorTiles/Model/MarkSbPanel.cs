@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
 {
@@ -103,7 +104,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.Name == Album.Options.BlockTileName)
+                  if (Blocks.EffectiveName(blRef) == Album.Options.BlockTileName)
                   {
                      blRef.Layer = "0";
                   }
@@ -364,7 +365,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (blRefTile.Name == Album.Options.BlockTileName)
+                  if (Blocks.EffectiveName(blRefTile) == Album.Options.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки
@@ -400,6 +401,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          return _markSb.Equals(other._markSb) &&
             _colorAreas.SequenceEqual(other._colorAreas) &&
             _idBtr.Equals(other._idBtr) &&
+            _paints.SequenceEqual(other._paints) &&
+            _tiles.SequenceEqual (other._tiles)  &&
             _marksAR.SequenceEqual(other._marksAR);
       }
    }

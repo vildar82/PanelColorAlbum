@@ -29,7 +29,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private Document _doc;
       private ObjectId _idLayerMarks = ObjectId.Null;
       private List<MarkSbPanel> _marksSB;
-      private SheetsSet _sheetsSet;
+      private SheetsSet _sheetsSet;      
 
       public Album()
       {
@@ -58,6 +58,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
 
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
+
+      public static Tolerance Tolerance
+      {
+         get
+         {            
+            return Tolerance.Global;
+         }
+      }
 
       // Поиск цвета в списке цветов альбома
       public static Paint FindPaint(string layerName)
