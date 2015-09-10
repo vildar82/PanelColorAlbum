@@ -53,7 +53,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          //Создание файлов марок СБ и листов марок АР в них.
          foreach (var sheetMarkSB in _sheetsMarkSB)
          {
-            sheetMarkSB.CreateFileMarkSB(this);
+            sheetMarkSB.CreateSheetMarkSB(this);
          }
 
          // Еспорт списка панелей в ексель.

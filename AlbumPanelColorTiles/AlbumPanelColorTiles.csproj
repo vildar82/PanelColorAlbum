@@ -75,6 +75,7 @@
     <Compile Include="Model\Paint.cs" />
     <Compile Include="Model\Panel.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
+    <Compile Include="Model\Sheets\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />
     <Compile Include="Model\Sheets\SheetMarkSB.cs" />
     <Compile Include="Model\Sheets\SheetsContent.cs" />

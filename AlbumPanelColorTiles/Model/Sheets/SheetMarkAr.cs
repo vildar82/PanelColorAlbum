@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -71,7 +72,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       }
 
       // Создание листа в файле марки СБ.
-      public void CreateLayout(Database dbMarkSB, Point3d pt)
+      public void CreateLayout(Database dbMarkSB, Point3d pt, List<ObjectId> layersToFreezeOnFacadeSheet, List<ObjectId> layersToFreezeOnFormSheet)
       {
          _ptInsertBlRefMarkAR = pt;
          // Определения блоков марок АР уже скопированы.
@@ -93,7 +94,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);
             // Направение видового экрана на блок марки АР.
-            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB);
+            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB, layersToFreezeOnFacadeSheet, null);
             // Заполнение таблицы
             FillTableTiles(idBtrLayoutMarkAR, t);
             // Заполнение штампа
@@ -109,7 +110,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             MirrorMarkArForFormSheet(idBlRefMarkArForm);
             var idLayoutMarkArForm = Blocks.CopyLayout(dbMarkSB, LayoutName, LayoutName + "з");
             // Направение видового экрана на блок марки АР(з).
-            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t, dbMarkSB);
+            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t, dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet);
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkArForm, false, t);
 
@@ -313,19 +314,32 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       }
 
       // Направление видового экрана на блок Марки АР
-      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t, Database dbMarkSB)
+      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw)
       {
          ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
          var idVP = GetViewport(idLayoutMarkAR, t);
          var vp = t.GetObject(idVP, OpenMode.ForWrite) as Viewport;
+
+         // Отключение слоя на видовом экране    
+         if (layersToFreeze != null && layersToFreeze.Count > 0)
+         { 
+            vp.FreezeLayersInViewport(layersToFreeze.GetEnumerator());                        
+         }
+         if (layersToThaw != null && layersToThaw.Count >0 )
+         {
+            vp.ThawLayersInViewport(layersToThaw.GetEnumerator());
+         }
+
          idBtrLayout = vp.OwnerId;
          var blRef = t.GetObject(idBlRefMarkAR, OpenMode.ForRead, false, true) as BlockReference;
          // Определение границ блока
          Extents3d bounds = GetBoundsBlRefMarkAR(blRef);
          ViewPortDirection(vp, bounds, dbMarkSB);
+         vp.Dispose();
          return idBtrLayout;
-      }
+      }      
+
       //// Создание листа для Марки АР
       //private ObjectId CreateLayoutMarkAR()
       //{
