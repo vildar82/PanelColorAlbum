@@ -47,12 +47,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             else
             {
                try
-               {
-                  _album.ChecksBeforeCreateAlbum();
+               {                             
+                  _album.ChecksBeforeCreateAlbum();                  
                   // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
                   // Нужно или выполнить перекраску панелей перед созданием альбома
                   // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.                  
-                  _album.CheckPanelsInDrawingAndMemory();
+                  _album.CheckPanelsInDrawingAndMemory();                  
                   // Покраска панелей
                   _album.CreateAlbum();
                   doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.SheetsSet.AlbumDir);

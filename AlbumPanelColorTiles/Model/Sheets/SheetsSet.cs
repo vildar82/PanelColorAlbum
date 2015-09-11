@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Autodesk.AutoCAD.Runtime;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
 {
@@ -24,23 +25,25 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
       public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
+
       // Создание альбома панелей
       public void CreateAlbum()
       {
+         //Создание файлов марок СБ и листов марок АР в них.
          // Проверка наличия файла шаблона листов
          _sheetTemplateFileMarkSB = Path.Combine(Commands.CurDllDir, Album.Options.TemplateSheetMarkSBFileName);
          _sheetTemplateFileContent = Path.Combine(Commands.CurDllDir, Album.Options.TemplateSheetContentFileName);
          if (!File.Exists(_sheetTemplateFileMarkSB))
-            throw new Exception("\nНе найден файл шаблона для листов панелей - " + _sheetTemplateFileMarkSB);
+            throw new System.Exception("\nНе найден файл шаблона для листов панелей - " + _sheetTemplateFileMarkSB);
          if (!File.Exists(_sheetTemplateFileContent))
-            throw new Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);
+            throw new System.Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);         
 
          // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
          _sheetsMarkSB = ProcessingSheets(_album.MarksSB);
          if (_sheetsMarkSB.Count ==0)
          {
-            throw new Exception ("Не определены панели марок АР");
-         }
+            throw new System.Exception("Не определены панели марок АР");
+         }         
 
          // Создаение папки для альбома панелей
          CreateAlbumFolder();         
@@ -50,14 +53,18 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
          // Листы содержания
          SheetsContent content = new SheetsContent(this);
 
-         //Создание файлов марок СБ и листов марок АР в них.
+         ProgressMeter progressMeter = new ProgressMeter();
+         progressMeter.SetLimit(_sheetsMarkSB.Count);
+         progressMeter.Start("Создание файлов панелей марок СБ с листами марок АР...");
          foreach (var sheetMarkSB in _sheetsMarkSB)
          {
+            progressMeter.MeterProgress();
             sheetMarkSB.CreateSheetMarkSB(this);
          }
-
+         progressMeter.Stop();
+                  
          // Еспорт списка панелей в ексель.
-         ExportToExcel.Export(this, _album);
+         ExportToExcel.Export(this, _album);         
       }
 
       // Создание папки Альбома панелей

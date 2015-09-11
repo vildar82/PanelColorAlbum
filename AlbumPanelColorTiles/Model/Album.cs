@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets;
@@ -66,9 +66,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          {            
             return Tolerance.Global;
          }
-      }
-
-      
+      }      
 
       // Поиск цвета в списке цветов альбома
       public static Paint FindPaint(string layerName)
@@ -98,11 +96,11 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          // Для покраски панелей, нужно, чтобы в чертеже были расставлены блоки панелей Марки СБ.
          // Поэтому, при изменении зон покраски, перед повторным запуском команды покраски панелей и создания альбома,
          // нужно восстановить блоки Марки СБ (вместо Марок АР).
-         // Блоки панелей Марки АР - удалить.
+         // Блоки панелей Марки АР - удалить.         
 
          Document doc = Application.DocumentManager.MdiActiveDocument;
          Database db = doc.Database;
-         Editor ed = doc.Editor;
+         Editor ed = doc.Editor;         
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -140,7 +138,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                      }
                   }
                }
-            }
+            }            
             // Удаление определений блоков Марок АР.
             foreach (ObjectId idBtr in bt)
             {
@@ -204,10 +202,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                if (textMark.Layer == Album.Options.LayerMarks)
                {
                   textMark.UpgradeOpen();
-                  textMark.Erase(true); // В панелях от Димана, находятся тексты, но их нет!!!??? Попробую удалять и по новой создавать подписи.
-                                    //text.TextString = panelMark;
-                                    //Марка найдена
-                                    //hasMark = true;                  
+                  textMark.Erase(true);          
                }
             }
          }
@@ -232,12 +227,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          // сравнение фоновых зон
          if (!colorAreaModelCheck.ColorAreasBackground.SequenceEqual(_colorAreaModel.ColorAreasBackground))
          {
-            throw new Exception("Фоновые зоны изменились. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+            throw new System.Exception("Фоновые зоны изменились. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
          }
          // сравнение передних зон (пятен)
          if (!colorAreaModelCheck.ColorAreasForeground.SequenceEqual(_colorAreaModel.ColorAreasForeground))
          {
-            throw new Exception("Пятна изменились (зоны покраски). Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+            throw new System.Exception("Пятна изменились (зоны покраски). Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
          }
 
          // Проверка панелей
@@ -246,14 +241,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          RenamePanelsToArchitectIndex(marksSbCheck, _abbreviateProject);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
-            throw new Exception("Панели изменились после последнего выполнения команды покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+            throw new System.Exception("Панели изменились после последнего выполнения команды покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
          }
       }
       public void ChecksBeforeCreateAlbum()
       {
          if (_marksSB == null)
          {
-            throw new Exception("Не определены панели марок АР.");
+            throw new System.Exception("Не определены панели марок АР.");
          }
          // Проверка есть ли панелеи марки АР
          bool hasMarkAR = false;
@@ -267,7 +262,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
          if (!hasMarkAR)
          {
-            throw new Exception("Не определены панели марок АР.");
+            throw new System.Exception("Не определены панели марок АР.");
          }
       }
 
@@ -288,40 +283,40 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          // В Модели должны быть расставлены панели Марки СБ и зоны покраски.
          // сброс списка цветов.
          _colors = new List<Paint>();
-
+         
          // Определение зон покраски в Модели
          _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
-
+         
          // Сброс блоков панелей Марки АР на панели марки СБ.
          ResetBlocks();
-
+         
          // Проверка чертежа
          Inspector inspector = new Inspector();
          if (!inspector.CheckDrawing())
          {
-            throw new Exception("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше.");
+            throw new System.Exception("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше.");
          }
-
+         
          // Определение покраски панелей.
          _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel);
-
+         
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
          if (!inspector.CheckAllTileArePainted(_marksSB))
          {
-            throw new Exception("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");
+            throw new System.Exception("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");
          }
-
+         
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
          RenamePanelsToArchitectIndex(_marksSB, _abbreviateProject);
-
+         
          // Создание определений блоков панелей покраски МаркиАР
          CreatePanelsMarkAR();
-
+         
          // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
          ReplaceBlocksMarkSbOnMarkAr();
-
+         
          // Добавление подписей к панелям
-         CaptionPanels();
+         CaptionPanels();         
       }
 
       // Сброс данных расчета панелей
@@ -429,10 +424,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private void RenamePanelsToArchitectIndex(List<MarkSbPanel> marksSB, string abbreviateProject)
       {
          // Определение этажа панели.
-         IdentificationStoreys(marksSB);
-
-         // Определение торца панели.
-         // Болт??? Хз пока как торцы определять.
+         IdentificationStoreys(marksSB);         
 
          // Маркировка Марок АР по архитектурному индексу
          foreach (var markSB in marksSB)

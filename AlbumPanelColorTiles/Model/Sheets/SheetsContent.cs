@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 
 namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
@@ -104,9 +105,9 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
-               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
+               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР               
                foreach (var sheetMarkSB in _sheetsMarkSB)
-               {
+               {                  
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
                   {
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArDocumentation + ".Раскладка плитки на фасаде";
@@ -136,7 +137,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                LayoutManager lm = LayoutManager.Current;
                lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForContent + (++_countContentSheets).ToString());
 
-               t.Commit();
+               t.Commit();               
             }
             HostApplicationServices.WorkingDatabase = dbOrig;
             dbContent.SaveAs(fileContent, DwgVersion.Current);
@@ -199,7 +200,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                }
             }
          }
-         throw new Exception("Не найден блок штампа в шаблоне содержания.");
+         throw new System.Exception("Не найден блок штампа в шаблоне содержания.");
       }
 
       private Table FindTableContent(BlockTableRecord btrLayoutContent, Transaction t)
@@ -212,7 +213,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
                return t.GetObject(idEnt, OpenMode.ForWrite) as Table;
             }
          }
-         throw new Exception("Не найдена заготовка таблицы в шаблоне содержания.");
+         throw new System.Exception("Не найдена заготовка таблицы в шаблоне содержания.");
       }
 
       private Layout GetCurLayoutContentAndCopyNext(int curSheetContentNum, Transaction t, Database db)
