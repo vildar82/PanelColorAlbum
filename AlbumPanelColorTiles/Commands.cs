@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq; 
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -136,7 +137,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal)]
+      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal |  CommandFlags.NoBlockEditor)]
       public static void PlotPdf()
       {
          Database db = HostApplicationServices.WorkingDatabase;
@@ -174,6 +175,58 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          finally
          {
             Application.SetSystemVariable("BACKGROUNDPLOT", bgp);
+         }
+      }
+
+      [CommandMethod("AKR", "SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void SelectPanelsCommand()
+      {
+         // Выбор блоков панелей на чертеже в Модели
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         using (var DocLock = doc.LockDocument())
+         {
+            Dictionary<string, List<ObjectId>> panels = new Dictionary<string, List<ObjectId>>();  
+            int countMarkSbPanels = 0;
+            int countMarkArPanels = 0;
+
+            using (var t = db.TransactionManager.StartTransaction())
+            {
+               var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+               foreach (ObjectId idEnt in ms)
+               {
+                  if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                  {
+                     var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                     if (MarkSbPanel.IsBlockNamePanel( blRef.Name ) )
+                     {
+                        if (MarkSbPanel.IsBlockNamePanelMarkAr (blRef.Name))                        
+                           countMarkArPanels++;                        
+                        else                        
+                           countMarkSbPanels++;
+
+                        if (panels.ContainsKey (blRef.Name) )
+                        {
+                           panels[blRef.Name].Add(blRef.ObjectId);
+                        }
+                        else
+                        {
+                           List<ObjectId> idBlRefs = new List<ObjectId>();
+                           idBlRefs.Add(blRef.ObjectId);
+                           panels.Add(blRef.Name, idBlRefs);
+                        }                       
+                     }
+                  }
+               }
+               t.Commit();
+            }
+            foreach (var panel in panels)
+            {
+               ed.WriteMessage("\n" + panel.Key + " - " + panel.Value.Count);
+            }
+            ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
+            ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - " + countMarkSbPanels + ", Марки АР - " + countMarkArPanels);
          }
       }
    }
