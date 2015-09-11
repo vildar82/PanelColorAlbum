@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -27,7 +28,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       private ColorAreaModel _colorAreaModel;
       private Database _db;
       private Document _doc;
-      private ObjectId _idLayerMarks = ObjectId.Null;
+      //private ObjectId _idLayerMarks = ObjectId.Null;
       private List<MarkSbPanel> _marksSB;
       private SheetsSet _sheetsSet;      
 
@@ -38,7 +39,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
             throw new System.Exception("Нужно сохранить файл.");
          _db = _doc.Database;
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
-         _abbreviateProject = AbbreviateNameProject();
+         _abbreviateProject = AbbreviateNameProject();         
       }
 
       public static Options Options
@@ -67,6 +68,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          }
       }
 
+      
+
       // Поиск цвета в списке цветов альбома
       public static Paint FindPaint(string layerName)
       {
@@ -90,7 +93,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
-      public static void Resetblocks()
+      public static void ResetBlocks()
       {
          // Для покраски панелей, нужно, чтобы в чертеже были расставлены блоки панелей Марки СБ.
          // Поэтому, при изменении зон покраски, перед повторным запуском команды покраски панелей и создания альбома,
@@ -125,7 +128,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                            string errMsg = "\nНет определения блока для панели Марки СБ " + markSbBlName +
                                           ". Оно создано из панели Марки АР " + blRef.Name + ". Зоны покраски внутри блока не определены." +
                                           "Необходимо проверить блоки и заново запустить программу.";
-                           throw new Exception(errMsg);
+                           ed.WriteMessage ("\n" + errMsg);
                            // Надо чтобы проектировщик проверил эти блоки, может в них нужно добавить зоны покраски (т.к. в блоках марки АР их нет).
                         }
                         var blRefMarkSb = new BlockReference(blRef.Position, bt[markSbBlName]);
@@ -158,64 +161,67 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
                      btr.UpgradeOpen();
                      btr.Erase(true);
                   }
+                  else
+                  {
+                     // Подпись марки блока
+                     string panelMark = btr.Name.Substring(Album.Options.BlockPanelPrefixName.Length);
+                     AddMarkToPanelBtr(panelMark, t, btr);
+                  }                  
+               }
+            }
+            t.Commit();            
+         }
+      }
+
+      // Добавление подписи имени марки панели в блоки панелей в чертеже
+      public void CaptionPanels()
+      {         
+         // Подпись в виде текста на слое АР_Марки
+         using (var t = _db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;            
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (MarkSbPanel.IsBlockNamePanel(btr.Name))
+               {
+                  string panelMark = MarkSbPanel.GetPanelMarkFromBlockName(btr.Name, _marksSB);
+                  AddMarkToPanelBtr(panelMark, t, btr);
                }
             }
             t.Commit();
          }
       }
 
-      // Добавление подписи имени марки панели в блоки панелей в чертеже
-      public void CaptionPanels()
+      public static void AddMarkToPanelBtr(string panelMark,Transaction t, BlockTableRecord btr)
       {
-         // Подпись в виде текста на слое АР_Марки
-         using (var t = _db.TransactionManager.StartTransaction())
+         // Найти панель марки СБ или АР по имени блока         
+         foreach (ObjectId idEnt in btr)
          {
-            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            bool hasMark = false;
-            foreach (ObjectId idBtr in bt)
+            if (idEnt.ObjectClass.Name == "AcDbText")
             {
-               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (MarkSbPanel.IsBlockNamePanel(btr.Name))
+               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
+               if (textMark.Layer == Album.Options.LayerMarks)
                {
-                  // Найти панель марки СБ или АР по имени блока
-                  string panelMark = MarkSbPanel.GetPanelMarkFromBlockName(btr.Name, _marksSB);
-                  foreach (ObjectId idEnt in btr)
-                  {
-                     if (idEnt.ObjectClass.Name == "AcDbText")
-                     {
-                        var text = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
-                        if (text.Layer == Album.Options.LayerMarks)
-                        {
-                           if (text.TextString != panelMark)
-                           {
-                              text.UpgradeOpen();
-                              text.Erase(); // В панелях от Димана, находятся тексты, но их нет!!!??? Попробую удалять и по новой создавать подписи.
-                              //text.TextString = panelMark;
-                              //Марка найдена
-                              //hasMark = true;
-                              break;
-                           }
-                        }
-                     }
-                  }
-                  // Если марки нет, то создаем ее.
-                  if (!hasMark)
-                  {
-                     DBText text = new DBText();
-                     text.TextString = panelMark;
-                     text.Height = 200;
-                     text.Annotative = AnnotativeStates.False;
-                     text.Layer = GetLayerForMark();
-                     text.Position = Point3d.Origin;
-                     // Точка вставки и выравнивание ???
-                     btr.UpgradeOpen();
-                     btr.AppendEntity(text);
-                     t.AddNewlyCreatedDBObject(text, true);
-                  }
+                  textMark.UpgradeOpen();
+                  textMark.Erase(true); // В панелях от Димана, находятся тексты, но их нет!!!??? Попробую удалять и по новой создавать подписи.
+                                    //text.TextString = panelMark;
+                                    //Марка найдена
+                                    //hasMark = true;                  
                }
             }
-            t.Commit();
          }
+         // Если марки нет, то создаем ее.         
+         var text = new DBText();
+         text.TextString = panelMark;
+         text.Height = 200;
+         text.Annotative = AnnotativeStates.False;
+         text.Layer = GetLayerForMark();
+         text.Position = Point3d.Origin;
+         // Точка вставки и выравнивание ???
+         btr.UpgradeOpen();
+         btr.AppendEntity(text);         
+         t.AddNewlyCreatedDBObject(text, true);
       }
 
       // Проверка панелей на чертеже и панелей в памяти (this)
@@ -287,7 +293,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
-         Resetblocks();
+         ResetBlocks();
 
          // Проверка чертежа
          Inspector inspector = new Inspector();
@@ -357,30 +363,24 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
       }
 
       // Получение слоя для марок (АР_Марки)
-      private string GetLayerForMark()
+      private static string GetLayerForMark()
       {
-         // Если уже был создан слой, то возвращаем его. Опасно, т.к. перед повторным запуском команды покраски, могут удалить/переименовать слой марок.
-         if (_idLayerMarks == ObjectId.Null)
+         Database db = HostApplicationServices.WorkingDatabase; 
+         // Если уже был создан слой, то возвращаем его. Опасно, т.к. перед повторным запуском команды покраски, могут удалить/переименовать слой марок.         
+         using (var t = db.TransactionManager.StartTransaction())
          {
-            using (var t = _db.TransactionManager.StartTransaction())
+            var lt = t.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+            if (!lt.Has(Album.Options.LayerMarks))
             {
-               var lt = t.GetObject(_db.LayerTableId, OpenMode.ForRead) as LayerTable;
-               if (lt.Has(Album.Options.LayerMarks))
-               {
-                  _idLayerMarks = lt[Album.Options.LayerMarks];
-               }
-               else
-               {
-                  // Если слоя нет, то он создается.
-                  var ltrMarks = new LayerTableRecord();
-                  ltrMarks.Name = Album.Options.LayerMarks;
-                  ltrMarks.IsPlottable = false;
-                  lt.UpgradeOpen();
-                  _idLayerMarks = lt.Add(ltrMarks);
-                  t.AddNewlyCreatedDBObject(ltrMarks, true);
-               }
-               t.Commit();
+               // Если слоя нет, то он создается.
+               var ltrMarks = new LayerTableRecord();
+               ltrMarks.Name = Album.Options.LayerMarks;
+               ltrMarks.IsPlottable = false;
+               lt.UpgradeOpen();
+               lt.Add(ltrMarks);
+               t.AddNewlyCreatedDBObject(ltrMarks, true);
             }
+            t.Commit();
          }
          return Album.Options.LayerMarks;
       }

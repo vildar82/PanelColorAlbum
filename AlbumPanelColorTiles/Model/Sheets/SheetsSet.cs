@@ -28,8 +28,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
       public void CreateAlbum()
       {
          // Проверка наличия файла шаблона листов
-         _sheetTemplateFileMarkSB = GetTemplateFile(Album.Options.SheetTemplateFileMarkSB, true);
-         _sheetTemplateFileContent = GetTemplateFile(Album.Options.SheetTemplateFileContent, false);
+         _sheetTemplateFileMarkSB = Path.Combine(Commands.CurDllDir, Album.Options.TemplateSheetMarkSBFileName);
+         _sheetTemplateFileContent = Path.Combine(Commands.CurDllDir, Album.Options.TemplateSheetContentFileName);
          if (!File.Exists(_sheetTemplateFileMarkSB))
             throw new Exception("\nНе найден файл шаблона для листов панелей - " + _sheetTemplateFileMarkSB);
          if (!File.Exists(_sheetTemplateFileContent))
@@ -72,22 +72,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             Directory.Delete(_albumDir, true);
          }
          Directory.CreateDirectory(_albumDir);
-      }
-
-      private string GetTemplateFile(string optionsPathToTemplate, bool markSbOrContent)
-      {
-         if (optionsPathToTemplate == "root")
-         {
-            string fileName;
-            if (markSbOrContent)
-               fileName = "АКР_Шаблон_МаркаСБ.dwg";
-            else
-               fileName = "АКР_Шаблон_Содержание.dwg";
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName);
-         }
-         else
-            return optionsPathToTemplate;
-      }
+      }      
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
       private List<SheetMarkSB> ProcessingSheets(List<MarkSbPanel> marksSB)

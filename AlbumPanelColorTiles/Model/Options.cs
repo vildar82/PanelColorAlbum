@@ -35,15 +35,15 @@
       // Шаблоны
       //
       /// <summary>
-      /// Путь к файлу шаблона содержания (АКР_Шаблон_Содержание.dwg)
-      /// root - в корне программы.
+      /// Имя файла шаблона содержания (АКР_Шаблон_Содержание.dwg)      
       /// </summary>
-      public string SheetTemplateFileContent = "root";
+      public string TemplateSheetContentFileName = "АКР_Шаблон_Содержание.dwg";
       /// <summary>
-      /// Путь к файлу шаблона МаркиСБ с шаблоном листа для МАрки АР. АКР_Шаблон_МаркаСБ.dwg
-      /// root - в корне программы.
+      /// Имя файла шаблона МаркиСБ с шаблоном листа для МАрки АР. АКР_Шаблон_МаркаСБ.dwg      
       /// </summary>
-      public string SheetTemplateFileMarkSB = "root";
+      public string TemplateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";
+      // Файл шаблона с блоками АКР (зона покраски, плитка, панель Марки СБ).
+      public string TemplateBlocksAKRFileName = "АКР_Блоки.dwg";
       /// <summary>
       /// Имя листа шаблона содержания в файле шаблона листов.
       /// </summary>

@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model;
+using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
 using Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets;
 
 [assembly: CommandClass(typeof(Vil.Acad.AR.AlbumPanelColorTiles.Commands))]
@@ -17,6 +20,18 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
    public class Commands : IExtensionApplication
    {
       private Album _album;
+      private static string _curDllDir; //Путь к папке программы.
+      public static string CurDllDir
+      {
+         get
+         {
+            if (_curDllDir == null)
+            {
+               _curDllDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            }
+            return _curDllDir;
+         }
+      }      
 
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AlbumPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
@@ -66,6 +81,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                       "\nAlbumPanels - создание альбома панелей." +
                       "\nPlotPdf - печать листов текущего чертежа в PDF. Файл создается в корне текущего чертежа с таким же именем." +
                       "\nSelectPanels - выбор блоков панелей в Модели." +
+                      "\nInsertBlockColorArea - вставка блока зоны покраски." +
                       "\nСправка: имена блоков:" +
                       "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок вконце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
@@ -100,7 +116,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                {
                   // Повторный запуск программы покраски панелей.
                   // Сброс данных
-                  _album.ResetData(); 
+                  _album.ResetData();
                }
                _album.PaintPanels();
                doc.Editor.Regen();
@@ -126,9 +142,10 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             {
                if (_album != null)
                {
-                  _album.ResetData(); 
+                  _album.ResetData();
                }
-               Album.Resetblocks();
+               Album.ResetBlocks();
+               doc.Editor.Regen();
                doc.Editor.WriteMessage("\nСброс блоков выполнен успешно.");
             }
             catch (System.Exception ex)
@@ -138,7 +155,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal |  CommandFlags.NoBlockEditor)]
+      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
       public static void PlotPdf()
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;
@@ -194,7 +211,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          Editor ed = doc.Editor;
          using (var DocLock = doc.LockDocument())
          {
-            Dictionary<string, List<ObjectId>> panels = new Dictionary<string, List<ObjectId>>();  
+            Dictionary<string, List<ObjectId>> panels = new Dictionary<string, List<ObjectId>>();
             int countMarkSbPanels = 0;
             int countMarkArPanels = 0;
 
@@ -206,14 +223,14 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                   if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                   {
                      var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
-                     if (MarkSbPanel.IsBlockNamePanel( blRef.Name ) )
+                     if (MarkSbPanel.IsBlockNamePanel(blRef.Name))
                      {
-                        if (MarkSbPanel.IsBlockNamePanelMarkAr (blRef.Name))                        
-                           countMarkArPanels++;                        
-                        else                        
+                        if (MarkSbPanel.IsBlockNamePanelMarkAr(blRef.Name))
+                           countMarkArPanels++;
+                        else
                            countMarkSbPanels++;
 
-                        if (panels.ContainsKey (blRef.Name) )
+                        if (panels.ContainsKey(blRef.Name))
                         {
                            panels[blRef.Name].Add(blRef.ObjectId);
                         }
@@ -222,7 +239,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
                            List<ObjectId> idBlRefs = new List<ObjectId>();
                            idBlRefs.Add(blRef.ObjectId);
                            panels.Add(blRef.Name, idBlRefs);
-                        }                       
+                        }
                      }
                   }
                }
@@ -234,6 +251,53 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             }
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
             ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - " + countMarkSbPanels + ", Марки АР - " + countMarkArPanels);
+         }
+      }
+
+      [CommandMethod("AKR", "InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor |  CommandFlags.NoPaperSpace)]
+      public void InsertBlockColorAreaCommand()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         try
+         {
+            // Имя вставляемого блока.         
+            string blName = Album.Options.BlockColorAreaName;
+
+            using (var t = doc.TransactionManager.StartTransaction())
+            {
+               var bt = (BlockTable)t.GetObject(db.BlockTableId, OpenMode.ForRead);
+               if (!bt.Has(blName))
+               {
+                  // Копирование определенич блока из файла с блоками.
+                  string fileBlocksTemplate = Path.Combine(CurDllDir, Album.Options.TemplateBlocksAKRFileName);
+                  if (!File.Exists(fileBlocksTemplate))
+                  {
+                     throw new System.Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
+                  }
+                  Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
+               }
+               ObjectId blockId = bt[blName];
+
+               Point3d pt = new Point3d(0, 0, 0);
+               BlockReference br = new BlockReference(pt, blockId);
+               BlockInsertJig entJig = new BlockInsertJig(br);
+
+               // jig
+               var pr = ed.Drag(entJig);
+               if (pr.Status == PromptStatus.OK)
+               {
+                  BlockTableRecord btr = (BlockTableRecord)t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+                  btr.AppendEntity(entJig.GetEntity());
+                  t.AddNewlyCreatedDBObject(entJig.GetEntity(), true);
+               }
+               t.Commit();
+            }
+         }
+         catch (System.Exception ex)
+         {
+            ed.WriteMessage("\n" + ex.Message);
          }
       }
    }

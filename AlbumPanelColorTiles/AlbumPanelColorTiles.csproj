@@ -69,6 +69,7 @@
     <Compile Include="Model\Lib\Geometry.cs" />
     <Compile Include="Model\Checks\Inspector.cs" />
     <Compile Include="Model\Lib\Blocks.cs" />
+    <Compile Include="Model\Lib\InsertBlock.cs" />
     <Compile Include="Model\MarkArPanel.cs" />
     <Compile Include="Model\MarkSbPanel.cs" />
     <Compile Include="Model\Options.cs" />
