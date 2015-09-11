@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq; 
+using System.Linq;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -141,6 +141,12 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
       [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal |  CommandFlags.NoBlockEditor)]
       public static void PlotPdf()
       {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+
+         // Regen
+         (doc.GetAcadDocument() as dynamic).Regen((dynamic)1);
+
          Database db = HostApplicationServices.WorkingDatabase;
          short bgp = (short)Application.GetSystemVariable("BACKGROUNDPLOT");
          try

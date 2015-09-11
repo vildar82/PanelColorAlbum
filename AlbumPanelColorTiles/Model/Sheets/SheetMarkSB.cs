@@ -71,10 +71,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             //// Удаление шаблона листа из фала Марки СБ
             HostApplicationServices.WorkingDatabase = dbMarkSB;
             LayoutManager lm = LayoutManager.Current;
-            lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForMarkAR);
-
-            // Печать
-            Commands.PlotPdf();
+            lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForMarkAR);            
 
             HostApplicationServices.WorkingDatabase = dbOrig;
             dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
