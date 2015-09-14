@@ -54,7 +54,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             // Копирование всех определений блоков марки АР в файл Марки СБ
             CopyBtrMarksARToSheetMarkSB(_markSB, dbMarkSB);
 
-            // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
+            // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)  
+            // А так же включение и разморозка всех слоев.           
             List<ObjectId> layersToFreezeOnFacadeSheet;
             List<ObjectId> layersToFreezeOnFormSheet;
             GetLayersToFreezeOnSheetsPanel(dbMarkSB, out layersToFreezeOnFacadeSheet, out layersToFreezeOnFormSheet);
@@ -98,6 +99,18 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
             {
                layersToFreezeOnFacadeSheet.Add(lt[Album.Options.LayerDimensionForm]);
             }
+            // Включение и разморозка всех слоев
+            foreach (var idLayer in lt)
+            {
+               var layer = t.GetObject(idLayer, OpenMode.ForRead) as LayerTableRecord;
+               if (layer.IsOff || layer.IsFrozen)
+               {
+                  layer.UpgradeOpen();
+                  layer.IsOff = false;
+                  layer.IsFrozen = false;  
+               }
+            }
+            t.Commit();
          }
       }
 

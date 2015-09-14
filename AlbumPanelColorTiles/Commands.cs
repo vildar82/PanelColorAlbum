@@ -75,7 +75,8 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          }
          Editor ed = doc.Editor;
          //Album albumForOptions = new Album();
-         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." +
+         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." + 
+                      "\nВерсия программы " +  Assembly.GetExecutingAssembly().GetName ().Version + 
                       "\nКоманды: PaintPanels - покраска блоков панелей." +
                       "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
                       "\nAlbumPanels - создание альбома панелей." +
