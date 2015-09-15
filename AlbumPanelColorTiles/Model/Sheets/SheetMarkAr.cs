@@ -103,9 +103,17 @@ namespace AlbumPanelColorTiles.Model.Sheets
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);
             // Направение видового экрана на блок марки АР.
-            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB, layersToFreezeOnFacadeSheet, null, true);
+            Extents3d extentsViewPort;
+            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, 
+                              dbMarkSB, layersToFreezeOnFacadeSheet, null, true, out extentsViewPort);
             // Заполнение таблицы
-            FillTableTiles(idBtrLayoutMarkAR, t);
+            Extents3d extentsTable;
+            ObjectId idTable;
+            FillTableTiles(idBtrLayoutMarkAR, t, out extentsTable, out idTable);
+
+            // Проверка расположения таблицы
+            CheckTableExtents(extentsTable, extentsViewPort, idTable, t);
+
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkAR, true, t);
 
@@ -119,11 +127,23 @@ namespace AlbumPanelColorTiles.Model.Sheets
             MirrorMarkArForFormSheet(idBlRefMarkArForm);
             var idLayoutMarkArForm = Blocks.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
             // Направение видового экрана на блок марки АР(з).
-            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t, dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false);
+            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t,
+                           dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false, out extentsViewPort);
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkArForm, false, t);
 
             t.Commit();
+         }
+      }
+
+      private void CheckTableExtents(Extents3d extentsTable, Extents3d extentsViewPort, ObjectId idTable, Transaction t)
+      {
+         if (!Geometry.IsPointInBounds(extentsTable.MinPoint, extentsViewPort))            
+         {
+            // Таблица выходит за границы видового экрана. (Видовой экран, как ориентир)
+            var table = t.GetObject(idTable, OpenMode.ForWrite) as Table;
+            table.Position = new Point3d(table.Position.X, extentsViewPort.MinPoint.Y + (extentsTable.MaxPoint.Y-extentsTable.MinPoint.Y), 0);
+            table.Dispose(); 
          }
       }
 
@@ -171,11 +191,13 @@ namespace AlbumPanelColorTiles.Model.Sheets
       }
 
       // Создание и Заполнение таблицы расхода плитки
-      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t)
+      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t, out Extents3d extentsTable, out ObjectId idTable )
       {
          var btrLayout = t.GetObject(idBtrLayoutMarkAR, OpenMode.ForRead) as BlockTableRecord;
          // Поиск таблицы на листе
          Table table = FindTable(btrLayout, t);
+         idTable = table.ObjectId;
+         extentsTable = table.GeometricExtents;
 
          // Расчет плитки
          var tilesCalc = _markAR.TilesCalc;
@@ -212,6 +234,8 @@ namespace AlbumPanelColorTiles.Model.Sheets
          table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
          table.Cells[row, 4].TextString = _markAR.MarkSB.TotalAreaTiles.ToString();//totalArea.ToString();
          table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
+
+         table.Dispose();//???
       }
 
       // Поиск штампа на листе
@@ -308,12 +332,14 @@ namespace AlbumPanelColorTiles.Model.Sheets
 
       // Направление видового экрана на блок Марки АР
       private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, 
-         Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw, bool isFacadeView)
+         Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw, bool isFacadeView, out Extents3d extentsViewPort)
       {
          ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
          var idVP = GetViewport(idLayoutMarkAR, t);
          var vp = t.GetObject(idVP, OpenMode.ForWrite) as Viewport;
+
+         extentsViewPort = vp.GeometricExtents; 
 
          // Отключение слоя на видовом экране
          if (layersToFreeze != null && layersToFreeze.Count > 0)

@@ -47,9 +47,7 @@ namespace AlbumPanelColorTiles.Model
 
       private static Paint GetPaintFromColorAreas(Point3d centerTile, List<ColorArea> colorAreas)
       {
-         // Центр плитки
-         //Point3d ptCentretile = new Point3d((boundsTile.MaxPoint.X + boundsTile.MinPoint.X) * 0.5,
-         //                                   (boundsTile.MaxPoint.Y + boundsTile.MinPoint.Y) * 0.5, 0);
+         // Центр плитки         
          foreach (ColorArea colorArea in colorAreas)
          {
             if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
