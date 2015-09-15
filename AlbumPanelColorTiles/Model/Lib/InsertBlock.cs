@@ -1,14 +1,12 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.Lib
 {
    public class BlockInsertJig : EntityJig
    {
-      Point3d mCenterPt, mActualPoint;
+      private Point3d mCenterPt, mActualPoint;
 
       public BlockInsertJig(BlockReference br)
         : base(br)
@@ -60,5 +58,5 @@ namespace AlbumPanelColorTiles.Model.Lib
       {
          return Entity;
       }
-   }   
+   }
 }

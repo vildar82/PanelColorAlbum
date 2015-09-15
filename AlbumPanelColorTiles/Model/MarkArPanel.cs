@@ -1,31 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AlbumPanelColorTiles.Model.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using AlbumPanelColorTiles.Model.Lib;
 
 namespace AlbumPanelColorTiles.Model
 {
    // Марка АР покраски панели
-   public class MarkArPanel :IEquatable<MarkArPanel>
+   public class MarkArPanel : IEquatable<MarkArPanel>
    {
       private ObjectId _idBtrAr;
 
       // Определенная марка покраски архитектурная
       private string _markArArch;
+
       private string _markArBlockName;
       private string _markARPanelFullName;
       private string _markARPanelFullValidName;
 
       // Временная марка покраски
       private string _markArTemp;
+
       private MarkSbPanel _markSB;
       private List<Paint> _paints;
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
+
       public MarkArPanel(List<Paint> paintAR, MarkSbPanel markSb, BlockReference blRefMarkAr)
       {
          _markSB = markSb;
@@ -74,6 +77,7 @@ namespace AlbumPanelColorTiles.Model
       /// Блоки панели с такой покраской
       /// </summary>
       public List<Panel> Panels { get { return _panels; } }
+
       public List<TileCalc> TilesCalc
       {
          get
@@ -85,6 +89,7 @@ namespace AlbumPanelColorTiles.Model
             return _tilesCalc;
          }
       }
+
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {
@@ -206,14 +211,15 @@ namespace AlbumPanelColorTiles.Model
          var paintsSameColor = _paints.GroupBy(p => p.LayerName);
          foreach (var item in paintsSameColor)
          {
-            TileCalc tileCalc = new TileCalc(item.Key, item.Count(), item.First().Color);            
+            TileCalc tileCalc = new TileCalc(item.Key, item.Count(), item.First().Color);
             tilesCalc.Add(tileCalc);
          }
          return tilesCalc;
       }
+
       private void DefMarkArTempNames(MarkSbPanel markSB, string blName)
       {
-         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();         
+         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
       }
 
       public bool Equals(MarkArPanel other)

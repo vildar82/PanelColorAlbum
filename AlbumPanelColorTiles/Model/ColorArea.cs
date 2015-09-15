@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlbumPanelColorTiles.Model.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using AlbumPanelColorTiles.Model.Lib;
 
 namespace AlbumPanelColorTiles.Model
 {
    // Зона покраски
-   public class ColorArea :IEquatable<ColorArea>
+   public class ColorArea : IEquatable<ColorArea>
    {
       private Extents3d _bounds;
       private ObjectId _idblRef;
@@ -77,6 +77,6 @@ namespace AlbumPanelColorTiles.Model
             bounds = new Extents3d(Point3d.Origin, Point3d.Origin);
          }
          return bounds;
-      }      
+      }
    }
 }

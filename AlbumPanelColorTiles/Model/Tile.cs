@@ -7,6 +7,7 @@ namespace AlbumPanelColorTiles.Model
    public class Tile : IEquatable<Tile>
    {
       private Extents3d _bounds;
+
       // Id внутри определения блока панели (марки СБ).
       private ObjectId _idBlRef;
 
@@ -23,7 +24,7 @@ namespace AlbumPanelColorTiles.Model
 
       public bool Equals(Tile other)
       {
-         return _idBlRef.Equals (other._idBlRef)  &&
+         return _idBlRef.Equals(other._idBlRef) &&
             _bounds.IsEqualTo(other._bounds, Album.Tolerance);
       }
    }

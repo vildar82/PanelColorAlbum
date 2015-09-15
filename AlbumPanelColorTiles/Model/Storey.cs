@@ -3,7 +3,7 @@
 namespace AlbumPanelColorTiles.Model
 {
    // Этаж
-   public class Storey :IEquatable <Storey>
+   public class Storey : IEquatable<Storey>
    {
       private string _number;
       private double _y;
@@ -32,6 +32,6 @@ namespace AlbumPanelColorTiles.Model
       {
          return _number.Equals(other._number) &&
             _y.Equals(other._y);
-      }      
+      }
    }
 }

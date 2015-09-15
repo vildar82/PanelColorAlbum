@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Runtime;
 using AlbumPanelColorTiles.Model.Lib;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model.Sheets
 {
@@ -12,6 +11,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
    public class SheetsContent
    {
       private readonly int _countSheetsBeforContent = 2;
+
       // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
@@ -20,6 +20,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       private int _countContentSheets;
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
+
       public SheetsContent(SheetsSet sheetsSet)
       {
          _sheetsSet = sheetsSet;
@@ -105,9 +106,9 @@ namespace AlbumPanelColorTiles.Model.Sheets
                tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
-               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР               
+               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
                foreach (var sheetMarkSB in _sheetsMarkSB)
-               {                  
+               {
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
                   {
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArDocumentation + ".Раскладка плитки на фасаде";
@@ -137,12 +138,13 @@ namespace AlbumPanelColorTiles.Model.Sheets
                LayoutManager lm = LayoutManager.Current;
                lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForContent + (++_countContentSheets).ToString());
 
-               t.Commit();               
+               t.Commit();
             }
             HostApplicationServices.WorkingDatabase = dbOrig;
             dbContent.SaveAs(fileContent, DwgVersion.Current);
          }
       }
+
       private void CopyContentSheet(Database dbContent, Transaction t, int curContentLayout, out Table tableContent, out BlockReference blRefStamp)
       {
          Layout layout = GetCurLayoutContentAndCopyNext(curContentLayout, t, dbContent);

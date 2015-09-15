@@ -12,7 +12,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
    {
       private string dwgFile, pdfFile, dsdFile, outputDir;
       private int sheetNum;
-      IEnumerable<Layout> layouts;
+      private IEnumerable<Layout> layouts;
 
       private const string LOG = "publish.log";
 

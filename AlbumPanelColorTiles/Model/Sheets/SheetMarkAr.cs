@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using AlbumPanelColorTiles.Model.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using AlbumPanelColorTiles.Model.Lib;
 
 namespace AlbumPanelColorTiles.Model.Sheets
 {
@@ -25,6 +24,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
 
       private int _sheetNumber;
       private string _sheetNumberInForm;
+
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
@@ -34,6 +34,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       public string LayoutName { get { return _markAR.MarkARPanelFullValidName; } }
       public MarkArPanel MarkAR { get { return _markAR; } }
       public string MarkArArch { get { return _markAR.MarkArArch; } }
+
       /// <summary>
       /// Марка панели для документации (содержание, заполнения штампов на листах).
       /// </summary>
@@ -55,6 +56,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       }
 
       public string MarkArFullName { get { return _markAR.MarkARPanelFullName; } }
+
       public int SheetNumber
       {
          get { return _sheetNumber; }
@@ -66,6 +68,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
          get { return _sheetNumberInForm; }
          set { _sheetNumberInForm = value; }
       }
+
       public int CompareTo(SheetMarkAr other)
       {
          return MarkArArch.CompareTo(other.MarkArArch);
@@ -287,6 +290,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
             blRefMarkArMirr.TransformBy(Matrix3d.Mirroring(lineMirr));
          }
       }
+
       private void ViewPortDirection(Viewport vp, Extents3d bounds, Database dbMarkSB)
       {
          Point3d maxPoint = bounds.MaxPoint;
@@ -321,12 +325,12 @@ namespace AlbumPanelColorTiles.Model.Sheets
          var idVP = GetViewport(idLayoutMarkAR, t);
          var vp = t.GetObject(idVP, OpenMode.ForWrite) as Viewport;
 
-         // Отключение слоя на видовом экране    
+         // Отключение слоя на видовом экране
          if (layersToFreeze != null && layersToFreeze.Count > 0)
-         { 
-            vp.FreezeLayersInViewport(layersToFreeze.GetEnumerator());                        
+         {
+            vp.FreezeLayersInViewport(layersToFreeze.GetEnumerator());
          }
-         if (layersToThaw != null && layersToThaw.Count >0 )
+         if (layersToThaw != null && layersToThaw.Count > 0)
          {
             vp.ThawLayersInViewport(layersToThaw.GetEnumerator());
          }
@@ -338,7 +342,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
          ViewPortDirection(vp, bounds, dbMarkSB);
          vp.Dispose();
          return idBtrLayout;
-      }      
+      }
 
       //// Создание листа для Марки АР
       //private ObjectId CreateLayoutMarkAR()

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Model.Sheets
@@ -14,6 +12,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileContent;
       private string _sheetTemplateFileMarkSB;
+
       public SheetsSet(Album album)
       {
          _album = album;
@@ -36,17 +35,17 @@ namespace AlbumPanelColorTiles.Model.Sheets
          if (!File.Exists(_sheetTemplateFileMarkSB))
             throw new System.Exception("\nНе найден файл шаблона для листов панелей - " + _sheetTemplateFileMarkSB);
          if (!File.Exists(_sheetTemplateFileContent))
-            throw new System.Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);         
+            throw new System.Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);
 
          // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
          _sheetsMarkSB = ProcessingSheets(_album.MarksSB);
-         if (_sheetsMarkSB.Count ==0)
+         if (_sheetsMarkSB.Count == 0)
          {
             throw new System.Exception("Не определены панели марок АР");
-         }         
+         }
 
          // Создаение папки для альбома панелей
-         CreateAlbumFolder();         
+         CreateAlbumFolder();
 
          // Титульные листы и обложеи в одном файле "Содержание".
          // Создание титульных листов
@@ -62,9 +61,9 @@ namespace AlbumPanelColorTiles.Model.Sheets
             sheetMarkSB.CreateSheetMarkSB(this);
          }
          progressMeter.Stop();
-                  
+
          // Еспорт списка панелей в ексель.
-         ExportToExcel.Export(this, _album);         
+         ExportToExcel.Export(this, _album);
       }
 
       // Создание папки Альбома панелей
@@ -79,7 +78,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
             Directory.Delete(_albumDir, true);
          }
          Directory.CreateDirectory(_albumDir);
-      }      
+      }
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
       private List<SheetMarkSB> ProcessingSheets(List<MarkSbPanel> marksSB)

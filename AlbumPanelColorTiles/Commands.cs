@@ -2,14 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using AlbumPanelColorTiles.Model;
-using AlbumPanelColorTiles.Model.Lib;
-using AlbumPanelColorTiles.Model.Sheets;
 
 [assembly: CommandClass(typeof(AlbumPanelColorTiles.Commands))]
 
@@ -19,8 +19,10 @@ namespace AlbumPanelColorTiles
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands : IExtensionApplication
    {
+      private static string _curDllDir;
       private Album _album;
-      private static string _curDllDir; //Путь к папке программы.
+      //Путь к папке программы.
+
       public static string CurDllDir
       {
          get
@@ -31,7 +33,54 @@ namespace AlbumPanelColorTiles
             }
             return _curDllDir;
          }
-      }      
+      }
+
+      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
+      public static void PlotPdf()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+
+         // Regen
+         (doc.GetAcadDocument() as dynamic).Regen((dynamic)1);
+
+         Database db = HostApplicationServices.WorkingDatabase;
+         short bgp = (short)Application.GetSystemVariable("BACKGROUNDPLOT");
+         try
+         {
+            Application.SetSystemVariable("BACKGROUNDPLOT", 0);
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+               List<Layout> layouts = new List<Layout>();
+               DBDictionary layoutDict =
+                   (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
+               foreach (DBDictionaryEntry entry in layoutDict)
+               {
+                  if (entry.Key != "Model")
+                  {
+                     layouts.Add((Layout)tr.GetObject(entry.Value, OpenMode.ForRead));
+                  }
+               }
+               layouts.Sort((l1, l2) => l1.TabOrder.CompareTo(l2.TabOrder));
+
+               string filename = Path.ChangeExtension(db.Filename, "pdf");
+
+               MultiSheetsPdf plotter = new MultiSheetsPdf(filename, layouts);
+               plotter.Publish();
+
+               tr.Commit();
+            }
+         }
+         catch (System.Exception e)
+         {
+            Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
+            ed.WriteMessage("\nError: {0}\n{1}", e.Message, e.StackTrace);
+         }
+         finally
+         {
+            Application.SetSystemVariable("BACKGROUNDPLOT", bgp);
+         }
+      }
 
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AlbumPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
@@ -47,12 +96,12 @@ namespace AlbumPanelColorTiles
             else
             {
                try
-               {                             
-                  _album.ChecksBeforeCreateAlbum();                  
+               {
+                  _album.ChecksBeforeCreateAlbum();
                   // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
                   // Нужно или выполнить перекраску панелей перед созданием альбома
-                  // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.                  
-                  _album.CheckPanelsInDrawingAndMemory();                  
+                  // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.
+                  _album.CheckPanelsInDrawingAndMemory();
                   // Покраска панелей
                   _album.CreateAlbum();
                   doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.SheetsSet.AlbumDir);
@@ -75,9 +124,9 @@ namespace AlbumPanelColorTiles
          }
          Editor ed = doc.Editor;
          //Album albumForOptions = new Album();
-         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." + 
-                      "\nВерсия программы " +  Assembly.GetExecutingAssembly().GetName ().Version + 
-                      "\nКоманды:"+
+         string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." +
+                      "\nВерсия программы " + Assembly.GetExecutingAssembly().GetName().Version +
+                      "\nКоманды:" +
                       "\nPaintPanels - покраска блоков панелей." +
                       "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
                       "\nAlbumPanels - создание альбома панелей." +
@@ -99,6 +148,53 @@ namespace AlbumPanelColorTiles
 
       void IExtensionApplication.Terminate()
       {
+      }
+
+      [CommandMethod("AKR", "InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void InsertBlockColorAreaCommand()
+      {
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         try
+         {
+            // Имя вставляемого блока.
+            string blName = Album.Options.BlockColorAreaName;
+
+            using (var t = doc.TransactionManager.StartTransaction())
+            {
+               var bt = (BlockTable)t.GetObject(db.BlockTableId, OpenMode.ForRead);
+               if (!bt.Has(blName))
+               {
+                  // Копирование определенич блока из файла с блоками.
+                  string fileBlocksTemplate = Path.Combine(CurDllDir, Album.Options.TemplateBlocksAKRFileName);
+                  if (!File.Exists(fileBlocksTemplate))
+                  {
+                     throw new System.Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
+                  }
+                  Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
+               }
+               ObjectId blockId = bt[blName];
+
+               Point3d pt = new Point3d(0, 0, 0);
+               BlockReference br = new BlockReference(pt, blockId);
+               BlockInsertJig entJig = new BlockInsertJig(br);
+
+               // jig
+               var pr = ed.Drag(entJig);
+               if (pr.Status == PromptStatus.OK)
+               {
+                  BlockTableRecord btr = (BlockTableRecord)t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+                  btr.AppendEntity(entJig.GetEntity());
+                  t.AddNewlyCreatedDBObject(entJig.GetEntity(), true);
+               }
+               t.Commit();
+            }
+         }
+         catch (System.Exception ex)
+         {
+            ed.WriteMessage("\n" + ex.Message);
+         }
       }
 
       // Покраска панелей в Моделе (по блокам зон покраски)
@@ -156,54 +252,6 @@ namespace AlbumPanelColorTiles
             }
          }
       }
-
-      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
-      public static void PlotPdf()
-      {
-         Document doc = Application.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-
-         // Regen
-         (doc.GetAcadDocument() as dynamic).Regen((dynamic)1);
-
-         Database db = HostApplicationServices.WorkingDatabase;
-         short bgp = (short)Application.GetSystemVariable("BACKGROUNDPLOT");
-         try
-         {
-            Application.SetSystemVariable("BACKGROUNDPLOT", 0);
-            using (Transaction tr = db.TransactionManager.StartTransaction())
-            {
-               List<Layout> layouts = new List<Layout>();
-               DBDictionary layoutDict =
-                   (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
-               foreach (DBDictionaryEntry entry in layoutDict)
-               {
-                  if (entry.Key != "Model")
-                  {
-                     layouts.Add((Layout)tr.GetObject(entry.Value, OpenMode.ForRead));
-                  }
-               }
-               layouts.Sort((l1, l2) => l1.TabOrder.CompareTo(l2.TabOrder));
-
-               string filename = Path.ChangeExtension(db.Filename, "pdf");
-
-               MultiSheetsPdf plotter = new MultiSheetsPdf(filename, layouts);
-               plotter.Publish();
-
-               tr.Commit();
-            }
-         }
-         catch (System.Exception e)
-         {
-            Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
-            ed.WriteMessage("\nError: {0}\n{1}", e.Message, e.StackTrace);
-         }
-         finally
-         {
-            Application.SetSystemVariable("BACKGROUNDPLOT", bgp);
-         }
-      }
-
       [CommandMethod("AKR", "SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void SelectPanelsCommand()
       {
@@ -253,53 +301,6 @@ namespace AlbumPanelColorTiles
             }
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
             ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - " + countMarkSbPanels + ", Марки АР - " + countMarkArPanels);
-         }
-      }
-
-      [CommandMethod("AKR", "InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor |  CommandFlags.NoPaperSpace)]
-      public void InsertBlockColorAreaCommand()
-      {
-         Document doc = Application.DocumentManager.MdiActiveDocument;
-         Database db = doc.Database;
-         Editor ed = doc.Editor;
-         try
-         {
-            // Имя вставляемого блока.         
-            string blName = Album.Options.BlockColorAreaName;
-
-            using (var t = doc.TransactionManager.StartTransaction())
-            {
-               var bt = (BlockTable)t.GetObject(db.BlockTableId, OpenMode.ForRead);
-               if (!bt.Has(blName))
-               {
-                  // Копирование определенич блока из файла с блоками.
-                  string fileBlocksTemplate = Path.Combine(CurDllDir, Album.Options.TemplateBlocksAKRFileName);
-                  if (!File.Exists(fileBlocksTemplate))
-                  {
-                     throw new System.Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
-                  }
-                  Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
-               }
-               ObjectId blockId = bt[blName];
-
-               Point3d pt = new Point3d(0, 0, 0);
-               BlockReference br = new BlockReference(pt, blockId);
-               BlockInsertJig entJig = new BlockInsertJig(br);
-
-               // jig
-               var pr = ed.Drag(entJig);
-               if (pr.Status == PromptStatus.OK)
-               {
-                  BlockTableRecord btr = (BlockTableRecord)t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
-                  btr.AppendEntity(entJig.GetEntity());
-                  t.AddNewlyCreatedDBObject(entJig.GetEntity(), true);
-               }
-               t.Commit();
-            }
-         }
-         catch (System.Exception ex)
-         {
-            ed.WriteMessage("\n" + ex.Message);
          }
       }
    }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
 using AlbumPanelColorTiles.Model.Lib;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model
 {
@@ -25,6 +25,7 @@ namespace AlbumPanelColorTiles.Model
       private string _markSbClean; // без _тп или _тл
       private string _markSbBlockName;
       private List<Paint> _paints;
+
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
 
@@ -50,6 +51,7 @@ namespace AlbumPanelColorTiles.Model
 
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
+
       /// <summary>
       /// Это панель чердака? true - да, false - нет.
       /// </summary>
@@ -61,9 +63,12 @@ namespace AlbumPanelColorTiles.Model
       public string MarkSbBlockName { get { return _markSbBlockName; } }
 
       public List<Paint> Paints { get { return _paints; } }
+
       // Суммарная площадь плитки на панель (расход м2 на панель).
-      public double TotalAreaTiles {
-         get {
+      public double TotalAreaTiles
+      {
+         get
+         {
             return Math.Round(_paints.Count * TileCalc.OneTileArea, 2);
          }
       }
@@ -84,7 +89,7 @@ namespace AlbumPanelColorTiles.Model
                else
                {
                   _markSbClean = _markSb;
-               }               
+               }
             }
             return _markSbClean;
          }
@@ -225,7 +230,7 @@ namespace AlbumPanelColorTiles.Model
       // Жуткий вид. ??? Переделать!!!
       public void DefineArchitectMarks(List<MarkSbPanel> marksSB, string abbreviateProject)
       {
-         Dictionary<string, MarkArPanel>  marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
+         Dictionary<string, MarkArPanel> marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
          if (IsUpperStoreyPanel)
          {
             // Панели чердака
@@ -334,6 +339,7 @@ namespace AlbumPanelColorTiles.Model
          }
          return markSb;
       }
+
       // Добавление панели АР по списку ее покраски
       private void AddPanelAR(List<Paint> paintAR, BlockReference blRefPanel, MarkSbPanel markSb)
       {
@@ -402,7 +408,7 @@ namespace AlbumPanelColorTiles.Model
             _colorAreas.SequenceEqual(other._colorAreas) &&
             _idBtr.Equals(other._idBtr) &&
             _paints.SequenceEqual(other._paints) &&
-            _tiles.SequenceEqual (other._tiles)  &&
+            _tiles.SequenceEqual(other._tiles) &&
             _marksAR.SequenceEqual(other._marksAR);
       }
    }

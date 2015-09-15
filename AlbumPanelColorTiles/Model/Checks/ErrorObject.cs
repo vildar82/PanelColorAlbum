@@ -7,6 +7,7 @@ namespace AlbumPanelColorTiles.Model.Checks
    {
       private string _errorMsg;
       private ObjectId _idEnt;
+
       /// <summary>
       ///
       /// </summary>

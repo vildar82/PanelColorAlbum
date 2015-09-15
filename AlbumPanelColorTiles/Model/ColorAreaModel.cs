@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using System.Collections.Generic;
 using AlbumPanelColorTiles.Model.Lib;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model
 {

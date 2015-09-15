@@ -4,12 +4,13 @@ using Autodesk.AutoCAD.Colors;
 namespace AlbumPanelColorTiles.Model
 {
    // Краска
-   public class Paint :IEquatable<Paint>
+   public class Paint : IEquatable<Paint>
    {
       private Color _color;
 
       // Имя слоя. (для каждой краски свой слой с именем марки краски)
       private string _layerName;
+
       public Paint(string layerName, Color color)
       {
          _layerName = layerName;

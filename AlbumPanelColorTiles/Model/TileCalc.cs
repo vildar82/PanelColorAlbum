@@ -1,5 +1,6 @@
-﻿using Autodesk.AutoCAD.Colors;
-using System;
+﻿using System;
+using Autodesk.AutoCAD.Colors;
+
 namespace AlbumPanelColorTiles.Model
 {
    public class TileCalc
@@ -14,7 +15,7 @@ namespace AlbumPanelColorTiles.Model
       {
          _colorMark = colorMark;
          _count = count;
-         _pattern = pattern;         
+         _pattern = pattern;
       }
 
       public static double OneTileArea
@@ -28,9 +29,11 @@ namespace AlbumPanelColorTiles.Model
             return _oneTileArea;
          }
       }
+
       public string ColorMark { get { return _colorMark; } }
       public int Count { get { return _count; } }
       public Color Pattern { get { return _pattern; } }
+
       public double TotalArea
       {
          get

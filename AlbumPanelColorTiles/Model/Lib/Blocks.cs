@@ -89,6 +89,7 @@ namespace AlbumPanelColorTiles.Model.Lib
             return btr.Name;
          }
       }
+
       /// <summary>
       /// Получение валидной строки для имени блока. С замоной всех ненужных символов на .
       /// </summary>
@@ -137,8 +138,8 @@ namespace AlbumPanelColorTiles.Model.Lib
 
             ObjectIdCollection ids = new ObjectIdCollection();
             using (var t = extDb.TransactionManager.StartTransaction())
-            {               
-               var bt= (BlockTable)t.GetObject(extDb.BlockTableId, OpenMode.ForRead);
+            {
+               var bt = (BlockTable)t.GetObject(extDb.BlockTableId, OpenMode.ForRead);
                if (bt.Has(blName))
                {
                   ids.Add(bt[blName]);
@@ -152,7 +153,7 @@ namespace AlbumPanelColorTiles.Model.Lib
             // Если нашли – добавим блок
             if (ids.Count != 0)
             {
-               // Получаем текущую базу чертежа               
+               // Получаем текущую базу чертежа
                IdMapping iMap = new IdMapping();
                destDb.WblockCloneObjects(ids, destDb.BlockTableId, iMap, DuplicateRecordCloning.Ignore, false);
             }

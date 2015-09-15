@@ -15,6 +15,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       private MarkSbPanel _markSB;
 
       private List<SheetMarkAr> _sheetsMarkAR;
+
       // Создание листа марки СБ
       public SheetMarkSB(MarkSbPanel markSB)
       {
@@ -33,6 +34,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       public string MarkSB { get { return _markSB.MarkSb; } }
 
       public List<SheetMarkAr> SheetsMarkAR { get { return _sheetsMarkAR; } }
+
       public int CompareTo(SheetMarkSB other)
       {
          return _markSB.MarkSb.CompareTo(other.MarkSB);
@@ -54,8 +56,8 @@ namespace AlbumPanelColorTiles.Model.Sheets
             // Копирование всех определений блоков марки АР в файл Марки СБ
             CopyBtrMarksARToSheetMarkSB(_markSB, dbMarkSB);
 
-            // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)  
-            // А так же включение и разморозка всех слоев.           
+            // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
+            // А так же включение и разморозка всех слоев.
             List<ObjectId> layersToFreezeOnFacadeSheet;
             List<ObjectId> layersToFreezeOnFormSheet;
             GetLayersToFreezeOnSheetsPanel(dbMarkSB, out layersToFreezeOnFacadeSheet, out layersToFreezeOnFormSheet);
@@ -72,7 +74,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
             //// Удаление шаблона листа из фала Марки СБ
             HostApplicationServices.WorkingDatabase = dbMarkSB;
             LayoutManager lm = LayoutManager.Current;
-            lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForMarkAR);            
+            lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForMarkAR);
 
             HostApplicationServices.WorkingDatabase = dbOrig;
             dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
@@ -84,10 +86,10 @@ namespace AlbumPanelColorTiles.Model.Sheets
       {
          layersToFreezeOnFacadeSheet = new List<ObjectId>();
          layersToFreezeOnFormSheet = new List<ObjectId>();
-         using (var t = dbMarkSB.TransactionManager.StartTransaction ())
+         using (var t = dbMarkSB.TransactionManager.StartTransaction())
          {
             var lt = t.GetObject(dbMarkSB.LayerTableId, OpenMode.ForRead) as LayerTable;
-            if (lt.Has (Album.Options.LayerDimensionFacade))
+            if (lt.Has(Album.Options.LayerDimensionFacade))
             {
                layersToFreezeOnFormSheet.Add(lt[Album.Options.LayerDimensionFacade]);
             }
@@ -107,7 +109,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
                {
                   layer.UpgradeOpen();
                   layer.IsOff = false;
-                  layer.IsFrozen = false;  
+                  layer.IsFrozen = false;
                }
             }
             t.Commit();

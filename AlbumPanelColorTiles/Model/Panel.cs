@@ -5,13 +5,14 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Model
 {
    // Панель Марки АР
-   public class Panel :IEquatable<Panel>
+   public class Panel : IEquatable<Panel>
    {
       // Вхождение блок Марки АР после выполнения операции замены блоков мрарки СБ на АР (после определения всех Марок Ар).
       private ObjectId _idBlRefAr;
 
       // Исходное вхождение блока на чертеже (Марки СБ). Которое нужно будет заменить на блок МаркиАР
       private ObjectId _idBlRefSb;
+
       // Точка вставки блока исходного (Марки СБ)
       private Point3d _insPt;
 
@@ -42,7 +43,7 @@ namespace AlbumPanelColorTiles.Model
       {
          return _insPt.Equals(other._insPt) &&
             _storey.Equals(other._storey);
-      }      
+      }
 
       // Замена вхождения блока СБ на АР
       public void ReplaceBlockSbToAr(MarkArPanel markAr)
