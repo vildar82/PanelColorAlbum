@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using Autodesk.AutoCAD.Runtime;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Model.Sheets
 {
    // Ведомость альбома панелей
    public class SheetsSet

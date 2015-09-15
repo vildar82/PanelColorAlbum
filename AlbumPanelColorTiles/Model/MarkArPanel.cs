@@ -5,9 +5,9 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Model
 {
    // Марка АР покраски панели
    public class MarkArPanel :IEquatable<MarkArPanel>
@@ -206,10 +206,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          var paintsSameColor = _paints.GroupBy(p => p.LayerName);
          foreach (var item in paintsSameColor)
          {
-            TileCalc tileCalc = new TileCalc();
-            tileCalc.ColorMark = item.Key;
-            tileCalc.Count = item.Count();
-            tileCalc.Pattern = item.First().Color;
+            TileCalc tileCalc = new TileCalc(item.Key, item.Count(), item.First().Color);            
             tilesCalc.Add(tileCalc);
          }
          return tilesCalc;

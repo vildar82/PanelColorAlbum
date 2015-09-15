@@ -1,7 +1,7 @@
 ﻿using System;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Model
 {
    // Плитка
    public class Tile : IEquatable<Tile>

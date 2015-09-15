@@ -4,7 +4,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
+namespace AlbumPanelColorTiles.Model.Lib
 {
    public class BlockInsertJig : EntityJig
    {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Model
 {
    // Зона покраски
    public class ColorArea :IEquatable<ColorArea>

@@ -4,7 +4,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks
+namespace AlbumPanelColorTiles.Model.Checks
 {
    public class Inspector
    {

@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib
+namespace AlbumPanelColorTiles.Model.Lib
 {
    public static class Geometry
    {

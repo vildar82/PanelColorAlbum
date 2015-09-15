@@ -2,7 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Model
 {
    // Панель Марки АР
    public class Panel :IEquatable<Panel>

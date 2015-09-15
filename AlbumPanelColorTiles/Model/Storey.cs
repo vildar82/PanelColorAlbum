@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Model
 {
    // Этаж
    public class Storey :IEquatable <Storey>

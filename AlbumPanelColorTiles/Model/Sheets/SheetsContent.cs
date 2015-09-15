@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Model.Sheets
 {
    // Листы содержания
    public class SheetsContent

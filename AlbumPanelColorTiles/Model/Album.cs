@@ -8,11 +8,11 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Checks;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets;
+using AlbumPanelColorTiles.Model.Checks;
+using AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Sheets;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Model
 {
    // Альбом колористических решений.
    public class Album
@@ -339,7 +339,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles.Model
          if (res.Status == PromptStatus.OK)
             abbrName = res.StringResult;
          else
-            abbrName = defName;
+            throw new System.Exception("Прервано пользователем.");
          return abbrName;
       }
 

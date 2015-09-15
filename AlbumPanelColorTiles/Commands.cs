@@ -7,13 +7,13 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets;
+using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Sheets;
 
-[assembly: CommandClass(typeof(Vil.Acad.AR.AlbumPanelColorTiles.Commands))]
+[assembly: CommandClass(typeof(AlbumPanelColorTiles.Commands))]
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles
+namespace AlbumPanelColorTiles
 {
    // Команды автокада.
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
@@ -77,14 +77,15 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
          //Album albumForOptions = new Album();
          string msg = "\nЗагружена программа для покраски плитки и создания альбома панелей." + 
                       "\nВерсия программы " +  Assembly.GetExecutingAssembly().GetName ().Version + 
-                      "\nКоманды: PaintPanels - покраска блоков панелей." +
+                      "\nКоманды:"+
+                      "\nPaintPanels - покраска блоков панелей." +
                       "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
                       "\nAlbumPanels - создание альбома панелей." +
                       "\nPlotPdf - печать листов текущего чертежа в PDF. Файл создается в корне текущего чертежа с таким же именем." +
                       "\nSelectPanels - выбор блоков панелей в Модели." +
                       "\nInsertBlockColorArea - вставка блока зоны покраски." +
                       "\nСправка: имена блоков:" +
-                      "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок вконце." +
+                      "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
                       "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName +
                       "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels +
@@ -127,7 +128,7 @@ namespace Vil.Acad.AR.AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\nНе удалось выполнить покраску панелей. " + ex.Message);
+               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
             }
          }
       }

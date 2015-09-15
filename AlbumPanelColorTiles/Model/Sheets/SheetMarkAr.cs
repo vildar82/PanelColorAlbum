@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Vil.Acad.AR.AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Model.Lib;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Model.Sheets
 {
    // Лист Марки АР (на фасаде и в форме)
    public class SheetMarkAr : IComparable<SheetMarkAr>

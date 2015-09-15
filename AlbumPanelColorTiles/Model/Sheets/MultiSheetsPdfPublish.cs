@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.PlottingServices;
 using Autodesk.AutoCAD.Publishing;
 using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
-namespace Vil.Acad.AR.AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Model.Sheets
 {
    public class MultiSheetsPdf
    {
