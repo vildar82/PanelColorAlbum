@@ -31,7 +31,13 @@ namespace AlbumPanelColorTiles.Model.Sheets
          _sheetName = string.Format("Наружная стеновая панель {0}", MarkArDocumentation);
       }
 
-      public string LayoutName { get { return _markAR.MarkARPanelFullValidName; } }
+      public string LayoutName
+      {
+         get
+         {
+            return _sheetNumber.ToString("00");
+         }
+      }
       public MarkArPanel MarkAR { get { return _markAR; } }
       public string MarkArArch { get { return _markAR.MarkArArch; } }
 
@@ -97,7 +103,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);
             // Направение видового экрана на блок марки АР.
-            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB, layersToFreezeOnFacadeSheet, null);
+            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, dbMarkSB, layersToFreezeOnFacadeSheet, null, true);
             // Заполнение таблицы
             FillTableTiles(idBtrLayoutMarkAR, t);
             // Заполнение штампа
@@ -111,9 +117,9 @@ namespace AlbumPanelColorTiles.Model.Sheets
             var idBlRefMarkArForm = InsertBlRefMarkAR(dbMarkSB, ptInsertMarkArForm);
             // Зеркалирование блока
             MirrorMarkArForFormSheet(idBlRefMarkArForm);
-            var idLayoutMarkArForm = Blocks.CopyLayout(dbMarkSB, LayoutName, LayoutName + "з");
+            var idLayoutMarkArForm = Blocks.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
             // Направение видового экрана на блок марки АР(з).
-            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t, dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet);
+            var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t, dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false);
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkArForm, false, t);
 
@@ -197,9 +203,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
             row++;
          }
 
-         // Строка итогов.
-         //var totalCount = tilesCalc.Sum(c => c.Count);
-         //var totalArea = tilesCalc.Sum(c => c.TotalArea);
+         // Строка итогов.         
          // Объединить строку итогов (1,2 и 3 столбцы).
          table.MergeCells(CellRange.Create(table, row, 0, row, 2));
          table.Cells[row, 0].TextString = "Итого на панель";
@@ -250,8 +254,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       private ObjectId GetViewport(ObjectId idLayoutMarkAR, Transaction t)
       {
          ObjectId idVp = ObjectId.Null;
-         var layoutMarkAR = t.GetObject(idLayoutMarkAR, OpenMode.ForRead) as Layout;
-         //var idsVPid = layoutMarkAR.GetViewports(); // 0
+         var layoutMarkAR = t.GetObject(idLayoutMarkAR, OpenMode.ForRead) as Layout;         
          var btrLayout = t.GetObject(layoutMarkAR.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          foreach (ObjectId idEnt in btrLayout)
          {
@@ -291,26 +294,12 @@ namespace AlbumPanelColorTiles.Model.Sheets
          }
       }
 
-      private void ViewPortDirection(Viewport vp, Extents3d bounds, Database dbMarkSB)
+      private void ViewPortDirection(Viewport vp, Database dbMarkSB, Point2d ptCenterPanel)
       {
-         Point3d maxPoint = bounds.MaxPoint;
-         Point3d minPoint = bounds.MinPoint;
-         //Point3d startPoint = new Point3d((bounds.MaxPoint.X + bounds.MinPoint.X) * 0.5,
-         //(bounds.MaxPoint.Y + bounds.MinPoint.Y) * 0.5, 0);
-
-         // формирование размеров видового экрана в листе
-         //vp.CenterPoint = startPoint.Add(new Vector3d(0, -0.15, 0));
-         //vp.Height = maxPoint.Y - minPoint.Y + 0.3;
-         //vp.Width = maxPoint.X - minPoint.X;
-         //vp.CustomScale = 1;    // масштаб ВЭ - 1:1.
-
          // "прицеливание" ВЭ на нужный фрагмент пространства модели
-         vp.ViewCenter = new Point2d((maxPoint.X - minPoint.X) / 2 + minPoint.X, (maxPoint.Y - minPoint.Y) / 2 + minPoint.Y).Add(new Vector2d(0, -0.15));
-         vp.ViewHeight = maxPoint.Y - minPoint.Y + 0.3;
-
-         //vp.Locked = true;              // ВЭ блокируется
-         //vp.On = true;                  // включен и видим
-         //vp.Visible = true;
+         var ptCentre = new Point2d(ptCenterPanel.X, ptCenterPanel.Y - 1400);         
+         vp.ViewCenter = ptCentre;         
+         
          ObjectContextManager ocm = dbMarkSB.ObjectContextManager;
          ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
          vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
@@ -318,7 +307,8 @@ namespace AlbumPanelColorTiles.Model.Sheets
       }
 
       // Направление видового экрана на блок Марки АР
-      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw)
+      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, 
+         Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw, bool isFacadeView)
       {
          ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
@@ -336,42 +326,25 @@ namespace AlbumPanelColorTiles.Model.Sheets
          }
 
          idBtrLayout = vp.OwnerId;
-         var blRef = t.GetObject(idBlRefMarkAR, OpenMode.ForRead, false, true) as BlockReference;
-         // Определение границ блока
-         Extents3d bounds = GetBoundsBlRefMarkAR(blRef);
-         ViewPortDirection(vp, bounds, dbMarkSB);
+         var blRefMarkAr = t.GetObject(idBlRefMarkAR, OpenMode.ForRead, false, true) as BlockReference;
+         // Определение границ блока         
+         Point2d ptCenterMarkAR;
+         if (isFacadeView)
+         {
+            if (_markAR.MarkSB.IsEndLeftPanel)
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X+700, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            else if (_markAR.MarkSB.IsEndRightPanel)
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X-700, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            else
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+         }
+         else
+         {
+            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+         }
+         ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
          vp.Dispose();
          return idBtrLayout;
-      }
-
-      //// Создание листа для Марки АР
-      //private ObjectId CreateLayoutMarkAR()
-      //{
-      //   ObjectId idLayoutMarAr = ObjectId.Null;
-      //   // Копирование листа шаблона
-      //   Database dbOrig = HostApplicationServices.WorkingDatabase;
-      //   HostApplicationServices.WorkingDatabase = _dbMarkSB;
-      //   LayoutManager lm = LayoutManager.Current;
-      //   if (lm.CurrentLayout == Album.Options.SheetTemplateLayoutNameForMarkAR)
-      //   {
-      //      lm.RenameLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
-      //   }
-      //   else
-      //   {
-      //      lm.CopyLayout(lm.CurrentLayout, _markAR.MarkARPanelFullValidName);
-      //   }
-      //   idLayoutMarAr = lm.GetLayoutId(_markAR.MarkARPanelFullValidName);
-      //   HostApplicationServices.WorkingDatabase = dbOrig;
-      //   return idLayoutMarAr;
-      //}
-      /*------------------------------------------------------------------------------------------------------------------*/
-      /* Процедура создания видового экрана, указывающего на нужный участок пространства модели, соответствующий странице */
-      /* Входные данные:                                                                                                  */
-      /* newViewPortId - идентификатор нового видового экрана                                                             */
-      /* newLayoutId - идентификатор листа, на котором расположен ВЭ                                                      */
-      /* minPoint - левая нижняя точка ВЭ в пространстве модели                                                           */
-      /* maxPoint - правая верхняя точка ВЭ в пространстве модели                                                         */
-      /* startPoint - стартовая точка ВЭ: центр видового экрана                                                           */
-      /*------------------------------------------------------------------------------------------------------------------*/
+      }      
    }
 }

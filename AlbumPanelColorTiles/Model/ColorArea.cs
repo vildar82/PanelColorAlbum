@@ -32,27 +32,27 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Определение покраски. Попадание точки в зону окраски
-      public static Paint GetPaint(Extents3d boundsTile, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
+      public static Paint GetPaint(Point3d centerTile, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
       {
-         Paint paint = GetPaintFromColorAreas(boundsTile, colorAreasForeground);
+         Paint paint = GetPaintFromColorAreas(centerTile, colorAreasForeground);
          if (paint == null)
          {
             if (colorAreasBackground != null)
             {
-               paint = GetPaintFromColorAreas(boundsTile, colorAreasBackground);
+               paint = GetPaintFromColorAreas(centerTile, colorAreasBackground);
             }
          }
          return paint;
       }
 
-      private static Paint GetPaintFromColorAreas(Extents3d boundsTile, List<ColorArea> colorAreas)
+      private static Paint GetPaintFromColorAreas(Point3d centerTile, List<ColorArea> colorAreas)
       {
          // Центр плитки
-         Point3d ptCentretile = new Point3d((boundsTile.MaxPoint.X + boundsTile.MinPoint.X) * 0.5,
-                                            (boundsTile.MaxPoint.Y + boundsTile.MinPoint.Y) * 0.5, 0);
+         //Point3d ptCentretile = new Point3d((boundsTile.MaxPoint.X + boundsTile.MinPoint.X) * 0.5,
+         //                                   (boundsTile.MaxPoint.Y + boundsTile.MinPoint.Y) * 0.5, 0);
          foreach (ColorArea colorArea in colorAreas)
          {
-            if (Geometry.IsPointInBounds(ptCentretile, colorArea.Bounds))
+            if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
             {
                return colorArea.Paint;
             }

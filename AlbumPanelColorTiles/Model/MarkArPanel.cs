@@ -103,8 +103,8 @@ namespace AlbumPanelColorTiles.Model
             if (paintSb == null)
             {
                // Опрделение покраски по зонам
-               Extents3d boundsTileInBlRef = GetBoundsTileInBlockRef(blRefPanel, tileMarSb);
-               paintAR = ColorArea.GetPaint(boundsTileInBlRef, colorAreasForeground, colorAreasBackground);
+               Point3d centerTileInBlRef = GetCenterTileInBlockRef(blRefPanel.Position, tileMarSb.CenterTile);
+               paintAR = ColorArea.GetPaint(centerTileInBlRef, colorAreasForeground, colorAreasBackground);
                if (paintAR == null)
                {
                   //Ошибка. Не удалось определить покраску плитки.???
@@ -195,13 +195,9 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Определение границы плитки во вхождении блока
-      private static Extents3d GetBoundsTileInBlockRef(BlockReference blRefPanel, Tile tile)
+      private static Point3d GetCenterTileInBlockRef(Point3d positionBlRef, Point3d centerTileInBtr)
       {
-         Point3d ptBlRef = blRefPanel.Position;
-         Point3d ptMin = new Point3d(ptBlRef.X + tile.Bounds.MinPoint.X, ptBlRef.Y + tile.Bounds.MinPoint.Y, 0);
-         Point3d ptMax = new Point3d(ptBlRef.X + tile.Bounds.MaxPoint.X, ptBlRef.Y + tile.Bounds.MaxPoint.Y, 0);
-         Extents3d boundsTileInBlRef = new Extents3d(ptMin, ptMax);
-         return boundsTileInBlRef;
+         return new Point3d(positionBlRef.X + centerTileInBtr.X, positionBlRef.Y + centerTileInBtr.Y, 0);
       }
 
       // Подсчет плитки

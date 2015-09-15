@@ -13,7 +13,7 @@ namespace AlbumPanelColorTiles.Model.Lib
          if (pt.X > bounds.MinPoint.X && pt.Y > bounds.MinPoint.Y &&
             pt.X < bounds.MaxPoint.X && pt.Y < bounds.MaxPoint.Y)
          {
-            res = true;
+            res = true;             
          }
          return res;
       }

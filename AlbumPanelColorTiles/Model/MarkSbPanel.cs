@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AlbumPanelColorTiles.Model.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model
 {
@@ -16,10 +17,7 @@ namespace AlbumPanelColorTiles.Model
       private bool _isEndLeftPanel;
       private bool _isEndRightPanel;
       private bool _isUpperStoreyPanel;
-      private List<MarkArPanel> _marksAR;
-
-      // Список тех же панелей марки АР, что и в _marksAR, но с архитектурными индексами. В списке _marksAR марки тоже будут архитектурными. Этот словарь просто для проверки уникальности марок.
-      //private Dictionary<string, MarkArPanel> _marksArArchitectIndex;
+      private List<MarkArPanel> _marksAR;      
 
       private string _markSb; // может быть с _тп или _тл
       private string _markSbClean; // без _тп или _тл
@@ -28,6 +26,8 @@ namespace AlbumPanelColorTiles.Model
 
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
+
+      private Point2d _centerPanel;
 
       // Конструктор. Скрытый.
       private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName)
@@ -45,6 +45,20 @@ namespace AlbumPanelColorTiles.Model
 
          // Список плиток (в определении блока марки СБ)
          GetTiles();
+
+         // Центр панели
+         _centerPanel = GetCenterPanel(_tiles);
+      }
+
+      // Определение центра панели по блокам плиток в ней
+      private Point2d GetCenterPanel(List<Tile> _tiles)
+      {         
+         Extents3d ext = new Extents3d();
+         foreach (var tile in _tiles)
+         {            
+            ext.AddPoint(tile.CenterTile);
+         }
+         return new Point2d((ext.MinPoint.X+ ext.MaxPoint.X)*0.5, (ext.MinPoint.Y + ext.MaxPoint.Y) * 0.5);         
       }
 
       public ObjectId IdBtr { get { return _idBtr; } }
@@ -63,6 +77,7 @@ namespace AlbumPanelColorTiles.Model
       public string MarkSbBlockName { get { return _markSbBlockName; } }
 
       public List<Paint> Paints { get { return _paints; } }
+      public Point2d CenterPanel { get { return _centerPanel; } }
 
       // Суммарная площадь плитки на панель (расход м2 на панель).
       public double TotalAreaTiles
@@ -93,7 +108,7 @@ namespace AlbumPanelColorTiles.Model
             }
             return _markSbClean;
          }
-      }
+      }      
 
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
@@ -358,7 +373,7 @@ namespace AlbumPanelColorTiles.Model
          return "АР-" + _marksAR.Count.ToString();
       }
 
-      // Получение списка плиток в определении блока
+      // Получение списка плиток в определении блока      
       private void GetTiles()
       {
          _tiles = new List<Tile>();
@@ -375,7 +390,7 @@ namespace AlbumPanelColorTiles.Model
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки
-                     Paint paint = ColorArea.GetPaint(tile.Bounds, _colorAreas, null);
+                     Paint paint = ColorArea.GetPaint(tile.CenterTile, _colorAreas, null);
                      _tiles.Add(tile);
                      _paints.Add(paint);
                   }

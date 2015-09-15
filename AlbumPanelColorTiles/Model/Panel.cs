@@ -14,18 +14,15 @@ namespace AlbumPanelColorTiles.Model
       private ObjectId _idBlRefSb;
 
       // Точка вставки блока исходного (Марки СБ)
-      private Point3d _insPt;
-
-      //// Матрица трансформации исходного блоко Марки СБ (наверно не нужна будет).
-      //private Matrix3d _transform;
+      private Point3d _insPt;      
+      
       // Этаж панели
       private Storey _storey;
 
       public Panel(BlockReference blRefPanel)
       {
          _idBlRefSb = blRefPanel.ObjectId;
-         _insPt = blRefPanel.Position;
-         //_transform = blRefPanel.BlockTransform;
+         _insPt = blRefPanel.Position;         
       }
 
       /// <summary>

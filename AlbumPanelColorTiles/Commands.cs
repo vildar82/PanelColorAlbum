@@ -52,8 +52,7 @@ namespace AlbumPanelColorTiles
             using (Transaction tr = db.TransactionManager.StartTransaction())
             {
                List<Layout> layouts = new List<Layout>();
-               DBDictionary layoutDict =
-                   (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
+               DBDictionary layoutDict =(DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
                foreach (DBDictionaryEntry entry in layoutDict)
                {
                   if (entry.Key != "Model")

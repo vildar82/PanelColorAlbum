@@ -16,7 +16,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
 
       private List<SheetMarkAr> _sheetsMarkAR;
 
-      // Создание листа марки СБ
+      // Конструктор
       public SheetMarkSB(MarkSbPanel markSB)
       {
          _markSB = markSB;
