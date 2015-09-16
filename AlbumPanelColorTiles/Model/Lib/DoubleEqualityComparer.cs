@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AlbumPanelColorTiles.Model.Lib
+namespace AlbumPanelColorTiles.Lib
 {
    // Сравнение чисел
    public class DoubleEqualityComparer : IEqualityComparer<double>

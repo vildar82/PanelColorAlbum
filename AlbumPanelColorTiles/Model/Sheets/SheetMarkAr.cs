@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Sheets
 {
    // Лист Марки АР (на фасаде и в форме)
    public class SheetMarkAr : IComparable<SheetMarkAr>

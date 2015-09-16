@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace AlbumPanelColorTiles.Model.Checks
+namespace AlbumPanelColorTiles.Checks
 {
    public class Inspector
    {

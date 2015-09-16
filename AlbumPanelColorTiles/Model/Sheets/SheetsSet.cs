@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.Runtime;
 
-namespace AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Sheets
 {
    // Ведомость альбома панелей
    public class SheetsSet
    {
       private Album _album;
-      private string _albumDir;
+      
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileContent;
       private string _sheetTemplateFileMarkSB;
@@ -19,8 +20,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
          _sheetsMarkSB = new List<SheetMarkSB>();
       }
 
-      public Album Album { get { return _album; } }
-      public string AlbumDir { get { return _albumDir; } }
+      public Album Album { get { return _album; } }      
       public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
       public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
@@ -55,10 +55,11 @@ namespace AlbumPanelColorTiles.Model.Sheets
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.SetLimit(_sheetsMarkSB.Count);
          progressMeter.Start("Создание файлов панелей марок СБ с листами марок АР...");
+         int countMarkSB = 1;
          foreach (var sheetMarkSB in _sheetsMarkSB)
          {
             progressMeter.MeterProgress();
-            sheetMarkSB.CreateSheetMarkSB(this);
+            sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++);
          }
          progressMeter.Stop();
 
@@ -70,14 +71,14 @@ namespace AlbumPanelColorTiles.Model.Sheets
       private void CreateAlbumFolder()
       {
          // Папка альбома панелей
-         string albumFolderName = "Альбом панелей";
+         string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension( _album.DwgFacade);
          string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
-         _albumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
-         if (Directory.Exists(_albumDir))
+         _album.AlbumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
+         if (Directory.Exists(_album.AlbumDir))
          {
-            Directory.Delete(_albumDir, true);
+            Directory.Delete(_album.AlbumDir, true);
          }
-         Directory.CreateDirectory(_albumDir);
+         Directory.CreateDirectory(_album.AlbumDir);
       }
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)

@@ -52,6 +52,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,8 +76,10 @@
     <Compile Include="Model\Options.cs" />
     <Compile Include="Model\Paint.cs" />
     <Compile Include="Model\Panel.cs" />
+    <Compile Include="Model\Plot\PlotMultiPdf.cs" />
+    <Compile Include="Model\Plot\PlotMultiPdfReadDwg.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
-    <Compile Include="Model\Sheets\MultiSheetsPdfPublish.cs" />
+    <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />
     <Compile Include="Model\Sheets\SheetMarkSB.cs" />
     <Compile Include="Model\Sheets\SheetsContent.cs" />

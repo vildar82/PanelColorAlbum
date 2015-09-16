@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Lib
+namespace AlbumPanelColorTiles.Lib
 {
    public static class Blocks
    {

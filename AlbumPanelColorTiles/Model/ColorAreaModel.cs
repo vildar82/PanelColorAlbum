@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model

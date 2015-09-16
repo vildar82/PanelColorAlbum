@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Sheets
 {
    // Листы Марки СБ
    public class SheetMarkSB : IComparable<SheetMarkSB>
@@ -41,10 +42,10 @@ namespace AlbumPanelColorTiles.Model.Sheets
       }
 
       // Создание файла марки СБ и листов с панелями марок АР
-      public void CreateSheetMarkSB(SheetsSet sheetSet)
+      public void CreateSheetMarkSB(SheetsSet sheetSet, int count)
       {
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
-         _fileMarkSB = CreateFileMarkSB(_markSB, sheetSet.AlbumDir, sheetSet.SheetTemplateFileMarkSB);
+         _fileMarkSB = CreateFileMarkSB(_markSB, sheetSet.Album.AlbumDir, sheetSet.SheetTemplateFileMarkSB, count);
 
          // Создание листов Марок АР
          using (Database dbMarkSB = new Database(false, true))
@@ -130,9 +131,9 @@ namespace AlbumPanelColorTiles.Model.Sheets
       }
 
       // Создание файла Марки СБ
-      private string CreateFileMarkSB(MarkSbPanel markSB, string albumFolder, string templateFileMarkSB)
+      private string CreateFileMarkSB(MarkSbPanel markSB, string albumFolder, string templateFileMarkSB, int count)
       {
-         string fileDest = Path.Combine(albumFolder, markSB.MarkSb + ".dwg");
+         string fileDest = Path.Combine(albumFolder, count.ToString("00") + "_" + markSB.MarkSb + ".dwg");
          File.Copy(templateFileMarkSB, fileDest);
          return fileDest;
       }

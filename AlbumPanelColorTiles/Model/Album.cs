@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AlbumPanelColorTiles.Model.Checks;
-using AlbumPanelColorTiles.Model.Lib;
-using AlbumPanelColorTiles.Model.Sheets;
+using AlbumPanelColorTiles.Checks;
+using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -19,6 +19,8 @@ namespace AlbumPanelColorTiles.Model
       private static List<Paint> _colors;
 
       private static Options _options;
+
+      private string _albumDir;
 
       // Сокращенное имя проеккта
       private string _abbreviateProject;
@@ -52,6 +54,8 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
+      public string AlbumDir { get { return _albumDir; } set { _albumDir = value; } }
+
       public static Tolerance Tolerance
       {
          get
@@ -62,7 +66,7 @@ namespace AlbumPanelColorTiles.Model
 
       public string AbbreviateProject { get { return _abbreviateProject; } }
 
-      public string DwgFacade { get { return _doc.Name; } }
+      public string DwgFacade { get { return _doc.Name; } }      
 
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
 

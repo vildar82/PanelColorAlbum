@@ -1,6 +1,7 @@
-﻿using Microsoft.Office.Interop.Excel;
+﻿using AlbumPanelColorTiles.Model;
+using Microsoft.Office.Interop.Excel;
 
-namespace AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Sheets
 {
    public static class ExportToExcel
    {

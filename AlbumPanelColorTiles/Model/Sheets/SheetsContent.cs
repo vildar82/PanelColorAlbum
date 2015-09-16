@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AlbumPanelColorTiles.Model.Lib;
+using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Sheets
+namespace AlbumPanelColorTiles.Sheets
 {
    // Листы содержания
    public class SheetsContent
@@ -15,8 +16,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
-      private Album _album;
-      private string _albumDir;
+      private Album _album;      
       private int _countContentSheets;
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
@@ -25,8 +25,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       {
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
-         _sheetsMarkSB = sheetsSet.SheetsMarkSB;
-         _albumDir = sheetsSet.AlbumDir;
+         _sheetsMarkSB = sheetsSet.SheetsMarkSB;         
          Contents();
       }
 
@@ -70,7 +69,7 @@ namespace AlbumPanelColorTiles.Model.Sheets
       private void Contents()
       {
          // Создание файла содержания и титульных листов
-         string fileContent = Path.Combine(_albumDir, "Содержание" + _album.AbbreviateProject + ".dwg");
+         string fileContent = Path.Combine(_album.AlbumDir, "00_Содержание" + _album.AbbreviateProject + ".dwg");
          File.Copy(_sheetsSet.SheetTemplateFileContent, fileContent);
 
          // Кол листов содержания = Суммарное кол лисчтов панелей / на кол строк в таблице на одном листе
@@ -136,7 +135,8 @@ namespace AlbumPanelColorTiles.Model.Sheets
                // Удаление последнего листа содержания (пустой копии)
                HostApplicationServices.WorkingDatabase = dbContent;
                LayoutManager lm = LayoutManager.Current;
-               lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForContent + (++_countContentSheets).ToString());
+               string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
+               lm.DeleteLayout(layoutNameToDel);
 
                t.Commit();
             }
@@ -228,15 +228,15 @@ namespace AlbumPanelColorTiles.Model.Sheets
          if (curSheetContentNum == 1)
          {
             nameLay = Album.Options.SheetTemplateLayoutNameForContent;
-            nameCopy = Album.Options.SheetTemplateLayoutNameForContent + (++curSheetContentNum).ToString();
+            nameCopy = (_countSheetsBeforContent + 2).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
             idLayoutContentCur = lm.GetLayoutId(nameLay);
             lm.CopyLayout(nameLay, nameCopy);
-            lm.RenameLayout(nameLay, nameLay + "1");
+            lm.RenameLayout(nameLay, (_countSheetsBeforContent + 1).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent);
          }
          else
          {
-            nameLay = Album.Options.SheetTemplateLayoutNameForContent + curSheetContentNum.ToString();
-            nameCopy = Album.Options.SheetTemplateLayoutNameForContent + (++curSheetContentNum).ToString();
+            nameLay = (_countSheetsBeforContent + curSheetContentNum).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
+            nameCopy = (_countSheetsBeforContent + (++curSheetContentNum)).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
             idLayoutContentCur = lm.GetLayoutId(nameLay);
             lm.CopyLayout(nameLay, nameCopy);
          }

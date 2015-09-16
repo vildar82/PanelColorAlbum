@@ -1,6 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Checks
+namespace AlbumPanelColorTiles.Checks
 {
    // Объект с ошибками
    public class ErrorObject
