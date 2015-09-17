@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.Plot
                {
                   using (var lockDoc = docOpen.LockDocument())
                   {
-                     MultiSheetPlot(string.Format("Печать {0} файла из {1} в папке", i, filesDwg.Length));
+                     MultiSheetPlot(string.Format("Печать {0} файла из {1} в папке {2}", i, filesDwg.Length, dirInfo.Name));
                   }
                }
                finally

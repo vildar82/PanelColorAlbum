@@ -49,7 +49,7 @@ namespace AlbumPanelColorTiles
                       "\nPaintPanels - покраска блоков панелей." +
                       "\nResetPanels - удаление блоков панелей Марки АР и замена их на блоки панелей Марки СБ." +
                       "\nAlbumPanels - создание альбома панелей." +
-                      "\nPlotPdf - печать в PDF текущего чертежа или выбранной папки с чертежами. Файлы создается в корне чертежа с тем же именем." +
+                      "\nPlotPdf - печать в PDF текущего чертежа или выбранной папки с чертежами. Файлы создается в корне чертежа с тем же именем. Печать выполняется по настройкам на листах." +
                       "\nSelectPanels - выбор блоков панелей в Модели." +
                       "\nInsertBlockColorArea - вставка блока зоны покраски." +
                       "\nСправка: имена блоков:" +
@@ -98,8 +98,7 @@ namespace AlbumPanelColorTiles
                }
                else if (resPrompt.StringResult == "Папки")
                {
-                  var dialog = new FolderBrowserDialog();                  
-                  dialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
+                  var dialog = new FolderBrowserDialog();                   
                   dialog.Description = "Выбор папки для печати чертежов из нее в PDF";
                   dialog.ShowNewFolderButton = false;
                   if (_album == null)
