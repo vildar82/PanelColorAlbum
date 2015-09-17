@@ -76,7 +76,7 @@ namespace AlbumPanelColorTiles
          Editor ed = doc.Editor;
 
          using (var lockDoc = doc.LockDocument())
-         {
+         {            
             var optPrompt = new PromptKeywordOptions("\nПечатать листы текущего чертежа или из папки?");
             optPrompt.Keywords.Add("Текущего");
             optPrompt.Keywords.Add("Папки");
@@ -94,7 +94,8 @@ namespace AlbumPanelColorTiles
                   catch (System.Exception ex)
                   {
                      ed.WriteMessage("\n" + ex.Message);
-                  }                  
+                  }           
+                  
                }
                else if (resPrompt.StringResult == "Папки")
                {

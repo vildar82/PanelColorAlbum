@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
+using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.PlottingServices;
@@ -10,6 +11,18 @@ namespace AlbumPanelColorTiles.Plot
 {
    public class PlotMultiPDF
    {
+      short _bgp;
+      public PlotMultiPDF ()
+      {
+         _bgp = (short)AcAp.GetSystemVariable("BACKGROUNDPLOT");
+         AcAp.SetSystemVariable("BACKGROUNDPLOT", 0);         
+      }
+
+      ~PlotMultiPDF()
+      {
+         AcAp.SetSystemVariable("BACKGROUNDPLOT", _bgp);
+      }
+
       public void PlotCur()
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;
