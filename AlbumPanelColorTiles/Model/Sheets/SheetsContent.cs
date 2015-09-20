@@ -20,12 +20,16 @@ namespace AlbumPanelColorTiles.Sheets
       private int _countContentSheets;
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
+      private BlockFrameFacade _blFrameInFacade;
+      private Database _dbFacade;
+      private Database _dbContent;      
 
-      public SheetsContent(SheetsSet sheetsSet)
+      public SheetsContent(SheetsSet sheetsSet, BlockFrameFacade blFrameInFacade)
       {
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
-         _sheetsMarkSB = sheetsSet.SheetsMarkSB;         
+         _sheetsMarkSB = sheetsSet.SheetsMarkSB;
+         _blFrameInFacade = blFrameInFacade;
          Contents();
       }
 
@@ -53,13 +57,13 @@ namespace AlbumPanelColorTiles.Sheets
          return marksSB.Sum(sb => sb.SheetsMarkAR.Count);
       }
 
-      private void CheckEndOfTable(Database dbContent, Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
+      private void CheckEndOfTable(Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
       {
          if (row == tableContent.Rows.Count)
          {
             // Новый лист содержания
             tableContent.RecomputeTableBlock(true);
-            CopyContentSheet(dbContent, t, ++curContentLayout, out tableContent, out blRefStamp);
+            CopyContentSheet(t, ++curContentLayout, out tableContent, out blRefStamp);
             FillingStampContent(blRefStamp, curContentLayout, t);
             row = _firstRowInTableForSheets;
          }
@@ -74,19 +78,21 @@ namespace AlbumPanelColorTiles.Sheets
 
          // Кол листов содержания = Суммарное кол лисчтов панелей / на кол строк в таблице на одном листе
          // Но на первом листе содержания первые 5 строк заняты (обложка, тит, общие данные, наруж стен панели, том1).
-         Database dbOrig = HostApplicationServices.WorkingDatabase;
-         using (Database dbContent = new Database(false, true))
+         _dbFacade = HostApplicationServices.WorkingDatabase;
+         using (_dbContent = new Database(false, true))
          {
-            dbContent.ReadDwgFile(fileContent, FileShare.ReadWrite, false, "");
-            dbContent.CloseInput(true);
+            _dbContent.ReadDwgFile(fileContent, FileShare.ReadWrite, false, "");
+            _dbContent.CloseInput(true);
 
-            //Копирование листа "Содержание" для следующего листа содержания (заполнять буду предыдущий лист содержания).
-            using (var t = dbContent.TransactionManager.StartTransaction())
+            // Замена блока рамки из чертежа фасада, если он есть
+            _blFrameInFacade.ChangeBlockFrame(_dbContent, Album.Options.BlockFrameName);
+
+            using (var t = _dbContent.TransactionManager.StartTransaction())
             {
                int curContentLayout = 1;
                Table tableContent;
                BlockReference blRefStamp;
-               CopyContentSheet(dbContent, t, curContentLayout, out tableContent, out blRefStamp);
+               CopyContentSheet(t, curContentLayout, out tableContent, out blRefStamp);
                // Определение кол-ва марок АР
                int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
                // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
@@ -115,14 +121,14 @@ namespace AlbumPanelColorTiles.Sheets
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
-                     CheckEndOfTable(dbContent, t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
+                     CheckEndOfTable(t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
 
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArDocumentation + ".Раскладка плитки в форме";
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
                      sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
-                     CheckEndOfTable(dbContent, t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
+                     CheckEndOfTable(t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
                   }
                }
 
@@ -133,21 +139,21 @@ namespace AlbumPanelColorTiles.Sheets
                }
 
                // Удаление последнего листа содержания (пустой копии)
-               HostApplicationServices.WorkingDatabase = dbContent;
+               HostApplicationServices.WorkingDatabase = _dbContent;
                LayoutManager lm = LayoutManager.Current;
                string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
                lm.DeleteLayout(layoutNameToDel);
 
                t.Commit();
             }
-            HostApplicationServices.WorkingDatabase = dbOrig;
-            dbContent.SaveAs(fileContent, DwgVersion.Current);
+            HostApplicationServices.WorkingDatabase = _dbFacade;
+            _dbContent.SaveAs(fileContent, DwgVersion.Current);
          }
-      }
+      }     
 
-      private void CopyContentSheet(Database dbContent, Transaction t, int curContentLayout, out Table tableContent, out BlockReference blRefStamp)
+      private void CopyContentSheet(Transaction t, int curContentLayout, out Table tableContent, out BlockReference blRefStamp)
       {
-         Layout layout = GetCurLayoutContentAndCopyNext(curContentLayout, t, dbContent);
+         Layout layout = GetCurLayoutContentAndCopyNext(curContentLayout, t);
          var btrLayoutContent = t.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          tableContent = FindTableContent(btrLayoutContent, t);
          blRefStamp = FindBlRefStampContent(btrLayoutContent, t);
@@ -164,9 +170,10 @@ namespace AlbumPanelColorTiles.Sheets
          var atrs = blRefStamp.AttributeCollection;
          foreach (ObjectId idAtrRef in atrs)
          {
+            if (idAtrRef.IsErased) continue;
             var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
             string text = string.Empty;
-            if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
+            if (atrRef.Tag.Equals("ВИД", StringComparison.OrdinalIgnoreCase))
             {
                if (curContentLayout == 1 & _countContentSheets > 1)
                   text = "Общие данные. Ведомость комплекта чертежей (начало)";
@@ -196,7 +203,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-               if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockStampContent)
+               if (Blocks.EffectiveName( blRefStampContent).Equals(Album.Options.BlockFrameName, StringComparison.OrdinalIgnoreCase))
                {
                   return blRefStampContent;
                }
@@ -218,10 +225,10 @@ namespace AlbumPanelColorTiles.Sheets
          throw new System.Exception("Не найдена заготовка таблицы в шаблоне содержания.");
       }
 
-      private Layout GetCurLayoutContentAndCopyNext(int curSheetContentNum, Transaction t, Database db)
+      private Layout GetCurLayoutContentAndCopyNext(int curSheetContentNum, Transaction t)
       {
          ObjectId idLayoutContentCur;
-         HostApplicationServices.WorkingDatabase = db;
+         HostApplicationServices.WorkingDatabase = _dbContent;
          LayoutManager lm = LayoutManager.Current;
          string nameLay;
          string nameCopy;

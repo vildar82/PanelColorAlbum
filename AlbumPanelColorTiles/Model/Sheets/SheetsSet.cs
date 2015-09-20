@@ -47,10 +47,14 @@ namespace AlbumPanelColorTiles.Sheets
          // Создаение папки для альбома панелей
          CreateAlbumFolder();
 
+         //Поиск блока рамки на текущем чертеже фасада
+         BlockFrameFacade blFrameSearch = new BlockFrameFacade();
+         blFrameSearch.Search();         
+
          // Титульные листы и обложеи в одном файле "Содержание".
          // Создание титульных листов
          // Листы содержания
-         SheetsContent content = new SheetsContent(this);
+         SheetsContent content = new SheetsContent(this, blFrameSearch);
 
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.SetLimit(_sheetsMarkSB.Count);
@@ -59,7 +63,7 @@ namespace AlbumPanelColorTiles.Sheets
          foreach (var sheetMarkSB in _sheetsMarkSB)
          {
             progressMeter.MeterProgress();
-            sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++);
+            sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++, blFrameSearch);
          }
          progressMeter.Stop();
 

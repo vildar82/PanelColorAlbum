@@ -169,6 +169,7 @@ namespace AlbumPanelColorTiles.Sheets
          var atrs = blRefStamp.AttributeCollection;
          foreach (ObjectId idAtrRef in atrs)
          {
+            if (idAtrRef.IsErased) continue;
             var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
             string text = string.Empty;
             if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
@@ -247,7 +248,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-               if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockStampMarkAR)
+               if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockFrameName)
                {
                   return blRefStampContent;
                }
