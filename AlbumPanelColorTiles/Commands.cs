@@ -59,6 +59,7 @@ namespace AlbumPanelColorTiles
                       "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
                       "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName +
+                      "\nБлок рамки со штампом - " + Album.Options.BlockFrameName +
                       "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels +
                       "\nПанели торцевые с суффиксом _тп или _тл после марки СБ в имени блока панели." +
                       "\nСлой для окон в панелях (замораживается на листе формы панели марки АР) - " + Album.Options.LayerWindows +
@@ -70,7 +71,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
+      [CommandMethod("AKR", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
       public void PlotPdf()
       {
          // Печать в PDF. Текущий чертеж или чертежи в указанной папке
@@ -180,6 +181,7 @@ namespace AlbumPanelColorTiles
       public void AlbumPanelsCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
             if (_album == null)
@@ -231,6 +233,7 @@ namespace AlbumPanelColorTiles
       public void InsertBlockColorAreaCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
          Database db = doc.Database;
          Editor ed = doc.Editor;
          try
@@ -246,7 +249,7 @@ namespace AlbumPanelColorTiles
       public void InsertBlockPanelCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         Database db = doc.Database;
+         if (doc == null) return;         
          Editor ed = doc.Editor;
          try
          {
@@ -261,7 +264,7 @@ namespace AlbumPanelColorTiles
       public void InsertBlockFrameCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         Database db = doc.Database;
+         if (doc == null) return;         
          Editor ed = doc.Editor;
          try
          {
@@ -276,7 +279,7 @@ namespace AlbumPanelColorTiles
       public void InsertBlockTileCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         Database db = doc.Database;
+         if (doc == null) return;         
          Editor ed = doc.Editor;
          try
          {
@@ -293,11 +296,11 @@ namespace AlbumPanelColorTiles
       public void PaintPanelsCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
             try
-            {
-               doc.Editor.WriteMessage(MsgHelp);
+            {               
                if (_album == null)
                {
                   _album = new Album();
@@ -326,6 +329,7 @@ namespace AlbumPanelColorTiles
       public void ResetPanelsCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
             try
@@ -350,6 +354,7 @@ namespace AlbumPanelColorTiles
       {
          // Выбор блоков панелей на чертеже в Модели
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
          Database db = doc.Database;
          Editor ed = doc.Editor;
          using (var DocLock = doc.LockDocument())
@@ -395,6 +400,15 @@ namespace AlbumPanelColorTiles
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
             ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - " + countMarkSbPanels + ", Марки АР - " + countMarkArPanels);
          }
+      }
+
+      [CommandMethod ("PIK", "AKR-Help", CommandFlags.Modal)]
+      public void HelpCommand()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Editor ed = doc.Editor;
+         ed.WriteMessage("\n{0}", MsgHelp);
       }
    }
 }
