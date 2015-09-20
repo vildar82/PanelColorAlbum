@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AlbumPanelColorTiles.Checks;
@@ -41,7 +42,7 @@ namespace AlbumPanelColorTiles.Model
             throw new System.Exception("Нужно сохранить файл.");
          _db = _doc.Database;
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
-         _abbreviateProject = AbbreviateNameProject();
+         _abbreviateProject = abbreviateNameProject();
       }
 
       public static Options Options
@@ -356,19 +357,48 @@ namespace AlbumPanelColorTiles.Model
          return Album.Options.LayerMarks;
       }
 
-      private string AbbreviateNameProject()
+      private string abbreviateNameProject()
       {
          string abbrName;
-         string defName = "Н47Г";
+         string defName = getSavedAbbreviateName();// "Н47Г";
          var opt = new PromptStringOptions("Введите сокращенное имя проекта для добавления к имени Марки АР:");
          opt.DefaultValue = defName;
          var res = _doc.Editor.GetString(opt);
          if (res.Status == PromptStatus.OK)
+         {
             abbrName = res.StringResult;
+            saveAbbreviateName(abbrName);
+         }
          else
+         {
             throw new System.Exception("Прервано пользователем.");
+         }
          return abbrName;
       }
+
+      private string getSavedAbbreviateName()
+      {
+         string res = "Н47Г";
+         try
+         {
+            string regAppPath = @"Software\Vildar\AKR";
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(regAppPath);
+            res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
+         }
+         catch { }
+         return  res;
+      }
+
+      private void saveAbbreviateName(string abbr)
+      {         
+         try
+         {
+            string regAppPath = @"Software\Vildar\AKR";
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(regAppPath);
+            keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
+         }
+         catch { }         
+      }      
 
       // Создание определений блоков панелей марки АР
       private bool CreatePanelsMarkAR()
