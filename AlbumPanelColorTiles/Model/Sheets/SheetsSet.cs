@@ -68,7 +68,13 @@ namespace AlbumPanelColorTiles.Sheets
          progressMeter.Stop();
 
          // Еспорт списка панелей в ексель.
-         ExportToExcel.Export(this, _album);
+         try
+         {
+            ExportToExcel.Export(this, _album);
+         }
+         catch
+         {
+         }         
       }
 
       // Создание папки Альбома панелей
