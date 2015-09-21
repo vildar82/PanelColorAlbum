@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AlbumPanelColorTiles</RootNamespace>
     <AssemblyName>AlbumPanelColorTiles</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,11 +67,12 @@
     <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\ColorArea.cs" />
     <Compile Include="Model\ColorAreaModel.cs" />
+    <Compile Include="Model\Lib\BlockInsert.cs" />
     <Compile Include="Model\Lib\DoubleEqualityComparer.cs" />
     <Compile Include="Model\Lib\Geometry.cs" />
     <Compile Include="Model\Checks\Inspector.cs" />
     <Compile Include="Model\Lib\Blocks.cs" />
-    <Compile Include="Model\Lib\InsertBlock.cs" />
+    <Compile Include="Model\Lib\BlockInsertJig.cs" />
     <Compile Include="Model\MarkArPanel.cs" />
     <Compile Include="Model\MarkSbPanel.cs" />
     <Compile Include="Model\Options.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Model\Panel.cs" />
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />
     <Compile Include="Model\Plot\PlotMultiPdfReadDwg.cs" />
+    <Compile Include="Model\BlockFrameFacade.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
     <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />

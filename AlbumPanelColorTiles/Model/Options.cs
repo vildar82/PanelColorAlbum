@@ -6,15 +6,14 @@
       // Имена блоков
       //
       public string BlockColorAreaName = "АКР_Зона-покраски";
-
       public string BlockPanelPrefixName = "АКР_Панель_";
-      public string BlockStampContent = "АКР_Рамака_Содержание";
-      public string BlockStampMarkAR = "АКР_Рамка_МаркаАР";
+      //public string BlockStampContent = "АКР_Рамака_Содержание";
+      //public string BlockStampMarkAR = "АКР_Рамка_МаркаАР";
+      public string BlockFrameName = "АКР_Рамка";
       public string BlockTileName = "АКР_Плитка";
 
       // Суффикс для торцевых панелей слева
       public string endLeftPanelSuffix = "_тл";
-
       // Суффикс для торцевых панелей справа
       public string endRightPanelSuffix = "_тп";
 
@@ -33,7 +32,6 @@
 
       // Слой окон (отключать на листе панели для формы)
       public string LayerWindows = "АР_Окна";
-
       public string LayerDimensionFacade = "АР_Размеры на фасаде";
       public string LayerDimensionForm = "АР_Размеры в форме";
 
