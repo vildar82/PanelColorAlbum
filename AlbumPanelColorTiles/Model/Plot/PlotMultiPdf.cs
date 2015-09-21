@@ -44,7 +44,7 @@ namespace AlbumPanelColorTiles.Plot
          if (!Application.DocumentManager.DocumentActivationEnabled)         
             Application.DocumentManager.DocumentActivationEnabled = true;
 
-         int i = 1;
+         int i = 0;
          foreach (var fileDwg in filesDwg)
          {
             i++;
