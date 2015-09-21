@@ -325,7 +325,7 @@ namespace AlbumPanelColorTiles
       }
 
       // Удаление блоков панелей марки АР и их замена на блоки панелей марок СБ.
-      [CommandMethod("PIK", "ARK-ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+      [CommandMethod("PIK", "AKR-ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void ResetPanelsCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
