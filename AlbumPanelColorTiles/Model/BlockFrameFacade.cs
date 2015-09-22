@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.Lib;
+using Autodesk.AutoCAD.ApplicationServices;
+using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model
@@ -23,7 +25,8 @@ namespace AlbumPanelColorTiles.Model
       public void Search()
       {
          // Поиск блока рамки на текущем чертеже фасада
-         _db = HostApplicationServices.WorkingDatabase;
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         _db = doc.Database;
          _blFrameName= Album.Options.BlockFrameName;
          using (var t = _db.TransactionManager.StartTransaction())
          {
@@ -39,7 +42,19 @@ namespace AlbumPanelColorTiles.Model
                   {
                      _isFound = true;
                   }
+                  else
+                  {
+                     doc.Editor.WriteMessage("\nНе найдено вхождение блока рамки (АКР_Рамка) в чертеже фасада в Модели.");
+                  }
                }
+               else
+               {
+                  doc.Editor.WriteMessage("\nБлок рамки (АКР_Рамка) не соответствует требованиям. У него должны быть атрибуты: Наименование, Вид, Лист.");
+               }
+            }
+            else
+            {
+               doc.Editor.WriteMessage("\nНет блока рамки (АКР_Рамка) в чертеже фасада, для копирования в чертежи альбома панелей.");
             }
             t.Commit();
          }

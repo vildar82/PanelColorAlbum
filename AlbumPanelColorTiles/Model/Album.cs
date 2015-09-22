@@ -298,16 +298,20 @@ namespace AlbumPanelColorTiles.Model
          Inspector inspector = new Inspector();
          if (!inspector.CheckDrawing())
          {
-            throw new System.Exception("\nПокраска панелей не выполнена, т.к. в чертежа найдены ошибки в блоках панелей, см. выше.");
+            throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");
          }
 
          // Определение покраски панелей.
          _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel);
+         if (_marksSB?.Count == 0)
+         {
+            throw new Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
+         }
 
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
          if (!inspector.CheckAllTileArePainted(_marksSB))
          {
-            throw new System.Exception("\nПокраска не выполнена, т.е. не все плитки покрашены. См. подробности выше.");
+            throw new System.Exception("\nПокраска не выполнена, не все плитки покрашены. См. подробности выше.");
          }
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
