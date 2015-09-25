@@ -18,9 +18,7 @@ namespace AlbumPanelColorTiles.Model
       private string _blFrameName;
       Dictionary<string, string> _attrs;
 
-      public bool IsFound { get { return _isFound; } }
-      //public ObjectId IdBtrFrame { get { return _idBtrFrame; } }
-      //public Dictionary<string, string> Attrs { get { return _attrs; } }
+      public bool IsFound { get { return _isFound; } }      
 
       public void Search()
       {

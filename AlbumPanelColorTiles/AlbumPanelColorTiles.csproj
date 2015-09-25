@@ -53,6 +53,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -67,6 +68,13 @@
     <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\ColorArea.cs" />
     <Compile Include="Model\ColorAreaModel.cs" />
+    <Compile Include="Model\Forms\FormRenameMarkAR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\Forms\FormRenameMarkAR.Designer.cs">
+      <DependentUpon>FormRenameMarkAR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\Forms\MarkArRename.cs" />
     <Compile Include="Model\Lib\BlockInsert.cs" />
     <Compile Include="Model\Lib\DoubleEqualityComparer.cs" />
     <Compile Include="Model\Lib\Geometry.cs" />
@@ -123,6 +131,11 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Model\Forms\FormRenameMarkAR.resx">
+      <DependentUpon>FormRenameMarkAR.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

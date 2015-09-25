@@ -18,21 +18,14 @@ namespace AlbumPanelColorTiles.Model
    {
       // Набор цветов используемых в альбоме.
       private static List<Paint> _colors;
-
       private static Options _options;
-
       private string _albumDir;
-
       // Сокращенное имя проеккта
       private string _abbreviateProject;
-
       private ColorAreaModel _colorAreaModel;
       private Database _db;
-      private Document _doc;
-
-      //private ObjectId _idLayerMarks = ObjectId.Null;
+      private Document _doc;      
       private List<MarkSbPanel> _marksSB;
-
       private SheetsSet _sheetsSet;
 
       public Album()
@@ -240,8 +233,8 @@ namespace AlbumPanelColorTiles.Model
 
          // Проверка панелей
          // Определение покраски панелей.
-         var marksSbCheck = MarkSbPanel.GetMarksSB(_colorAreaModel);
-         RenamePanelsToArchitectIndex(marksSbCheck, _abbreviateProject);
+         var marksSbCheck = MarkSbPanel.GetMarksSB(_colorAreaModel, _abbreviateProject);
+         RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
             throw new System.Exception("Панели изменились после последнего выполнения команды покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
@@ -302,7 +295,7 @@ namespace AlbumPanelColorTiles.Model
          }
 
          // Определение покраски панелей.
-         _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel);
+         _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel, _abbreviateProject);
          if (_marksSB?.Count == 0)
          {
             throw new Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
@@ -315,7 +308,7 @@ namespace AlbumPanelColorTiles.Model
          }
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
-         RenamePanelsToArchitectIndex(_marksSB, _abbreviateProject);
+         RenamePanelsToArchitectIndex(_marksSB);
 
          // Создание определений блоков панелей покраски МаркиАР
          CreatePanelsMarkAR();
@@ -458,7 +451,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
-      private void RenamePanelsToArchitectIndex(List<MarkSbPanel> marksSB, string abbreviateProject)
+      private void RenamePanelsToArchitectIndex(List<MarkSbPanel> marksSB)
       {
          // Определение этажа панели.
          IdentificationStoreys(marksSB);
@@ -466,7 +459,7 @@ namespace AlbumPanelColorTiles.Model
          // Маркировка Марок АР по архитектурному индексу
          foreach (var markSB in marksSB)
          {
-            markSB.DefineArchitectMarks(marksSB, abbreviateProject);
+            markSB.DefineArchitectMarks(marksSB);
          }
       }
 

@@ -10,17 +10,18 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Model
 {
    // Марка АР покраски панели
-   public class MarkArPanel : IEquatable<MarkArPanel>
+   public class MarkArPanel : IEquatable<MarkArPanel>, IComparable<MarkArPanel>
    {
-      private ObjectId _idBtrAr;
+      private ObjectId _idBtrAr;      
 
       // Определенная марка покраски архитектурная
-      private string _markArArch;
-
+      //private string _markArArch;
+      private string _markPainting;
+      private string _markPaintingOld;
       private string _markArBlockName;
       private string _markARPanelFullName;
       private string _markARPanelFullValidName;
-
+      
       // Временная марка покраски
       private string _markArTemp;
 
@@ -34,20 +35,22 @@ namespace AlbumPanelColorTiles.Model
          _markSB = markSb;
          _paints = paintAR;
          DefMarkArTempNames(markSb, blRefMarkAr.Name);
-         _panels = new List<Panel>();
+         _panels = new List<Panel>();         
       }
 
-      public ObjectId IdBtrAr { get { return _idBtrAr; } }
+      public ObjectId IdBtrAr { get { return _idBtrAr; } }      
 
-      public string MarkArArch
+      public string MarkPainting
       {
-         get { return _markArArch; }
+         get { return _markPainting; }
          set
          {
-            // Переименовать _markARPanelFullName и _markArBlockName
-            _markArArch = value;
-            _markARPanelFullName = _markSB.MarkSbClean + _markArArch;
-            _markArBlockName = _markSB.MarkSbBlockName + Blocks.GetValidNameForBlock(_markArArch);
+            _markPaintingOld = _markPainting;
+            _markPainting = value;
+            //Переименовать _markARPanelFullName и _markArBlockName
+            //_markArArch = value;
+            _markARPanelFullName = string.Format("{0}({1}_{2})",_markSB.MarkSbClean, _markPainting, _markSB.Abbr);
+            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);            
          }
       }
 
@@ -88,7 +91,7 @@ namespace AlbumPanelColorTiles.Model
             }
             return _tilesCalc;
          }
-      }
+      }      
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
@@ -220,9 +223,14 @@ namespace AlbumPanelColorTiles.Model
 
       public bool Equals(MarkArPanel other)
       {
-         return _markArArch.Equals(other._markArArch) &&
+         return _markPainting.Equals(other._markPainting) &&
             _paints.SequenceEqual(other._paints) &&
             _panels.SequenceEqual(other._panels);
+      }
+
+      public int CompareTo(MarkArPanel other)
+      {
+         throw new NotImplementedException();
       }
    }
 }

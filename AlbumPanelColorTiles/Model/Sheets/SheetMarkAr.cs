@@ -12,6 +12,7 @@ namespace AlbumPanelColorTiles.Sheets
    {
       // Данные для заполнения штампа
       private readonly string _sheetName;
+      private ObjectId _idBtrArSheet; // опредедление блока марки АР в этом файле.
 
       // Блок Марки АР.
       // Лист раскладки плитки на фасаде
@@ -32,15 +33,13 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetName = string.Format("Наружная стеновая панель {0}", MarkArDocumentation);
       }
 
+      public ObjectId IdBtrArSheet { get { return _idBtrArSheet; } set { _idBtrArSheet = value; } }
+
       public string LayoutName
       {
-         get
-         {
-            return _sheetNumber.ToString("00");
-         }
+         get { return _sheetNumber.ToString("00"); }
       }
-      public MarkArPanel MarkAR { get { return _markAR; } }
-      public string MarkArArch { get { return _markAR.MarkArArch; } }
+      public MarkArPanel MarkAR { get { return _markAR; } }      
 
       /// <summary>
       /// Марка панели для документации (содержание, заполнения штампов на листах).
@@ -78,7 +77,7 @@ namespace AlbumPanelColorTiles.Sheets
 
       public int CompareTo(SheetMarkAr other)
       {
-         return MarkArArch.CompareTo(other.MarkArArch);
+         return _markAR.MarkPainting.CompareTo(other._markAR.MarkPainting);
       }
 
       // Создание листа в файле марки СБ.
@@ -298,9 +297,9 @@ namespace AlbumPanelColorTiles.Sheets
          ObjectId idBlRefMarkAR = ObjectId.Null;
          using (var bt = dbMarkSB.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
-            using (var blRefMarkAR = new BlockReference(ptInsert, bt[_markAR.MarkArBlockName]))
+            using (var blRefMarkAR = new BlockReference(ptInsert, _idBtrArSheet))
             {
-               using (var ms = bt[BlockTableRecord.ModelSpace].GetObject(OpenMode.ForWrite) as BlockTableRecord)
+               using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(dbMarkSB).GetObject(OpenMode.ForWrite) as BlockTableRecord)
                {
                   idBlRefMarkAR = ms.AppendEntity(blRefMarkAR);
                }

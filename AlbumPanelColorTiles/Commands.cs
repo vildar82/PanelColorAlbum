@@ -12,6 +12,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using AlbumPanelColorTiles.Model.Forms;
 
 [assembly: CommandClass(typeof(AlbumPanelColorTiles.Commands))]
 
@@ -197,9 +198,22 @@ namespace AlbumPanelColorTiles
                   // Нужно или выполнить перекраску панелей перед созданием альбома
                   // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.
                   _album.CheckPanelsInDrawingAndMemory();
-                  // Покраска панелей
-                  _album.CreateAlbum();
-                  doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
+
+                  // Вывод списка панелей для возможности переименования марок АР пользователем
+                  FormRenameMarkAR formRenameMarkAR = new FormRenameMarkAR(_album);
+                  if (formRenameMarkAR.ShowDialog() == DialogResult.OK)
+                  {
+                     // Переименовать марки АР
+                     formRenameMarkAR.RenamedMarksAr().ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
+
+                     // Покраска панелей
+                     _album.CreateAlbum();
+                     doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
+                  }
+                  else
+                  {
+                     throw new System.Exception("Отменено пользователем.");
+                  }
 
                   //var optPromptPlot = new PromptKeywordOptions("\nНапечатать альбом в PDF?");
                   //optPromptPlot.Keywords.Add("Да");
@@ -299,8 +313,8 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
-            try
-            {               
+            //try
+            //{               
                if (_album == null)
                {
                   _album = new Album();
@@ -316,11 +330,11 @@ namespace AlbumPanelColorTiles
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
                doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
                doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
-            }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //   doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
+            //}
          }
       }
 

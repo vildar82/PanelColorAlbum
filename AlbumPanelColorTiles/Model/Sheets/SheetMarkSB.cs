@@ -14,7 +14,6 @@ namespace AlbumPanelColorTiles.Sheets
 
       // Файл панели Марки СБ с листами Маркок АР.
       private MarkSbPanel _markSB;
-
       private List<SheetMarkAr> _sheetsMarkAR;
 
       // Конструктор
@@ -58,7 +57,7 @@ namespace AlbumPanelColorTiles.Sheets
             blFrameFacade.ChangeBlockFrame(dbMarkSB, Album.Options.BlockFrameName);
 
             // Копирование всех определений блоков марки АР в файл Марки СБ
-            CopyBtrMarksARToSheetMarkSB(_markSB, dbMarkSB);
+            CopyBtrMarksARToSheetMarkSB(dbMarkSB);
 
             // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
             // А так же включение и разморозка всех слоев.
@@ -121,16 +120,20 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
-      private void CopyBtrMarksARToSheetMarkSB(MarkSbPanel markSB, Database dbMarkSB)
+      private void CopyBtrMarksARToSheetMarkSB(Database dbMarkSB)
       {
-         Database dbSource = markSB.IdBtr.Database;
+         Database dbSource = _markSB.IdBtr.Database;
          var idsCopy = new ObjectIdCollection();
-         foreach (var markAr in markSB.MarksAR)
+         foreach (var sheetMarkAr in _sheetsMarkAR)
          {
-            idsCopy.Add(markAr.IdBtrAr);
+            idsCopy.Add(sheetMarkAr.MarkAR.IdBtrAr);
          }
          IdMapping map = new IdMapping();
          dbSource.WblockCloneObjects(idsCopy, dbMarkSB.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+         foreach (var sheetMarkAr in _sheetsMarkAR)
+         {
+            sheetMarkAr.IdBtrArSheet = map[sheetMarkAr.MarkAR.IdBtrAr].Value;
+         }
       }
 
       // Создание файла Марки СБ
