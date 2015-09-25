@@ -313,8 +313,8 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
-            //try
-            //{               
+            try
+            {
                if (_album == null)
                {
                   _album = new Album();
@@ -330,11 +330,11 @@ namespace AlbumPanelColorTiles
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
                doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
                doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
-            //}
-            //catch (System.Exception ex)
-            //{
-            //   doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
-            //}
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
+            }
          }
       }
 
