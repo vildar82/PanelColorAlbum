@@ -10,7 +10,7 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Model
 {
    // Марка АР покраски панели
-   public class MarkArPanel : IEquatable<MarkArPanel>, IComparable<MarkArPanel>
+   public class MarkArPanel : IEquatable<MarkArPanel>
    {
       private ObjectId _idBtrAr;        
       private string _markPainting;      
@@ -40,10 +40,16 @@ namespace AlbumPanelColorTiles.Model
       {
          get { return _markPainting; }
          set
-         {            
-            _markPainting = value;
-            _markARPanelFullName = string.Format("{0}({1}_{2})",_markSB.MarkSbClean, _markPainting, _markSB.Abbr);
-            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);            
+         {
+            bool isRename = !string.IsNullOrEmpty(_markPainting);            
+            _markPainting = value;               
+            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);
+            _markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);            
+            // Переименование подписей марок панелей
+            if (isRename) // Переименование марки покраски пользователем.
+            {
+               Album.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
+            }                        
          }
       }
 
@@ -123,9 +129,8 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Создание определения блока Марки АР
-      public bool CreateBlock(MarkSbPanel markSB)
-      {
-         bool res = true;
+      public void CreateBlock()
+      {         
          // Создание копии блока маркиСБ, с покраской блоков плиток
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
@@ -135,14 +140,12 @@ namespace AlbumPanelColorTiles.Model
             if (bt.Has(_markArBlockName))
             {
                //Ошибка. Не должно быть определений блоков Марки АР.
-               Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
-               ed.WriteMessage("\nВ чертеже не должно быть блоков Марки АР - " + _markArBlockName);
-               ed.WriteMessage("\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");
-               return false;
+               throw new  System.Exception("\nВ чертеже не должно быть блоков Марки АР - " + _markArBlockName + 
+                           "\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");               
             }
-            var btrMarkSb = t.GetObject(markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
+            var btrMarkSb = t.GetObject(_markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
-            _idBtrAr = Lib.Blocks.CopyBtr(markSB.IdBtr, _markArBlockName);
+            _idBtrAr = Lib.Blocks.CopyBtr(_markSB.IdBtr, _markArBlockName);
             var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)
@@ -171,8 +174,7 @@ namespace AlbumPanelColorTiles.Model
                }
             }
             t.Commit();
-         }
-         return res;
+         }         
       }
 
       public bool EqualPaint(List<Paint> paintAR)
@@ -216,14 +218,9 @@ namespace AlbumPanelColorTiles.Model
 
       public bool Equals(MarkArPanel other)
       {
-         return _markPainting.Equals(other._markPainting) &&
+         return _markArTemp.Equals(other._markArTemp) &&
             _paints.SequenceEqual(other._paints) &&
             _panels.SequenceEqual(other._panels);
-      }
-
-      public int CompareTo(MarkArPanel other)
-      {
-         throw new NotImplementedException();
       }
    }
 }

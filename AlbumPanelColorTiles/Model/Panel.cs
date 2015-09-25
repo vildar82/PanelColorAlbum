@@ -39,8 +39,7 @@ namespace AlbumPanelColorTiles.Model
 
       public bool Equals(Panel other)
       {
-         return _insPt.Equals(other._insPt) &&
-            _storey.Equals(other._storey);
+         return _insPt.Equals(other._insPt);
       }
 
       // Замена вхождения блока СБ на АР
@@ -55,6 +54,7 @@ namespace AlbumPanelColorTiles.Model
             blRefPanelAr.SetDatabaseDefaults();
             blRefPanelAr.Layer = blRefMarkSb.Layer;
             _extents = blRefPanelAr.GeometricExtents;
+            //_insPt = blRefPanelAr.Position; 
             blRefMarkSb.Erase(true);
             _idBlRefAr = ms.AppendEntity(blRefPanelAr);
             t.AddNewlyCreatedDBObject(blRefPanelAr, true);

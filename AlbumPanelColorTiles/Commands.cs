@@ -199,16 +199,18 @@ namespace AlbumPanelColorTiles
                   // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.
                   _album.CheckPanelsInDrawingAndMemory();
 
+                  // Переименование марок пользователем.
                   // Вывод списка панелей для возможности переименования марок АР пользователем
                   FormRenameMarkAR formRenameMarkAR = new FormRenameMarkAR(_album);
                   if (Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
                   {
                      // Переименовать марки АР
-                     formRenameMarkAR.RenamedMarksAr().ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
+                     formRenameMarkAR.RenamedMarksAr().ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);                     
 
                      // Покраска панелей
-                     _album.CreateAlbum();
+                     _album.CreateAlbum();                     
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
+                     doc.Editor.Regen();
                   }
                   else
                   {

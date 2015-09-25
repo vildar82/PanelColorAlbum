@@ -49,22 +49,21 @@ namespace AlbumPanelColorTiles.Model
       }
 
       public string AlbumDir { get { return _albumDir; } set { _albumDir = value; } }
+      public static Tolerance Tolerance { get { return Tolerance.Global; } }
+      public string AbbreviateProject { get { return _abbreviateProject; } }
+      public string DwgFacade { get { return _doc.Name; } }      
+      public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
+      public SheetsSet SheetsSet { get { return _sheetsSet; } }
 
-      public static Tolerance Tolerance
+      public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
       {
-         get
+         using (var t = idBtr.Database.TransactionManager.StartTransaction()  )
          {
-            return Tolerance.Global;
+            var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+            AddMarkToPanelBtr(panelMark, t, btr);
+            t.Commit();
          }
       }
-
-      public string AbbreviateProject { get { return _abbreviateProject; } }
-
-      public string DwgFacade { get { return _doc.Name; } }      
-
-      public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
-
-      public SheetsSet SheetsSet { get { return _sheetsSet; } }
       public static void AddMarkToPanelBtr(string panelMark, Transaction t, BlockTableRecord btr)
       {
          // Найти панель марки СБ или АР по имени блока
@@ -234,7 +233,7 @@ namespace AlbumPanelColorTiles.Model
          // Проверка панелей
          // Определение покраски панелей.
          var marksSbCheck = MarkSbPanel.GetMarksSB(_colorAreaModel, _abbreviateProject);
-         RenamePanelsToArchitectIndex(marksSbCheck);
+         //RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
             throw new System.Exception("Панели изменились после последнего выполнения команды покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
@@ -398,17 +397,15 @@ namespace AlbumPanelColorTiles.Model
       }      
 
       // Создание определений блоков панелей марки АР
-      private bool CreatePanelsMarkAR()
-      {
-         bool res = true;
+      private void CreatePanelsMarkAR()
+      {         
          foreach (var markSB in _marksSB)
          {
             foreach (var markAR in markSB.MarksAR)
             {
-               res = markAR.CreateBlock(markSB);
+               markAR.CreateBlock();
             }
-         }
-         return res;
+         }         
       }
       // определение этажей панелей
       private void IdentificationStoreys(List<MarkSbPanel> marksSB)
