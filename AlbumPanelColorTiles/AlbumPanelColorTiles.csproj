@@ -32,23 +32,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCoreMgd">
-      <HintPath>..\..\..\..\..\ObjectARX\ObjectARX2015\inc\AcCoreMgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="AcCui">
-      <HintPath>..\..\..\..\..\ObjectARX\ObjectARX2015\inc\AcCui.dll</HintPath>
+      <HintPath>..\..\..\ObjectARX\ObjectARX2013\inc\AcCoreMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcDbMgd">
-      <HintPath>..\..\..\..\..\ObjectARX\ObjectARX2015\inc\AcDbMgd.dll</HintPath>
+      <HintPath>..\..\..\ObjectARX\ObjectARX2013\inc\AcDbMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="AcMgd">
-      <HintPath>..\..\..\..\..\ObjectARX\ObjectARX2015\inc\AcMgd.dll</HintPath>
+      <HintPath>..\..\..\ObjectARX\ObjectARX2013\inc\AcMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="AcWindows">
-      <HintPath>..\..\..\..\..\ObjectARX\ObjectARX2015\inc\AcWindows.dll</HintPath>
+    <Reference Include="AutoCAD_PIK_Manager">
+      <HintPath>..\..\..\AutoCAD_PIK_Manager\AutoCAD_PIK_Manager\bin\Release\AutoCAD_PIK_Manager.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -64,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\ColorArea.cs" />
