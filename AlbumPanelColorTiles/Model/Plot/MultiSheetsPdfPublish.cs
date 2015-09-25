@@ -10,11 +10,16 @@ namespace AlbumPanelColorTiles.Plot
 {
    public class MultiSheetsPdf
    {
-      private string dwgFile, pdfFile, dsdFile, outputDir;
-      private int sheetNum;
-      private IEnumerable<Layout> layouts;
+      #region Private Fields
 
       private const string LOG = "publish.log";
+      private string dwgFile, pdfFile, dsdFile, outputDir;
+      private IEnumerable<Layout> layouts;
+      private int sheetNum;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public MultiSheetsPdf(string pdfFile, IEnumerable<Layout> layouts)
       {
@@ -25,6 +30,10 @@ namespace AlbumPanelColorTiles.Plot
          this.dsdFile = Path.ChangeExtension(this.pdfFile, "dsd");
          this.layouts = layouts;
       }
+
+      #endregion Public Constructors
+
+      #region Public Methods
 
       public void Publish()
       {
@@ -38,33 +47,9 @@ namespace AlbumPanelColorTiles.Plot
          }
       }
 
-      private bool TryCreateDSD()
-      {
-         using (DsdData dsd = new DsdData())
-         using (DsdEntryCollection dsdEntries = CreateDsdEntryCollection(this.layouts))
-         {
-            if (dsdEntries == null || dsdEntries.Count <= 0) return false;
+      #endregion Public Methods
 
-            if (!Directory.Exists(this.outputDir))
-               Directory.CreateDirectory(this.outputDir);
-
-            this.sheetNum = dsdEntries.Count;
-
-            dsd.SetDsdEntryCollection(dsdEntries);
-
-            dsd.SetUnrecognizedData("PwdProtectPublishedDWF", "FALSE");
-            dsd.SetUnrecognizedData("PromptForPwd", "FALSE");
-            dsd.SheetType = SheetType.MultiDwf;
-            dsd.NoOfCopies = 1;
-            dsd.DestinationName = this.pdfFile;
-            dsd.IsHomogeneous = false;
-            dsd.LogFilePath = Path.Combine(this.outputDir, LOG);
-
-            PostProcessDSD(dsd);
-
-            return true;
-         }
-      }
+      #region Private Methods
 
       private DsdEntryCollection CreateDsdEntryCollection(IEnumerable<Layout> layouts)
       {
@@ -132,5 +117,35 @@ namespace AlbumPanelColorTiles.Plot
          }
          File.Delete(tmpFile);
       }
+
+      private bool TryCreateDSD()
+      {
+         using (DsdData dsd = new DsdData())
+         using (DsdEntryCollection dsdEntries = CreateDsdEntryCollection(this.layouts))
+         {
+            if (dsdEntries == null || dsdEntries.Count <= 0) return false;
+
+            if (!Directory.Exists(this.outputDir))
+               Directory.CreateDirectory(this.outputDir);
+
+            this.sheetNum = dsdEntries.Count;
+
+            dsd.SetDsdEntryCollection(dsdEntries);
+
+            dsd.SetUnrecognizedData("PwdProtectPublishedDWF", "FALSE");
+            dsd.SetUnrecognizedData("PromptForPwd", "FALSE");
+            dsd.SheetType = SheetType.MultiDwf;
+            dsd.NoOfCopies = 1;
+            dsd.DestinationName = this.pdfFile;
+            dsd.IsHomogeneous = false;
+            dsd.LogFilePath = Path.Combine(this.outputDir, LOG);
+
+            PostProcessDSD(dsd);
+
+            return true;
+         }
+      }
+
+      #endregion Private Methods
    }
 }

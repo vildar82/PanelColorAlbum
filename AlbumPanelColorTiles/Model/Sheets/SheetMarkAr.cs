@@ -10,8 +10,11 @@ namespace AlbumPanelColorTiles.Sheets
    // Лист Марки АР (на фасаде и в форме)
    public class SheetMarkAr : IComparable<SheetMarkAr>
    {
+      #region Private Fields
+
       // Данные для заполнения штампа
       private readonly string _sheetName;
+
       private ObjectId _idBtrArSheet; // опредедление блока марки АР в этом файле.
 
       // Блок Марки АР.
@@ -27,11 +30,19 @@ namespace AlbumPanelColorTiles.Sheets
       private int _sheetNumber;
       private string _sheetNumberInForm;
 
+      #endregion Private Fields
+
+      #region Public Constructors
+
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
          _sheetName = string.Format("Наружная стеновая панель {0}", MarkArDocumentation);
       }
+
+      #endregion Public Constructors
+
+      #region Public Properties
 
       public ObjectId IdBtrArSheet { get { return _idBtrArSheet; } set { _idBtrArSheet = value; } }
 
@@ -39,7 +50,8 @@ namespace AlbumPanelColorTiles.Sheets
       {
          get { return _sheetNumber.ToString("00"); }
       }
-      public MarkArPanel MarkAR { get { return _markAR; } }      
+
+      public MarkArPanel MarkAR { get { return _markAR; } }
 
       /// <summary>
       /// Марка панели для документации (содержание, заполнения штампов на листах).
@@ -75,6 +87,10 @@ namespace AlbumPanelColorTiles.Sheets
          set { _sheetNumberInForm = value; }
       }
 
+      #endregion Public Properties
+
+      #region Public Methods
+
       public int CompareTo(SheetMarkAr other)
       {
          return _markAR.MarkPainting.CompareTo(other._markAR.MarkPainting);
@@ -104,7 +120,7 @@ namespace AlbumPanelColorTiles.Sheets
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);
             // Направение видового экрана на блок марки АР.
             Extents3d extentsViewPort;
-            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t, 
+            var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t,
                               dbMarkSB, layersToFreezeOnFacadeSheet, null, true, out extentsViewPort);
             // Заполнение таблицы
             Extents3d extentsTable;
@@ -136,14 +152,18 @@ namespace AlbumPanelColorTiles.Sheets
          }
       }
 
+      #endregion Public Methods
+
+      #region Private Methods
+
       private void CheckTableExtents(Extents3d extentsTable, Extents3d extentsViewPort, ObjectId idTable, Transaction t)
       {
-         if (!Geometry.IsPointInBounds(extentsTable.MinPoint, extentsViewPort))            
+         if (!Geometry.IsPointInBounds(extentsTable.MinPoint, extentsViewPort))
          {
             // Таблица выходит за границы видового экрана. (Видовой экран, как ориентир)
             var table = t.GetObject(idTable, OpenMode.ForWrite) as Table;
-            table.Position = new Point3d(table.Position.X, extentsViewPort.MinPoint.Y + (extentsTable.MaxPoint.Y-extentsTable.MinPoint.Y), 0);
-            table.Dispose(); 
+            table.Position = new Point3d(table.Position.X, extentsViewPort.MinPoint.Y + (extentsTable.MaxPoint.Y - extentsTable.MinPoint.Y), 0);
+            table.Dispose();
          }
       }
 
@@ -192,7 +212,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание и Заполнение таблицы расхода плитки
-      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t, out Extents3d extentsTable, out ObjectId idTable )
+      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t, out Extents3d extentsTable, out ObjectId idTable)
       {
          var btrLayout = t.GetObject(idBtrLayoutMarkAR, OpenMode.ForRead) as BlockTableRecord;
          // Поиск таблицы на листе
@@ -226,7 +246,7 @@ namespace AlbumPanelColorTiles.Sheets
             row++;
          }
 
-         // Строка итогов.         
+         // Строка итогов.
          // Объединить строку итогов (1,2 и 3 столбцы).
          table.MergeCells(CellRange.Create(table, row, 0, row, 2));
          table.Cells[row, 0].TextString = "Итого на панель";
@@ -279,7 +299,7 @@ namespace AlbumPanelColorTiles.Sheets
       private ObjectId GetViewport(ObjectId idLayoutMarkAR, Transaction t)
       {
          ObjectId idVp = ObjectId.Null;
-         var layoutMarkAR = t.GetObject(idLayoutMarkAR, OpenMode.ForRead) as Layout;         
+         var layoutMarkAR = t.GetObject(idLayoutMarkAR, OpenMode.ForRead) as Layout;
          var btrLayout = t.GetObject(layoutMarkAR.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          foreach (ObjectId idEnt in btrLayout)
          {
@@ -322,9 +342,9 @@ namespace AlbumPanelColorTiles.Sheets
       private void ViewPortDirection(Viewport vp, Database dbMarkSB, Point2d ptCenterPanel)
       {
          // "прицеливание" ВЭ на нужный фрагмент пространства модели
-         var ptCentre = new Point2d(ptCenterPanel.X, ptCenterPanel.Y - 1400);         
-         vp.ViewCenter = ptCentre;         
-         
+         var ptCentre = new Point2d(ptCenterPanel.X, ptCenterPanel.Y - 1400);
+         vp.ViewCenter = ptCentre;
+
          ObjectContextManager ocm = dbMarkSB.ObjectContextManager;
          ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
          vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
@@ -332,7 +352,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Направление видового экрана на блок Марки АР
-      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, 
+      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR,
          Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw, bool isFacadeView, out Extents3d extentsViewPort)
       {
          ObjectId idBtrLayout = ObjectId.Null;
@@ -340,7 +360,7 @@ namespace AlbumPanelColorTiles.Sheets
          var idVP = GetViewport(idLayoutMarkAR, t);
          var vp = t.GetObject(idVP, OpenMode.ForWrite) as Viewport;
 
-         extentsViewPort = vp.GeometricExtents; 
+         extentsViewPort = vp.GeometricExtents;
 
          // Отключение слоя на видовом экране
          if (layersToFreeze != null && layersToFreeze.Count > 0)
@@ -354,14 +374,14 @@ namespace AlbumPanelColorTiles.Sheets
 
          idBtrLayout = vp.OwnerId;
          var blRefMarkAr = t.GetObject(idBlRefMarkAR, OpenMode.ForRead, false, true) as BlockReference;
-         // Определение границ блока         
+         // Определение границ блока
          Point2d ptCenterMarkAR;
          if (isFacadeView)
          {
             if (_markAR.MarkSB.IsEndLeftPanel)
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X+700, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X + 700, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
             else if (_markAR.MarkSB.IsEndRightPanel)
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X-700, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - 700, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
             else
                ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X, blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
          }
@@ -372,6 +392,8 @@ namespace AlbumPanelColorTiles.Sheets
          ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
          vp.Dispose();
          return idBtrLayout;
-      }      
+      }
+
+      #endregion Private Methods
    }
 }

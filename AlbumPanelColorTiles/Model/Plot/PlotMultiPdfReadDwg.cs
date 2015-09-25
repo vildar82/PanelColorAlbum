@@ -1,12 +1,8 @@
-﻿using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.PlottingServices;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.PlottingServices;
 
 namespace AlbumPanelColorTiles.Plot
 {
@@ -15,13 +11,15 @@ namespace AlbumPanelColorTiles.Plot
    /// </summary>
    public class PlotMultiPDFReadDwg
    {
+      #region Public Methods
+
       // Открытие и печать всех файлов в папке
       public void PlotDir(string dir)
       {
          var dirInfo = new DirectoryInfo(dir);
          var filesDwg = dirInfo.GetFiles("*.dwg", SearchOption.TopDirectoryOnly);
 
-         Database dbOrig = HostApplicationServices.WorkingDatabase;         
+         Database dbOrig = HostApplicationServices.WorkingDatabase;
 
          foreach (var fileDwg in filesDwg)
          {
@@ -36,6 +34,10 @@ namespace AlbumPanelColorTiles.Plot
             }
          }
       }
+
+      #endregion Public Methods
+
+      #region Private Methods
 
       // Печать всех листов в текущем документе
       private void multiSheetPlot(Database db)
@@ -98,5 +100,7 @@ namespace AlbumPanelColorTiles.Plot
             t.Commit();
          }
       }
+
+      #endregion Private Methods
    }
 }

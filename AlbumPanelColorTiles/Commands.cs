@@ -3,16 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using AlbumPanelColorTiles.Model;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Model.Forms;
 using AlbumPanelColorTiles.Plot;
 using Autodesk.AutoCAD.ApplicationServices;
-using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using AlbumPanelColorTiles.Model.Forms;
+using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(AlbumPanelColorTiles.Commands))]
 
@@ -22,9 +21,15 @@ namespace AlbumPanelColorTiles
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands
    {
+      #region Private Fields
+
       private static string _curDllDir;
       private Album _album;
       private string _msgHelp;
+
+      #endregion Private Fields
+
+      #region Public Properties
 
       public static string CurDllDir
       {
@@ -37,6 +42,10 @@ namespace AlbumPanelColorTiles
             return _curDllDir;
          }
       }
+
+      #endregion Public Properties
+
+      #region Private Properties
 
       private string MsgHelp
       {
@@ -72,110 +81,9 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
-      public void PlotPdf()
-      {
-         // Печать в PDF. Текущий чертеж или чертежи в указанной папке
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Editor ed = doc.Editor;
+      #endregion Private Properties
 
-         using (var lockDoc = doc.LockDocument())
-         {            
-            var optPrompt = new PromptKeywordOptions("\nПечатать листы текущего чертежа или из папки?");
-            optPrompt.Keywords.Add("Текущего");
-            optPrompt.Keywords.Add("Папки");
-
-            var resPrompt = ed.GetKeywords(optPrompt);
-            PlotMultiPDF plotter = new PlotMultiPDF();
-            if (resPrompt.Status == PromptStatus.OK)
-            {
-               if (resPrompt.StringResult == "Текущего")
-               {
-                  try
-                  {
-                     plotter.PlotCur();
-                  }
-                  catch (System.Exception ex)
-                  {
-                     ed.WriteMessage("\n" + ex.Message);
-                  }           
-                  
-               }
-               else if (resPrompt.StringResult == "Папки")
-               {
-                  var dialog = new FolderBrowserDialog();                   
-                  dialog.Description = "Выбор папки для печати чертежов из нее в PDF";
-                  dialog.ShowNewFolderButton = false;
-                  if (_album == null)
-                  {
-                     dialog.SelectedPath = Path.GetDirectoryName(doc.Name);
-                  }
-                  else
-                  {
-                     dialog.SelectedPath = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
-                  }
-                  if (dialog.ShowDialog() == DialogResult.OK)
-                  {
-                     try
-                     {
-                        plotter.PlotDir(dialog.SelectedPath);
-                     }
-                     catch (System.Exception ex)
-                     {
-                        ed.WriteMessage("\n" + ex.Message);
-                     }                     
-                  }
-               }
-            }
-         }
-      }
-
-      //[CommandMethod("AKR", "PlotPdfDst", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
-      //public void PlotPdfDst()
-      //{
-      //   Document doc = AcAp.DocumentManager.MdiActiveDocument;
-      //   if (doc == null) return;
-
-      //   // Regen
-      //   (doc.GetAcadDocument() as dynamic).Regen((dynamic)1);
-
-      //   Database db = HostApplicationServices.WorkingDatabase;
-      //   short bgp = (short)AcAp.GetSystemVariable("BACKGROUNDPLOT");
-      //   try
-      //   {
-      //      AcAp.SetSystemVariable("BACKGROUNDPLOT", 0);
-      //      using (Transaction tr = db.TransactionManager.StartTransaction())
-      //      {
-      //         List<Layout> layouts = new List<Layout>();
-      //         DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
-      //         foreach (DBDictionaryEntry entry in layoutDict)
-      //         {
-      //            if (entry.Key != "Model")
-      //            {
-      //               layouts.Add((Layout)tr.GetObject(entry.Value, OpenMode.ForRead));
-      //            }
-      //         }
-      //         layouts.Sort((l1, l2) => l1.TabOrder.CompareTo(l2.TabOrder));
-
-      //         string filename = Path.ChangeExtension(db.Filename, "pdf");
-
-      //         MultiSheetsPdf plotter = new MultiSheetsPdf(filename, layouts);
-      //         plotter.Publish();
-
-      //         tr.Commit();
-      //      }
-      //   }
-      //   catch (System.Exception e)
-      //   {
-      //      Editor ed = AcAp.DocumentManager.MdiActiveDocument.Editor;
-      //      ed.WriteMessage("\nError: {0}\n{1}", e.Message, e.StackTrace);
-      //   }
-      //   finally
-      //   {
-      //      AcAp.SetSystemVariable("BACKGROUNDPLOT", bgp);
-      //   }
-      //}
+      #region Public Methods
 
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.Session | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
@@ -205,10 +113,10 @@ namespace AlbumPanelColorTiles
                   if (Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
                   {
                      // Переименовать марки АР
-                     formRenameMarkAR.RenamedMarksAr().ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);                     
+                     formRenameMarkAR.RenamedMarksAr().ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
 
                      // Покраска панелей
-                     _album.CreateAlbum();                     
+                     _album.CreateAlbum();
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
                      doc.Editor.Regen();
                   }
@@ -233,7 +141,7 @@ namespace AlbumPanelColorTiles
                   //      catch (System.Exception ex)
                   //      {
                   //         doc.Editor.WriteMessage("\n" + ex.Message);
-                  //      }                        
+                  //      }
                   //   }
                   //}
                }
@@ -245,6 +153,28 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("PIK", "AKR-Help", CommandFlags.Modal)]
+      public void HelpCommand()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Editor ed = doc.Editor;
+         ed.WriteMessage("\n{0}", MsgHelp);
+      }
+
+      //         tr.Commit();
+      //      }
+      //   }
+      //   catch (System.Exception e)
+      //   {
+      //      Editor ed = AcAp.DocumentManager.MdiActiveDocument.Editor;
+      //      ed.WriteMessage("\nError: {0}\n{1}", e.Message, e.StackTrace);
+      //   }
+      //   finally
+      //   {
+      //      AcAp.SetSystemVariable("BACKGROUNDPLOT", bgp);
+      //   }
+      //}
       [CommandMethod("AKR", "AKR-InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockColorAreaCommand()
       {
@@ -261,26 +191,12 @@ namespace AlbumPanelColorTiles
             ed.WriteMessage("\n" + ex.Message);
          }
       }
-      [CommandMethod("AKR", "AKR-InsertBlockPanel", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void InsertBlockPanelCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;         
-         Editor ed = doc.Editor;
-         try
-         {
-            BlockInsert.Insert("АКР_Панель_[Марка СБ]");
-         }
-         catch (System.Exception ex)
-         {
-            ed.WriteMessage("\n" + ex.Message);
-         }
-      }
+
       [CommandMethod("AKR", "AKR-InsertBlockFrame", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockFrameCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;         
+         if (doc == null) return;
          Editor ed = doc.Editor;
          try
          {
@@ -291,11 +207,31 @@ namespace AlbumPanelColorTiles
             ed.WriteMessage("\n" + ex.Message);
          }
       }
+
+      //         MultiSheetsPdf plotter = new MultiSheetsPdf(filename, layouts);
+      //         plotter.Publish();
+      [CommandMethod("AKR", "AKR-InsertBlockPanel", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void InsertBlockPanelCommand()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Editor ed = doc.Editor;
+         try
+         {
+            BlockInsert.Insert("АКР_Панель_[Марка СБ]");
+         }
+         catch (System.Exception ex)
+         {
+            ed.WriteMessage("\n" + ex.Message);
+         }
+      }
+
+      //         string filename = Path.ChangeExtension(db.Filename, "pdf");
       [CommandMethod("AKR", "AKR-InsertBlockTile", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockTileCommand()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;         
+         if (doc == null) return;
          Editor ed = doc.Editor;
          try
          {
@@ -307,6 +243,23 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      //   Database db = HostApplicationServices.WorkingDatabase;
+      //   short bgp = (short)AcAp.GetSystemVariable("BACKGROUNDPLOT");
+      //   try
+      //   {
+      //      AcAp.SetSystemVariable("BACKGROUNDPLOT", 0);
+      //      using (Transaction tr = db.TransactionManager.StartTransaction())
+      //      {
+      //         List<Layout> layouts = new List<Layout>();
+      //         DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
+      //         foreach (DBDictionaryEntry entry in layoutDict)
+      //         {
+      //            if (entry.Key != "Model")
+      //            {
+      //               layouts.Add((Layout)tr.GetObject(entry.Value, OpenMode.ForRead));
+      //            }
+      //         }
+      //         layouts.Sort((l1, l2) => l1.TabOrder.CompareTo(l2.TabOrder));
       // Покраска панелей в Моделе (по блокам зон покраски)
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
@@ -340,6 +293,72 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("AKR", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
+      public void PlotPdf()
+      {
+         // Печать в PDF. Текущий чертеж или чертежи в указанной папке
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Editor ed = doc.Editor;
+
+         using (var lockDoc = doc.LockDocument())
+         {
+            var optPrompt = new PromptKeywordOptions("\nПечатать листы текущего чертежа или из папки?");
+            optPrompt.Keywords.Add("Текущего");
+            optPrompt.Keywords.Add("Папки");
+
+            var resPrompt = ed.GetKeywords(optPrompt);
+            PlotMultiPDF plotter = new PlotMultiPDF();
+            if (resPrompt.Status == PromptStatus.OK)
+            {
+               if (resPrompt.StringResult == "Текущего")
+               {
+                  try
+                  {
+                     plotter.PlotCur();
+                  }
+                  catch (System.Exception ex)
+                  {
+                     ed.WriteMessage("\n" + ex.Message);
+                  }
+               }
+               else if (resPrompt.StringResult == "Папки")
+               {
+                  var dialog = new FolderBrowserDialog();
+                  dialog.Description = "Выбор папки для печати чертежов из нее в PDF";
+                  dialog.ShowNewFolderButton = false;
+                  if (_album == null)
+                  {
+                     dialog.SelectedPath = Path.GetDirectoryName(doc.Name);
+                  }
+                  else
+                  {
+                     dialog.SelectedPath = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
+                  }
+                  if (dialog.ShowDialog() == DialogResult.OK)
+                  {
+                     try
+                     {
+                        plotter.PlotDir(dialog.SelectedPath);
+                     }
+                     catch (System.Exception ex)
+                     {
+                        ed.WriteMessage("\n" + ex.Message);
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      //[CommandMethod("AKR", "PlotPdfDst", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
+      //public void PlotPdfDst()
+      //{
+      //   Document doc = AcAp.DocumentManager.MdiActiveDocument;
+      //   if (doc == null) return;
+
+      //   // Regen
+      //   (doc.GetAcadDocument() as dynamic).Regen((dynamic)1);
       // Удаление блоков панелей марки АР и их замена на блоки панелей марок СБ.
       [CommandMethod("PIK", "AKR-ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void ResetPanelsCommand()
@@ -418,13 +437,6 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod ("PIK", "AKR-Help", CommandFlags.Modal)]
-      public void HelpCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Editor ed = doc.Editor;
-         ed.WriteMessage("\n{0}", MsgHelp);
-      }
+      #endregion Public Methods
    }
 }

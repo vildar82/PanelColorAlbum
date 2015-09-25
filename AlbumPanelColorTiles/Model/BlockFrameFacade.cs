@@ -1,31 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
-using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.DatabaseServices;
+using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace AlbumPanelColorTiles.Model
 {
    public class BlockFrameFacade
    {
-      private bool _isFound;      
-      private ObjectId _idBtrFrame;
-      private Database _db;
-      private string _blFrameName;
-      Dictionary<string, string> _attrs;
+      #region Private Fields
 
-      public bool IsFound { get { return _isFound; } }      
+      private Dictionary<string, string> _attrs;
+      private string _blFrameName;
+      private Database _db;
+      private ObjectId _idBtrFrame;
+      private bool _isFound;
+
+      #endregion Private Fields
+
+      #region Public Properties
+
+      public bool IsFound { get { return _isFound; } }
+
+      #endregion Public Properties
+
+      #region Public Methods
+
+      public void ChangeBlockFrame(Database db, string blName)
+      {
+         // Замена блока рамки если он есть в чертеже фасада
+         if (IsFound)
+         {
+            IdMapping iMap = new IdMapping();
+            var ids = new ObjectIdCollection();
+            ids.Add(_idBtrFrame);
+            db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+            // Запись атрибутов (Наименование, и другие если есть)
+            changeBlkRefFrame(db, blName);
+         }
+      }
 
       public void Search()
       {
          // Поиск блока рамки на текущем чертеже фасада
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          _db = doc.Database;
-         _blFrameName= Album.Options.BlockFrameName;
+         _blFrameName = Album.Options.BlockFrameName;
          using (var t = _db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -58,84 +79,9 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      private bool checkBlockRefs(BlockTableRecord btrFrame, Transaction t)
-      {
-         bool res = false;
-         var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(_db), OpenMode.ForRead) as BlockTableRecord;
-         foreach (ObjectId idEnt in ms)
-         {
-            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-            {
-               var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
-               if (Blocks.EffectiveName(blRef).Equals(_blFrameName, StringComparison.OrdinalIgnoreCase))
-               {
-                  // считывание атрибутов
-                  var atrCol = blRef.AttributeCollection;
-                  _attrs = new Dictionary<string, string>();
-                  foreach (ObjectId idAtrRef in atrCol)
-                  {
-                     var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
-                     string key = atrRef.Tag.ToUpper();
-                     if (!_attrs.ContainsKey(key))
-                     {
-                        _attrs.Add(key, atrRef.TextString);
-                     }
-                  }
-                  res = true; 
-               }
-            }
-         }
-         return res;
-      }
+      #endregion Public Methods
 
-      private bool checkBtrFrame(BlockTableRecord btrFrame, Transaction t)
-      {
-         bool res = false;
-         if (btrFrame.HasAttributeDefinitions)
-         {
-            Dictionary<string, string> attrsChecks = new Dictionary<string, string>();            
-            foreach (ObjectId idEnt in btrFrame)
-            {
-               if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
-               {
-                  var atrDef = t.GetObject(idEnt, OpenMode.ForRead) as AttributeDefinition;                  
-                  switch (atrDef.Tag.ToUpper())
-                  {
-                     case "ВИД":
-                        attrsChecks.Add("ВИД", atrDef.TextString);                        
-                        break;
-                     case "НАИМЕНОВАНИЕ":
-                        attrsChecks.Add("НАИМЕНОВАНИЕ", atrDef.TextString);                        
-                        break;
-                     case "ЛИСТ":
-                        attrsChecks.Add("ЛИСТ", atrDef.TextString);
-                        break;
-                     default:
-                        break;
-                  }
-               }
-            }
-            if (attrsChecks.Count == 3)
-            {
-               res = true;
-            }
-         }
-         return res;
-      }      
-
-      public void ChangeBlockFrame(Database db, string blName)
-      {
-         // Замена блока рамки если он есть в чертеже фасада
-         if (IsFound)
-         {
-            IdMapping iMap = new IdMapping();
-            var ids = new ObjectIdCollection();
-            ids.Add(_idBtrFrame);
-            db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
-            // Запись атрибутов (Наименование, и другие если есть)
-            changeBlkRefFrame(db, blName);
-         }
-      }
+      #region Private Methods
 
       private void changeBlkRefFrame(Database db, string blName)
       {
@@ -175,19 +121,87 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
+      private bool checkBlockRefs(BlockTableRecord btrFrame, Transaction t)
+      {
+         bool res = false;
+         var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(_db), OpenMode.ForRead) as BlockTableRecord;
+         foreach (ObjectId idEnt in ms)
+         {
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            {
+               var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+               if (Blocks.EffectiveName(blRef).Equals(_blFrameName, StringComparison.OrdinalIgnoreCase))
+               {
+                  // считывание атрибутов
+                  var atrCol = blRef.AttributeCollection;
+                  _attrs = new Dictionary<string, string>();
+                  foreach (ObjectId idAtrRef in atrCol)
+                  {
+                     var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
+                     string key = atrRef.Tag.ToUpper();
+                     if (!_attrs.ContainsKey(key))
+                     {
+                        _attrs.Add(key, atrRef.TextString);
+                     }
+                  }
+                  res = true;
+               }
+            }
+         }
+         return res;
+      }
+
+      private bool checkBtrFrame(BlockTableRecord btrFrame, Transaction t)
+      {
+         bool res = false;
+         if (btrFrame.HasAttributeDefinitions)
+         {
+            Dictionary<string, string> attrsChecks = new Dictionary<string, string>();
+            foreach (ObjectId idEnt in btrFrame)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
+               {
+                  var atrDef = t.GetObject(idEnt, OpenMode.ForRead) as AttributeDefinition;
+                  switch (atrDef.Tag.ToUpper())
+                  {
+                     case "ВИД":
+                        attrsChecks.Add("ВИД", atrDef.TextString);
+                        break;
+
+                     case "НАИМЕНОВАНИЕ":
+                        attrsChecks.Add("НАИМЕНОВАНИЕ", atrDef.TextString);
+                        break;
+
+                     case "ЛИСТ":
+                        attrsChecks.Add("ЛИСТ", atrDef.TextString);
+                        break;
+
+                     default:
+                        break;
+                  }
+               }
+            }
+            if (attrsChecks.Count == 3)
+            {
+               res = true;
+            }
+         }
+         return res;
+      }
+
       private void updateBlRefFrame(BlockReference blRef, BlockTableRecord btrFrame, Transaction t)
       {
          // Обновление вхождения блока рамки
-         if (!IsFound)         
+         if (!IsFound)
             return;
-         
+
          // Удаление атрибутов
          foreach (ObjectId idAtrRef in blRef.AttributeCollection)
          {
             var atrRef = t.GetObject(idAtrRef, OpenMode.ForWrite) as AttributeReference;
             atrRef.Erase(true);
          }
-         
+
          blRef.UpgradeOpen();
          foreach (ObjectId idEnt in btrFrame)
          {
@@ -208,5 +222,7 @@ namespace AlbumPanelColorTiles.Model
             }
          }
       }
+
+      #endregion Private Methods
    }
 }

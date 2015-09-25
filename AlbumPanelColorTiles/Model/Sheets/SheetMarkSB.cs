@@ -10,11 +10,18 @@ namespace AlbumPanelColorTiles.Sheets
    // Листы Марки СБ
    public class SheetMarkSB : IComparable<SheetMarkSB>
    {
+      #region Private Fields
+
       private string _fileMarkSB;
 
       // Файл панели Марки СБ с листами Маркок АР.
       private MarkSbPanel _markSB;
+
       private List<SheetMarkAr> _sheetsMarkAR;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       // Конструктор
       public SheetMarkSB(MarkSbPanel markSB)
@@ -31,9 +38,17 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetsMarkAR.Sort();
       }
 
+      #endregion Public Constructors
+
+      #region Public Properties
+
       public string MarkSB { get { return _markSB.MarkSb; } }
 
       public List<SheetMarkAr> SheetsMarkAR { get { return _sheetsMarkAR; } }
+
+      #endregion Public Properties
+
+      #region Public Methods
 
       public int CompareTo(SheetMarkSB other)
       {
@@ -84,6 +99,35 @@ namespace AlbumPanelColorTiles.Sheets
          }
       }
 
+      #endregion Public Methods
+
+      #region Private Methods
+
+      // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
+      private void CopyBtrMarksARToSheetMarkSB(Database dbMarkSB)
+      {
+         Database dbSource = _markSB.IdBtr.Database;
+         var idsCopy = new ObjectIdCollection();
+         foreach (var sheetMarkAr in _sheetsMarkAR)
+         {
+            idsCopy.Add(sheetMarkAr.MarkAR.IdBtrAr);
+         }
+         IdMapping map = new IdMapping();
+         dbSource.WblockCloneObjects(idsCopy, dbMarkSB.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+         foreach (var sheetMarkAr in _sheetsMarkAR)
+         {
+            sheetMarkAr.IdBtrArSheet = map[sheetMarkAr.MarkAR.IdBtrAr].Value;
+         }
+      }
+
+      // Создание файла Марки СБ
+      private string CreateFileMarkSB(MarkSbPanel markSB, string albumFolder, string templateFileMarkSB, int count)
+      {
+         string fileDest = Path.Combine(albumFolder, count.ToString("00") + "_" + markSB.MarkSb + ".dwg");
+         File.Copy(templateFileMarkSB, fileDest);
+         return fileDest;
+      }
+
       // Слои для заморозки на видовых экранах на листах панелей
       private void GetLayersToFreezeOnSheetsPanel(Database dbMarkSB, out List<ObjectId> layersToFreezeOnFacadeSheet, out List<ObjectId> layersToFreezeOnFormSheet)
       {
@@ -119,29 +163,6 @@ namespace AlbumPanelColorTiles.Sheets
          }
       }
 
-      // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
-      private void CopyBtrMarksARToSheetMarkSB(Database dbMarkSB)
-      {
-         Database dbSource = _markSB.IdBtr.Database;
-         var idsCopy = new ObjectIdCollection();
-         foreach (var sheetMarkAr in _sheetsMarkAR)
-         {
-            idsCopy.Add(sheetMarkAr.MarkAR.IdBtrAr);
-         }
-         IdMapping map = new IdMapping();
-         dbSource.WblockCloneObjects(idsCopy, dbMarkSB.BlockTableId, map, DuplicateRecordCloning.Replace, false);
-         foreach (var sheetMarkAr in _sheetsMarkAR)
-         {
-            sheetMarkAr.IdBtrArSheet = map[sheetMarkAr.MarkAR.IdBtrAr].Value;
-         }
-      }
-
-      // Создание файла Марки СБ
-      private string CreateFileMarkSB(MarkSbPanel markSB, string albumFolder, string templateFileMarkSB, int count)
-      {
-         string fileDest = Path.Combine(albumFolder, count.ToString("00") + "_" + markSB.MarkSb + ".dwg");
-         File.Copy(templateFileMarkSB, fileDest);
-         return fileDest;
-      }
+      #endregion Private Methods
    }
 }

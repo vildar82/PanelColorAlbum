@@ -7,8 +7,14 @@ namespace AlbumPanelColorTiles.Model
    // Зоны покраски в Модели
    public class ColorAreaModel
    {
+      #region Private Fields
+
       private List<ColorArea> _colorAreasBackground;
       private List<ColorArea> _colorAreasForeground;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public ColorAreaModel(ObjectId ms)
       {
@@ -16,8 +22,16 @@ namespace AlbumPanelColorTiles.Model
          DefColorAreaGrounds(colorAreas);
       }
 
+      #endregion Public Constructors
+
+      #region Public Properties
+
       public List<ColorArea> ColorAreasBackground { get { return _colorAreasBackground; } }
       public List<ColorArea> ColorAreasForeground { get { return _colorAreasForeground; } }
+
+      #endregion Public Properties
+
+      #region Public Methods
 
       // Определение зон покраски в определении блока
       public static List<ColorArea> GetColorAreas(ObjectId idBtr)
@@ -42,6 +56,10 @@ namespace AlbumPanelColorTiles.Model
          }
          return colorAreas;
       }
+
+      #endregion Public Methods
+
+      #region Private Methods
 
       // Разделение зон покраски на фоновые и передние зоны покраски
       private void DefColorAreaGrounds(List<ColorArea> colorAreas)
@@ -71,5 +89,7 @@ namespace AlbumPanelColorTiles.Model
             }
          }
       }
+
+      #endregion Private Methods
    }
 }

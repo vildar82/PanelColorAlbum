@@ -11,18 +11,24 @@ namespace AlbumPanelColorTiles.Sheets
    // Листы содержания
    public class SheetsContent
    {
+      #region Private Fields
+
       private readonly int _countSheetsBeforContent = 2;
 
       // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
-      private Album _album;      
+      private Album _album;
+      private BlockFrameFacade _blFrameInFacade;
       private int _countContentSheets;
+      private Database _dbContent;
+      private Database _dbFacade;
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
-      private BlockFrameFacade _blFrameInFacade;
-      private Database _dbFacade;
-      private Database _dbContent;      
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public SheetsContent(SheetsSet sheetsSet, BlockFrameFacade blFrameInFacade)
       {
@@ -32,6 +38,10 @@ namespace AlbumPanelColorTiles.Sheets
          _blFrameInFacade = blFrameInFacade;
          Contents();
       }
+
+      #endregion Public Constructors
+
+      #region Private Methods
 
       // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
       private static int CalcSheetsContentNumber(int rowsTable, int marksAr)
@@ -149,7 +159,7 @@ namespace AlbumPanelColorTiles.Sheets
             HostApplicationServices.WorkingDatabase = _dbFacade;
             _dbContent.SaveAs(fileContent, DwgVersion.Current);
          }
-      }     
+      }
 
       private void CopyContentSheet(Transaction t, int curContentLayout, out Table tableContent, out BlockReference blRefStamp)
       {
@@ -203,7 +213,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-               if (Blocks.EffectiveName( blRefStampContent).Equals(Album.Options.BlockFrameName, StringComparison.OrdinalIgnoreCase))
+               if (Blocks.EffectiveName(blRefStampContent).Equals(Album.Options.BlockFrameName, StringComparison.OrdinalIgnoreCase))
                {
                   return blRefStampContent;
                }
@@ -249,5 +259,7 @@ namespace AlbumPanelColorTiles.Sheets
          }
          return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;
       }
+
+      #endregion Private Methods
    }
 }

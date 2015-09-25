@@ -8,11 +8,17 @@ namespace AlbumPanelColorTiles.Sheets
    // Ведомость альбома панелей
    public class SheetsSet
    {
+      #region Private Fields
+
       private Album _album;
-      
+
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileContent;
       private string _sheetTemplateFileMarkSB;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public SheetsSet(Album album)
       {
@@ -20,10 +26,18 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetsMarkSB = new List<SheetMarkSB>();
       }
 
-      public Album Album { get { return _album; } }      
+      #endregion Public Constructors
+
+      #region Public Properties
+
+      public Album Album { get { return _album; } }
       public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
       public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
+
+      #endregion Public Properties
+
+      #region Public Methods
 
       // Создание альбома панелей
       public void CreateAlbum()
@@ -49,7 +63,7 @@ namespace AlbumPanelColorTiles.Sheets
 
          //Поиск блока рамки на текущем чертеже фасада
          BlockFrameFacade blFrameSearch = new BlockFrameFacade();
-         blFrameSearch.Search();         
+         blFrameSearch.Search();
 
          // Титульные листы и обложеи в одном файле "Содержание".
          // Создание титульных листов
@@ -74,14 +88,18 @@ namespace AlbumPanelColorTiles.Sheets
          }
          catch
          {
-         }         
+         }
       }
+
+      #endregion Public Methods
+
+      #region Private Methods
 
       // Создание папки Альбома панелей
       private void CreateAlbumFolder()
       {
          // Папка альбома панелей
-         string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension( _album.DwgFacade);
+         string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension(_album.DwgFacade);
          string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
          _album.AlbumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
          if (Directory.Exists(_album.AlbumDir))
@@ -105,5 +123,7 @@ namespace AlbumPanelColorTiles.Sheets
          sheetsMarkSb.Sort();
          return sheetsMarkSb;
       }
+
+      #endregion Private Methods
    }
 }

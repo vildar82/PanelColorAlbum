@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -15,11 +11,13 @@ namespace AlbumPanelColorTiles.Lib
 {
    public static class BlockInsert
    {
-      public static void Insert (string blName)
+      #region Public Methods
+
+      public static void Insert(string blName)
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          Database db = doc.Database;
-         Editor ed = doc.Editor;     
+         Editor ed = doc.Editor;
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -48,18 +46,22 @@ namespace AlbumPanelColorTiles.Lib
                var spaceBtr = (BlockTableRecord)t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
                spaceBtr.AppendEntity(blRef);
                t.AddNewlyCreatedDBObject(blRef, true);
-               if (btrBl.HasAttributeDefinitions)               
-                  AddAttributes(blRef, btrBl, t);                              
+               if (btrBl.HasAttributeDefinitions)
+                  AddAttributes(blRef, btrBl, t);
             }
             t.Commit();
          }
       }
 
+      #endregion Public Methods
+
+      #region Private Methods
+
       private static void AddAttributes(BlockReference blRef, BlockTableRecord btrBl, Transaction t)
-      {         
+      {
          foreach (ObjectId idEnt in btrBl)
          {
-            if (idEnt.ObjectClass.Name== "AcDbAttributeDefinition")
+            if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
             {
                var atrDef = t.GetObject(idEnt, OpenMode.ForRead) as AttributeDefinition;
                if (!atrDef.Constant)
@@ -75,5 +77,7 @@ namespace AlbumPanelColorTiles.Lib
             }
          }
       }
+
+      #endregion Private Methods
    }
 }

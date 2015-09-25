@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -13,13 +9,19 @@ using Autodesk.AutoCAD.EditorInput;
 namespace AlbumPanelColorTiles.Model.Forms
 {
    public partial class FormRenameMarkAR : Form
-   {      
+   {
+      #region Private Fields
+
+      private BindingSource _bindingsMarksArRename;
       private Dictionary<string, MarkArRename> _marksArForRename;
-      BindingSource _bindingsMarksArRename;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public FormRenameMarkAR(Album album)
       {
-         InitializeComponent();         
+         InitializeComponent();
          _marksArForRename = MarkArRename.GetMarks(album);
          // Сортировка панелей.
          _marksArForRename = _marksArForRename.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
@@ -29,8 +31,12 @@ namespace AlbumPanelColorTiles.Model.Forms
 
          listBoxMarksAR.DataSource = _bindingsMarksArRename;
          listBoxMarksAR.DisplayMember = "MarkArCurFull";
-         textBoxOldMarkAR.DataBindings.Add("Text", _bindingsMarksArRename, "MarkPainting", false, DataSourceUpdateMode.OnPropertyChanged);         
-      }     
+         textBoxOldMarkAR.DataBindings.Add("Text", _bindingsMarksArRename, "MarkPainting", false, DataSourceUpdateMode.OnPropertyChanged);
+      }
+
+      #endregion Public Constructors
+
+      #region Public Methods
 
       public List<MarkArRename> RenamedMarksAr()
       {
@@ -45,24 +51,16 @@ namespace AlbumPanelColorTiles.Model.Forms
          return renamedMarks;
       }
 
-      private void textBoxNewMark_TextChanged(object sender, EventArgs e)
-      {
-         labelPreview.Text = getMarkArPreview();
-      }
+      #endregion Public Methods
 
-      private string getMarkArPreview()
-      {
-         MarkArRename markArForRename = listBoxMarksAR.SelectedItem as MarkArRename;
-         if (markArForRename == null) return "";
-         return  markArForRename.GetMarkArPreview(textBoxNewMark.Text);         
-      }
+      #region Private Methods
 
       private void buttonRename_Click(object sender, EventArgs e)
       {
          ClearErrors();
          string newPaintingMark = textBoxNewMark.Text;
          if (string.IsNullOrWhiteSpace(newPaintingMark))
-         {            
+         {
             errorProviderError.SetError(textBoxNewMark, "Пустое имя!");
             return;
          }
@@ -75,7 +73,7 @@ namespace AlbumPanelColorTiles.Model.Forms
          string markArOld = markArForRename.MarkArCurFull;
          string markArNew = markArForRename.GetMarkArPreview(newPaintingMark);
 
-         // Проверка новаой марки            
+         // Проверка новаой марки
          if (_marksArForRename.ContainsKey(markArNew))
          {
             MessageBox.Show("Панель с такой маркой уже есть. Переименование отклонено.",
@@ -83,10 +81,10 @@ namespace AlbumPanelColorTiles.Model.Forms
             errorProviderError.SetError(textBoxNewMark, "Панель с такой маркой уже есть.");
          }
          else
-         {            
+         {
             markArForRename.RenamePainting(newPaintingMark);
             _marksArForRename.Remove(markArForRename.MarkArCurFull);
-            _marksArForRename.Add(markArForRename.MarkArCurFull, markArForRename);            
+            _marksArForRename.Add(markArForRename.MarkArCurFull, markArForRename);
             _bindingsMarksArRename.ResetBindings(false);
             errorProviderOk.SetError(textBoxNewMark, "Панель переименована.");
          }
@@ -96,6 +94,20 @@ namespace AlbumPanelColorTiles.Model.Forms
       {
          ZoomPanel();
       }
+
+      private void ClearErrors()
+      {
+         errorProviderError.Clear();
+         errorProviderOk.Clear();
+      }
+
+      private string getMarkArPreview()
+      {
+         MarkArRename markArForRename = listBoxMarksAR.SelectedItem as MarkArRename;
+         if (markArForRename == null) return "";
+         return markArForRename.GetMarkArPreview(textBoxNewMark.Text);
+      }
+
       private void listBoxMarksAR_DoubleClick(object sender, EventArgs e)
       {
          ZoomPanel();
@@ -109,14 +121,13 @@ namespace AlbumPanelColorTiles.Model.Forms
          ClearErrors();
       }
 
-      private void ClearErrors()
+      private void textBoxNewMark_TextChanged(object sender, EventArgs e)
       {
-         errorProviderError.Clear();
-         errorProviderOk.Clear();
+         labelPreview.Text = getMarkArPreview();
       }
 
       private void ZoomPanel()
-      {         
+      {
          // Приблизить блок панели на чертеже
          MarkArRename markArForRename = listBoxMarksAR.SelectedItem as MarkArRename;
          if (markArForRename == null)
@@ -128,7 +139,8 @@ namespace AlbumPanelColorTiles.Model.Forms
          Editor ed = doc.Editor;
          ed.Zoom(markArForRename.MarkAR.Panels[0].Extents);
          errorProviderOk.SetError(buttonShow, string.Format("Блок панели показан - {0}", markArForRename.MarkArCurFull));
-      }      
+      }
+
+      #endregion Private Methods
    }
 }
-

@@ -16,17 +16,26 @@ namespace AlbumPanelColorTiles.Model
    // Альбом колористических решений.
    public class Album
    {
+      #region Private Fields
+
       // Набор цветов используемых в альбоме.
       private static List<Paint> _colors;
+
       private static Options _options;
-      private string _albumDir;
+
       // Сокращенное имя проеккта
       private string _abbreviateProject;
+
+      private string _albumDir;
       private ColorAreaModel _colorAreaModel;
       private Database _db;
-      private Document _doc;      
+      private Document _doc;
       private List<MarkSbPanel> _marksSB;
       private SheetsSet _sheetsSet;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public Album()
       {
@@ -38,6 +47,10 @@ namespace AlbumPanelColorTiles.Model
          _abbreviateProject = abbreviateNameProject();
       }
 
+      #endregion Public Constructors
+
+      #region Public Properties
+
       public static Options Options
       {
          get
@@ -48,22 +61,27 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      public string AlbumDir { get { return _albumDir; } set { _albumDir = value; } }
       public static Tolerance Tolerance { get { return Tolerance.Global; } }
       public string AbbreviateProject { get { return _abbreviateProject; } }
-      public string DwgFacade { get { return _doc.Name; } }      
+      public string AlbumDir { get { return _albumDir; } set { _albumDir = value; } }
+      public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
 
+      #endregion Public Properties
+
+      #region Public Methods
+
       public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
       {
-         using (var t = idBtr.Database.TransactionManager.StartTransaction()  )
+         using (var t = idBtr.Database.TransactionManager.StartTransaction())
          {
             var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
             AddMarkToPanelBtr(panelMark, t, btr);
             t.Commit();
          }
       }
+
       public static void AddMarkToPanelBtr(string panelMark, Transaction t, BlockTableRecord btr)
       {
          // Найти панель марки СБ или АР по имени блока
@@ -214,6 +232,7 @@ namespace AlbumPanelColorTiles.Model
             t.Commit();
          }
       }
+
       // Проверка панелей на чертеже и панелей в памяти (this)
       public void CheckPanelsInDrawingAndMemory()
       {
@@ -330,6 +349,10 @@ namespace AlbumPanelColorTiles.Model
          _sheetsSet = null;
       }
 
+      #endregion Public Methods
+
+      #region Private Methods
+
       // Получение слоя для марок (АР_Марки)
       private static string GetLayerForMark()
       {
@@ -372,6 +395,18 @@ namespace AlbumPanelColorTiles.Model
          return abbrName;
       }
 
+      // Создание определений блоков панелей марки АР
+      private void CreatePanelsMarkAR()
+      {
+         foreach (var markSB in _marksSB)
+         {
+            foreach (var markAR in markSB.MarksAR)
+            {
+               markAR.CreateBlock();
+            }
+         }
+      }
+
       private string getSavedAbbreviateName()
       {
          string res = "Н47Г";
@@ -382,31 +417,9 @@ namespace AlbumPanelColorTiles.Model
             res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
          }
          catch { }
-         return  res;
+         return res;
       }
 
-      private void saveAbbreviateName(string abbr)
-      {         
-         try
-         {
-            string regAppPath = @"Software\Vildar\AKR";
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(regAppPath);
-            keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
-         }
-         catch { }         
-      }      
-
-      // Создание определений блоков панелей марки АР
-      private void CreatePanelsMarkAR()
-      {         
-         foreach (var markSB in _marksSB)
-         {
-            foreach (var markAR in markSB.MarksAR)
-            {
-               markAR.CreateBlock();
-            }
-         }         
-      }
       // определение этажей панелей
       private void IdentificationStoreys(List<MarkSbPanel> marksSB)
       {
@@ -468,5 +481,18 @@ namespace AlbumPanelColorTiles.Model
             markSb.ReplaceBlocksSbOnAr();
          }
       }
+
+      private void saveAbbreviateName(string abbr)
+      {
+         try
+         {
+            string regAppPath = @"Software\Vildar\AKR";
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(regAppPath);
+            keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
+         }
+         catch { }
+      }
+
+      #endregion Private Methods
    }
 }

@@ -10,7 +10,11 @@ namespace AlbumPanelColorTiles.Model
    // Панели марки СБ
    public class MarkSbPanel : IEquatable<MarkSbPanel>
    {
+      #region Private Fields
+
       private string _abbr;
+
+      private Point2d _centerPanel;
 
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
       private List<ColorArea> _colorAreas;
@@ -19,17 +23,19 @@ namespace AlbumPanelColorTiles.Model
       private bool _isEndLeftPanel;
       private bool _isEndRightPanel;
       private bool _isUpperStoreyPanel;
-      private List<MarkArPanel> _marksAR;      
+      private List<MarkArPanel> _marksAR;
 
       private string _markSb; // может быть с _тп или _тл
-      private string _markSbClean; // без _тп или _тл
       private string _markSbBlockName;
+      private string _markSbClean; // без _тп или _тл
       private List<Paint> _paints;
 
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
 
-      private Point2d _centerPanel;
+      #endregion Private Fields
+
+      #region Private Constructors
 
       // Конструктор. Скрытый.
       private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr)
@@ -53,20 +59,18 @@ namespace AlbumPanelColorTiles.Model
          _centerPanel = GetCenterPanel(_tiles);
       }
 
-      // Определение центра панели по блокам плиток в ней
-      private Point2d GetCenterPanel(List<Tile> _tiles)
-      {         
-         Extents3d ext = new Extents3d();
-         foreach (var tile in _tiles)
-         {            
-            ext.AddPoint(tile.CenterTile);
-         }
-         return new Point2d((ext.MinPoint.X+ ext.MaxPoint.X)*0.5, (ext.MinPoint.Y + ext.MaxPoint.Y) * 0.5);         
-      }
+      #endregion Private Constructors
+
+      #region Public Properties
+
+      public string Abbr { get { return _abbr; } }
+
+      public Point2d CenterPanel { get { return _centerPanel; } }
 
       public ObjectId IdBtr { get { return _idBtr; } }
 
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
+
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
 
       /// <summary>
@@ -77,22 +81,8 @@ namespace AlbumPanelColorTiles.Model
       public List<MarkArPanel> MarksAR { get { return _marksAR; } }
 
       public string MarkSb { get { return _markSb; } }
+
       public string MarkSbBlockName { get { return _markSbBlockName; } }
-
-      public List<Paint> Paints { get { return _paints; } }
-      public Point2d CenterPanel { get { return _centerPanel; } }
-
-      // Суммарная площадь плитки на панель (расход м2 на панель).
-      public double TotalAreaTiles
-      {
-         get
-         {
-            return Math.Round(_paints.Count * TileCalc.OneTileArea, 2);
-         }
-      }
-
-      // Свойства
-      public List<Tile> Tiles { get { return _tiles; } }
 
       public string MarkSbClean
       {
@@ -113,7 +103,23 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      public string Abbr { get { return _abbr; } }
+      public List<Paint> Paints { get { return _paints; } }
+
+      // Свойства
+      public List<Tile> Tiles { get { return _tiles; } }
+
+      // Суммарная площадь плитки на панель (расход м2 на панель).
+      public double TotalAreaTiles
+      {
+         get
+         {
+            return Math.Round(_paints.Count * TileCalc.OneTileArea, 2);
+         }
+      }
+
+      #endregion Public Properties
+
+      #region Public Methods
 
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
@@ -166,7 +172,7 @@ namespace AlbumPanelColorTiles.Model
 
       // Определение покраски панелей текущего чертежа (в Модели)
       public static List<MarkSbPanel> GetMarksSB(ColorAreaModel colorAreaModel, string abbr)
-      {         
+      {
          List<MarkSbPanel> _marksSb = new List<MarkSbPanel>();
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
@@ -318,6 +324,16 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
+      public bool Equals(MarkSbPanel other)
+      {
+         return _markSb.Equals(other._markSb) &&
+            _colorAreas.SequenceEqual(other._colorAreas) &&
+            _idBtr.Equals(other._idBtr) &&
+            _paints.SequenceEqual(other._paints) &&
+            _tiles.SequenceEqual(other._tiles) &&
+            _marksAR.SequenceEqual(other._marksAR);
+      }
+
       // Замена вхождений блоков СБ на АР
       public void ReplaceBlocksSbOnAr()
       {
@@ -326,6 +342,10 @@ namespace AlbumPanelColorTiles.Model
             markAr.ReplaceBlocksSbOnAr();
          }
       }
+
+      #endregion Public Methods
+
+      #region Private Methods
 
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
       private static MarkSbPanel GetMarkSb(BlockReference blRefPanel, List<MarkSbPanel> marksSb, BlockTable bt, string abbr)
@@ -373,12 +393,23 @@ namespace AlbumPanelColorTiles.Model
          panelAR.AddBlockRefPanel(blRefPanel);
       }
 
+      // Определение центра панели по блокам плиток в ней
+      private Point2d GetCenterPanel(List<Tile> _tiles)
+      {
+         Extents3d ext = new Extents3d();
+         foreach (var tile in _tiles)
+         {
+            ext.AddPoint(tile.CenterTile);
+         }
+         return new Point2d((ext.MinPoint.X + ext.MaxPoint.X) * 0.5, (ext.MinPoint.Y + ext.MaxPoint.Y) * 0.5);
+      }
+
       private string GetMarkArNextName()
       {
          return "АР-" + _marksAR.Count.ToString();
       }
 
-      // Получение списка плиток в определении блока      
+      // Получение списка плиток в определении блока
       private void GetTiles()
       {
          _tiles = new List<Tile>();
@@ -422,14 +453,6 @@ namespace AlbumPanelColorTiles.Model
          return resPanelAR;
       }
 
-      public bool Equals(MarkSbPanel other)
-      {
-         return _markSb.Equals(other._markSb) &&
-            _colorAreas.SequenceEqual(other._colorAreas) &&
-            _idBtr.Equals(other._idBtr) &&
-            _paints.SequenceEqual(other._paints) &&
-            _tiles.SequenceEqual(other._tiles) &&
-            _marksAR.SequenceEqual(other._marksAR);
-      }
+      #endregion Private Methods
    }
 }

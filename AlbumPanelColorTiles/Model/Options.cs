@@ -2,20 +2,29 @@
 {
    public class Options
    {
+      #region Public Fields
+
       //
       // Имена блоков
       //
       public string BlockColorAreaName = "АКР_Зона-покраски";
-      public string BlockPanelPrefixName = "АКР_Панель_";
+
       //public string BlockStampContent = "АКР_Рамака_Содержание";
       //public string BlockStampMarkAR = "АКР_Рамка_МаркаАР";
       public string BlockFrameName = "АКР_Рамка";
+
+      public string BlockPanelPrefixName = "АКР_Панель_";
       public string BlockTileName = "АКР_Плитка";
 
       // Суффикс для торцевых панелей слева
       public string endLeftPanelSuffix = "_тл";
+
       // Суффикс для торцевых панелей справа
       public string endRightPanelSuffix = "_тп";
+
+      public string LayerDimensionFacade = "АР_Размеры на фасаде";
+
+      public string LayerDimensionForm = "АР_Размеры в форме";
 
       //
       // Слои
@@ -32,8 +41,19 @@
 
       // Слой окон (отключать на листе панели для формы)
       public string LayerWindows = "АР_Окна";
-      public string LayerDimensionFacade = "АР_Размеры на фасаде";
-      public string LayerDimensionForm = "АР_Размеры в форме";
+
+      /// <summary>
+      /// Имя листа шаблона содержания в файле шаблона листов.
+      /// </summary>
+      public string SheetTemplateLayoutNameForContent = "Содержание";
+
+      /// <summary>
+      /// Имя листа шаблона для Марки АР в файле шаблона листов.
+      /// </summary>
+      public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
+
+      // Файл шаблона с блоками АКР (зона покраски, плитка, панель Марки СБ).
+      public string TemplateBlocksAKRFileName = "АКР_Блоки.dwg";
 
       //
       // Шаблоны
@@ -48,17 +68,6 @@
       /// </summary>
       public string TemplateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";
 
-      // Файл шаблона с блоками АКР (зона покраски, плитка, панель Марки СБ).
-      public string TemplateBlocksAKRFileName = "АКР_Блоки.dwg";
-
-      /// <summary>
-      /// Имя листа шаблона содержания в файле шаблона листов.
-      /// </summary>
-      public string SheetTemplateLayoutNameForContent = "Содержание";
-
-      /// <summary>
-      /// Имя листа шаблона для Марки АР в файле шаблона листов.
-      /// </summary>
-      public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
+      #endregion Public Fields
    }
 }

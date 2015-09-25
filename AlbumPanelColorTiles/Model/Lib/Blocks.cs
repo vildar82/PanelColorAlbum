@@ -7,6 +7,8 @@ namespace AlbumPanelColorTiles.Lib
 {
    public static class Blocks
    {
+      #region Public Methods
+
       /// <summary>
       /// Смена имен листов. Лист с с именем name1 станет name2, и наоборот.
       /// </summary>
@@ -23,6 +25,43 @@ namespace AlbumPanelColorTiles.Lib
          lm.RenameLayout(name2, name1);
          lm.RenameLayout(tempName1, name2);
          HostApplicationServices.WorkingDatabase = dbOrig;
+      }
+
+      /// <summary>
+      /// Копирование определенич блока из внешнего чертежа
+      /// </summary>
+      /// <param name="blName">Имя блока</param>
+      /// <param name="fileDrawing">Полный путь к чертежу из которого копируется блок</param>
+      /// <param name="destDb">База чертежа в который копируетсяя блок</param>
+      /// <exception cref="Exception">Если нет блока в файле fileDrawing.</exception>
+      public static void CopyBlockFromExternalDrawing(string blName, string fileDrawing, Database destDb)
+      {
+         using (var extDb = new Database(false, true))
+         {
+            extDb.ReadDwgFile(fileDrawing, System.IO.FileShare.ReadWrite, true, "");
+
+            ObjectIdCollection ids = new ObjectIdCollection();
+            using (var t = extDb.TransactionManager.StartTransaction())
+            {
+               var bt = (BlockTable)t.GetObject(extDb.BlockTableId, OpenMode.ForRead);
+               if (bt.Has(blName))
+               {
+                  ids.Add(bt[blName]);
+               }
+               else
+               {
+                  throw new Exception(string.Format("Не найдено определение блока {0} в файле {1}", blName, fileDrawing));
+               }
+               t.Commit();
+            }
+            // Если нашли – добавим блок
+            if (ids.Count != 0)
+            {
+               // Получаем текущую базу чертежа
+               IdMapping iMap = new IdMapping();
+               destDb.WblockCloneObjects(ids, destDb.BlockTableId, iMap, DuplicateRecordCloning.Ignore, false);
+            }
+         }
       }
 
       /// <summary>
@@ -123,41 +162,6 @@ namespace AlbumPanelColorTiles.Lib
              blk1.ScaleFactors.IsEqualTo(blk2.ScaleFactors, tol);
       }
 
-      /// <summary>
-      /// Копирование определенич блока из внешнего чертежа
-      /// </summary>
-      /// <param name="blName">Имя блока</param>
-      /// <param name="fileDrawing">Полный путь к чертежу из которого копируется блок</param>
-      /// <param name="destDb">База чертежа в который копируетсяя блок</param>
-      /// <exception cref="Exception">Если нет блока в файле fileDrawing.</exception>
-      public static void CopyBlockFromExternalDrawing(string blName, string fileDrawing, Database destDb)
-      {
-         using (var extDb = new Database(false, true))
-         {
-            extDb.ReadDwgFile(fileDrawing, System.IO.FileShare.ReadWrite, true, "");
-
-            ObjectIdCollection ids = new ObjectIdCollection();
-            using (var t = extDb.TransactionManager.StartTransaction())
-            {
-               var bt = (BlockTable)t.GetObject(extDb.BlockTableId, OpenMode.ForRead);
-               if (bt.Has(blName))
-               {
-                  ids.Add(bt[blName]);
-               }
-               else
-               {
-                  throw new Exception(string.Format("Не найдено определение блока {0} в файле {1}", blName, fileDrawing));
-               }
-               t.Commit();
-            }
-            // Если нашли – добавим блок
-            if (ids.Count != 0)
-            {
-               // Получаем текущую базу чертежа
-               IdMapping iMap = new IdMapping();
-               destDb.WblockCloneObjects(ids, destDb.BlockTableId, iMap, DuplicateRecordCloning.Ignore, false);
-            }
-         }
-      }
+      #endregion Public Methods
    }
 }

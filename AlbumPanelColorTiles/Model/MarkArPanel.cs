@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AlbumPanelColorTiles.Lib;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model
@@ -12,72 +10,59 @@ namespace AlbumPanelColorTiles.Model
    // Марка АР покраски панели
    public class MarkArPanel : IEquatable<MarkArPanel>
    {
-      private ObjectId _idBtrAr;        
-      private string _markPainting;      
+      #region Private Fields
+
+      private ObjectId _idBtrAr;
       private string _markArBlockName;
       private string _markARPanelFullName;
-      private string _markARPanelFullValidName;
-      
-      // Временная марка покраски
       private string _markArTemp;
-
+      private string _markPainting;
       private MarkSbPanel _markSB;
       private List<Paint> _paints;
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public MarkArPanel(List<Paint> paintAR, MarkSbPanel markSb, BlockReference blRefMarkAr)
       {
          _markSB = markSb;
          _paints = paintAR;
          DefMarkArTempNames(markSb, blRefMarkAr.Name);
-         _panels = new List<Panel>();         
+         _panels = new List<Panel>();
       }
 
-      public ObjectId IdBtrAr { get { return _idBtrAr; } }      
+      #endregion Public Constructors
+
+      #region Public Properties
+
+      public ObjectId IdBtrAr { get { return _idBtrAr; } }
+
+      public string MarkArBlockName { get { return _markArBlockName; } }
+
+      public string MarkARPanelFullName { get { return _markARPanelFullName; } }
 
       public string MarkPainting
       {
          get { return _markPainting; }
          set
          {
-            bool isRename = !string.IsNullOrEmpty(_markPainting);            
-            _markPainting = value;               
+            bool isRename = !string.IsNullOrEmpty(_markPainting);
+            _markPainting = value;
             _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);
-            _markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);            
-            // Переименование подписей марок панелей
+            _markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
             if (isRename) // Переименование марки покраски пользователем.
             {
+               // Переименование подписей марок панелей
                Album.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
-            }                        
-         }
-      }
-
-      public string MarkArBlockName { get { return _markArBlockName; } }
-
-      /// <summary>
-      /// Полное имя панели (Марка СБ + Марка АР)
-      /// </summary>
-      public string MarkARPanelFullName { get { return _markARPanelFullName; } }
-
-      public string MarkARPanelFullValidName
-      {
-         get
-         {
-            if (_markARPanelFullValidName == null)
-            {
-               _markARPanelFullValidName = _markArBlockName.Substring(Album.Options.BlockPanelPrefixName.Length);
             }
-            return _markARPanelFullValidName;
          }
       }
 
       public MarkSbPanel MarkSB { get { return _markSB; } }
       public List<Paint> Paints { get { return _paints; } }
-
-      /// <summary>
-      /// Блоки панели с такой покраской
-      /// </summary>
       public List<Panel> Panels { get { return _panels; } }
 
       public List<TileCalc> TilesCalc
@@ -90,7 +75,11 @@ namespace AlbumPanelColorTiles.Model
             }
             return _tilesCalc;
          }
-      }      
+      }
+
+      #endregion Public Properties
+
+      #region Public Methods
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
@@ -130,7 +119,7 @@ namespace AlbumPanelColorTiles.Model
 
       // Создание определения блока Марки АР
       public void CreateBlock()
-      {         
+      {
          // Создание копии блока маркиСБ, с покраской блоков плиток
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
@@ -140,8 +129,8 @@ namespace AlbumPanelColorTiles.Model
             if (bt.Has(_markArBlockName))
             {
                //Ошибка. Не должно быть определений блоков Марки АР.
-               throw new  System.Exception("\nВ чертеже не должно быть блоков Марки АР - " + _markArBlockName + 
-                           "\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");               
+               throw new System.Exception("\nВ чертеже не должно быть блоков Марки АР - " + _markArBlockName +
+                           "\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");
             }
             var btrMarkSb = t.GetObject(_markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
@@ -174,13 +163,20 @@ namespace AlbumPanelColorTiles.Model
                }
             }
             t.Commit();
-         }         
+         }
       }
 
       public bool EqualPaint(List<Paint> paintAR)
       {
          // ??? сработает такое сравнение списков покраски?
          return paintAR.SequenceEqual(_paints);
+      }
+
+      public bool Equals(MarkArPanel other)
+      {
+         return _markArTemp.Equals(other._markArTemp) &&
+            _paints.SequenceEqual(other._paints) &&
+            _panels.SequenceEqual(other._panels);
       }
 
       // Замена вхождений блоков СБ на блоки АР
@@ -191,6 +187,10 @@ namespace AlbumPanelColorTiles.Model
             panel.ReplaceBlockSbToAr(this);
          }
       }
+
+      #endregion Public Methods
+
+      #region Private Methods
 
       // Определение границы плитки во вхождении блока
       private static Point3d GetCenterTileInBlockRef(Point3d positionBlRef, Point3d centerTileInBtr)
@@ -216,11 +216,6 @@ namespace AlbumPanelColorTiles.Model
          _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
       }
 
-      public bool Equals(MarkArPanel other)
-      {
-         return _markArTemp.Equals(other._markArTemp) &&
-            _paints.SequenceEqual(other._paints) &&
-            _panels.SequenceEqual(other._panels);
-      }
+      #endregion Private Methods
    }
 }

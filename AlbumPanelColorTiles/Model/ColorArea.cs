@@ -9,9 +9,15 @@ namespace AlbumPanelColorTiles.Model
    // Зона покраски
    public class ColorArea : IEquatable<ColorArea>
    {
+      #region Private Fields
+
       private Extents3d _bounds;
       private ObjectId _idblRef;
       private Paint _paint;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public ColorArea(BlockReference blRef)
       {
@@ -20,6 +26,10 @@ namespace AlbumPanelColorTiles.Model
          _bounds = GetBounds(blRef);
          _paint = Album.FindPaint(blRef.Layer);
       }
+
+      #endregion Public Constructors
+
+      #region Public Properties
 
       public Extents3d Bounds
       {
@@ -30,6 +40,10 @@ namespace AlbumPanelColorTiles.Model
       {
          get { return _paint; }
       }
+
+      #endregion Public Properties
+
+      #region Public Methods
 
       // Определение покраски. Попадание точки в зону окраски
       public static Paint GetPaint(Point3d centerTile, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
@@ -45,9 +59,18 @@ namespace AlbumPanelColorTiles.Model
          return paint;
       }
 
+      public bool Equals(ColorArea other)
+      {
+         return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
+      }
+
+      #endregion Public Methods
+
+      #region Private Methods
+
       private static Paint GetPaintFromColorAreas(Point3d centerTile, List<ColorArea> colorAreas)
       {
-         // Центр плитки         
+         // Центр плитки
          foreach (ColorArea colorArea in colorAreas)
          {
             if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
@@ -56,11 +79,6 @@ namespace AlbumPanelColorTiles.Model
             }
          }
          return null;
-      }
-
-      public bool Equals(ColorArea other)
-      {
-         return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
       }
 
       private Extents3d GetBounds(BlockReference blRef)
@@ -76,5 +94,7 @@ namespace AlbumPanelColorTiles.Model
          }
          return bounds;
       }
+
+      #endregion Private Methods
    }
 }

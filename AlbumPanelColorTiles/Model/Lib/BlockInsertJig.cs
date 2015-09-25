@@ -6,13 +6,32 @@ namespace AlbumPanelColorTiles.Lib
 {
    public class BlockInsertJig : EntityJig
    {
+      #region Private Fields
+
       private Point3d mCenterPt, mActualPoint;
+
+      #endregion Private Fields
+
+      #region Public Constructors
 
       public BlockInsertJig(BlockReference br)
         : base(br)
       {
          mCenterPt = br.Position;
       }
+
+      #endregion Public Constructors
+
+      #region Public Methods
+
+      public Entity GetEntity()
+      {
+         return Entity;
+      }
+
+      #endregion Public Methods
+
+      #region Protected Methods
 
       protected override SamplerStatus Sampler(JigPrompts prompts)
       {
@@ -54,9 +73,6 @@ namespace AlbumPanelColorTiles.Lib
          return true;
       }
 
-      public Entity GetEntity()
-      {
-         return Entity;
-      }
+      #endregion Protected Methods
    }
 }
