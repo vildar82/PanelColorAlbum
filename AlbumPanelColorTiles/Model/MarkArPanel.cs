@@ -12,12 +12,8 @@ namespace AlbumPanelColorTiles.Model
    // Марка АР покраски панели
    public class MarkArPanel : IEquatable<MarkArPanel>, IComparable<MarkArPanel>
    {
-      private ObjectId _idBtrAr;      
-
-      // Определенная марка покраски архитектурная
-      //private string _markArArch;
-      private string _markPainting;
-      private string _markPaintingOld;
+      private ObjectId _idBtrAr;        
+      private string _markPainting;      
       private string _markArBlockName;
       private string _markARPanelFullName;
       private string _markARPanelFullValidName;
@@ -44,11 +40,8 @@ namespace AlbumPanelColorTiles.Model
       {
          get { return _markPainting; }
          set
-         {
-            _markPaintingOld = _markPainting;
+         {            
             _markPainting = value;
-            //Переименовать _markARPanelFullName и _markArBlockName
-            //_markArArch = value;
             _markARPanelFullName = string.Format("{0}({1}_{2})",_markSB.MarkSbClean, _markPainting, _markSB.Abbr);
             _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);            
          }
