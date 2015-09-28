@@ -10,6 +10,7 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Model
 {
@@ -316,7 +317,7 @@ namespace AlbumPanelColorTiles.Model
          _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel, _abbreviateProject);
          if (_marksSB?.Count == 0)
          {
-            throw new Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
+            throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
          }
 
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
@@ -398,13 +399,19 @@ namespace AlbumPanelColorTiles.Model
       // Создание определений блоков панелей марки АР
       private void CreatePanelsMarkAR()
       {
+         ProgressMeter progressMeter = new ProgressMeter();
+         progressMeter.Start("Создание определений блоков панелей марки АР ");
+         progressMeter.SetLimit(_marksSB.Count);
+         progressMeter.Start();
          foreach (var markSB in _marksSB)
          {
+            progressMeter.MeterProgress();
             foreach (var markAR in markSB.MarksAR)
             {
                markAR.CreateBlock();
             }
          }
+         progressMeter.Stop();
       }
 
       private string getSavedAbbreviateName()
@@ -476,10 +483,21 @@ namespace AlbumPanelColorTiles.Model
       // Замена вхождений блоков панелей Марки СБ на панели Марки АР
       private void ReplaceBlocksMarkSbOnMarkAr()
       {
-         foreach (var markSb in _marksSB)
+         ProgressMeter progressMeter = new ProgressMeter();
+         progressMeter.SetLimit(_marksSB.Count);
+         progressMeter.Start("Замена вхождений блоков панелей Марки СБ на панели Марки АР ");
+
+         using (var t = _db.TransactionManager.StartTransaction())
          {
-            markSb.ReplaceBlocksSbOnAr();
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(_db), OpenMode.ForWrite) as BlockTableRecord;
+            foreach (var markSb in _marksSB)
+            {
+               markSb.ReplaceBlocksSbOnAr(t, ms);
+               progressMeter.MeterProgress();
+            }
+            t.Commit();
          }
+         progressMeter.Stop();
       }
 
       private void saveAbbreviateName(string abbr)
