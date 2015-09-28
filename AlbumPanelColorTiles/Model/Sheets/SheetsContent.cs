@@ -5,6 +5,7 @@ using System.Linq;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -122,8 +123,14 @@ namespace AlbumPanelColorTiles.Sheets
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
                int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
+
+               ProgressMeter progressMeter = new ProgressMeter();
+               progressMeter.SetLimit(_sheetsMarkSB.Count);
+               progressMeter.Start("Создание содержания ");
+
                foreach (var sheetMarkSB in _sheetsMarkSB)
                {
+                  progressMeter.MeterProgress();
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
                   {
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArDocumentation + ".Раскладка плитки на фасаде";
@@ -141,6 +148,7 @@ namespace AlbumPanelColorTiles.Sheets
                      CheckEndOfTable(t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
                   }
                }
+               progressMeter.Stop();
 
                //Удаление пустых строк в таблице содержания
                if (tableContent.Rows.Count > row + 1)
@@ -259,7 +267,6 @@ namespace AlbumPanelColorTiles.Sheets
          }
          return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;
       }
-
       #endregion Private Methods
    }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Model
 {
@@ -180,8 +181,14 @@ namespace AlbumPanelColorTiles.Model
             // Перебор всех блоков в модели и составление списка блоков марок и панелей.
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+            ProgressMeter progressMeter = new ProgressMeter();
+            progressMeter.SetLimit(5000);
+            progressMeter.Start("Покраска панелей...");
+
             foreach (ObjectId idEnt in ms)
             {
+               progressMeter.MeterProgress();
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefPanel = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
@@ -198,6 +205,7 @@ namespace AlbumPanelColorTiles.Model
                   markSb.AddPanelAR(paintAR, blRefPanel, markSb);
                }
             }
+            progressMeter.Stop();
             t.Commit();
          }
          return _marksSb;
@@ -335,11 +343,11 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Замена вхождений блоков СБ на АР
-      public void ReplaceBlocksSbOnAr()
+      public void ReplaceBlocksSbOnAr(Transaction t, BlockTableRecord ms)
       {
          foreach (var markAr in _marksAR)
          {
-            markAr.ReplaceBlocksSbOnAr();
+            markAr.ReplaceBlocksSbOnAr(t, ms);
          }
       }
 

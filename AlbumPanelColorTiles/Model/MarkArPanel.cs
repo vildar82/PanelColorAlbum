@@ -180,11 +180,11 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Замена вхождений блоков СБ на блоки АР
-      public void ReplaceBlocksSbOnAr()
+      public void ReplaceBlocksSbOnAr(Transaction t, BlockTableRecord ms)
       {
          foreach (var panel in _panels)
          {
-            panel.ReplaceBlockSbToAr(this);
+            panel.ReplaceBlockSbToAr(this, t, ms);
          }
       }
 

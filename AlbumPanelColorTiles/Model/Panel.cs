@@ -62,23 +62,33 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Замена вхождения блока СБ на АР
-      public void ReplaceBlockSbToAr(MarkArPanel markAr)
-      {
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
-            var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
-            blRefPanelAr.SetDatabaseDefaults();
-            blRefPanelAr.Layer = blRefMarkSb.Layer;
-            _extents = blRefPanelAr.GeometricExtents;
-            //_insPt = blRefPanelAr.Position;
-            blRefMarkSb.Erase(true);
-            _idBlRefAr = ms.AppendEntity(blRefPanelAr);
-            t.AddNewlyCreatedDBObject(blRefPanelAr, true);
-            t.Commit();
-         }
+      public void ReplaceBlockSbToAr(MarkArPanel markAr, Transaction t, BlockTableRecord ms)
+      {         
+         var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
+         var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
+         blRefPanelAr.SetDatabaseDefaults();
+         blRefPanelAr.Layer = blRefMarkSb.Layer;
+         _extents = blRefPanelAr.GeometricExtents;
+         //_insPt = blRefPanelAr.Position;
+         blRefMarkSb.Erase(true);
+         _idBlRefAr = ms.AppendEntity(blRefPanelAr);
+         t.AddNewlyCreatedDBObject(blRefPanelAr, true);
+
+         //Database db = HostApplicationServices.WorkingDatabase;
+         //using (var t = db.TransactionManager.StartTransaction())
+         //{
+         //   var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
+         //   var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
+         //   var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
+         //   blRefPanelAr.SetDatabaseDefaults();
+         //   blRefPanelAr.Layer = blRefMarkSb.Layer;
+         //   _extents = blRefPanelAr.GeometricExtents;
+         //   //_insPt = blRefPanelAr.Position;
+         //   blRefMarkSb.Erase(true);
+         //   _idBlRefAr = ms.AppendEntity(blRefPanelAr);
+         //   t.AddNewlyCreatedDBObject(blRefPanelAr, true);
+         //   t.Commit();
+         //}
       }
 
       #endregion Public Methods
