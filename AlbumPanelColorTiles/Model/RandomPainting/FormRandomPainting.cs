@@ -142,9 +142,9 @@ namespace AlbumPanelColorTiles.Model
       {
          _location.Y += distance;
          // Проверка размера формы
-         if (this.Height < (_location.Y + 30))
+         if (this.Height < (_location.Y + 40))
          {
-            this.Height = _location.Y + 30;
+            this.Height = _location.Y + 40;
             buttonDraw.Location = new Point(buttonDraw.Location.X, this.Height - 38); 
          }
       }
