@@ -127,27 +127,7 @@ namespace AlbumPanelColorTiles
                   {
                      Log.Info("Отменено пользователем.");
                      throw new System.Exception("Отменено пользователем.");
-                  }
-
-                  //var optPromptPlot = new PromptKeywordOptions("\nНапечатать альбом в PDF?");
-                  //optPromptPlot.Keywords.Add("Да");
-                  //optPromptPlot.Keywords.Add("Нет");
-                  //var promptPlotRes = doc.Editor.GetKeywords(optPromptPlot);
-                  //if (promptPlotRes.Status == PromptStatus.OK)
-                  //{
-                  //   if (promptPlotRes.StringResult == "Да")
-                  //   {
-                  //      PlotMultiPDF plotMultiPdf = new PlotMultiPDF();
-                  //      try
-                  //      {
-                  //         plotMultiPdf.PlotDir(_album.AlbumDir);
-                  //      }
-                  //      catch (System.Exception ex)
-                  //      {
-                  //         doc.Editor.WriteMessage("\n" + ex.Message);
-                  //      }
-                  //   }
-                  //}
+                  }                  
                }
                catch (System.Exception ex)
                {
@@ -165,21 +145,7 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          Editor ed = doc.Editor;
          ed.WriteMessage("\n{0}", MsgHelp);
-      }
-
-      //         tr.Commit();
-      //      }
-      //   }
-      //   catch (System.Exception e)
-      //   {
-      //      Editor ed = AcAp.DocumentManager.MdiActiveDocument.Editor;
-      //      ed.WriteMessage("\nError: {0}\n{1}", e.Message, e.StackTrace);
-      //   }
-      //   finally
-      //   {
-      //      AcAp.SetSystemVariable("BACKGROUNDPLOT", bgp);
-      //   }
-      //}
+      }      
       [CommandMethod("AKR", "AKR-InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockColorAreaCommand()
       {
@@ -211,10 +177,7 @@ namespace AlbumPanelColorTiles
          {
             ed.WriteMessage("\n" + ex.Message);
          }
-      }
-
-      //         MultiSheetsPdf plotter = new MultiSheetsPdf(filename, layouts);
-      //         plotter.Publish();
+      }      
       [CommandMethod("AKR", "AKR-InsertBlockPanel", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockPanelCommand()
       {
@@ -229,9 +192,7 @@ namespace AlbumPanelColorTiles
          {
             ed.WriteMessage("\n" + ex.Message);
          }
-      }
-
-      //         string filename = Path.ChangeExtension(db.Filename, "pdf");
+      }      
       [CommandMethod("AKR", "AKR-InsertBlockTile", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockTileCommand()
       {
@@ -246,26 +207,7 @@ namespace AlbumPanelColorTiles
          {
             ed.WriteMessage("\n" + ex.Message);
          }
-      }
-
-      //   Database db = HostApplicationServices.WorkingDatabase;
-      //   short bgp = (short)AcAp.GetSystemVariable("BACKGROUNDPLOT");
-      //   try
-      //   {
-      //      AcAp.SetSystemVariable("BACKGROUNDPLOT", 0);
-      //      using (Transaction tr = db.TransactionManager.StartTransaction())
-      //      {
-      //         List<Layout> layouts = new List<Layout>();
-      //         DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
-      //         foreach (DBDictionaryEntry entry in layoutDict)
-      //         {
-      //            if (entry.Key != "Model")
-      //            {
-      //               layouts.Add((Layout)tr.GetObject(entry.Value, OpenMode.ForRead));
-      //            }
-      //         }
-      //         layouts.Sort((l1, l2) => l1.TabOrder.CompareTo(l2.TabOrder));
-      // Покраска панелей в Моделе (по блокам зон покраски)
+      }      
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
       {
@@ -362,20 +304,12 @@ namespace AlbumPanelColorTiles
                }
             }
          }
-      }
-
-      //[CommandMethod("AKR", "PlotPdfDst", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
-      //public void PlotPdfDst()
-      //{
-      //   Document doc = AcAp.DocumentManager.MdiActiveDocument;
-      //   if (doc == null) return;
-
-      //   // Regen
-      //   (doc.GetAcadDocument() as dynamic).Regen((dynamic)1);
+      }      
       // Удаление блоков панелей марки АР и их замена на блоки панелей марок СБ.
       [CommandMethod("PIK", "AKR-ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void ResetPanelsCommand()
       {
+         Log.Info("Start Command: AKR-ResetPanels");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
          using (var DocLock = doc.LockDocument())
@@ -393,6 +327,7 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
+               Log.Error(ex, "Не удалось выполнить сброс панелей. ");
             }
          }
       }
@@ -400,6 +335,7 @@ namespace AlbumPanelColorTiles
       [CommandMethod("AKR", "AKR-SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void SelectPanelsCommand()
       {
+         Log.Info("Start Command: AKR-SelectPanels");
          // Выбор блоков панелей на чертеже в Модели
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
@@ -446,7 +382,8 @@ namespace AlbumPanelColorTiles
                ed.WriteMessage("\n" + panel.Key + " - " + panel.Value.Count);
             }
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
-            ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - " + countMarkSbPanels + ", Марки АР - " + countMarkArPanels);
+            ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
+            Log.Info ("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
          }
       }
 
@@ -455,6 +392,7 @@ namespace AlbumPanelColorTiles
       {
          try
          {
+            Log.Info("Start Command: AKR-RandomPainting");
             // Произвольная покраска участка, с % распределением цветов зон покраски.
             RandomPainting properPaint = new RandomPainting();
             properPaint.Start();
@@ -464,6 +402,7 @@ namespace AlbumPanelColorTiles
          {
             Editor ed = AcAp.DocumentManager.MdiActiveDocument.Editor;
             ed.WriteMessage("\n{0}", ex.ToString());
+            Log.Error(ex, "Command: AKR-RandomPainting");
          }         
       }
 
