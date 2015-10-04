@@ -12,7 +12,7 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Model
 {
    // Произвольная покраска участа с % распределением цветов
-   public class ProperPainting
+   public class RandomPainting
    {
       private Document _doc;
       private Editor _ed;
@@ -26,7 +26,7 @@ namespace AlbumPanelColorTiles.Model
       private ObjectIdCollection _idColCopy;
       private List<Spot> _spots;
 
-      public ProperPainting()
+      public RandomPainting()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
@@ -44,10 +44,10 @@ namespace AlbumPanelColorTiles.Model
          PromptExtents();
 
          // Список всех цветов (по списку листов) - которые можно добавить в распределение покраски зоны
-         Dictionary<string, ProperPaint> allProperPaint = getAllProperPaints();
+         Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
 
          // Форма для распределения цветов
-         FormProperPainting formProper = new FormProperPainting(allProperPaint);
+         FormRandomPainting formProper = new FormRandomPainting(allProperPaint);
          formProper.Fire += FormProper_Fire;
          Application.ShowModalDialog(formProper);         
       }
@@ -62,8 +62,8 @@ namespace AlbumPanelColorTiles.Model
          }       
 
          // Красим участок
-         Dictionary<string, ProperPaint> trackPropers = sender as Dictionary<string, ProperPaint>;
-         List<ProperPaint> propers = trackPropers.Values.ToList(); 
+         Dictionary<string, RandomPaint> trackPropers = sender as Dictionary<string, RandomPaint>;
+         List<RandomPaint> propers = trackPropers.Values.ToList(); 
          _xsize = Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
          _ysize = Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
          int totalTileCount = _xsize * _ysize;
@@ -77,7 +77,7 @@ namespace AlbumPanelColorTiles.Model
 
          if (distributedCount > totalTileCount)
          {
-            ProperPaint lastProper = propers.Last();
+            RandomPaint lastProper = propers.Last();
             lastProper.TailCount -= distributedCount - totalTileCount;
          }
          else
@@ -201,9 +201,9 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      private Dictionary<string, ProperPaint> getAllProperPaints()
+      private Dictionary<string, RandomPaint> getAllProperPaints()
       {
-         Dictionary<string, ProperPaint> propers = new Dictionary<string, ProperPaint>();
+         Dictionary<string, RandomPaint> propers = new Dictionary<string, RandomPaint>();
          int numProper = 0;
          using (var t = _db.TransactionManager.StartTransaction())
          {
@@ -211,7 +211,7 @@ namespace AlbumPanelColorTiles.Model
             foreach (ObjectId idLayer in lt)
             {
                var layer = idLayer.GetObject(OpenMode.ForRead) as LayerTableRecord;
-               ProperPaint proper = new ProperPaint(layer.Name, numProper++, layer.Color.ColorValue, layer.Id);
+               RandomPaint proper = new RandomPaint(layer.Name, numProper++, layer.Color.ColorValue, layer.Id);
                propers.Add(proper.LayerName, proper);
             }
          }

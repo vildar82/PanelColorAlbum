@@ -61,6 +61,7 @@ namespace AlbumPanelColorTiles
                       "\nAKR-AlbumPanels - создание альбома панелей." +
                       "\nAKR-PlotPdf - печать в PDF текущего чертежа или выбранной папки с чертежами. Файлы создается в корне чертежа с тем же именем. Печать выполняется по настройкам на листах." +
                       "\nAKR-SelectPanels - выбор блоков панелей в Модели." +
+                      "\nAKR-RandomPainting - случайное распределение зон покраски в указанной области/" +
                       "\nAKR-InsertBlockColorArea - вставка блока зоны покраски." +
                       "\nAKR-InsertBlockPanel - вставка блока зоны покраски." +
                       "\nAKR-InsertBlockFrame - вставка блока зоны покраски." +
@@ -449,13 +450,13 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-ProperPainting", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void ProperPaintingCommand()
+      [CommandMethod("AKR", "AKR-RandomPainting", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void RandomPaintingCommand()
       {
          try
          {
             // Произвольная покраска участка, с % распределением цветов зон покраски.
-            ProperPainting properPaint = new ProperPainting();
+            RandomPainting properPaint = new RandomPainting();
             properPaint.Start();
             // В результате получится участок заполненный блоками зон покраски с одной целой зоной и кучей маленьких пятен величиной с 1 плитку.
          }
