@@ -7,24 +7,26 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Model
 {
    // Зона покраски
-   public class ColorArea : IEquatable<ColorArea>
+   public class ColorArea : IEquatable<ColorArea>, IComparable<ColorArea>
    {
       #region Private Fields
 
       private Extents3d _bounds;
       private ObjectId _idblRef;
       private Paint _paint;
+      private double _size;
 
       #endregion Private Fields
 
       #region Public Constructors
 
       public ColorArea(BlockReference blRef)
-      {
+      {          
          _idblRef = blRef.ObjectId;
          // Определение габаритов
-         _bounds = GetBounds(blRef);
+         _bounds = blRef.GeometricExtents;
          _paint = Album.FindPaint(blRef.Layer);
+         _size = (_bounds.MaxPoint.X - _bounds.MinPoint.X) * (_bounds.MaxPoint.Y - _bounds.MinPoint.Y);
       }
 
       #endregion Public Constructors
@@ -46,31 +48,8 @@ namespace AlbumPanelColorTiles.Model
       #region Public Methods
 
       // Определение покраски. Попадание точки в зону окраски
-      public static Paint GetPaint(Point3d centerTile, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
+      public static Paint GetPaint(Point3d centerTile, List<ColorArea> colorAreas)
       {
-         Paint paint = GetPaintFromColorAreas(centerTile, colorAreasForeground);
-         if (paint == null)
-         {
-            if (colorAreasBackground != null)
-            {
-               paint = GetPaintFromColorAreas(centerTile, colorAreasBackground);
-            }
-         }
-         return paint;
-      }
-
-      public bool Equals(ColorArea other)
-      {
-         return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
-      }
-
-      #endregion Public Methods
-
-      #region Private Methods
-
-      private static Paint GetPaintFromColorAreas(Point3d centerTile, List<ColorArea> colorAreas)
-      {
-         // Центр плитки
          foreach (ColorArea colorArea in colorAreas)
          {
             if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
@@ -81,18 +60,42 @@ namespace AlbumPanelColorTiles.Model
          return null;
       }
 
-      private Extents3d GetBounds(BlockReference blRef)
+      public bool Equals(ColorArea other)
       {
-         Extents3d bounds;
-         if (blRef.Bounds.HasValue)
+         return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
+      } 
+
+      public int CompareTo(ColorArea other)
+      {
+         return _size.CompareTo(other._size);
+      }
+
+      // Определение зон покраски в определении блока
+      public static List<ColorArea> GetColorAreas(ObjectId idBtr)
+      {
+         List<ColorArea> colorAreas = new List<ColorArea>();
+         using (var t = idBtr.Database.TransactionManager.StartTransaction())
          {
-            bounds = blRef.Bounds.Value;
+            var btrMarkSb = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in btrMarkSb)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  if (string.Equals(Lib.Blocks.EffectiveName(blRefColorArea),
+                     Album.Options.BlockColorAreaName,
+                     System.StringComparison.InvariantCultureIgnoreCase))
+                  {
+                     ColorArea colorArea = new ColorArea(blRefColorArea);
+                     colorAreas.Add(colorArea);
+                  }
+               }
+            }
+            t.Commit();
          }
-         else
-         {
-            bounds = new Extents3d(Point3d.Origin, Point3d.Origin);
-         }
-         return bounds;
+         // Сортировка зон покраски по размеру
+         colorAreas.Sort();
+         return colorAreas;
       }
 
       #endregion Private Methods
