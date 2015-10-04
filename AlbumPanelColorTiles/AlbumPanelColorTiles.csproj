@@ -64,7 +64,6 @@
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\ColorArea.cs" />
-    <Compile Include="Model\ColorAreaModel.cs" />
     <Compile Include="Model\Forms\FormRenameMarkAR.cs">
       <SubType>Form</SubType>
     </Compile>

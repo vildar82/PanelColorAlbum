@@ -82,7 +82,7 @@ namespace AlbumPanelColorTiles.Model
       #region Public Methods
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
-      public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreasForeground, List<ColorArea> colorAreasBackground)
+      public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreas)
       {
          List<Paint> paintsAR = new List<Paint>();
 
@@ -95,7 +95,7 @@ namespace AlbumPanelColorTiles.Model
             {
                // Опрделение покраски по зонам
                Point3d centerTileInBlRef = GetCenterTileInBlockRef(blRefPanel.Position, tileMarSb.CenterTile);
-               paintAR = ColorArea.GetPaint(centerTileInBlRef, colorAreasForeground, colorAreasBackground);
+               paintAR = ColorArea.GetPaint(centerTileInBlRef, colorAreas);
                if (paintAR == null)
                {
                   //Ошибка. Не удалось определить покраску плитки.???

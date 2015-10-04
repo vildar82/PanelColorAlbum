@@ -28,7 +28,8 @@ namespace AlbumPanelColorTiles.Model
       private string _abbreviateProject;
 
       private string _albumDir;
-      private ColorAreaModel _colorAreaModel;
+      //private ColorAreaModel _colorAreaModel;
+      List<ColorArea> _colorAreas; // Зоны покраски
       private Database _db;
       private Document _doc;
       private List<MarkSbPanel> _marksSB;
@@ -238,21 +239,16 @@ namespace AlbumPanelColorTiles.Model
       public void CheckPanelsInDrawingAndMemory()
       {
          // Проверка зон покраски
-         var colorAreaModelCheck = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
+         var colorAreasCheck = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
          // сравнение фоновых зон
-         if (!colorAreaModelCheck.ColorAreasBackground.SequenceEqual(_colorAreaModel.ColorAreasBackground))
+         if (!colorAreasCheck.SequenceEqual(_colorAreas))
          {
-            throw new System.Exception("Фоновые зоны изменились. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
-         }
-         // сравнение передних зон (пятен)
-         if (!colorAreaModelCheck.ColorAreasForeground.SequenceEqual(_colorAreaModel.ColorAreasForeground))
-         {
-            throw new System.Exception("Пятна изменились (зоны покраски). Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
-         }
+            throw new System.Exception("Изменились зоны покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
+         }         
 
          // Проверка панелей
          // Определение покраски панелей.
-         var marksSbCheck = MarkSbPanel.GetMarksSB(_colorAreaModel, _abbreviateProject);
+         var marksSbCheck = MarkSbPanel.GetMarksSB(colorAreasCheck, _abbreviateProject);
          //RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
@@ -301,7 +297,7 @@ namespace AlbumPanelColorTiles.Model
          _colors = new List<Paint>();
 
          // Определение зон покраски в Модели
-         _colorAreaModel = new ColorAreaModel(SymbolUtilityServices.GetBlockModelSpaceId(_db));
+         _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
          ResetBlocks();
@@ -314,7 +310,7 @@ namespace AlbumPanelColorTiles.Model
          }
 
          // Определение покраски панелей.
-         _marksSB = MarkSbPanel.GetMarksSB(_colorAreaModel, _abbreviateProject);
+         _marksSB = MarkSbPanel.GetMarksSB(_colorAreas, _abbreviateProject);
          if (_marksSB?.Count == 0)
          {
             throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
@@ -344,7 +340,7 @@ namespace AlbumPanelColorTiles.Model
       {
          // Набор цветов используемых в альбоме.
          _colors = null;
-         _colorAreaModel = null;
+         _colorAreas = null;
          ObjectId _idLayerMarks = ObjectId.Null;
          _marksSB = null;
          _sheetsSet = null;

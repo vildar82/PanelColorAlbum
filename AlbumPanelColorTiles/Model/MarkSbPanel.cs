@@ -49,7 +49,7 @@ namespace AlbumPanelColorTiles.Model
          _isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix);
          _isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix);
          _marksAR = new List<MarkArPanel>();
-         _colorAreas = ColorAreaModel.GetColorAreas(_idBtr);
+         _colorAreas = ColorArea.GetColorAreas(_idBtr);         
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
          //???
 
@@ -172,7 +172,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Определение покраски панелей текущего чертежа (в Модели)
-      public static List<MarkSbPanel> GetMarksSB(ColorAreaModel colorAreaModel, string abbr)
+      public static List<MarkSbPanel> GetMarksSB(List<ColorArea> colorAreas, string abbr)
       {
          List<MarkSbPanel> _marksSb = new List<MarkSbPanel>();
          Database db = HostApplicationServices.WorkingDatabase;
@@ -200,7 +200,7 @@ namespace AlbumPanelColorTiles.Model
                      continue;
                   }
                   //Определение покраски панели (Марки АР)
-                  List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, colorAreaModel.ColorAreasForeground, colorAreaModel.ColorAreasBackground);
+                  List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, colorAreas);
                   // Добавление панели АР в список панелей для Марки СБ
                   markSb.AddPanelAR(paintAR, blRefPanel, markSb);
                }
@@ -434,7 +434,7 @@ namespace AlbumPanelColorTiles.Model
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки
-                     Paint paint = ColorArea.GetPaint(tile.CenterTile, _colorAreas, null);
+                     Paint paint = ColorArea.GetPaint(tile.CenterTile, _colorAreas);
                      _tiles.Add(tile);
                      _paints.Add(paint);
                   }
