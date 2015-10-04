@@ -10,18 +10,18 @@ namespace AlbumPanelColorTiles.Model
    // Участок покраски
    public class Spot
    {
-      private ProperPaint _proper;
+      private RandomPaint _proper;
       private ObjectId _idBlRef;
 
-      public ProperPaint Proper { get { return _proper; } }
+      public RandomPaint Proper { get { return _proper; } }
       public ObjectId IdBlRef { get { return _idBlRef; } set { _idBlRef = value; } }
 
-      public Spot (ProperPaint proper)
+      public Spot (RandomPaint proper)
       {
          _proper = proper;
       }
 
-      public static IEnumerable<Spot> GetSpots(ProperPaint proper)
+      public static IEnumerable<Spot> GetSpots(RandomPaint proper)
       {
          List<Spot> spots = new List<Spot>();
          for (int i = 0; i < proper.TailCount; i++)

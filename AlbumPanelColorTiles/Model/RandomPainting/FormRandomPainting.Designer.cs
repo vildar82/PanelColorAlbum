@@ -1,6 +1,6 @@
 ﻿namespace AlbumPanelColorTiles.Model
 {
-   partial class FormProperPainting
+   partial class FormRandomPainting
    {
       /// <summary>
       /// Required designer variable.

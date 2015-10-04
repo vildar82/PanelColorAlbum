@@ -87,15 +87,15 @@
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />
     <Compile Include="Model\Plot\PlotMultiPdfReadDwg.cs" />
     <Compile Include="Model\BlockFrameFacade.cs" />
-    <Compile Include="Model\ProperPainting\FormProperPainting.cs">
+    <Compile Include="Model\RandomPainting\FormRandomPainting.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Model\ProperPainting\FormProperPainting.Designer.cs">
-      <DependentUpon>FormProperPainting.cs</DependentUpon>
+    <Compile Include="Model\RandomPainting\FormRandomPainting.Designer.cs">
+      <DependentUpon>FormRandomPainting.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\ProperPainting\ProperPaint.cs" />
-    <Compile Include="Model\ProperPainting\ProperPainting.cs" />
-    <Compile Include="Model\ProperPainting\Spot.cs" />
+    <Compile Include="Model\RandomPainting\RandomPaint.cs" />
+    <Compile Include="Model\RandomPainting\RandomPainting.cs" />
+    <Compile Include="Model\RandomPainting\Spot.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
     <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />
@@ -148,8 +148,8 @@
     <EmbeddedResource Include="Model\Forms\FormRenameMarkAR.resx">
       <DependentUpon>FormRenameMarkAR.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Model\ProperPainting\FormProperPainting.resx">
-      <DependentUpon>FormProperPainting.cs</DependentUpon>
+    <EmbeddedResource Include="Model\RandomPainting\FormRandomPainting.resx">
+      <DependentUpon>FormRandomPainting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

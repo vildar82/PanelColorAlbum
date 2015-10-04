@@ -8,7 +8,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model
 {
-   public class ProperPaint
+   public class RandomPaint
    {
       private int _num;
       private string _layerName;
@@ -24,7 +24,7 @@ namespace AlbumPanelColorTiles.Model
       public int Percent { get { return _percent; } set { _percent = value; } }
       public int TailCount { get { return _tailCount; } set { _tailCount = value; } }
 
-      public ProperPaint(string layer, int num, Color color, ObjectId idLayer)
+      public RandomPaint(string layer, int num, Color color, ObjectId idLayer)
       {
          _num = num;
          _layerName = layer;

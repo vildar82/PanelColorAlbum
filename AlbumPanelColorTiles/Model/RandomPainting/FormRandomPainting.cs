@@ -10,25 +10,25 @@ using System.Windows.Forms;
 
 namespace AlbumPanelColorTiles.Model
 {
-   public partial class FormProperPainting : Form
+   public partial class FormRandomPainting : Form
    {
       private Point mouseOffset;
       private bool isMouseDown = false;
-      private Dictionary<string, ProperPaint> _allPropers;
-      private Dictionary<string, ProperPaint> _trackPropers;
+      private Dictionary<string, RandomPaint> _allPropers;
+      private Dictionary<string, RandomPaint> _trackPropers;
       private Dictionary<string, GroupBox> _groupBoxs;
       private Point _location;
       private const int DISTANCE_BETWEEN_GROUP = 78;
       public event EventHandler Fire = delegate { };      
 
-      public FormProperPainting(Dictionary<string, ProperPaint> propers)
+      public FormRandomPainting(Dictionary<string, RandomPaint> propers)
       {
          InitializeComponent();
 
          _location = new Point(12, 64);
          _allPropers = propers;
          // Ключ у всех - имя слоя.
-         _trackPropers = new Dictionary<string, ProperPaint>();
+         _trackPropers = new Dictionary<string, RandomPaint>();
          _groupBoxs = new Dictionary<string, GroupBox>();
          comboBoxColor.DataSource = _allPropers.Values.ToList();
          comboBoxColor.DisplayMember = "LayerName";
@@ -37,7 +37,7 @@ namespace AlbumPanelColorTiles.Model
       private void comboBoxColor_DrawItem(object sender, DrawItemEventArgs e)
       {
          e.DrawBackground();
-         ProperPaint proper = ((ComboBox)sender).Items[e.Index] as ProperPaint;
+         RandomPaint proper = ((ComboBox)sender).Items[e.Index] as RandomPaint;
          // Покраска                                    
          e.Graphics.FillRectangle(new SolidBrush(proper.Color), e.Bounds);
          // Текст
@@ -45,18 +45,18 @@ namespace AlbumPanelColorTiles.Model
       }
       private void comboBoxColor_SelectedIndexChanged(object sender, EventArgs e)
       {
-         ProperPaint proper = comboBoxColor.SelectedItem as ProperPaint;
+         RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
          comboBoxColor.BackColor = proper.Color;
       }
 
       private void buttonAdd_Click(object sender, EventArgs e)
       {
-         ProperPaint proper = comboBoxColor.SelectedItem as ProperPaint;
+         RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
          // Добавление набора с ползунком 
          addTrackProper(proper);
       }
 
-      private void addTrackProper(ProperPaint proper)
+      private void addTrackProper(RandomPaint proper)
       {
          // Проверка нет ли уже такого слоя в распределении
          if (!_trackPropers.ContainsKey(proper.LayerName))
@@ -66,7 +66,7 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      private void AddControls(ProperPaint proper)
+      private void AddControls(RandomPaint proper)
       {
          string tag = proper.LayerName;
          GroupBox groupBox = new GroupBox();
@@ -171,7 +171,7 @@ namespace AlbumPanelColorTiles.Model
       {
          // Распределяемый трек
          TrackBar trackBar = (TrackBar)sender;
-         ProperPaint proper = _trackPropers[(string)trackBar.Tag];
+         RandomPaint proper = _trackPropers[(string)trackBar.Tag];
          int value = getCorrectValue(proper, trackBar.Value);
          proper.Percent = value;
          trackBar.Value = value;
@@ -183,7 +183,7 @@ namespace AlbumPanelColorTiles.Model
       {
          TextBox textBox = (TextBox)sender;
          string tag = (string)textBox.Tag;
-         ProperPaint proper = _trackPropers[tag];
+         RandomPaint proper = _trackPropers[tag];
          int val;
          if (int.TryParse(textBox.Text, out val))
          {
@@ -197,7 +197,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Получение корректного нового значения процента (чтобы не превышалось 100% распределения)
-      private int getCorrectValue(ProperPaint proper, int newValue)
+      private int getCorrectValue(RandomPaint proper, int newValue)
       {
          int delta = newValue - proper.Percent;
          int value = newValue;
@@ -216,7 +216,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Запись текущего значения процента в текстбокс
-      private void setPercentToTextBox(ProperPaint proper)
+      private void setPercentToTextBox(RandomPaint proper)
       {
          GroupBox groupBox = _groupBoxs[proper.LayerName];
          string tag = (string)groupBox.Tag;
