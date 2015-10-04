@@ -449,6 +449,23 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("AKR", "AKR-ProperPainting", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void ProperPaintingCommand()
+      {
+         try
+         {
+            // Произвольная покраска участка, с % распределением цветов зон покраски.
+            ProperPainting properPaint = new ProperPainting();
+            properPaint.Start();
+            // В результате получится участок заполненный блоками зон покраски с одной целой зоной и кучей маленьких пятен величиной с 1 плитку.
+         }
+         catch (System.Exception ex)
+         {
+            Editor ed = AcAp.DocumentManager.MdiActiveDocument.Editor;
+            ed.WriteMessage("\n{0}", ex.ToString());
+         }         
+      }
+
       #endregion Public Methods
    }
 }

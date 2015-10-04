@@ -23,15 +23,8 @@ namespace AlbumPanelColorTiles.Lib
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             if (!bt.Has(blName))
             {
-               // Копирование определения блока из файла с блоками.
-               string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Album.Options.TemplateBlocksAKRFileName);
-               if (!File.Exists(fileBlocksTemplate))
-               {
-                  throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
-               }
-               Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
+               CopyBlockFromTemplate(blName, db);
             }
-
             ObjectId idBlBtr = bt[blName];
             Point3d pt = Point3d.Origin;
             BlockReference br = new BlockReference(pt, idBlBtr);
@@ -51,6 +44,23 @@ namespace AlbumPanelColorTiles.Lib
             }
             t.Commit();
          }
+      }
+
+      /// <summary>
+      /// Копирование блока из файла шаблона.
+      /// </summary>
+      /// <param name="blName">Имя блока</param>
+      /// <param name="db">База в которую копировать</param>
+      /// <exception cref="Exception">Не найден файл-шаблон с блоками</exception>
+      public static void CopyBlockFromTemplate(string blName, Database db)
+      {
+         // Копирование определения блока из файла с блоками.
+         string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Album.Options.TemplateBlocksAKRFileName);
+         if (!File.Exists(fileBlocksTemplate))
+         {
+            throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
+         }
+         Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
       }
 
       #endregion Public Methods
