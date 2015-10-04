@@ -4,6 +4,11 @@
    {
       #region Public Fields
 
+      // Размеры плитки
+      public int TileLenght = 288; // Длина плитки
+      public int TileHeight = 88; // Высота плитки
+      public int TileSeam = 12; // Высота плитки
+
       //
       // Имена блоков
       //
