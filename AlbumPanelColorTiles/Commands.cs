@@ -26,6 +26,7 @@ namespace AlbumPanelColorTiles
       private static string _curDllDir;
       private Album _album;
       private string _msgHelp;
+      private RandomPainting _randomPainting;
 
       #endregion Private Fields
 
@@ -394,8 +395,11 @@ namespace AlbumPanelColorTiles
          {
             Log.Info("Start Command: AKR-RandomPainting");
             // Произвольная покраска участка, с % распределением цветов зон покраски.
-            RandomPainting properPaint = new RandomPainting();
-            properPaint.Start();
+            if (_randomPainting == null)
+            {
+               _randomPainting = new RandomPainting();
+            }
+            _randomPainting.Start();
             // В результате получится участок заполненный блоками зон покраски с одной целой зоной и кучей маленьких пятен величиной с 1 плитку.
          }
          catch (System.Exception ex)

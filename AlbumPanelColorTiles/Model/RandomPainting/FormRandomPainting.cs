@@ -21,20 +21,40 @@ namespace AlbumPanelColorTiles.Model
       private Point _location;
       private RandomPainting _randomPaintingService;
       private const int DISTANCE_BETWEEN_GROUP = 78;
+
+      public Dictionary<string, RandomPaint> TrackPropers { get { return _trackPropers; } }
+
       public event EventHandler Fire = delegate { };      
 
-      public FormRandomPainting(Dictionary<string, RandomPaint> propers, RandomPainting randomPaintingService)
+      public FormRandomPainting(Dictionary<string, RandomPaint> propers, 
+         RandomPainting randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
       {
          InitializeComponent();
 
          _randomPaintingService = randomPaintingService;
          _location = new Point(12, 64);
          _allPropers = propers;
-         // Ключ у всех - имя слоя.
-         _trackPropers = new Dictionary<string, RandomPaint>();
          _groupBoxs = new Dictionary<string, GroupBox>();
+         // Ключ у всех - имя слоя.
+         // Восстановление набора распределяемых цветов
+         restoreTracks(trackPropers);                  
          comboBoxColor.DataSource = _allPropers.Values.ToList();
          comboBoxColor.DisplayMember = "LayerName";
+      }
+
+      private void restoreTracks(Dictionary<string, RandomPaint> trackPropers)
+      {
+         _trackPropers = new Dictionary<string, RandomPaint>();
+         if (trackPropers != null)
+         {
+            foreach (var item in trackPropers)
+            {
+               if (_allPropers.ContainsKey(item.Key))
+               {
+                  addTrackProper(item.Value);
+               }
+            }
+         }
       }
 
       private void comboBoxColor_DrawItem(object sender, DrawItemEventArgs e)
@@ -103,9 +123,9 @@ namespace AlbumPanelColorTiles.Model
          textBox.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
          textBox.Location = new Point(291, 28);
          textBox.Name = "textBox" + tag;
-         textBox.Size = new Size(43, 24);
-         textBox.TextChanged += TextBox_TextChanged;
+         textBox.Size = new Size(43, 24);         
          textBox.Tag = tag;
+         textBox.Text = proper.Percent.ToString(); 
          // buttonDel         
          buttonDel.Anchor = AnchorStyles.Right;         
          buttonDel.BackgroundImage = Properties.Resources.delete;
@@ -115,8 +135,7 @@ namespace AlbumPanelColorTiles.Model
          buttonDel.Size = new Size(28, 28);
          buttonDel.Text = "-";
          buttonDel.UseVisualStyleBackColor = true;
-         buttonDel.Tag = tag;
-         buttonDel.Click += buttonDel_Click;
+         buttonDel.Tag = tag;         
          // trackBar         
          trackBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
          trackBar.BackColor = proper.Color;
@@ -126,7 +145,7 @@ namespace AlbumPanelColorTiles.Model
          trackBar.TickStyle = TickStyle.Both;
          trackBar.Tag = tag;
          trackBar.Maximum = 100;
-         trackBar.ValueChanged += trackBar_ValueChanged;
+         trackBar.Value = proper.Percent;       
          // Label
          label.AutoSize = true;
          label.Location = new Point(301, 12);
@@ -136,6 +155,11 @@ namespace AlbumPanelColorTiles.Model
          label.Text = "%";
 
          this.Controls.Add(groupBox);
+
+         // События
+         textBox.TextChanged += TextBox_TextChanged;
+         trackBar.ValueChanged += trackBar_ValueChanged;
+         buttonDel.Click += buttonDel_Click;
 
          _groupBoxs.Add(proper.LayerName, groupBox);
       }
