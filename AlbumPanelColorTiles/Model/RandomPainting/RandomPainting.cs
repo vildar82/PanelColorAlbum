@@ -121,7 +121,7 @@ namespace AlbumPanelColorTiles.Model
                {
                   if (spot != null)
                   {
-                     if (!spot.IdBlRef.IsNull)
+                     if (!spot.IdBlRef.IsNull && spot.IdBlRef.IsValid && !spot.IdBlRef.IsErased)
                      {                      
                         var blRef = t.GetObject(spot.IdBlRef, OpenMode.ForWrite, false, true) as BlockReference;
                         blRef.Erase(true);
