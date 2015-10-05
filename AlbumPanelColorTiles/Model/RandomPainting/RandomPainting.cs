@@ -26,6 +26,8 @@ namespace AlbumPanelColorTiles.Model
       private ObjectIdCollection _idColCopy;
       private List<Spot> _spots;
 
+      public Editor Ed { get { return _ed; } }
+
       public RandomPainting()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
@@ -47,7 +49,7 @@ namespace AlbumPanelColorTiles.Model
          Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
 
          // Форма для распределения цветов
-         FormRandomPainting formProper = new FormRandomPainting(allProperPaint);
+         FormRandomPainting formProper = new FormRandomPainting(allProperPaint, this);
          formProper.Fire += FormProper_Fire;
          Application.ShowModalDialog(formProper);         
       }
@@ -91,14 +93,12 @@ namespace AlbumPanelColorTiles.Model
          {
             _spots.AddRange(Spot.GetSpots(proper));
          }
-         // Пустые споты
-         _spots.AddRange(Spot.GetEmpty(emptySpotsCount));
 
          // Перемешивание списка
-         mixingList(_spots);
+         List<Spot> mixSpots = mixingList(_spots, totalTileCount);
 
          // Вставка блоков зон 
-         placementSpots(_spots);
+         placementSpots(mixSpots);
 
          _ed.Regen(); 
       }
@@ -141,24 +141,19 @@ namespace AlbumPanelColorTiles.Model
                _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;               
                setDynParamColorAreaBlock(blRefColorAreaTemplate);
                _idColCopy = new ObjectIdCollection();
-               _idColCopy.Add(_idBlRefColorAreaTemplate);
-
-               List<Spot> insertSpotsTest = new List<Spot>();
+               _idColCopy.Add(_idBlRefColorAreaTemplate);               
 
                int x, y;
-
-               for (int i = 0; i < spots.Count; i++)
-               {
-                  Spot spot = spots[i];
+               foreach (var spot in spots)
+               {                  
                   if (spot != null)
                   {
+                     int i = spots.IndexOf(spot);
                      x = i / _ysize;
-                     y = i % _ysize;
-                     insertSpot(spot, x, y, t);
-                     insertSpotsTest.Add(spot);
+                     y = i % _ysize;                     
+                     insertSpot(spot, x, y, t);                     
                   }
-               }
-                              
+               }                              
                blRefColorAreaTemplate.Erase(true);
                t.Commit();
             }
@@ -188,17 +183,32 @@ namespace AlbumPanelColorTiles.Model
          spot.IdBlRef = blRefSpot.Id;
       }
 
-      private void mixingList(List<Spot> spots)
+      private List<Spot> mixingList(List<Spot> spotsReal, int totalCount)
       {
+         //List<Spot> mixSpots = Spot.GetEmpty(totalCount);                  
+         Spot[] mixSpots = new Spot[totalCount];
          Spot temp;
-         var count = spots.Count;
-         for (int i = 0; i < count; i++)
+         foreach (var spot in spotsReal)
          {
-            int number = _rnd.Next(count);
-            temp = spots[number];
-            spots.RemoveAt(number);
-            spots.Insert(0, temp);
+            int number = _rnd.Next(totalCount - 1);
+            do
+            {
+               temp = mixSpots[number];
+               if (temp == null)
+               {
+                  mixSpots[number] = spot;
+               }
+               else
+               {
+                  number++;
+                  if (number >= totalCount)
+                  {
+                     number = _rnd.Next(totalCount - 1);
+                  }
+               }               
+            } while (temp!=null);
          }
+         return mixSpots.ToList();
       }
 
       private Dictionary<string, RandomPaint> getAllProperPaints()
@@ -218,7 +228,7 @@ namespace AlbumPanelColorTiles.Model
          return propers;
       }
 
-      private void PromptExtents()
+      public void PromptExtents()
       {
          var prPtRes = _ed.GetPoint("Укажите первую точку зоны произвольной покраски");
          if (prPtRes.Status == PromptStatus.OK)
@@ -228,14 +238,14 @@ namespace AlbumPanelColorTiles.Model
             {
                _extentsPrompted = new Extents3d();
                _extentsPrompted.AddPoint(prPtRes.Value);
-               _extentsPrompted.AddPoint(prCornerRes.Value);                
+               _extentsPrompted.AddPoint(prCornerRes.Value);
             }
          }
-         var dist = _extentsPrompted.MaxPoint - _extentsPrompted.MinPoint;
-         if (dist.Length < 650)
-         {
-            throw new Exception("Указана слишком маленькая зона.");
-         }
+         //var dist = _extentsPrompted.MaxPoint - _extentsPrompted.MinPoint;
+         //if (dist.Length < 650)
+         //{
+         //   throw new Exception("Указана слишком маленькая зона.");
+         //}
       }
 
       private void checkBlock(Database db)
