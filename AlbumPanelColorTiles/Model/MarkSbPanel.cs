@@ -172,7 +172,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       // Определение покраски панелей текущего чертежа (в Модели)
-      public static List<MarkSbPanel> GetMarksSB(List<ColorArea> colorAreas, string abbr)
+      public static List<MarkSbPanel> GetMarksSB(List<ColorArea> colorAreas, string abbr, string progressMsg)
       {
          List<MarkSbPanel> _marksSb = new List<MarkSbPanel>();
          Database db = HostApplicationServices.WorkingDatabase;
@@ -184,7 +184,7 @@ namespace AlbumPanelColorTiles.Model
 
             ProgressMeter progressMeter = new ProgressMeter();
             progressMeter.SetLimit(5000);
-            progressMeter.Start("Покраска панелей...");
+            progressMeter.Start(progressMsg);
 
             foreach (ObjectId idEnt in ms)
             {

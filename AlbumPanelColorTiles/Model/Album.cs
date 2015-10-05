@@ -248,7 +248,7 @@ namespace AlbumPanelColorTiles.Model
 
          // Проверка панелей
          // Определение покраски панелей.
-         var marksSbCheck = MarkSbPanel.GetMarksSB(colorAreasCheck, _abbreviateProject);
+         var marksSbCheck = MarkSbPanel.GetMarksSB(colorAreasCheck, _abbreviateProject, "Проверка панелей..");
          //RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
@@ -310,7 +310,7 @@ namespace AlbumPanelColorTiles.Model
          }
 
          // Определение покраски панелей.
-         _marksSB = MarkSbPanel.GetMarksSB(_colorAreas, _abbreviateProject);
+         _marksSB = MarkSbPanel.GetMarksSB(_colorAreas, _abbreviateProject, "Покраска панелей...");
          if (_marksSB?.Count == 0)
          {
             throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
@@ -396,9 +396,8 @@ namespace AlbumPanelColorTiles.Model
       private void CreatePanelsMarkAR()
       {
          ProgressMeter progressMeter = new ProgressMeter();
-         progressMeter.Start("Создание определений блоков панелей марки АР ");
          progressMeter.SetLimit(_marksSB.Count);
-         progressMeter.Start();
+         progressMeter.Start("Создание определений блоков панелей марки АР ");         
          foreach (var markSB in _marksSB)
          {
             progressMeter.MeterProgress();
