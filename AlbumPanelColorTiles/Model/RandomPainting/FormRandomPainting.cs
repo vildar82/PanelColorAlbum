@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.Model
 {
@@ -18,13 +19,15 @@ namespace AlbumPanelColorTiles.Model
       private Dictionary<string, RandomPaint> _trackPropers;
       private Dictionary<string, GroupBox> _groupBoxs;
       private Point _location;
+      private RandomPainting _randomPaintingService;
       private const int DISTANCE_BETWEEN_GROUP = 78;
       public event EventHandler Fire = delegate { };      
 
-      public FormRandomPainting(Dictionary<string, RandomPaint> propers)
+      public FormRandomPainting(Dictionary<string, RandomPaint> propers, RandomPainting randomPaintingService)
       {
          InitializeComponent();
 
+         _randomPaintingService = randomPaintingService;
          _location = new Point(12, 64);
          _allPropers = propers;
          // Ключ у всех - имя слоя.
@@ -146,6 +149,7 @@ namespace AlbumPanelColorTiles.Model
          {
             this.Height = _location.Y + 40;
             buttonDraw.Location = new Point(buttonDraw.Location.X, this.Height - 38); 
+            buttonSelect.Location = new Point(buttonSelect.Location.X, this.Height - 28);
          }
       }
 
@@ -281,6 +285,25 @@ namespace AlbumPanelColorTiles.Model
          {
             isMouseDown = false;
          }
+      }
+
+      private void buttonSelect_Click(object sender, EventArgs e)
+      {
+         using (EditorUserInteraction UI = _randomPaintingService.Ed.StartUserInteraction(this))
+         {
+            _randomPaintingService.PromptExtents(); 
+         }
+      }
+
+      // Esc - сclose
+      protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+      {
+         if (keyData == Keys.Escape)
+         {
+            this.Close();
+            return true;
+         }
+         return base.ProcessCmdKey(ref msg, keyData);
       }
    }
 }

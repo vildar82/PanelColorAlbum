@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.Model
          return spots;
       }
 
-      public static IEnumerable<Spot> GetEmpty(int emptySpotsCount)
+      public static List<Spot> GetEmpty(int emptySpotsCount)
       {
          List<Spot> spots = new List<Spot>(emptySpotsCount);
          for (int i = 0; i < emptySpotsCount; i++)

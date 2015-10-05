@@ -31,6 +31,7 @@
          this.comboBoxColor = new System.Windows.Forms.ComboBox();
          this.label1 = new System.Windows.Forms.Label();
          this.buttonDraw = new System.Windows.Forms.Button();
+         this.buttonSelect = new System.Windows.Forms.Button();
          this.buttonClose = new System.Windows.Forms.Button();
          this.buttonAdd = new System.Windows.Forms.Button();
          this.SuspendLayout();
@@ -70,6 +71,18 @@
          this.buttonDraw.UseVisualStyleBackColor = true;
          this.buttonDraw.Click += new System.EventHandler(this.buttonDraw_Click);
          // 
+         // buttonSelect
+         // 
+         this.buttonSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+         this.buttonSelect.BackgroundImage = global::AlbumPanelColorTiles.Properties.Resources.select;
+         this.buttonSelect.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+         this.buttonSelect.Location = new System.Drawing.Point(3, 146);
+         this.buttonSelect.Name = "buttonSelect";
+         this.buttonSelect.Size = new System.Drawing.Size(25, 25);
+         this.buttonSelect.TabIndex = 7;
+         this.buttonSelect.UseVisualStyleBackColor = true;
+         this.buttonSelect.Click += new System.EventHandler(this.buttonSelect_Click);
+         // 
          // buttonClose
          // 
          this.buttonClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -95,10 +108,11 @@
          this.buttonAdd.UseVisualStyleBackColor = true;
          this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
          // 
-         // FormProperPainting
+         // FormRandomPainting
          // 
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
          this.ClientSize = new System.Drawing.Size(440, 174);
+         this.Controls.Add(this.buttonSelect);
          this.Controls.Add(this.buttonClose);
          this.Controls.Add(this.buttonAdd);
          this.Controls.Add(this.buttonDraw);
@@ -107,7 +121,7 @@
          this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
          this.MaximizeBox = false;
          this.MinimizeBox = false;
-         this.Name = "FormProperPainting";
+         this.Name = "FormRandomPainting";
          this.ShowIcon = false;
          this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
          this.Text = "Произвольная покраска";
@@ -126,5 +140,6 @@
       private System.Windows.Forms.Button buttonDraw;
       private System.Windows.Forms.Button buttonAdd;
       private System.Windows.Forms.Button buttonClose;
+      private System.Windows.Forms.Button buttonSelect;
    }
 }
