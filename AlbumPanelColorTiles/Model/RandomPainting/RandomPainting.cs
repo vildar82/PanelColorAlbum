@@ -25,20 +25,22 @@ namespace AlbumPanelColorTiles.Model
       private ObjectId _idBlRefColorAreaTemplate;
       private ObjectIdCollection _idColCopy;
       private List<Spot> _spots;
+      private Dictionary<string, RandomPaint> _trackRandoms; // Распределяемые цвета
 
-      public Editor Ed { get { return _ed; } }
+      public Editor Ed { get { return _ed; } }      
 
       public RandomPainting()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
          _db = _doc.Database;
-         _rnd = new Random();
-         _spots = new List<Spot>();
+         _rnd = new Random();         
       }
 
       public void Start()
       {
+         resetData();
+
          // Проверка наличия блока зоны покраски
          checkBlock(_db);
 
@@ -49,9 +51,15 @@ namespace AlbumPanelColorTiles.Model
          Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
 
          // Форма для распределения цветов
-         FormRandomPainting formProper = new FormRandomPainting(allProperPaint, this);
+         FormRandomPainting formProper = new FormRandomPainting(allProperPaint, this, _trackRandoms);
          formProper.Fire += FormProper_Fire;
-         Application.ShowModalDialog(formProper);         
+         Application.ShowModalDialog(formProper);
+         _trackRandoms = formProper.TrackPropers;
+      }
+
+      private void resetData()
+      {
+         _spots = new List<Spot>();         
       }
 
       // Огонь
@@ -115,7 +123,7 @@ namespace AlbumPanelColorTiles.Model
                   {
                      if (!spot.IdBlRef.IsNull)
                      {                      
-                        var blRef = t.GetObject(spot.IdBlRef, OpenMode.ForWrite) as BlockReference;
+                        var blRef = t.GetObject(spot.IdBlRef, OpenMode.ForWrite, false, true) as BlockReference;
                         blRef.Erase(true);
                      }                     
                   }
@@ -229,7 +237,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       public void PromptExtents()
-      {
+      {         
          var prPtRes = _ed.GetPoint("Укажите первую точку зоны произвольной покраски");
          if (prPtRes.Status == PromptStatus.OK)
          {
@@ -239,13 +247,10 @@ namespace AlbumPanelColorTiles.Model
                _extentsPrompted = new Extents3d();
                _extentsPrompted.AddPoint(prPtRes.Value);
                _extentsPrompted.AddPoint(prCornerRes.Value);
+
+               _spots = new List<Spot>();
             }
-         }
-         //var dist = _extentsPrompted.MaxPoint - _extentsPrompted.MinPoint;
-         //if (dist.Length < 650)
-         //{
-         //   throw new Exception("Указана слишком маленькая зона.");
-         //}
+         }                  
       }
 
       private void checkBlock(Database db)
