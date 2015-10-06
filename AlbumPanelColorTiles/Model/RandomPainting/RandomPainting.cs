@@ -126,37 +126,38 @@ namespace AlbumPanelColorTiles.Model
 
          // Получение общего списка распределения покроаски
          _spots = new List<Spot>();
-         foreach (var proper in propers)
+         var propersOrdered = propers.OrderBy(p => p.Percent);
+         foreach (var proper in propersOrdered)
          {
             _spots.AddRange(Spot.GetSpots(proper));
          }
 
          // Перемешивание списка
-         List<Spot> mixSpots;
-         //mixSpots = mixingGaussian(_spots, totalTileCount);         
-         var distributedPercent = distributedCount * 100d / totalTileCount;
-         if (distributedPercent > 60)
-         {
-            mixSpots = mixingListNear100(_spots, totalTileCount);
-         }
-         //else if (distributedPercent <= 10)
+         List<Spot> mixSpots = mixingSpots(_spots, totalTileCount);
+         //mixSpots = mixingGaussian(_spots, totalTileCount);          
+         //var distributedPercent = distributedCount * 100d / totalTileCount;
+         //if (distributedPercent > 60)
          //{
-         //   mixSpots = mixingListUpAndDownstairsNeighbor(_spots, totalTileCount);
+         //   mixSpots = mixingListNear100(_spots, totalTileCount);
          //}
-         else if (distributedPercent < 20)
-         {
-            mixSpots = mixingListUpstairsNeighbor(_spots, totalTileCount);
-         }         
-         else
-         {
-            mixSpots = mixingListAllRandom(_spots, totalTileCount);
-         }
+         ////else if (distributedPercent <= 10)
+         ////{
+         ////   mixSpots = mixingListUpAndDownstairsNeighbor(_spots, totalTileCount);
+         ////}
+         //else if (distributedPercent < 50)
+         //{
+         //   mixSpots = mixingListUpstairsNeighbor(_spots, totalTileCount);
+         //}         
+         //else
+         //{
+         //   mixSpots = mixingListAllRandom(_spots, totalTileCount);
+         //}
 
          // Вставка блоков зон 
          placementSpots(mixSpots);
 
          _ed.Regen(); 
-      }
+      }      
 
       private void deleteSpots(List<Spot> spots)
       {
@@ -237,40 +238,74 @@ namespace AlbumPanelColorTiles.Model
          blRefSpot.LayerId = spot.Proper.IdLayer;         
          spot.IdBlRef = blRefSpot.Id;
       }
-      
-      private List<Spot> mixingListUpAndDownstairsNeighbor(List<Spot> spotsReal, int totalCount)
+
+      private List<Spot> mixingSpots(List<Spot> _spots, int totalTileCount)
       {
-         Spot[] mixSpots = new Spot[totalCount];
-         Spot temp;
-         Spot upstairsNeighbor;
-         Spot downstairsNeighbor;
+         Spot[] mixingSpots = new  Spot[totalTileCount];
+         var spotOrdered = _spots.GroupBy(s => s.Proper);
+         int countPercent = 0;
+         foreach (var spots in spotOrdered)
+         {
+            countPercent += spots.Key.Percent;
+            if (countPercent < 70)
+            {
+               if (spots.Key.Percent < 25)
+               {
+                  // Без соседей одного цвета
+                  mixingListWithoutNeighborSomeColor(spots.ToList(), totalTileCount,ref mixingSpots);
+               }
+               else
+               {
+                  mixingListAllRandom(spots.ToList(), totalTileCount, ref mixingSpots);
+               }
+            }
+            else
+            {
+               mixingListNear100(spots.ToList(), totalTileCount, ref mixingSpots);
+            }            
+         }
+         return mixingSpots.ToList();
+      }
+
+      private void mixingListWithoutNeighborSomeColor(List<Spot> spots, int Count, ref Spot[] mixSpots)
+      {          
+         Spot temp;         
          bool mayNext = false;
-         foreach (var spot in spotsReal)
+         foreach (var spot in spots)
          {
             do
             {
-               int number = _rnd.Next(totalCount - 1);
-               temp = mixSpots[number];
-               if (temp == null)
+               int number = _rnd.Next(Count - 1); // случайное место для размещения зоны покраски
+               temp = mixSpots[number]; // получение спота в этом расположении
+               if (temp == null) // если там никого нет
                {
                   mayNext = true;
-                  // проверка соседей
-                  if (number < totalCount - 1)
-                  {
-                     upstairsNeighbor = mixSpots[number + 1];
-                     if (upstairsNeighbor != null)
-                     {
-                        mayNext = false;
-                     }
+                  // проверка соседа сверху
+                  if (number < (Count - 1))
+                  {                     
+                     mayNext = checkNeighborSomeColor(mixSpots[number + 1],  spot);
+                     if (!mayNext) continue;
                   }
+                  // проверка соседа снизу
                   if (number > 0)
-                  {
-                     downstairsNeighbor = mixSpots[number - 1];
-                     if (downstairsNeighbor != null)
-                     {
-                        mayNext = false;
-                     }
+                  {                     
+                     mayNext = checkNeighborSomeColor(mixSpots[number - 1], spot);
+                     if (!mayNext) continue;
                   }
+                  // Проверка соседа справа                  
+                  int indexRightHandMan = number - _ysize;
+                  if (indexRightHandMan >=0)
+                  {
+                     mayNext = checkNeighborSomeColor(mixSpots[indexRightHandMan], spot);
+                     if (!mayNext) continue;
+                  }
+                  int indexLeftHandMan = number + _ysize;
+                  if (indexLeftHandMan <= (Count - 1))
+                  {
+                     mayNext = checkNeighborSomeColor(mixSpots[indexLeftHandMan], spot);
+                     if (!mayNext) continue;
+                  }
+
                   if (mayNext)
                   {
                      mixSpots[number] = spot;
@@ -281,62 +316,74 @@ namespace AlbumPanelColorTiles.Model
                   mayNext = false;
                }
             } while (!mayNext);
-         }
-         return mixSpots.ToList();
+         }         
       }
-      private List<Spot> mixingListUpstairsNeighbor(List<Spot> spotsReal, int totalCount)
-      {         
-         Spot[] mixSpots = new Spot[totalCount];
-         Spot temp;
-         Spot upstairsNeighbor;
-         //Spot downstairsNeighbor;
-         bool mayNext = false;
-         foreach (var spot in spotsReal)
-         {            
-            do
-            {
-               int number = _rnd.Next(totalCount - 1);
-               temp = mixSpots[number];               
-               if (temp == null)
-               {
-                  mayNext = true;
-                  // проверка соседей
-                  if (number < totalCount - 1)
-                  {
-                     upstairsNeighbor = mixSpots[number + 1];
-                     if (upstairsNeighbor != null)
-                     {
-                        mayNext = false;
-                     }
-                  }
-                  //if (number > 0)
-                  //{
-                  //   downstairsNeighbor = mixSpots[number - 1];
-                  //   if (downstairsNeighbor != null)
-                  //   {
-                  //      mayNext = false;
-                  //   }
-                  //}
-                  if (mayNext)
-                  {
-                     mixSpots[number] = spot;
-                  }                   
-               }
-               else
-               {                  
-                  mayNext = false;
-               }             
-            } while (!mayNext);
-         }
-         return mixSpots.ToList();
-      }
-      private List<Spot> mixingListNear100(List<Spot> spotsReal, int totalCount)
+
+      private static bool checkNeighborSomeColor(Spot neighbor, Spot spot)
       {
-         Spot[] mixSpots = new Spot[totalCount];
-         Spot temp;
-         foreach (var spot in spotsReal)
+         if (neighbor != null)
          {
-            int number = _rnd.Next(totalCount - 1);
+            // если сосед того же цвето, то поиск нового места проживания)
+            if (neighbor.Proper.IdLayer == spot.Proper.IdLayer)
+            {
+               return false;
+            }
+         }
+         return true;
+      }
+
+      //private List<Spot> mixingListUpstairsNeighbor(List<Spot> spotsReal, int totalCount)
+      //{         
+      //   Spot[] mixSpots = new Spot[totalCount];
+      //   Spot temp;
+      //   Spot upstairsNeighbor;
+      //   //Spot downstairsNeighbor;
+      //   bool mayNext = false;
+      //   foreach (var spot in spotsReal)
+      //   {            
+      //      do
+      //      {
+      //         int number = _rnd.Next(totalCount - 1);
+      //         temp = mixSpots[number];               
+      //         if (temp == null)
+      //         {
+      //            mayNext = true;
+      //            // проверка соседей
+      //            if (number < totalCount - 1)
+      //            {
+      //               upstairsNeighbor = mixSpots[number + 1];
+      //               if (upstairsNeighbor != null)
+      //               {
+      //                  mayNext = false;
+      //               }
+      //            }
+      //            //if (number > 0)
+      //            //{
+      //            //   downstairsNeighbor = mixSpots[number - 1];
+      //            //   if (downstairsNeighbor != null)
+      //            //   {
+      //            //      mayNext = false;
+      //            //   }
+      //            //}
+      //            if (mayNext)
+      //            {
+      //               mixSpots[number] = spot;
+      //            }                   
+      //         }
+      //         else
+      //         {                  
+      //            mayNext = false;
+      //         }             
+      //      } while (!mayNext);
+      //   }
+      //   return mixSpots.ToList();
+      //}
+      private void mixingListNear100(List<Spot> spots, int Count, ref Spot[] mixSpots)
+      {         
+         Spot temp;
+         foreach (var spot in spots)
+         {
+            int number = _rnd.Next(Count - 1);
             do
             {
                temp = mixSpots[number];
@@ -347,32 +394,30 @@ namespace AlbumPanelColorTiles.Model
                else
                {
                   number++;
-                  if (number >= totalCount)
+                  if (number >= Count)
                   {
-                     number = _rnd.Next(totalCount - 1);
+                     number = _rnd.Next(Count - 1);
                   }                  
                }
             } while (temp != null);
-         }
-         return mixSpots.ToList();
+         }         
       }
-      private List<Spot> mixingListAllRandom(List<Spot> spotsReal, int totalCount)
-      {
-         Spot[] mixSpots = new Spot[totalCount];
+
+      private void mixingListAllRandom(List<Spot> spots, int Count, ref Spot[] mixSpots)
+      {         
          Spot temp;                  
-         foreach (var spot in spotsReal)
+         foreach (var spot in spots)
          {
             do
             {
-               int number = _rnd.Next(totalCount - 1);
+               int number = _rnd.Next(Count - 1);
                temp = mixSpots[number];
                if (temp == null)
                {
                   mixSpots[number] = spot;
                }
             } while (temp != null);
-         }
-         return mixSpots.ToList();
+         }         
       }      
 
       private Dictionary<string, RandomPaint> getAllProperPaints()
