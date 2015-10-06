@@ -95,70 +95,52 @@ namespace AlbumPanelColorTiles.Model
       // Огонь
       private void FormProper_Fire(object sender, EventArgs e)
       {
-         // Удаление предыдущей покраски
-         if (_spots.Count>0)
+         try
          {
-            deleteSpots(_spots);
-         }       
+            // Удаление предыдущей покраски
+            if (_spots.Count > 0)
+            {
+               deleteSpots(_spots);
+            }           
+            
+            List<RandomPaint> propers = ((Dictionary<string, RandomPaint>)sender).Values.ToList();
+            _xsize = Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
+            _ysize = Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
+            int totalTileCount = _xsize * _ysize;
+            int distributedCount = 0;            
+            foreach (var proper in propers)
+            {
+               proper.TailCount = Convert.ToInt32(proper.Percent * totalTileCount / 100d);
+               distributedCount += proper.TailCount;
+            }
 
-         // Красим участок
-         Dictionary<string, RandomPaint> trackPropers = sender as Dictionary<string, RandomPaint>;
-         List<RandomPaint> propers = trackPropers.Values.ToList(); 
-         _xsize = Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
-         _ysize = Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
-         int totalTileCount = _xsize * _ysize;
-         int distributedCount = 0;
-         int emptySpotsCount =0;         
-         foreach (var proper in propers)
-         {
-            proper.TailCount = Convert.ToInt32(proper.Percent * totalTileCount / 100d);
-            distributedCount += proper.TailCount;            
-         }         
+            if (distributedCount > totalTileCount)
+            {
+               RandomPaint lastProper = propers.Last();
+               lastProper.TailCount -= distributedCount - totalTileCount;
+            }            
 
-         if (distributedCount > totalTileCount)
-         {
-            RandomPaint lastProper = propers.Last();
-            lastProper.TailCount -= distributedCount - totalTileCount;
+            // Получение общего списка распределения покроаски
+            _spots = new List<Spot>();
+            // Сортировка по процентам (начиная с меньшего)
+            var propersOrdered = propers.OrderBy(p => p.Percent);
+            foreach (var proper in propersOrdered)
+            {
+               _spots.AddRange(Spot.GetSpots(proper));
+            }
+
+            // Перемешивание списка
+            List<Spot> mixSpots = mixingSpots(_spots, totalTileCount);            
+
+            // Вставка блоков зон 
+            placementSpots(mixSpots);
+
+            _ed.Regen();
          }
-         else
+         catch (System.Exception ex)
          {
-            emptySpotsCount = totalTileCount - distributedCount;
+            _ed.WriteMessage("\n{0}",ex.ToString());
          }
-
-         // Получение общего списка распределения покроаски
-         _spots = new List<Spot>();
-         var propersOrdered = propers.OrderBy(p => p.Percent);
-         foreach (var proper in propersOrdered)
-         {
-            _spots.AddRange(Spot.GetSpots(proper));
-         }
-
-         // Перемешивание списка
-         List<Spot> mixSpots = mixingSpots(_spots, totalTileCount);         
-
-         //mixSpots = mixingGaussian(_spots, totalTileCount);          
-         //var distributedPercent = distributedCount * 100d / totalTileCount;
-         //if (distributedPercent > 60)
-         //{
-         //   mixSpots = mixingListNear100(_spots, totalTileCount);
-         //}
-         ////else if (distributedPercent <= 10)
-         ////{
-         ////   mixSpots = mixingListUpAndDownstairsNeighbor(_spots, totalTileCount);
-         ////}
-         //else if (distributedPercent < 50)
-         //{
-         //   mixSpots = mixingListUpstairsNeighbor(_spots, totalTileCount);
-         //}         
-         //else
-         //{
-         //   mixSpots = mixingListAllRandom(_spots, totalTileCount);
-         //}
-
-         // Вставка блоков зон 
-         placementSpots(mixSpots);
-
-         _ed.Regen(); 
       }      
 
       private void deleteSpots(List<Spot> spots)
@@ -204,10 +186,8 @@ namespace AlbumPanelColorTiles.Model
                int x, y;
                foreach (var spot in spots)
                {
-                  if (HostApplicationServices.Current.UserBreak())
-                  {
-                     break;
-                  }                     
+                  if (HostApplicationServices.Current.UserBreak())                  
+                     break;                                       
 
                   if (spot != null)
                   {
