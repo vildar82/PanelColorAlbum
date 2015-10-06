@@ -107,18 +107,22 @@ namespace AlbumPanelColorTiles.Model
             _xsize = Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
             _ysize = Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
             int totalTileCount = _xsize * _ysize;
+            Log.Info("totalTileCount = {0}, xsize={1}, ysize={2}", totalTileCount, _xsize, _ysize);
             int distributedCount = 0;            
             foreach (var proper in propers)
             {
                proper.TailCount = Convert.ToInt32(proper.Percent * totalTileCount / 100d);
                distributedCount += proper.TailCount;
+               Log.Info("Распределяемый цвет {0}, процентов {1}, штук {2}", proper.LayerName, proper.Percent, proper.TailCount);
             }
 
             if (distributedCount > totalTileCount)
             {
                RandomPaint lastProper = propers.Last();
                lastProper.TailCount -= distributedCount - totalTileCount;
-            }            
+               Log.Info("Уменьшено кол распр цвета {0} на штук {1}", lastProper.LayerName, (distributedCount - totalTileCount));
+            }
+            Log.Info("distributedCount = {0}",distributedCount); 
 
             // Получение общего списка распределения покроаски
             _spots = new List<Spot>();
@@ -140,6 +144,7 @@ namespace AlbumPanelColorTiles.Model
          catch (System.Exception ex)
          {
             _ed.WriteMessage("\n{0}",ex.ToString());
+            Log.Error(ex, "FormProper_Fire()");
          }
       }      
 
@@ -183,14 +188,14 @@ namespace AlbumPanelColorTiles.Model
                _idColCopy = new ObjectIdCollection();
                _idColCopy.Add(_idBlRefColorAreaTemplate);               
 
-               int x, y;
+               int x, y;               
                foreach (var spot in spots)
                {
                   if (HostApplicationServices.Current.UserBreak())                  
                      break;                                       
 
                   if (spot != null)
-                  {
+                  {                     
                      int i = spot.Index;
                      x = i / _ysize;
                      y = i % _ysize;                     
