@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Model
 {
@@ -133,7 +134,8 @@ namespace AlbumPanelColorTiles.Model
          }
 
          // Перемешивание списка
-         List<Spot> mixSpots = mixingSpots(_spots, totalTileCount);
+         List<Spot> mixSpots = mixingSpots(_spots, totalTileCount);         
+
          //mixSpots = mixingGaussian(_spots, totalTileCount);          
          //var distributedPercent = distributedCount * 100d / totalTileCount;
          //if (distributedPercent > 60)
@@ -201,10 +203,15 @@ namespace AlbumPanelColorTiles.Model
 
                int x, y;
                foreach (var spot in spots)
-               {                  
+               {
+                  if (HostApplicationServices.Current.UserBreak())
+                  {
+                     break;
+                  }                     
+
                   if (spot != null)
                   {
-                     int i = spots.IndexOf(spot);
+                     int i = spot.Index;
                      x = i / _ysize;
                      y = i % _ysize;                     
                      insertSpot(spot, x, y, t);                     
@@ -239,8 +246,14 @@ namespace AlbumPanelColorTiles.Model
          spot.IdBlRef = blRefSpot.Id;
       }
 
+      /// <summary>
+      /// Определение индексов зон покраски
+      /// </summary>
+      /// <param name="_spots"></param>
+      /// <param name="totalTileCount"></param>
+      /// <returns>Список зон покраски с записанными индексами</returns>
       private List<Spot> mixingSpots(List<Spot> _spots, int totalTileCount)
-      {
+      {         
          Spot[] mixingSpots = new  Spot[totalTileCount];
          var spotOrdered = _spots.GroupBy(s => s.Proper);
          int countPercent = 0;
@@ -263,8 +276,8 @@ namespace AlbumPanelColorTiles.Model
             {
                mixingListNear100(spots.ToList(), totalTileCount, ref mixingSpots);
             }            
-         }
-         return mixingSpots.ToList();
+         }         
+         return mixingSpots.Where(s => s != null).ToList();
       }
 
       private void mixingListWithoutNeighborSomeColor(List<Spot> spots, int Count, ref Spot[] mixSpots)
@@ -309,6 +322,7 @@ namespace AlbumPanelColorTiles.Model
                   if (mayNext)
                   {
                      mixSpots[number] = spot;
+                     spot.Index = number;
                   }
                }
                else
@@ -390,6 +404,7 @@ namespace AlbumPanelColorTiles.Model
                if (temp == null)
                {
                   mixSpots[number] = spot;
+                  spot.Index = number;
                }
                else
                {
@@ -415,6 +430,7 @@ namespace AlbumPanelColorTiles.Model
                if (temp == null)
                {
                   mixSpots[number] = spot;
+                  spot.Index = number;
                }
             } while (temp != null);
          }         

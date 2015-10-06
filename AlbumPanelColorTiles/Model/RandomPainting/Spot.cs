@@ -12,9 +12,16 @@ namespace AlbumPanelColorTiles.Model
    {
       private RandomPaint _proper;
       private ObjectId _idBlRef;
+      private int _index;
 
       public RandomPaint Proper { get { return _proper; } }
       public ObjectId IdBlRef { get { return _idBlRef; } set { _idBlRef = value; } }
+
+      public int Index
+      {
+         get { return _index; }
+         set { _index = value; }
+      }
 
       public Spot (RandomPaint proper)
       {
