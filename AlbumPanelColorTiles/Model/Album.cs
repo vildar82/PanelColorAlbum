@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AlbumPanelColorTiles.Checks;
@@ -17,8 +16,6 @@ namespace AlbumPanelColorTiles.Model
    // Альбом колористических решений.
    public class Album
    {
-      #region Private Fields
-
       // Набор цветов используемых в альбоме.
       private static List<Paint> _colors;
 
@@ -28,16 +25,14 @@ namespace AlbumPanelColorTiles.Model
       private string _abbreviateProject;
 
       private string _albumDir;
+
       //private ColorAreaModel _colorAreaModel;
-      List<ColorArea> _colorAreas; // Зоны покраски
+      private List<ColorArea> _colorAreas; // Зоны покраски
+
       private Database _db;
       private Document _doc;
       private List<MarkSbPanel> _marksSB;
       private SheetsSet _sheetsSet;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       public Album()
       {
@@ -48,10 +43,6 @@ namespace AlbumPanelColorTiles.Model
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
          _abbreviateProject = abbreviateNameProject();
       }
-
-      #endregion Public Constructors
-
-      #region Public Properties
 
       public static Options Options
       {
@@ -69,10 +60,6 @@ namespace AlbumPanelColorTiles.Model
       public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
       {
@@ -244,7 +231,7 @@ namespace AlbumPanelColorTiles.Model
          if (!colorAreasCheck.SequenceEqual(_colorAreas))
          {
             throw new System.Exception("Изменились зоны покраски. Рекомендуется выполнить повторную покраску панелей командой PaintPanels.");
-         }         
+         }
 
          // Проверка панелей
          // Определение покраски панелей.
@@ -345,10 +332,6 @@ namespace AlbumPanelColorTiles.Model
          _marksSB = null;
          _sheetsSet = null;
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       // Получение слоя для марок (АР_Марки)
       private static string GetLayerForMark()
@@ -506,7 +489,5 @@ namespace AlbumPanelColorTiles.Model
          }
          catch { }
       }
-
-      #endregion Private Methods
    }
 }

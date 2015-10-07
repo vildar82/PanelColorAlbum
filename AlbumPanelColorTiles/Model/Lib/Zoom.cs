@@ -7,8 +7,6 @@ namespace Autodesk.AutoCAD.DatabaseServices
 {
    public static class ViewTableRecordExtension
    {
-      #region Public Methods
-
       public static Matrix3d EyeToWorld(this ViewTableRecord view)
       {
          if (view == null)
@@ -24,8 +22,6 @@ namespace Autodesk.AutoCAD.DatabaseServices
       {
          return view.EyeToWorld().Inverse();
       }
-
-      #endregion Public Methods
    }
 }
 
@@ -33,8 +29,6 @@ namespace Autodesk.AutoCAD.EditorInput
 {
    public static class EditorExtension
    {
-      #region Public Methods
-
       public static void Zoom(this Editor ed, Extents3d ext)
       {
          if (ed == null)
@@ -63,7 +57,5 @@ namespace Autodesk.AutoCAD.EditorInput
              new Extents3d(db.Extmin, db.Extmax);
          ed.Zoom(ext);
       }
-
-      #endregion Public Methods
    }
 }

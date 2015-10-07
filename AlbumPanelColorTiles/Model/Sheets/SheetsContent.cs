@@ -12,8 +12,6 @@ namespace AlbumPanelColorTiles.Sheets
    // Листы содержания
    public class SheetsContent
    {
-      #region Private Fields
-
       private readonly int _countSheetsBeforContent = 2;
 
       // кол листов до содержания
@@ -27,10 +25,6 @@ namespace AlbumPanelColorTiles.Sheets
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
 
-      #endregion Private Fields
-
-      #region Public Constructors
-
       public SheetsContent(SheetsSet sheetsSet, BlockFrameFacade blFrameInFacade)
       {
          _sheetsSet = sheetsSet;
@@ -39,10 +33,6 @@ namespace AlbumPanelColorTiles.Sheets
          _blFrameInFacade = blFrameInFacade;
          Contents();
       }
-
-      #endregion Public Constructors
-
-      #region Private Methods
 
       // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
       private static int CalcSheetsContentNumber(int rowsTable, int marksAr)
@@ -267,6 +257,5 @@ namespace AlbumPanelColorTiles.Sheets
          }
          return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;
       }
-      #endregion Private Methods
    }
 }

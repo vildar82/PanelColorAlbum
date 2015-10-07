@@ -7,8 +7,6 @@ namespace AlbumPanelColorTiles.Model
    // Панель Марки АР - вхождение блока на чертеже фасада.
    public class Panel : IEquatable<Panel>
    {
-      #region Private Fields
-
       // Границы блока
       private Extents3d _extents;
 
@@ -24,20 +22,12 @@ namespace AlbumPanelColorTiles.Model
       // Этаж панели
       private Storey _storey;
 
-      #endregion Private Fields
-
-      #region Public Constructors
-
       public Panel(BlockReference blRefPanel)
       {
          _idBlRefSb = blRefPanel.ObjectId;
          _insPt = blRefPanel.Position;
          _extents = blRefPanel.GeometricExtents;
       }
-
-      #endregion Public Constructors
-
-      #region Public Properties
 
       public Extents3d Extents { get { return _extents; } }
 
@@ -52,10 +42,6 @@ namespace AlbumPanelColorTiles.Model
          set { _storey = value; }
       }
 
-      #endregion Public Properties
-
-      #region Public Methods
-
       public bool Equals(Panel other)
       {
          return _insPt.Equals(other._insPt);
@@ -63,7 +49,7 @@ namespace AlbumPanelColorTiles.Model
 
       // Замена вхождения блока СБ на АР
       public void ReplaceBlockSbToAr(MarkArPanel markAr, Transaction t, BlockTableRecord ms)
-      {         
+      {
          var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
          var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
          blRefPanelAr.SetDatabaseDefaults();
@@ -90,7 +76,5 @@ namespace AlbumPanelColorTiles.Model
          //   t.Commit();
          //}
       }
-
-      #endregion Public Methods
    }
 }

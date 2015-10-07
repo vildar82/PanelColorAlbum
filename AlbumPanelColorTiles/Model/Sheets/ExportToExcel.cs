@@ -5,8 +5,6 @@ namespace AlbumPanelColorTiles.Sheets
 {
    public static class ExportToExcel
    {
-      #region Public Methods
-
       public static void Export(SheetsSet sheetsSet, Album album)
       {
          // Експорт списка панелей в ексель.
@@ -45,7 +43,5 @@ namespace AlbumPanelColorTiles.Sheets
          // Лучше сохранить файл и закрыть!!!???
          excelApp.Visible = true;
       }
-
-      #endregion Public Methods
    }
 }

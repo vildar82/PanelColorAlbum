@@ -5,17 +5,11 @@ namespace AlbumPanelColorTiles.Model
 {
    public class TileCalc
    {
-      #region Private Fields
-
       private static double _oneTileArea;
       private string _colorMark;
       private int _count;
       private Color _pattern;
       private double _totalArea;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       public TileCalc(string colorMark, int count, Color pattern)
       {
@@ -23,10 +17,6 @@ namespace AlbumPanelColorTiles.Model
          _count = count;
          _pattern = pattern;
       }
-
-      #endregion Public Constructors
-
-      #region Public Properties
 
       public static double OneTileArea
       {
@@ -55,7 +45,5 @@ namespace AlbumPanelColorTiles.Model
             return _totalArea;
          }
       }
-
-      #endregion Public Properties
    }
 }

@@ -7,8 +7,6 @@ namespace AlbumPanelColorTiles.Lib
 {
    public static class Blocks
    {
-      #region Public Methods
-
       /// <summary>
       /// Смена имен листов. Лист с с именем name1 станет name2, и наоборот.
       /// </summary>
@@ -161,7 +159,5 @@ namespace AlbumPanelColorTiles.Lib
              blk1.Position.IsEqualTo(blk2.Position, tol) &&
              blk1.ScaleFactors.IsEqualTo(blk2.ScaleFactors, tol);
       }
-
-      #endregion Public Methods
    }
 }

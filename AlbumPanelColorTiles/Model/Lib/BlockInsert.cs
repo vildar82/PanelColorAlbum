@@ -11,7 +11,22 @@ namespace AlbumPanelColorTiles.Lib
 {
    public static class BlockInsert
    {
-      #region Public Methods
+      /// <summary>
+      /// Копирование блока из файла шаблона.
+      /// </summary>
+      /// <param name="blName">Имя блока</param>
+      /// <param name="db">База в которую копировать</param>
+      /// <exception cref="Exception">Не найден файл-шаблон с блоками</exception>
+      public static void CopyBlockFromTemplate(string blName, Database db)
+      {
+         // Копирование определения блока из файла с блоками.
+         string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Album.Options.TemplateBlocksAKRFileName);
+         if (!File.Exists(fileBlocksTemplate))
+         {
+            throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
+         }
+         Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
+      }
 
       public static void Insert(string blName)
       {
@@ -46,27 +61,6 @@ namespace AlbumPanelColorTiles.Lib
          }
       }
 
-      /// <summary>
-      /// Копирование блока из файла шаблона.
-      /// </summary>
-      /// <param name="blName">Имя блока</param>
-      /// <param name="db">База в которую копировать</param>
-      /// <exception cref="Exception">Не найден файл-шаблон с блоками</exception>
-      public static void CopyBlockFromTemplate(string blName, Database db)
-      {
-         // Копирование определения блока из файла с блоками.
-         string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Album.Options.TemplateBlocksAKRFileName);
-         if (!File.Exists(fileBlocksTemplate))
-         {
-            throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
-         }
-         Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
-      }
-
-      #endregion Public Methods
-
-      #region Private Methods
-
       private static void AddAttributes(BlockReference blRef, BlockTableRecord btrBl, Transaction t)
       {
          foreach (ObjectId idEnt in btrBl)
@@ -87,7 +81,5 @@ namespace AlbumPanelColorTiles.Lib
             }
          }
       }
-
-      #endregion Private Methods
    }
 }

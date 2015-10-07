@@ -9,8 +9,6 @@ namespace AlbumPanelColorTiles.Checks
 {
    public class Inspector
    {
-      #region Private Fields
-
       private Database _db;
       private Document _doc;
       private Editor _ed;
@@ -19,20 +17,12 @@ namespace AlbumPanelColorTiles.Checks
       // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
       private List<ErrorObject> _notPaintedTilesInMarkAR;
 
-      #endregion Private Fields
-
-      #region Public Constructors
-
       public Inspector()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
          _ed = _doc.Editor;
       }
-
-      #endregion Public Constructors
-
-      #region Public Methods
 
       // Проверка, все ли плитки покрашены
       public bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)
@@ -94,10 +84,6 @@ namespace AlbumPanelColorTiles.Checks
          return res;
       }
 
-      #endregion Public Methods
-
-      #region Private Methods
-
       // Проверка наличия определений блоков Марки АР
       private bool CheckBtrMarkAr(BlockTable bt, Transaction t)
       {
@@ -114,7 +100,5 @@ namespace AlbumPanelColorTiles.Checks
          }
          return res;
       }
-
-      #endregion Private Methods
    }
 }

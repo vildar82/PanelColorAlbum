@@ -10,16 +10,10 @@ namespace AlbumPanelColorTiles.Plot
 {
    public class MultiSheetsPdf
    {
-      #region Private Fields
-
       private const string LOG = "publish.log";
       private string dwgFile, pdfFile, dsdFile, outputDir;
       private IEnumerable<Layout> layouts;
       private int sheetNum;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       public MultiSheetsPdf(string pdfFile, IEnumerable<Layout> layouts)
       {
@@ -30,10 +24,6 @@ namespace AlbumPanelColorTiles.Plot
          this.dsdFile = Path.ChangeExtension(this.pdfFile, "dsd");
          this.layouts = layouts;
       }
-
-      #endregion Public Constructors
-
-      #region Public Methods
 
       public void Publish()
       {
@@ -46,10 +36,6 @@ namespace AlbumPanelColorTiles.Plot
             File.Delete(this.dsdFile);
          }
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       private DsdEntryCollection CreateDsdEntryCollection(IEnumerable<Layout> layouts)
       {
@@ -145,7 +131,5 @@ namespace AlbumPanelColorTiles.Plot
             return true;
          }
       }
-
-      #endregion Private Methods
    }
 }

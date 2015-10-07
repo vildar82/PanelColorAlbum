@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AlbumPanelColorTiles
 {
    public static class Log
    {
-      #region Private Fields
-
       private static string _appmsg = "Plugin AlbumPanelColorTiles ";
-
-      #endregion Private Fields
-
-      #region Public Methods
 
       /// <summary>
       /// Debug: сообщения отладки, профилирования. В production системе обычно сообщения этого уровня включаются при первоначальном запуске системы или для поиска узких мест (bottleneck-ов).
@@ -110,7 +100,5 @@ namespace AlbumPanelColorTiles
       {
          AutoCAD_PIK_Manager.Log.Warn(ex, _appmsg + message, args);
       }
-
-      #endregion Public Methods
    }
 }

@@ -2,13 +2,6 @@
 {
    public class Options
    {
-      #region Public Fields
-
-      // Размеры плитки
-      public int TileLenght = 288; // Длина плитки
-      public int TileHeight = 88; // Высота плитки
-      public int TileSeam = 12; // Высота плитки
-
       //
       // Имена блоков
       //
@@ -19,6 +12,7 @@
       public string BlockFrameName = "АКР_Рамка";
 
       public string BlockPanelPrefixName = "АКР_Панель_";
+
       public string BlockTileName = "АКР_Плитка";
 
       // Суффикс для торцевых панелей слева
@@ -73,6 +67,12 @@
       /// </summary>
       public string TemplateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";
 
-      #endregion Public Fields
+      public int TileHeight = 88;
+
+      // Размеры плитки
+      public int TileLenght = 288; // Длина плитки
+
+      // Высота плитки
+      public int TileSeam = 12; // Высота плитки
    }
 }

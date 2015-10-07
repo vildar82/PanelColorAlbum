@@ -10,18 +10,12 @@ namespace AlbumPanelColorTiles.Sheets
    // Листы Марки СБ
    public class SheetMarkSB : IComparable<SheetMarkSB>
    {
-      #region Private Fields
-
       private string _fileMarkSB;
 
       // Файл панели Марки СБ с листами Маркок АР.
       private MarkSbPanel _markSB;
 
       private List<SheetMarkAr> _sheetsMarkAR;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       // Конструктор
       public SheetMarkSB(MarkSbPanel markSB)
@@ -38,17 +32,9 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetsMarkAR.Sort();
       }
 
-      #endregion Public Constructors
-
-      #region Public Properties
-
       public string MarkSB { get { return _markSB.MarkSb; } }
 
       public List<SheetMarkAr> SheetsMarkAR { get { return _sheetsMarkAR; } }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       public int CompareTo(SheetMarkSB other)
       {
@@ -98,10 +84,6 @@ namespace AlbumPanelColorTiles.Sheets
             dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
          }
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       // Копирование определений блоков Марок АР в чертеж листов Марки СБ.
       private void CopyBtrMarksARToSheetMarkSB(Database dbMarkSB)
@@ -162,7 +144,5 @@ namespace AlbumPanelColorTiles.Sheets
             t.Commit();
          }
       }
-
-      #endregion Private Methods
    }
 }

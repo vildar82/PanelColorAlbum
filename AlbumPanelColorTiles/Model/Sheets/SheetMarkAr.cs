@@ -10,8 +10,6 @@ namespace AlbumPanelColorTiles.Sheets
    // Лист Марки АР (на фасаде и в форме)
    public class SheetMarkAr : IComparable<SheetMarkAr>
    {
-      #region Private Fields
-
       // Данные для заполнения штампа
       private readonly string _sheetName;
 
@@ -30,19 +28,11 @@ namespace AlbumPanelColorTiles.Sheets
       private int _sheetNumber;
       private string _sheetNumberInForm;
 
-      #endregion Private Fields
-
-      #region Public Constructors
-
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
          _sheetName = string.Format("Наружная стеновая панель {0}", MarkArDocumentation);
       }
-
-      #endregion Public Constructors
-
-      #region Public Properties
 
       public ObjectId IdBtrArSheet { get { return _idBtrArSheet; } set { _idBtrArSheet = value; } }
 
@@ -86,10 +76,6 @@ namespace AlbumPanelColorTiles.Sheets
          get { return _sheetNumberInForm; }
          set { _sheetNumberInForm = value; }
       }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       public int CompareTo(SheetMarkAr other)
       {
@@ -151,10 +137,6 @@ namespace AlbumPanelColorTiles.Sheets
             t.Commit();
          }
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       private void CheckTableExtents(Extents3d extentsTable, Extents3d extentsViewPort, ObjectId idTable, Transaction t)
       {
@@ -393,7 +375,5 @@ namespace AlbumPanelColorTiles.Sheets
          vp.Dispose();
          return idBtrLayout;
       }
-
-      #endregion Private Methods
    }
 }

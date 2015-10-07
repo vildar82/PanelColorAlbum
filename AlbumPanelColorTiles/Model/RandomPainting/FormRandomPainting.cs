@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.EditorInput;
 
@@ -13,20 +10,16 @@ namespace AlbumPanelColorTiles.Model
 {
    public partial class FormRandomPainting : Form
    {
-      private Point mouseOffset;
-      private bool isMouseDown = false;
+      private const int DISTANCE_BETWEEN_GROUP = 78;
       private Dictionary<string, RandomPaint> _allPropers;
-      private Dictionary<string, RandomPaint> _trackPropers;
       private Dictionary<string, GroupBox> _groupBoxs;
       private Point _location;
       private RandomPainting _randomPaintingService;
-      private const int DISTANCE_BETWEEN_GROUP = 78;
+      private Dictionary<string, RandomPaint> _trackPropers;
+      private bool isMouseDown = false;
+      private Point mouseOffset;
 
-      public Dictionary<string, RandomPaint> TrackPropers { get { return _trackPropers; } }
-
-      public event EventHandler Fire = delegate { };      
-
-      public FormRandomPainting(Dictionary<string, RandomPaint> propers, 
+      public FormRandomPainting(Dictionary<string, RandomPaint> propers,
          RandomPainting randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
       {
          InitializeComponent();
@@ -37,56 +30,24 @@ namespace AlbumPanelColorTiles.Model
          _groupBoxs = new Dictionary<string, GroupBox>();
          // Ключ у всех - имя слоя.
          // Восстановление набора распределяемых цветов
-         restoreTracks(trackPropers);                  
+         restoreTracks(trackPropers);
          comboBoxColor.DataSource = _allPropers.Values.ToList();
          comboBoxColor.DisplayMember = "LayerName";
       }
 
-      private void restoreTracks(Dictionary<string, RandomPaint> trackPropers)
+      public event EventHandler Fire = delegate { };
+
+      public Dictionary<string, RandomPaint> TrackPropers { get { return _trackPropers; } }
+
+      // Esc - сclose
+      protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
       {
-         _trackPropers = new Dictionary<string, RandomPaint>();
-         if (trackPropers != null)
+         if (keyData == Keys.Escape)
          {
-            foreach (var item in trackPropers)
-            {
-               if (_allPropers.ContainsKey(item.Key))
-               {
-                  addTrackProper(item.Value);
-               }
-            }
+            this.Close();
+            return true;
          }
-      }
-
-      private void comboBoxColor_DrawItem(object sender, DrawItemEventArgs e)
-      {
-         e.DrawBackground();
-         RandomPaint proper = ((ComboBox)sender).Items[e.Index] as RandomPaint;
-         // Покраска                                    
-         e.Graphics.FillRectangle(new SolidBrush(proper.Color), e.Bounds);
-         // Текст
-         e.Graphics.DrawString(proper.LayerName, ((Control)sender).Font, Brushes.Black, e.Bounds.X, e.Bounds.Y);
-      }
-      private void comboBoxColor_SelectedIndexChanged(object sender, EventArgs e)
-      {
-         RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
-         comboBoxColor.BackColor = proper.Color;
-      }
-
-      private void buttonAdd_Click(object sender, EventArgs e)
-      {
-         RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
-         // Добавление набора с ползунком 
-         addTrackProper(proper);
-      }
-
-      private void addTrackProper(RandomPaint proper)
-      {
-         // Проверка нет ли уже такого слоя в распределении
-         if (!_trackPropers.ContainsKey(proper.LayerName))
-         {
-            _trackPropers.Add(proper.LayerName, proper);
-            AddControls(proper);
-         }
+         return base.ProcessCmdKey(ref msg, keyData);
       }
 
       private void AddControls(RandomPaint proper)
@@ -101,33 +62,33 @@ namespace AlbumPanelColorTiles.Model
          groupBox.SuspendLayout();
          ((ISupportInitialize)(trackBar)).BeginInit();
          SuspendLayout();
-         // groupBox         
+         // groupBox
          groupBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
          groupBox.Tag = tag;
          groupBox.Name = "groupBox" + tag;
          groupBox.Size = new Size(378, 72);
          groupBox.TabStop = false;
-         groupBox.Text = tag;         
+         groupBox.Text = tag;
          groupBox.Controls.Add(textBox);
          groupBox.Controls.Add(buttonDel);
          groupBox.Controls.Add(trackBar);
          groupBox.Controls.Add(label);
          groupBox.Enabled = true;
          groupBox.Visible = true;
-         groupBox.Location = _location;         
+         groupBox.Location = _location;
 
          shiftLocation(DISTANCE_BETWEEN_GROUP);
 
-         // textbox % 
+         // textbox %
          textBox.Anchor = AnchorStyles.Right;
          textBox.Font = new Font("Microsoft Sans Serif", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
          textBox.Location = new Point(291, 28);
          textBox.Name = "textBox" + tag;
-         textBox.Size = new Size(43, 24);         
+         textBox.Size = new Size(43, 24);
          textBox.Tag = tag;
-         textBox.Text = proper.Percent.ToString(); 
-         // buttonDel         
-         buttonDel.Anchor = AnchorStyles.Right;         
+         textBox.Text = proper.Percent.ToString();
+         // buttonDel
+         buttonDel.Anchor = AnchorStyles.Right;
          buttonDel.BackgroundImage = Properties.Resources.delete;
          buttonDel.BackgroundImageLayout = ImageLayout.Stretch;
          buttonDel.Location = new Point(344, 27);
@@ -135,8 +96,8 @@ namespace AlbumPanelColorTiles.Model
          buttonDel.Size = new Size(28, 28);
          buttonDel.Text = "-";
          buttonDel.UseVisualStyleBackColor = true;
-         buttonDel.Tag = tag;         
-         // trackBar         
+         buttonDel.Tag = tag;
+         // trackBar
          trackBar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
          trackBar.BackColor = proper.Color;
          trackBar.Location = new Point(12, 19);
@@ -145,7 +106,7 @@ namespace AlbumPanelColorTiles.Model
          trackBar.TickStyle = TickStyle.Both;
          trackBar.Tag = tag;
          trackBar.Maximum = 100;
-         trackBar.Value = proper.Percent;       
+         trackBar.Value = proper.Percent;
          // Label
          label.AutoSize = true;
          label.Location = new Point(301, 12);
@@ -164,17 +125,21 @@ namespace AlbumPanelColorTiles.Model
          _groupBoxs.Add(proper.LayerName, groupBox);
       }
 
-      // Сдвиг точки вставуки трэка на следующую позицию
-      private void shiftLocation(int distance)
+      private void addTrackProper(RandomPaint proper)
       {
-         _location.Y += distance;
-         // Проверка размера формы
-         if (this.Height < (_location.Y + 40))
+         // Проверка нет ли уже такого слоя в распределении
+         if (!_trackPropers.ContainsKey(proper.LayerName))
          {
-            this.Height = _location.Y + 40;
-            buttonDraw.Location = new Point(buttonDraw.Location.X, this.Height - 38); 
-            buttonSelect.Location = new Point(buttonSelect.Location.X, this.Height - 28);
+            _trackPropers.Add(proper.LayerName, proper);
+            AddControls(proper);
          }
+      }
+
+      private void buttonAdd_Click(object sender, EventArgs e)
+      {
+         RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
+         // Добавление набора с ползунком
+         addTrackProper(proper);
       }
 
       // Удаление трека
@@ -195,61 +160,33 @@ namespace AlbumPanelColorTiles.Model
          shiftLocation(-DISTANCE_BETWEEN_GROUP);
       }
 
-      private void trackBar_ValueChanged(object sender, EventArgs e)
+      private void buttonDraw_Click(object sender, EventArgs e)
       {
-         // Распределяемый трек
-         TrackBar trackBar = (TrackBar)sender;
-         RandomPaint proper = _trackPropers[(string)trackBar.Tag];
-         int value = getCorrectValue(proper, trackBar.Value);
-         proper.Percent = value;
-         trackBar.Value = value;
-         // Подпись процента в TextBox
-         setPercentToTextBox(proper);
+         Fire(_trackPropers, e);
       }
 
-      private void TextBox_TextChanged(object sender, EventArgs e)
+      private void buttonSelect_Click(object sender, EventArgs e)
       {
-         TextBox textBox = (TextBox)sender;
-         string tag = (string)textBox.Tag;
-         RandomPaint proper = _trackPropers[tag];
-         int val;
-         if (int.TryParse(textBox.Text, out val))
+         using (EditorUserInteraction UI = _randomPaintingService.Ed.StartUserInteraction(this))
          {
-            val = getCorrectValue(proper, val);
-            proper.Percent = val;
-            GroupBox groupBox = _groupBoxs[tag];
-            TrackBar trackBar = groupBox.Controls.Find("trackBar" + tag, false).First() as TrackBar;
-            trackBar.Value = val;
-            setPercentToTextBox(proper);
+            _randomPaintingService.PromptExtents();
          }
       }
 
-      // Получение корректного нового значения процента (чтобы не превышалось 100% распределения)
-      private int getCorrectValue(RandomPaint proper, int newValue)
+      private void comboBoxColor_DrawItem(object sender, DrawItemEventArgs e)
       {
-         int delta = newValue - proper.Percent;
-         int value = newValue;
-         // Нельзя распределить больше 100%
-         if (delta > 0)
-         {
-            int oldDistributedPercent = distributedPercent();
-            int newDistributedPercent = oldDistributedPercent + delta;
-            if (newDistributedPercent >= 100)
-            {
-               value = 100 - oldDistributedPercent + proper.Percent;
-               return value;
-            }
-         }
-         return value;
+         e.DrawBackground();
+         RandomPaint proper = ((ComboBox)sender).Items[e.Index] as RandomPaint;
+         // Покраска
+         e.Graphics.FillRectangle(new SolidBrush(proper.Color), e.Bounds);
+         // Текст
+         e.Graphics.DrawString(proper.LayerName, ((Control)sender).Font, Brushes.Black, e.Bounds.X, e.Bounds.Y);
       }
 
-      // Запись текущего значения процента в текстбокс
-      private void setPercentToTextBox(RandomPaint proper)
+      private void comboBoxColor_SelectedIndexChanged(object sender, EventArgs e)
       {
-         GroupBox groupBox = _groupBoxs[proper.LayerName];
-         string tag = (string)groupBox.Tag;
-         TextBox textBox = groupBox.Controls.Find("textBox" + tag, false).First() as TextBox;
-         textBox.Text = proper.Percent.ToString();
+         RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
+         comboBoxColor.BackColor = proper.Color;
       }
 
       /// <summary>
@@ -261,12 +198,6 @@ namespace AlbumPanelColorTiles.Model
          // распределено на данный момент
          return _trackPropers.Values.Sum(p => p.Percent);
       }
-      
-      private void buttonDraw_Click(object sender, EventArgs e)
-      {         
-         Fire(_trackPropers, e);         
-      }
-
 
       //
       // Перемещение формвы
@@ -311,23 +242,89 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      private void buttonSelect_Click(object sender, EventArgs e)
+      // Получение корректного нового значения процента (чтобы не превышалось 100% распределения)
+      private int getCorrectValue(RandomPaint proper, int newValue)
       {
-         using (EditorUserInteraction UI = _randomPaintingService.Ed.StartUserInteraction(this))
+         int delta = newValue - proper.Percent;
+         int value = newValue;
+         // Нельзя распределить больше 100%
+         if (delta > 0)
          {
-            _randomPaintingService.PromptExtents(); 
+            int oldDistributedPercent = distributedPercent();
+            int newDistributedPercent = oldDistributedPercent + delta;
+            if (newDistributedPercent >= 100)
+            {
+               value = 100 - oldDistributedPercent + proper.Percent;
+               return value;
+            }
+         }
+         return value;
+      }
+
+      private void restoreTracks(Dictionary<string, RandomPaint> trackPropers)
+      {
+         _trackPropers = new Dictionary<string, RandomPaint>();
+         if (trackPropers != null)
+         {
+            foreach (var item in trackPropers)
+            {
+               if (_allPropers.ContainsKey(item.Key))
+               {
+                  addTrackProper(item.Value);
+               }
+            }
          }
       }
 
-      // Esc - сclose
-      protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+      // Запись текущего значения процента в текстбокс
+      private void setPercentToTextBox(RandomPaint proper)
       {
-         if (keyData == Keys.Escape)
+         GroupBox groupBox = _groupBoxs[proper.LayerName];
+         string tag = (string)groupBox.Tag;
+         TextBox textBox = groupBox.Controls.Find("textBox" + tag, false).First() as TextBox;
+         textBox.Text = proper.Percent.ToString();
+      }
+
+      // Сдвиг точки вставуки трэка на следующую позицию
+      private void shiftLocation(int distance)
+      {
+         _location.Y += distance;
+         // Проверка размера формы
+         if (this.Height < (_location.Y + 40))
          {
-            this.Close();
-            return true;
+            this.Height = _location.Y + 40;
+            buttonDraw.Location = new Point(buttonDraw.Location.X, this.Height - 38);
+            buttonSelect.Location = new Point(buttonSelect.Location.X, this.Height - 28);
          }
-         return base.ProcessCmdKey(ref msg, keyData);
+      }
+
+      private void TextBox_TextChanged(object sender, EventArgs e)
+      {
+         TextBox textBox = (TextBox)sender;
+         string tag = (string)textBox.Tag;
+         RandomPaint proper = _trackPropers[tag];
+         int val;
+         if (int.TryParse(textBox.Text, out val))
+         {
+            val = getCorrectValue(proper, val);
+            proper.Percent = val;
+            GroupBox groupBox = _groupBoxs[tag];
+            TrackBar trackBar = groupBox.Controls.Find("trackBar" + tag, false).First() as TrackBar;
+            trackBar.Value = val;
+            setPercentToTextBox(proper);
+         }
+      }
+
+      private void trackBar_ValueChanged(object sender, EventArgs e)
+      {
+         // Распределяемый трек
+         TrackBar trackBar = (TrackBar)sender;
+         RandomPaint proper = _trackPropers[(string)trackBar.Tag];
+         int value = getCorrectValue(proper, trackBar.Value);
+         proper.Percent = value;
+         trackBar.Value = value;
+         // Подпись процента в TextBox
+         setPercentToTextBox(proper);
       }
    }
 }

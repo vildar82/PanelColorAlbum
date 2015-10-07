@@ -10,8 +10,6 @@ namespace AlbumPanelColorTiles.Model
    // Марка АР покраски панели
    public class MarkArPanel : IEquatable<MarkArPanel>
    {
-      #region Private Fields
-
       private ObjectId _idBtrAr;
       private string _markArBlockName;
       private string _markARPanelFullName;
@@ -22,10 +20,6 @@ namespace AlbumPanelColorTiles.Model
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
 
-      #endregion Private Fields
-
-      #region Public Constructors
-
       public MarkArPanel(List<Paint> paintAR, MarkSbPanel markSb, BlockReference blRefMarkAr)
       {
          _markSB = markSb;
@@ -33,10 +27,6 @@ namespace AlbumPanelColorTiles.Model
          DefMarkArTempNames(markSb, blRefMarkAr.Name);
          _panels = new List<Panel>();
       }
-
-      #endregion Public Constructors
-
-      #region Public Properties
 
       public ObjectId IdBtrAr { get { return _idBtrAr; } }
 
@@ -76,10 +66,6 @@ namespace AlbumPanelColorTiles.Model
             return _tilesCalc;
          }
       }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
       public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreas)
@@ -188,10 +174,6 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      #endregion Public Methods
-
-      #region Private Methods
-
       // Определение границы плитки во вхождении блока
       private static Point3d GetCenterTileInBlockRef(Point3d positionBlRef, Point3d centerTileInBtr)
       {
@@ -215,7 +197,5 @@ namespace AlbumPanelColorTiles.Model
       {
          _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
       }
-
-      #endregion Private Methods
    }
 }

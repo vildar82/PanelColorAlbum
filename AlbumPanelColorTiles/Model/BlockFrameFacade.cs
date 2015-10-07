@@ -9,23 +9,13 @@ namespace AlbumPanelColorTiles.Model
 {
    public class BlockFrameFacade
    {
-      #region Private Fields
-
       private Dictionary<string, string> _attrs;
       private string _blFrameName;
       private Database _db;
       private ObjectId _idBtrFrame;
       private bool _isFound;
 
-      #endregion Private Fields
-
-      #region Public Properties
-
       public bool IsFound { get { return _isFound; } }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       public void ChangeBlockFrame(Database db, string blName)
       {
@@ -78,10 +68,6 @@ namespace AlbumPanelColorTiles.Model
             t.Commit();
          }
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       private void changeBlkRefFrame(Database db, string blName)
       {
@@ -222,7 +208,5 @@ namespace AlbumPanelColorTiles.Model
             }
          }
       }
-
-      #endregion Private Methods
    }
 }

@@ -5,14 +5,8 @@ namespace AlbumPanelColorTiles.Checks
    // Объект с ошибками
    public class ErrorObject
    {
-      #region Private Fields
-
       private string _errorMsg;
       private ObjectId _idEnt;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       /// <summary>
       ///
@@ -24,7 +18,5 @@ namespace AlbumPanelColorTiles.Checks
          _idEnt = idEnt;
          _errorMsg = errMsg;
       }
-
-      #endregion Public Constructors
    }
 }

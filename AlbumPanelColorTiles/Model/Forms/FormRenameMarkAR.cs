@@ -10,14 +10,8 @@ namespace AlbumPanelColorTiles.Model.Forms
 {
    public partial class FormRenameMarkAR : Form
    {
-      #region Private Fields
-
       private BindingSource _bindingsMarksArRename;
       private Dictionary<string, MarkArRename> _marksArForRename;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       public FormRenameMarkAR(Album album)
       {
@@ -34,10 +28,6 @@ namespace AlbumPanelColorTiles.Model.Forms
          textBoxOldMarkAR.DataBindings.Add("Text", _bindingsMarksArRename, "MarkPainting", false, DataSourceUpdateMode.OnPropertyChanged);
       }
 
-      #endregion Public Constructors
-
-      #region Public Methods
-
       public List<MarkArRename> RenamedMarksAr()
       {
          List<MarkArRename> renamedMarks = new List<MarkArRename>();
@@ -50,10 +40,6 @@ namespace AlbumPanelColorTiles.Model.Forms
          }
          return renamedMarks;
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       private void buttonRename_Click(object sender, EventArgs e)
       {
@@ -140,7 +126,5 @@ namespace AlbumPanelColorTiles.Model.Forms
          ed.Zoom(markArForRename.MarkAR.Panels[0].Extents);
          errorProviderOk.SetError(buttonShow, string.Format("Блок панели показан - {0}", markArForRename.MarkArCurFull));
       }
-
-      #endregion Private Methods
    }
 }

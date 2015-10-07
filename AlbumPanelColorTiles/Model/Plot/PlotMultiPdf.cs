@@ -10,13 +10,7 @@ namespace AlbumPanelColorTiles.Plot
 {
    public class PlotMultiPDF
    {
-      #region Private Fields
-
       private short _bgp;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       public PlotMultiPDF()
       {
@@ -24,18 +18,10 @@ namespace AlbumPanelColorTiles.Plot
          AcAp.SetSystemVariable("BACKGROUNDPLOT", 0);
       }
 
-      #endregion Public Constructors
-
-      #region Private Destructors
-
       ~PlotMultiPDF()
       {
          AcAp.SetSystemVariable("BACKGROUNDPLOT", _bgp);
       }
-
-      #endregion Private Destructors
-
-      #region Public Methods
 
       public void PlotCur()
       {
@@ -81,10 +67,6 @@ namespace AlbumPanelColorTiles.Plot
             }
          }
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       // Печать всех листов в текущем документе
       private void MultiSheetPlot(string title)
@@ -173,7 +155,5 @@ namespace AlbumPanelColorTiles.Plot
             t.Commit();
          }
       }
-
-      #endregion Private Methods
    }
 }

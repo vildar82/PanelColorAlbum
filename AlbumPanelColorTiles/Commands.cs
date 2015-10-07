@@ -21,16 +21,10 @@ namespace AlbumPanelColorTiles
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands
    {
-      #region Private Fields
-
       private static string _curDllDir;
       private Album _album;
       private string _msgHelp;
       private RandomPainting _randomPainting;
-
-      #endregion Private Fields
-
-      #region Public Properties
 
       public static string CurDllDir
       {
@@ -43,10 +37,6 @@ namespace AlbumPanelColorTiles
             return _curDllDir;
          }
       }
-
-      #endregion Public Properties
-
-      #region Private Properties
 
       private string MsgHelp
       {
@@ -62,7 +52,7 @@ namespace AlbumPanelColorTiles
                       "\nAKR-AlbumPanels - создание альбома панелей." +
                       "\nAKR-PlotPdf - печать в PDF текущего чертежа или выбранной папки с чертежами. Файлы создается в корне чертежа с тем же именем. Печать выполняется по настройкам на листах." +
                       "\nAKR-SelectPanels - выбор блоков панелей в Модели." +
-                      "\nAKR-RandomPainting - случайное распределение зон покраски в указанной области/" +
+                      "\nAKR-RandomPainting - случайное распределение зон покраски в указанной области." +
                       "\nAKR-InsertBlockColorArea - вставка блока зоны покраски." +
                       "\nAKR-InsertBlockPanel - вставка блока зоны покраски." +
                       "\nAKR-InsertBlockFrame - вставка блока зоны покраски." +
@@ -82,10 +72,6 @@ namespace AlbumPanelColorTiles
             return _msgHelp;
          }
       }
-
-      #endregion Private Properties
-
-      #region Public Methods
 
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.Session | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
@@ -128,7 +114,7 @@ namespace AlbumPanelColorTiles
                   {
                      Log.Info("Отменено пользователем.");
                      throw new System.Exception("Отменено пользователем.");
-                  }                  
+                  }
                }
                catch (System.Exception ex)
                {
@@ -146,7 +132,8 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          Editor ed = doc.Editor;
          ed.WriteMessage("\n{0}", MsgHelp);
-      }      
+      }
+
       [CommandMethod("AKR", "AKR-InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockColorAreaCommand()
       {
@@ -178,7 +165,8 @@ namespace AlbumPanelColorTiles
          {
             ed.WriteMessage("\n" + ex.Message);
          }
-      }      
+      }
+
       [CommandMethod("AKR", "AKR-InsertBlockPanel", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockPanelCommand()
       {
@@ -193,7 +181,8 @@ namespace AlbumPanelColorTiles
          {
             ed.WriteMessage("\n" + ex.Message);
          }
-      }      
+      }
+
       [CommandMethod("AKR", "AKR-InsertBlockTile", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void InsertBlockTileCommand()
       {
@@ -208,7 +197,8 @@ namespace AlbumPanelColorTiles
          {
             ed.WriteMessage("\n" + ex.Message);
          }
-      }      
+      }
+
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
       {
@@ -305,7 +295,30 @@ namespace AlbumPanelColorTiles
                }
             }
          }
-      }      
+      }
+
+      [CommandMethod("AKR", "AKR-RandomPainting", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void RandomPaintingCommand()
+      {
+         Log.Info("Start Command: AKR-RandomPainting");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {            
+            // Произвольная покраска участка, с % распределением цветов зон покраски.
+            if (_randomPainting == null)
+            {
+               _randomPainting = new RandomPainting();
+            }
+            _randomPainting.Start();            
+         }
+         catch (System.Exception ex)
+         {            
+            doc.Editor.WriteMessage("\n{0}", ex.ToString());
+            Log.Error(ex, "Command: AKR-RandomPainting");
+         }
+      }
+
       // Удаление блоков панелей марки АР и их замена на блоки панелей марок СБ.
       [CommandMethod("PIK", "AKR-ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void ResetPanelsCommand()
@@ -384,32 +397,8 @@ namespace AlbumPanelColorTiles
             }
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
             ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
-            Log.Info ("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
+            Log.Info("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
          }
       }
-
-      [CommandMethod("AKR", "AKR-RandomPainting", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void RandomPaintingCommand()
-      {
-         try
-         {
-            Log.Info("Start Command: AKR-RandomPainting");
-            // Произвольная покраска участка, с % распределением цветов зон покраски.
-            if (_randomPainting == null)
-            {
-               _randomPainting = new RandomPainting();
-            }
-            _randomPainting.Start();
-            // В результате получится участок заполненный блоками зон покраски с одной целой зоной и кучей маленьких пятен величиной с 1 плитку.
-         }
-         catch (System.Exception ex)
-         {
-            Editor ed = AcAp.DocumentManager.MdiActiveDocument.Editor;
-            ed.WriteMessage("\n{0}", ex.ToString());
-            Log.Error(ex, "Command: AKR-RandomPainting");
-         }         
-      }
-
-      #endregion Public Methods
    }
 }

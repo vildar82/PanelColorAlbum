@@ -11,8 +11,6 @@ namespace AlbumPanelColorTiles.Model
    // Панели марки СБ
    public class MarkSbPanel : IEquatable<MarkSbPanel>
    {
-      #region Private Fields
-
       private string _abbr;
 
       private Point2d _centerPanel;
@@ -34,10 +32,6 @@ namespace AlbumPanelColorTiles.Model
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
 
-      #endregion Private Fields
-
-      #region Private Constructors
-
       // Конструктор. Скрытый.
       private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr)
       {
@@ -49,7 +43,7 @@ namespace AlbumPanelColorTiles.Model
          _isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix);
          _isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix);
          _marksAR = new List<MarkArPanel>();
-         _colorAreas = ColorArea.GetColorAreas(_idBtr);         
+         _colorAreas = ColorArea.GetColorAreas(_idBtr);
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
          //???
 
@@ -59,10 +53,6 @@ namespace AlbumPanelColorTiles.Model
          // Центр панели
          _centerPanel = GetCenterPanel(_tiles);
       }
-
-      #endregion Private Constructors
-
-      #region Public Properties
 
       public string Abbr { get { return _abbr; } }
 
@@ -117,10 +107,6 @@ namespace AlbumPanelColorTiles.Model
             return Math.Round(_paints.Count * TileCalc.OneTileArea, 2);
          }
       }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
@@ -351,10 +337,6 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      #endregion Public Methods
-
-      #region Private Methods
-
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
       private static MarkSbPanel GetMarkSb(BlockReference blRefPanel, List<MarkSbPanel> marksSb, BlockTable bt, string abbr)
       {
@@ -460,7 +442,5 @@ namespace AlbumPanelColorTiles.Model
          }
          return resPanelAR;
       }
-
-      #endregion Private Methods
    }
 }

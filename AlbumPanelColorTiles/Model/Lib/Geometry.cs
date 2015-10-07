@@ -5,8 +5,6 @@ namespace AlbumPanelColorTiles.Lib
 {
    public static class Geometry
    {
-      #region Public Methods
-
       // Попадает ли точка внутрь границы
       public static bool IsPointInBounds(Point3d pt, Extents3d bounds)
       {
@@ -19,7 +17,5 @@ namespace AlbumPanelColorTiles.Lib
          }
          return res;
       }
-
-      #endregion Public Methods
    }
 }

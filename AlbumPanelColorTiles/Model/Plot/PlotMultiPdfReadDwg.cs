@@ -11,8 +11,6 @@ namespace AlbumPanelColorTiles.Plot
    /// </summary>
    public class PlotMultiPDFReadDwg
    {
-      #region Public Methods
-
       // Открытие и печать всех файлов в папке
       public void PlotDir(string dir)
       {
@@ -34,10 +32,6 @@ namespace AlbumPanelColorTiles.Plot
             }
          }
       }
-
-      #endregion Public Methods
-
-      #region Private Methods
 
       // Печать всех листов в текущем документе
       private void multiSheetPlot(Database db)
@@ -100,7 +94,5 @@ namespace AlbumPanelColorTiles.Plot
             t.Commit();
          }
       }
-
-      #endregion Private Methods
    }
 }

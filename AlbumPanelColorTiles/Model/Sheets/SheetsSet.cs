@@ -8,17 +8,11 @@ namespace AlbumPanelColorTiles.Sheets
    // Ведомость альбома панелей
    public class SheetsSet
    {
-      #region Private Fields
-
       private Album _album;
 
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileContent;
       private string _sheetTemplateFileMarkSB;
-
-      #endregion Private Fields
-
-      #region Public Constructors
 
       public SheetsSet(Album album)
       {
@@ -26,18 +20,10 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetsMarkSB = new List<SheetMarkSB>();
       }
 
-      #endregion Public Constructors
-
-      #region Public Properties
-
       public Album Album { get { return _album; } }
       public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
       public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
-
-      #endregion Public Properties
-
-      #region Public Methods
 
       // Создание альбома панелей
       public void CreateAlbum()
@@ -91,10 +77,6 @@ namespace AlbumPanelColorTiles.Sheets
          }
       }
 
-      #endregion Public Methods
-
-      #region Private Methods
-
       // Создание папки Альбома панелей
       private void CreateAlbumFolder()
       {
@@ -123,7 +105,5 @@ namespace AlbumPanelColorTiles.Sheets
          sheetsMarkSb.Sort();
          return sheetsMarkSb;
       }
-
-      #endregion Private Methods
    }
 }
