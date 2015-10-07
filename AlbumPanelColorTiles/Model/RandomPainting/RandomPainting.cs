@@ -1,49 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using Rivilis;
 
 namespace AlbumPanelColorTiles.Model
 {
-   public static class RandomExtension
-   {
-      private static bool haveNextNextGaussian;
-      private static double nextNextGaussian;
-
-      public static double NextGaussian(this Random rand)
-      {
-         if (haveNextNextGaussian)
-         {
-            haveNextNextGaussian = false;
-            return nextNextGaussian;
-         }
-         else
-         {
-            double v1, v2, s;
-            do
-            {
-               v1 = 2 * rand.NextDouble() - 1;   // between -1.0 and 1.0
-               v2 = 2 * rand.NextDouble() - 1;   // between -1.0 and 1.0
-               s = v1 * v1 + v2 * v2;
-            } while (s >= 1 || s == 0);
-            double multiplier = Math.Sqrt(-2 * Math.Log(s) / s);
-            nextNextGaussian = v2 * multiplier;
-            haveNextNextGaussian = true;
-            return v1 * multiplier;
-         }
-      }
-   }
-
    // Произвольная покраска участа с % распределением цветов
    public class RandomPainting
    {
+      private int _countInsertBlocksSpot;
+      private Stopwatch _stopwatch = new Stopwatch();
       private Document _doc;
       private Editor _ed;
       private Database _db;
@@ -101,8 +77,9 @@ namespace AlbumPanelColorTiles.Model
             if (_spots.Count > 0)
             {
                deleteSpots(_spots);
-            }           
-            
+            }
+            _spots = new List<Spot>();
+
             List<RandomPaint> propers = ((Dictionary<string, RandomPaint>)sender).Values.ToList();
             _xsize = Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
             _ysize = Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
@@ -123,23 +100,31 @@ namespace AlbumPanelColorTiles.Model
                Log.Info("Уменьшено кол распр цвета {0} на штук {1}", lastProper.LayerName, (distributedCount - totalTileCount));
             }
             Log.Info("distributedCount = {0}",distributedCount); 
-
-            // Получение общего списка распределения покроаски
-            _spots = new List<Spot>();
+            
             // Сортировка по процентам (начиная с меньшего)
             var propersOrdered = propers.OrderBy(p => p.Percent);
+            // Получение общего списка распределения покроаски            
             foreach (var proper in propersOrdered)
             {
                _spots.AddRange(Spot.GetSpots(proper));
             }
 
-            // Перемешивание списка
-            List<Spot> mixSpots = mixingSpots(_spots, totalTileCount);            
+            // Распределение зон покраски
+            _stopwatch.Restart();            
+            List<Spot> distributedSpots = distributeSpots(_spots, totalTileCount);
+            _stopwatch.Stop();
+            Log.Debug("После перемешивания списка, время {0} сек.", _stopwatch.Elapsed.Seconds);
 
-            // Вставка блоков зон 
-            placementSpots(mixSpots);
+            // Вставка блоков зон
+            _stopwatch.Restart();  
+            placementSpots(distributedSpots);
+            _stopwatch.Stop();
+            Log.Debug("Время вставки блоков {0} сек.", _stopwatch.Elapsed.Seconds);             
 
+            _stopwatch.Restart(); 
             _ed.Regen();
+            _stopwatch.Stop(); 
+            Log.Debug("Regen {0} сек.", _stopwatch.Elapsed.Seconds);
          }
          catch (System.Exception ex)
          {
@@ -171,7 +156,7 @@ namespace AlbumPanelColorTiles.Model
       }
 
       private void placementSpots(List<Spot> spots)
-      {
+      {         
          using (var lockdoc = _doc.LockDocument())
          {
             using (var t = _db.TransactionManager.StartTransaction())
@@ -179,29 +164,27 @@ namespace AlbumPanelColorTiles.Model
                var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
                var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                _idMS = ms.Id;
-               var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;               
+               var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
                var blRefColorAreaTemplate = new BlockReference(Point3d.Origin, btrColorArea.Id);
                ms.AppendEntity(blRefColorAreaTemplate);
                t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);
-               _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;               
+               _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;
                setDynParamColorAreaBlock(blRefColorAreaTemplate);
                _idColCopy = new ObjectIdCollection();
-               _idColCopy.Add(_idBlRefColorAreaTemplate);               
-
-               int x, y;               
+               _idColCopy.Add(_idBlRefColorAreaTemplate);
+               
+               _countInsertBlocksSpot = 0;
                foreach (var spot in spots)
                {
-                  if (HostApplicationServices.Current.UserBreak())                  
-                     break;                                       
-
+                  if (HostApplicationServices.Current.UserBreak())
+                     break;
                   if (spot != null)
                   {                     
-                     int i = spot.Index;
-                     x = i / _ysize;
-                     y = i % _ysize;                     
-                     insertSpot(spot, x, y, t);                     
+                     insertSpot(spot, spot.Index / _ysize, spot.Index % _ysize, t);
                   }
-               }                              
+               }
+               Log.Debug("Вставлено блоков {0}", _countInsertBlocksSpot);               
+
                blRefColorAreaTemplate.Erase(true);
                t.Commit();
             }
@@ -219,16 +202,23 @@ namespace AlbumPanelColorTiles.Model
          }
       }
 
-      // Вставка ячейки покраски (пока = одной плитке)
+      // Вставка ячейки покраски (пока = одной плитке)      
       private void insertSpot(Spot spot, int x, int y, Transaction t)
       {
          Point3d position = new Point3d(_extentsPrompted.MinPoint.X + x * 300, _extentsPrompted.MinPoint.Y + y * 100, 0);
          IdMapping map = new IdMapping();
          _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
-         var blRefSpot = t.GetObject(map[_idBlRefColorAreaTemplate].Value, OpenMode.ForWrite) as BlockReference;
-         blRefSpot.Position = position;
-         blRefSpot.LayerId = spot.Proper.IdLayer;         
-         spot.IdBlRef = blRefSpot.Id;
+         ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
+         if (idBlRefCopy.IsValid && !idBlRefCopy.IsNull)
+         {
+            using (var blRefSpot = t.GetObject(idBlRefCopy, OpenMode.ForWrite) as BlockReference)
+            {
+               blRefSpot.Position = position;
+               blRefSpot.LayerId = spot.Proper.IdLayer;
+               spot.IdBlRef = blRefSpot.Id;
+               _countInsertBlocksSpot++;
+            }
+         }         
       }
 
       /// <summary>
@@ -237,9 +227,9 @@ namespace AlbumPanelColorTiles.Model
       /// <param name="_spots"></param>
       /// <param name="totalTileCount"></param>
       /// <returns>Список зон покраски с записанными индексами</returns>
-      private List<Spot> mixingSpots(List<Spot> _spots, int totalTileCount)
+      private List<Spot> distributeSpots(List<Spot> _spots, int totalTileCount)
       {         
-         Spot[] mixingSpots = new  Spot[totalTileCount];
+         Spot[] distributeSpots = new  Spot[totalTileCount];
          var spotOrdered = _spots.GroupBy(s => s.Proper);
          int countPercent = 0;
          foreach (var spots in spotOrdered)
@@ -250,22 +240,22 @@ namespace AlbumPanelColorTiles.Model
                if (spots.Key.Percent < 25)
                {
                   // Без соседей одного цвета
-                  mixingListWithoutNeighborSomeColor(spots.ToList(), totalTileCount,ref mixingSpots);
+                  distributeListWithoutNeighborSomeColor(spots.ToList(), totalTileCount,ref distributeSpots);
                }
                else
                {
-                  mixingListAllRandom(spots.ToList(), totalTileCount, ref mixingSpots);
+                  distributeListAllRandom(spots.ToList(), totalTileCount, ref distributeSpots);
                }
             }
             else
             {
-               mixingListNear100(spots.ToList(), totalTileCount, ref mixingSpots);
+               distributeListNear100(spots.ToList(), totalTileCount, ref distributeSpots);
             }            
          }         
-         return mixingSpots.Where(s => s != null).ToList();
+         return distributeSpots.Where(s => s != null).ToList();
       }
 
-      private void mixingListWithoutNeighborSomeColor(List<Spot> spots, int Count, ref Spot[] mixSpots)
+      private void distributeListWithoutNeighborSomeColor(List<Spot> spots, int Count, ref Spot[] mixSpots)
       {          
          Spot temp;         
          bool mayNext = false;
@@ -377,7 +367,7 @@ namespace AlbumPanelColorTiles.Model
       //   }
       //   return mixSpots.ToList();
       //}
-      private void mixingListNear100(List<Spot> spots, int Count, ref Spot[] mixSpots)
+      private void distributeListNear100(List<Spot> spots, int Count, ref Spot[] mixSpots)
       {         
          Spot temp;
          foreach (var spot in spots)
@@ -403,7 +393,7 @@ namespace AlbumPanelColorTiles.Model
          }         
       }
 
-      private void mixingListAllRandom(List<Spot> spots, int Count, ref Spot[] mixSpots)
+      private void distributeListAllRandom(List<Spot> spots, int Count, ref Spot[] mixSpots)
       {         
          Spot temp;                  
          foreach (var spot in spots)
