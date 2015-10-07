@@ -202,6 +202,7 @@
          this.Controls.Add(this.listBoxMarksAR);
          this.Name = "FormRenameMarkAR";
          this.Text = "Переименование марок АР";
+         this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormRenameMarkAR_KeyUp);
          ((System.ComponentModel.ISupportInitialize)(this.errorProviderError)).EndInit();
          ((System.ComponentModel.ISupportInitialize)(this.errorProviderOk)).EndInit();
          this.ResumeLayout(false);

@@ -198,15 +198,15 @@ namespace AlbumPanelColorTiles.Model
          // распределено на данный момент
          return _trackPropers.Values.Sum(p => p.Percent);
       }
-
-      //
-      // Перемещение формвы
-      //
+      
       private void Form_KeyUp(object sender, KeyEventArgs e)
       {
          if (e.KeyCode == Keys.Escape) this.Close();
       }
 
+      //
+      // Перемещение формвы
+      //
       private void Form_MouseDown(object sender, MouseEventArgs e)
       {
          int xOffset;

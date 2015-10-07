@@ -123,8 +123,16 @@ namespace AlbumPanelColorTiles.Model.Forms
          }
          Document doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
          Editor ed = doc.Editor;
-         ed.Zoom(markArForRename.MarkAR.Panels[0].Extents);
+         // Определение границ по плитке         
+         var panel = markArForRename.MarkAR.Panels[0];
+         var ext = panel.GetExtentsTiles(markArForRename.MarkAR.MarkSB);
+         ed.Zoom(ext);
          errorProviderOk.SetError(buttonShow, string.Format("Блок панели показан - {0}", markArForRename.MarkArCurFull));
-      }
+      }      
+
+      private void FormRenameMarkAR_KeyUp(object sender, KeyEventArgs e)
+      {
+         if (e.KeyCode == Keys.Escape) this.Close(); 
+      }      
    }
 }

@@ -14,6 +14,8 @@ namespace AlbumPanelColorTiles.Model
       private string _abbr;
 
       private Point2d _centerPanel;
+      // Границы блока по плитке
+      private Extents3d _extentsTiles;
 
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
       private List<ColorArea> _colorAreas;
@@ -57,6 +59,7 @@ namespace AlbumPanelColorTiles.Model
       public string Abbr { get { return _abbr; } }
 
       public Point2d CenterPanel { get { return _centerPanel; } }
+      public Extents3d ExtentsTiles { get { return _extentsTiles; } }
 
       public ObjectId IdBtr { get { return _idBtr; } }
 
@@ -386,12 +389,12 @@ namespace AlbumPanelColorTiles.Model
       // Определение центра панели по блокам плиток в ней
       private Point2d GetCenterPanel(List<Tile> _tiles)
       {
-         Extents3d ext = new Extents3d();
+         _extentsTiles = new Extents3d();
          foreach (var tile in _tiles)
          {
-            ext.AddPoint(tile.CenterTile);
+            _extentsTiles.AddPoint(tile.CenterTile);
          }
-         return new Point2d((ext.MinPoint.X + ext.MaxPoint.X) * 0.5, (ext.MinPoint.Y + ext.MaxPoint.Y) * 0.5);
+         return new Point2d((_extentsTiles.MinPoint.X + _extentsTiles.MaxPoint.X) * 0.5, (_extentsTiles.MinPoint.Y + _extentsTiles.MaxPoint.Y) * 0.5);
       }
 
       private string GetMarkArNextName()

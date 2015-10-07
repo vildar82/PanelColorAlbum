@@ -29,6 +29,10 @@ namespace AlbumPanelColorTiles.Model
          _extents = blRefPanel.GeometricExtents;
       }
 
+      /// <summary>
+      ///  Границы блока по GeometricExtents
+      ///  Для границ по плитке используй getExtentsTiles(MarkSbPanel)
+      /// </summary>
       public Extents3d Extents { get { return _extents; } }
 
       /// <summary>
@@ -75,6 +79,29 @@ namespace AlbumPanelColorTiles.Model
          //   t.AddNewlyCreatedDBObject(blRefPanelAr, true);
          //   t.Commit();
          //}
+      }
+
+      /// <summary>
+      /// Определение границ блока по блокам плитки внутри
+      /// </summary>
+      /// <param name="markSB"></param>
+      /// <returns></returns>
+      public Extents3d GetExtentsTiles(MarkSbPanel markSB)
+      {
+         // границы в определении блока
+         var extTilesBtr = markSB.ExtentsTiles;
+         // трансформация границ из BTR в BlRef
+         if (_idBlRefAr.IsNull || _idBlRefAr.IsErased || !_idBlRefAr.IsValid)
+         {
+            return _extents;
+         }
+         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead) as BlockReference)
+         {
+            var matrix = blRef.BlockTransform;
+            extTilesBtr.TransformBy(matrix);
+            _extents = extTilesBtr;
+         }
+         return extTilesBtr;
       }
    }
 }
