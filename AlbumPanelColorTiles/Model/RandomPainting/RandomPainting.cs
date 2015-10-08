@@ -62,16 +62,12 @@ namespace AlbumPanelColorTiles.Model
       public void Start()
       {
          resetData();
-
          // Проверка наличия блока зоны покраски
          checkBlock(_db);
-
          // Запрос области для покраски
          PromptExtents();
-
          // Список всех цветов (по списку листов) - которые можно добавить в распределение покраски зоны
          Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
-
          // Форма для распределения цветов
          FormRandomPainting formProper = new FormRandomPainting(allProperPaint, this, _trackRandoms);
          formProper.Fire += FormProper_Fire;
@@ -414,11 +410,11 @@ namespace AlbumPanelColorTiles.Model
             using (var t = _db.TransactionManager.StartTransaction())
             {
                var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
-               var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-               _idMS = ms.Id;
+               var cs = t.GetObject(_db.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
+               _idMS = cs.Id;
                var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
                var blRefColorAreaTemplate = new BlockReference(Point3d.Origin, btrColorArea.Id);
-               ms.AppendEntity(blRefColorAreaTemplate);
+               cs.AppendEntity(blRefColorAreaTemplate);
                t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);
                _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;
                setDynParamColorAreaBlock(blRefColorAreaTemplate);

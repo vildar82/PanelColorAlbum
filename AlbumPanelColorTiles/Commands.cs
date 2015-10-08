@@ -297,7 +297,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-RandomPainting", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      [CommandMethod("AKR", "AKR-RandomPainting", CommandFlags.Modal)]
       public void RandomPaintingCommand()
       {
          Log.Info("Start Command: AKR-RandomPainting");
