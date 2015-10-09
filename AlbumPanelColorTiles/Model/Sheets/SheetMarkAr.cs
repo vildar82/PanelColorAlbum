@@ -227,7 +227,6 @@ namespace AlbumPanelColorTiles.Sheets
             table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
             row++;
          }
-
          // Строка итогов.
          // Объединить строку итогов (1,2 и 3 столбцы).
          table.MergeCells(CellRange.Create(table, row, 0, row, 2));
