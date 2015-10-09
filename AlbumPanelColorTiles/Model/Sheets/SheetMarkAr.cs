@@ -231,7 +231,7 @@ namespace AlbumPanelColorTiles.Sheets
          // Строка итогов.
          // Объединить строку итогов (1,2 и 3 столбцы).
          table.MergeCells(CellRange.Create(table, row, 0, row, 2));
-         table.Cells[row, 0].TextString = "Итого на панель";
+         table.Cells[row, 0].TextString = "Итого на панель:";
          table.Cells[row, 0].Alignment = CellAlignment.MiddleCenter;
          table.Cells[row, 3].TextString = _markAR.Paints.Count.ToString();//  totalCount.ToString();
          table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
