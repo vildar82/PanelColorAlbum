@@ -237,8 +237,7 @@ namespace AlbumPanelColorTiles.Sheets
          table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
          table.Cells[row, 4].TextString = _markAR.MarkSB.TotalAreaTiles.ToString();//totalArea.ToString();
          table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
-
-         table.Dispose();//???
+         //table.Dispose();//???
       }
 
       // Поиск штампа на листе
