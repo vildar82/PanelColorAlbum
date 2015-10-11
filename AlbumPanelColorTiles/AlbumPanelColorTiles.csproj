@@ -47,6 +47,10 @@
       <HintPath>..\..\..\..\AutoCAD_PIK_Manager\AutoCAD_PIK_Manager\bin\Release\AutoCAD_PIK_Manager.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="FreeImageNET">
+      <HintPath>..\..\..\..\..\Users\khisyametdinovvt\Downloads\FreeImage\Wrapper\FreeImage.NET\cs\Library\bin\Release\FreeImageNET.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -64,14 +68,30 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Checks\ErrorObject.cs" />
-    <Compile Include="Model\ColorArea.cs" />
-    <Compile Include="Model\Forms\FormRenameMarkAR.cs">
+    <Compile Include="Model\ImagePainting\FormImageCrop.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Model\Forms\FormRenameMarkAR.Designer.cs">
+    <Compile Include="Model\ImagePainting\FormImageCrop.Designer.cs">
+      <DependentUpon>FormImageCrop.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
+    <Compile Include="Model\Lib\UserPrompt.cs" />
+    <Compile Include="Model\Panels\ColorArea.cs" />
+    <Compile Include="Model\RandomPainting\ColorAreaSpotSize.cs" />
+    <Compile Include="Model\RandomPainting\FormColorAreaSize.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\RandomPainting\FormColorAreaSize.Designer.cs">
+      <DependentUpon>FormColorAreaSize.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\RenamePanels\FormRenameMarkAR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\RenamePanels\FormRenameMarkAR.Designer.cs">
       <DependentUpon>FormRenameMarkAR.cs</DependentUpon>
     </Compile>
-    <Compile Include="Model\Forms\MarkArRename.cs" />
+    <Compile Include="Model\RenamePanels\MarkArRename.cs" />
+    <Compile Include="Model\ImagePainting\UserRect.cs" />
     <Compile Include="Model\Lib\BlockInsert.cs" />
     <Compile Include="Model\Lib\DoubleEqualityComparer.cs" />
     <Compile Include="Model\Lib\Geometry.cs" />
@@ -79,14 +99,14 @@
     <Compile Include="Model\Lib\Blocks.cs" />
     <Compile Include="Model\Lib\BlockInsertJig.cs" />
     <Compile Include="Model\Lib\Zoom.cs" />
-    <Compile Include="Model\MarkArPanel.cs" />
-    <Compile Include="Model\MarkSbPanel.cs" />
+    <Compile Include="Model\Panels\MarkArPanel.cs" />
+    <Compile Include="Model\Panels\MarkSbPanel.cs" />
     <Compile Include="Model\Options.cs" />
-    <Compile Include="Model\Paint.cs" />
-    <Compile Include="Model\Panel.cs" />
+    <Compile Include="Model\Panels\Paint.cs" />
+    <Compile Include="Model\Panels\Panel.cs" />
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />
     <Compile Include="Model\Plot\PlotMultiPdfReadDwg.cs" />
-    <Compile Include="Model\BlockFrameFacade.cs" />
+    <Compile Include="Model\Panels\BlockFrameFacade.cs" />
     <Compile Include="Model\RandomPainting\FormRandomPainting.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,7 +114,7 @@
       <DependentUpon>FormRandomPainting.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\RandomPainting\RandomPaint.cs" />
-    <Compile Include="Model\RandomPainting\RandomPainting.cs" />
+    <Compile Include="Model\RandomPainting\RandomPaintingService.cs" />
     <Compile Include="Model\RandomPainting\Spot.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
     <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
@@ -102,9 +122,9 @@
     <Compile Include="Model\Sheets\SheetMarkSB.cs" />
     <Compile Include="Model\Sheets\SheetsContent.cs" />
     <Compile Include="Model\Sheets\SheetsSet.cs" />
-    <Compile Include="Model\Storey.cs" />
-    <Compile Include="Model\Tile.cs" />
-    <Compile Include="Model\TileCalc.cs" />
+    <Compile Include="Model\Panels\Storey.cs" />
+    <Compile Include="Model\Panels\Tile.cs" />
+    <Compile Include="Model\Panels\TileCalc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -142,7 +162,13 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Model\Forms\FormRenameMarkAR.resx">
+    <EmbeddedResource Include="Model\ImagePainting\FormImageCrop.resx">
+      <DependentUpon>FormImageCrop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Model\RandomPainting\FormColorAreaSize.resx">
+      <DependentUpon>FormColorAreaSize.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Model\RenamePanels\FormRenameMarkAR.resx">
       <DependentUpon>FormRenameMarkAR.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Model\RandomPainting\FormRandomPainting.resx">

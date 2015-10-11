@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace AlbumPanelColorTiles.Model.Forms
+namespace AlbumPanelColorTiles.RenamePanels
 {
    public partial class FormRenameMarkAR : Form
    {

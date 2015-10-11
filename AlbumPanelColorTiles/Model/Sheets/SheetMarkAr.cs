@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Lib;
-using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 

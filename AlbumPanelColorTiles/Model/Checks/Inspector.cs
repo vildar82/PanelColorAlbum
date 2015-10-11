@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
@@ -11,7 +12,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles
 {
    // Альбом колористических решений.
    public class Album
@@ -23,6 +24,7 @@ namespace AlbumPanelColorTiles.Model
 
       // Сокращенное имя проеккта
       private string _abbreviateProject;
+      private const string _regAppPath = @"Software\Vildar\AKR";
 
       private string _albumDir;
 
@@ -37,8 +39,8 @@ namespace AlbumPanelColorTiles.Model
       public Album()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
-         if (!File.Exists(_doc.Name))
-            throw new System.Exception("Нужно сохранить файл.");
+         //if (!File.Exists(_doc.Name))
+         //   throw new System.Exception("Нужно сохранить файл.");
          _db = _doc.Database;
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
          _abbreviateProject = abbreviateNameProject();
@@ -56,6 +58,7 @@ namespace AlbumPanelColorTiles.Model
 
       public static Tolerance Tolerance { get { return Tolerance.Global; } }
       public string AbbreviateProject { get { return _abbreviateProject; } }
+      public static string RegAppPath { get { return _regAppPath; } }
       public string AlbumDir { get { return _albumDir; } set { _albumDir = value; } }
       public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
@@ -359,7 +362,7 @@ namespace AlbumPanelColorTiles.Model
       private string abbreviateNameProject()
       {
          string abbrName;
-         string defName = getSavedAbbreviateName();// "Н47Г";
+         string defName = loadAbbreviateName();// "Н47Г";
          var opt = new PromptStringOptions("Введите сокращенное имя проекта для добавления к имени Марки АР:");
          opt.DefaultValue = defName;
          var res = _doc.Editor.GetString(opt);
@@ -393,13 +396,12 @@ namespace AlbumPanelColorTiles.Model
          progressMeter.Stop();
       }
 
-      private string getSavedAbbreviateName()
+      private string loadAbbreviateName()
       {
-         string res = "Н47Г";
+         string res = "Н47Г"; // default
          try
-         {
-            string regAppPath = @"Software\Vildar\AKR";
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(regAppPath);
+         {            
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
             res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
          }
          catch { }
@@ -482,9 +484,8 @@ namespace AlbumPanelColorTiles.Model
       private void saveAbbreviateName(string abbr)
       {
          try
-         {
-            string regAppPath = @"Software\Vildar\AKR";
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(regAppPath);
+         {            
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegAppPath);
             keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
          }
          catch { }

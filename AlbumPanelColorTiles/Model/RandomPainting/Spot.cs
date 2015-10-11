@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.RandomPainting
 {
    // Участок покраски
    public class Spot

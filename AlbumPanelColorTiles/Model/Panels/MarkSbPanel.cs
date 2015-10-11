@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    // Панели марки СБ
    public class MarkSbPanel : IEquatable<MarkSbPanel>

@@ -1,0 +1,95 @@
+﻿namespace AlbumPanelColorTiles.ImagePainting
+{
+   partial class FormImageCrop
+   {
+      /// <summary>
+      /// Required designer variable.
+      /// </summary>
+      private System.ComponentModel.IContainer components = null;
+
+      /// <summary>
+      /// Clean up any resources being used.
+      /// </summary>
+      /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+      protected override void Dispose(bool disposing)
+      {
+         if (disposing && (components != null))
+         {
+            components.Dispose();
+         }
+         base.Dispose(disposing);
+      }
+
+      #region Windows Form Designer generated code
+
+      /// <summary>
+      /// Required method for Designer support - do not modify
+      /// the contents of this method with the code editor.
+      /// </summary>
+      private void InitializeComponent()
+      {
+         this.pictureBoxImage = new System.Windows.Forms.PictureBox();
+         this.buttonBrowse = new System.Windows.Forms.Button();
+         this.buttonFire = new System.Windows.Forms.Button();
+         ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).BeginInit();
+         this.SuspendLayout();
+         // 
+         // pictureBoxImage
+         // 
+         this.pictureBoxImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+         this.pictureBoxImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+         this.pictureBoxImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+         this.pictureBoxImage.Location = new System.Drawing.Point(12, 41);
+         this.pictureBoxImage.Name = "pictureBoxImage";
+         this.pictureBoxImage.Size = new System.Drawing.Size(787, 571);
+         this.pictureBoxImage.TabIndex = 0;
+         this.pictureBoxImage.TabStop = false;
+         // 
+         // buttonBrowse
+         // 
+         this.buttonBrowse.Location = new System.Drawing.Point(12, 12);
+         this.buttonBrowse.Name = "buttonBrowse";
+         this.buttonBrowse.Size = new System.Drawing.Size(120, 23);
+         this.buttonBrowse.TabIndex = 1;
+         this.buttonBrowse.Text = "Выбрать картинку";
+         this.buttonBrowse.UseVisualStyleBackColor = true;
+         this.buttonBrowse.Click += new System.EventHandler(this.buttonBrowse_Click);
+         // 
+         // buttonFire
+         // 
+         this.buttonFire.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+         this.buttonFire.Location = new System.Drawing.Point(724, 624);
+         this.buttonFire.Name = "buttonFire";
+         this.buttonFire.Size = new System.Drawing.Size(75, 23);
+         this.buttonFire.TabIndex = 3;
+         this.buttonFire.Text = "Огонь";
+         this.buttonFire.UseVisualStyleBackColor = true;
+         this.buttonFire.Click += new System.EventHandler(this.buttonFire_Click);
+         // 
+         // FormImageCrop
+         // 
+         this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+         this.ClientSize = new System.Drawing.Size(811, 659);
+         this.Controls.Add(this.buttonFire);
+         this.Controls.Add(this.buttonBrowse);
+         this.Controls.Add(this.pictureBoxImage);
+         this.MaximizeBox = false;
+         this.MinimizeBox = false;
+         this.Name = "FormImageCrop";
+         this.ShowIcon = false;
+         this.Text = "Выбор картинки";
+         ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
+         this.ResumeLayout(false);
+
+      }
+
+      #endregion
+
+      private System.Windows.Forms.PictureBox pictureBoxImage;
+      private System.Windows.Forms.Button buttonBrowse;
+      private System.Windows.Forms.Button buttonFire;
+   }
+}

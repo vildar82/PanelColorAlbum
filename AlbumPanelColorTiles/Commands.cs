@@ -3,10 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
-using AlbumPanelColorTiles.Model;
-using AlbumPanelColorTiles.Model.Forms;
+using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Plot;
+using AlbumPanelColorTiles.RandomPainting;
+using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -24,7 +26,8 @@ namespace AlbumPanelColorTiles
       private static string _curDllDir;
       private Album _album;
       private string _msgHelp;
-      private RandomPainting _randomPainting;
+      private RandomPaintService _randomPainting;
+      private ImagePaintingService _imagePainting;
 
       public static string CurDllDir
       {
@@ -80,6 +83,8 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-AlbumPanels");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
+         if (!File.Exists(doc.Name))
+            throw new System.Exception("Нужно сохранить файл.");
          using (var DocLock = doc.LockDocument())
          {
             if (_album == null)
@@ -308,7 +313,7 @@ namespace AlbumPanelColorTiles
             // Произвольная покраска участка, с % распределением цветов зон покраски.
             if (_randomPainting == null)
             {
-               _randomPainting = new RandomPainting();
+               _randomPainting = new RandomPaintService();
             }
             _randomPainting.Start();            
          }
@@ -398,6 +403,27 @@ namespace AlbumPanelColorTiles
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
             ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
             Log.Info("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
+         }
+      }
+
+      [CommandMethod("AKR", "AKR-ImagePainting", CommandFlags.Modal)]
+      public void ImagePaintingCommand()
+      {
+         Log.Info("Start Command: AKR-ImagePainting");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            if (_imagePainting == null)
+            {
+               _imagePainting = new ImagePaintingService(doc);
+            }            
+            _imagePainting.Go(); 
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage("\n{0}", ex.ToString());
+            Log.Error(ex, "Command: AKR-ImagePainting");
          }
       }
    }

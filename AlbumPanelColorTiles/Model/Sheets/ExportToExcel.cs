@@ -1,5 +1,4 @@
-﻿using AlbumPanelColorTiles.Model;
-using Microsoft.Office.Interop.Excel;
+﻿using Microsoft.Office.Interop.Excel;
 
 namespace AlbumPanelColorTiles.Sheets
 {

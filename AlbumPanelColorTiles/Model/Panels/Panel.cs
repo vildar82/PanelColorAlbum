@@ -2,7 +2,7 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    // Панель Марки АР - вхождение блока на чертеже фасада.
    public class Panel : IEquatable<Panel>

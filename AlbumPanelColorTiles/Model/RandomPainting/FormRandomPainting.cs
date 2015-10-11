@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.RandomPainting
 {
    public partial class FormRandomPainting : Form
    {
@@ -14,13 +14,13 @@ namespace AlbumPanelColorTiles.Model
       private Dictionary<string, RandomPaint> _allPropers;
       private Dictionary<string, GroupBox> _groupBoxs;
       private Point _location;
-      private RandomPainting _randomPaintingService;
+      private RandomPaintService _randomPaintingService;
       private Dictionary<string, RandomPaint> _trackPropers;
       private bool isMouseDown = false;
-      private Point mouseOffset;
+      private Point mouseOffset;      
 
       public FormRandomPainting(Dictionary<string, RandomPaint> propers,
-         RandomPainting randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
+         RandomPaintService randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
       {
          InitializeComponent();
 
@@ -169,7 +169,7 @@ namespace AlbumPanelColorTiles.Model
       {
          using (EditorUserInteraction UI = _randomPaintingService.Ed.StartUserInteraction(this))
          {
-            _randomPaintingService.PromptExtents();
+            _randomPaintingService.PromptExtents();            
          }
       }
 

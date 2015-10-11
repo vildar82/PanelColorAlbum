@@ -5,7 +5,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    public class BlockFrameFacade
    {

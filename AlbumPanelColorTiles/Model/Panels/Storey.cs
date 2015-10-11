@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    // Этаж
    public class Storey : IEquatable<Storey>

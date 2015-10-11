@@ -4,7 +4,7 @@ using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    // Зона покраски
    public class ColorArea : IEquatable<ColorArea>, IComparable<ColorArea>

@@ -5,7 +5,7 @@ using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    // Марка АР покраски панели
    public class MarkArPanel : IEquatable<MarkArPanel>

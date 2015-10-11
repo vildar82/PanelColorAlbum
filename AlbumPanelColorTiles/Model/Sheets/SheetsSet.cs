@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Sheets

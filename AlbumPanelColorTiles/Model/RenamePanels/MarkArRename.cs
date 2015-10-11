@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlbumPanelColorTiles.Panels;
 
-namespace AlbumPanelColorTiles.Model.Forms
+namespace AlbumPanelColorTiles.RenamePanels
 {
    public class MarkArRename : IComparable<MarkArRename>
    {

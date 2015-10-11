@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using AlbumPanelColorTiles.Model;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;

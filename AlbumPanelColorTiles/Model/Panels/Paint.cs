@@ -1,7 +1,7 @@
 ﻿using System;
 using Autodesk.AutoCAD.Colors;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.Panels
 {
    // Краска
    public class Paint : IEquatable<Paint>

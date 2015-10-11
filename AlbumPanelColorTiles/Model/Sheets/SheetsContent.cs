@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AlbumPanelColorTiles.Lib;
-using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.RandomPainting
 {
    public class RandomPaint
    {

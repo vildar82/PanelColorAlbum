@@ -8,10 +8,10 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles.RandomPainting
 {
    // Произвольная покраска участа с % распределением цветов
-   public class RandomPainting
+   public class RandomPaintService
    {
       private int _countInsertBlocksSpot;
       private Database _db;
@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.Model
       private int _ysize; // кол рядов участков в зоне покраски
                           // Распределяемые цвета
 
-      public RandomPainting()
+      public RandomPaintService()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
@@ -44,28 +44,17 @@ namespace AlbumPanelColorTiles.Model
 
       public void PromptExtents()
       {
-         var prPtRes = _ed.GetPoint("Укажите первую точку зоны произвольной покраски");
-         if (prPtRes.Status == PromptStatus.OK)
-         {
-            var prCornerRes = _ed.GetCorner("Укажите вторую точку зоны произвольной покраски", prPtRes.Value);
-            if (prCornerRes.Status == PromptStatus.OK)
-            {
-               _extentsPrompted = new Extents3d();
-               _extentsPrompted.AddPoint(prPtRes.Value);
-               _extentsPrompted.AddPoint(prCornerRes.Value);
-
-               _spots = new List<Spot>();
-            }
-         }
-      }
+         _extentsPrompted =UserPrompt.PromptExtents(_ed, "Укажите первую точку зоны произвольной покраски", "Укажите вторую точку зоны произвольной покраски");
+         _spots = new List<Spot>();
+      }      
 
       public void Start()
       {
          resetData();
          // Проверка наличия блока зоны покраски
-         checkBlock(_db);
+         CheckBlockColorAre(_db);
          // Запрос области для покраски
-         PromptExtents();
+         PromptExtents();         
          // Список всех цветов (по списку листов) - которые можно добавить в распределение покраски зоны
          Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
          // Форма для распределения цветов
@@ -88,7 +77,7 @@ namespace AlbumPanelColorTiles.Model
          return true;
       }
 
-      private void checkBlock(Database db)
+      public static void CheckBlockColorAre(Database db)
       {
          using (var t = db.TransactionManager.StartTransaction())
          {
@@ -306,7 +295,7 @@ namespace AlbumPanelColorTiles.Model
       private void FormProper_Fire(object sender, EventArgs e)
       {
          try
-         {
+         {            
             // Удаление предыдущей покраски
             if (_spots.Count > 0)
             {
@@ -454,5 +443,15 @@ namespace AlbumPanelColorTiles.Model
                item.Value = 100d;
          }
       }
+      public static void SetDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot, ColorAreaSpotSize _colorAreaSize)
+      {
+         foreach (DynamicBlockReferenceProperty item in blRefcolorAreaSpot.DynamicBlockReferencePropertyCollection)
+         {
+            if (string.Equals(item.PropertyName, "Длина", StringComparison.InvariantCultureIgnoreCase))
+               item.Value = (double)_colorAreaSize.LenghtSpot;
+            else if (string.Equals(item.PropertyName, "Высота", StringComparison.InvariantCultureIgnoreCase))
+               item.Value = (double)_colorAreaSize.HeightSpot;
+         }
+      }      
    }
 }

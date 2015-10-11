@@ -1,4 +1,4 @@
-﻿namespace AlbumPanelColorTiles.Model
+﻿namespace AlbumPanelColorTiles
 {
    public class Options
    {

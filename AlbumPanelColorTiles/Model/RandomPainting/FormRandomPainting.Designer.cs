@@ -1,4 +1,4 @@
-﻿namespace AlbumPanelColorTiles.Model
+﻿namespace AlbumPanelColorTiles.RandomPainting
 {
    partial class FormRandomPainting
    {
@@ -111,6 +111,7 @@
          // FormRandomPainting
          // 
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+         this.CancelButton = this.buttonClose;
          this.ClientSize = new System.Drawing.Size(440, 174);
          this.Controls.Add(this.buttonSelect);
          this.Controls.Add(this.buttonClose);
