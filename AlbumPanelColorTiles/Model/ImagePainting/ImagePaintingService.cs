@@ -152,14 +152,14 @@ namespace AlbumPanelColorTiles.ImagePainting
       private Bitmap getBitmapForColorArea(Bitmap cropBitmap)
       {
          Bitmap resBitmap = new Bitmap(cropBitmap, new Size(_colorAreaSize.LenghtSize, _colorAreaSize.HeightSize));         
-         resBitmap = ConvertTo8bpp(resBitmap);
+         resBitmap = ConvertTo4bpp(resBitmap);
          return resBitmap;
       }
-      public static Bitmap ConvertTo8bpp(System.Drawing.Bitmap img)
+      public static Bitmap ConvertTo4bpp(System.Drawing.Bitmap img)
       {
          Bitmap res;
          FIBITMAP dib = FreeImage.CreateFromBitmap(img);
-         dib = FreeImage.ConvertColorDepth(dib, FREE_IMAGE_COLOR_DEPTH.FICD_08_BPP, true);
+         dib = FreeImage.ConvertColorDepth(dib, FREE_IMAGE_COLOR_DEPTH.FICD_04_BPP, true);
          res = FreeImage.GetBitmap(dib);
          FreeImage.UnloadEx(ref dib);
          return res;
