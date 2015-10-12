@@ -3,7 +3,7 @@ using Autodesk.AutoCAD.Colors;
 
 namespace AlbumPanelColorTiles.Panels
 {
-   public class TileCalc
+   public class TileCalc : IComparable <TileCalc>
    {
       private static double _oneTileArea;
       private string _colorMark;
@@ -44,6 +44,11 @@ namespace AlbumPanelColorTiles.Panels
             }
             return _totalArea;
          }
+      }
+
+      public int CompareTo(TileCalc other)
+      {
+         return other._count.CompareTo(_count);
       }
    }
 }

@@ -108,16 +108,15 @@ namespace AlbumPanelColorTiles.Sheets
             Extents3d extentsViewPort;
             var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t,
                               dbMarkSB, layersToFreezeOnFacadeSheet, null, true, out extentsViewPort);
-            // Заполнение таблицы
-            Extents3d extentsTable;
+            // Заполнение таблицы            
             ObjectId idTable;
-            FillTableTiles(idBtrLayoutMarkAR, t, out extentsTable, out idTable);
+            FillTableTiles(idBtrLayoutMarkAR, out idTable);
 
             // Проверка расположения таблицы
-            CheckTableExtents(extentsTable, extentsViewPort, idTable, t);
+            CheckTableExtents(extentsViewPort, idTable);
 
             // Заполнение штампа
-            FillingStampMarkAr(idBtrLayoutMarkAR, true, t);
+            FillingStampMarkAr(idBtrLayoutMarkAR, true);
 
             //
             // Создание листа "в Форме" (зеркально)
@@ -132,28 +131,33 @@ namespace AlbumPanelColorTiles.Sheets
             var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t,
                            dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false, out extentsViewPort);
             // Заполнение штампа
-            FillingStampMarkAr(idBtrLayoutMarkArForm, false, t);
+            FillingStampMarkAr(idBtrLayoutMarkArForm, false);
 
             t.Commit();
          }
       }
 
-      private void CheckTableExtents(Extents3d extentsTable, Extents3d extentsViewPort, ObjectId idTable, Transaction t)
+      private void CheckTableExtents(Extents3d extentsViewPort, ObjectId idTable)
       {
-         if (!Geometry.IsPointInBounds(extentsTable.MinPoint, extentsViewPort))
+         // Таблица выходит за границы видового экрана. (Видовой экран, как ориентир)
+         using (var table = idTable.GetObject(OpenMode.ForRead) as Table)
          {
-            // Таблица выходит за границы видового экрана. (Видовой экран, как ориентир)
-            var table = t.GetObject(idTable, OpenMode.ForWrite) as Table;
-            table.Position = new Point3d(table.Position.X, extentsViewPort.MinPoint.Y + (extentsTable.MaxPoint.Y - extentsTable.MinPoint.Y), 0);
-            table.Dispose();
+            var extTable = table.GeometricExtents;
+            if (!Geometry.IsPointInBounds(extTable.MinPoint, extentsViewPort))
+            {
+               Point3d newPt = new Point3d(table.Position.X,
+                  extentsViewPort.MinPoint.Y + (extTable.MaxPoint.Y - extTable.MinPoint.Y), 0);
+               table.UpgradeOpen();
+               table.Position = newPt;
+            }
          }
       }
 
       // Заполнение штампа содержания.
-      private void FillingStampMarkAr(ObjectId idBtrLayout, bool isFacadeView, Transaction t)
+      private void FillingStampMarkAr(ObjectId idBtrLayout, bool isFacadeView)
       {
-         var btrLayout = t.GetObject(idBtrLayout, OpenMode.ForRead) as BlockTableRecord;
-         var blRefStamp = FindStamp(btrLayout, t);
+         var btrLayout = idBtrLayout.GetObject(OpenMode.ForRead) as BlockTableRecord;
+         var blRefStamp = FindStamp(btrLayout);
          string textView;
          string textNumber;
          if (isFacadeView)
@@ -171,7 +175,7 @@ namespace AlbumPanelColorTiles.Sheets
          foreach (ObjectId idAtrRef in atrs)
          {
             if (idAtrRef.IsErased) continue;
-            var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
+            var atrRef = idAtrRef.GetObject(OpenMode.ForRead) as AttributeReference;
             string text = string.Empty;
             if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
             {
@@ -194,59 +198,61 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание и Заполнение таблицы расхода плитки
-      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, Transaction t, out Extents3d extentsTable, out ObjectId idTable)
+      private void FillTableTiles(ObjectId idBtrLayoutMarkAR, out ObjectId idTable)
       {
-         var btrLayout = t.GetObject(idBtrLayoutMarkAR, OpenMode.ForRead) as BlockTableRecord;
+         var btrLayout = idBtrLayoutMarkAR.GetObject(OpenMode.ForRead) as BlockTableRecord;
          // Поиск таблицы на листе
-         Table table = FindTable(btrLayout, t);
-         idTable = table.ObjectId;
-         extentsTable = table.GeometricExtents;
-
-         // Расчет плитки
-         var tilesCalc = _markAR.TilesCalc;
-         // Установка размера таблицы.
-         if (table.Rows.Count > 3)
+         using (Table table = FindTable(btrLayout))
          {
-            table.DeleteRows(3, table.Rows.Count - 3);
-            table.SetSize(tilesCalc.Count + 3, table.Columns.Count);
-         }
+            idTable = table.ObjectId;
+            // Расчет плитки
+            List<TileCalc> tilesCalc = _markAR.TilesCalc;
+            tilesCalc.Sort(); // Сортировка расчетных плиток по количеству.
+            // Установка размера таблицы.
+            if (table.Rows.Count > 3)
+            {
+               table.DeleteRows(3, table.Rows.Count - 3);
+               table.SetSize(tilesCalc.Count + 3, table.Columns.Count);
+            }
+            // Заголовок
+            table.Cells[0, 0].TextString = "Расход плитки на панель " + MarkArDocumentation;
+            // Подсчет плитки
+            int row = 2;
 
-         // Заголовок
-         table.Cells[0, 0].TextString = "Расход плитки на панель " + MarkArDocumentation;
-         // Подсчет плитки
-         int row = 2;
-
-         // Заполнение строк таблицы
-         foreach (var tileCalc in tilesCalc)
-         {
-            table.Cells[row, 1].TextString = tileCalc.ColorMark;
-            table.Cells[row, 2].BackgroundColor = tileCalc.Pattern;
-            table.Cells[row, 3].TextString = tileCalc.Count.ToString();
+            // Заполнение строк таблицы
+            foreach (var tileCalc in tilesCalc)
+            {
+               table.Cells[row, 1].TextString = tileCalc.ColorMark;
+               table.Cells[row, 2].BackgroundColor = tileCalc.Pattern;
+               table.Cells[row, 3].TextString = tileCalc.Count.ToString();
+               table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
+               table.Cells[row, 4].TextString = tileCalc.TotalArea.ToString();
+               table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
+               row++;
+            }
+            // Строка итогов.
+            // Объединить строку итогов (1,2 и 3 столбцы).
+            table.MergeCells(CellRange.Create(table, row, 0, row, 2));
+            table.Cells[row, 0].TextString = "Итого на панель:";
+            table.Cells[row, 0].Alignment = CellAlignment.MiddleCenter;
+            table.Cells[row, 3].TextString = _markAR.Paints.Count.ToString();//  totalCount.ToString();
             table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
-            table.Cells[row, 4].TextString = tileCalc.TotalArea.ToString();
+            table.Cells[row, 4].TextString = _markAR.MarkSB.TotalAreaTiles.ToString();//totalArea.ToString();
             table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
-            row++;
+
+            table.RecomputeTableBlock(true);
+            //table.Dispose();//???
          }
-         // Строка итогов.
-         // Объединить строку итогов (1,2 и 3 столбцы).
-         table.MergeCells(CellRange.Create(table, row, 0, row, 2));
-         table.Cells[row, 0].TextString = "Итого на панель:";
-         table.Cells[row, 0].Alignment = CellAlignment.MiddleCenter;
-         table.Cells[row, 3].TextString = _markAR.Paints.Count.ToString();//  totalCount.ToString();
-         table.Cells[row, 3].Alignment = CellAlignment.MiddleCenter;
-         table.Cells[row, 4].TextString = _markAR.MarkSB.TotalAreaTiles.ToString();//totalArea.ToString();
-         table.Cells[row, 4].Alignment = CellAlignment.MiddleCenter;
-         //table.Dispose();//???
       }
 
       // Поиск штампа на листе
-      private BlockReference FindStamp(BlockTableRecord btrLayout, Transaction t)
+      private BlockReference FindStamp(BlockTableRecord btrLayout)
       {
          foreach (ObjectId idEnt in btrLayout)
          {
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+               var blRefStampContent = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
                if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockFrameName)
                {
                   return blRefStampContent;
@@ -257,13 +263,13 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Поиск таблицы на листе
-      private Table FindTable(BlockTableRecord btrLayout, Transaction t)
+      private Table FindTable(BlockTableRecord btrLayout)
       {
          foreach (ObjectId idEnt in btrLayout)
          {
             if (idEnt.ObjectClass.Name == "AcDbTable")
             {
-               return t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Table;
+               return idEnt.GetObject( OpenMode.ForWrite, false, true) as Table;
             }
          }
          throw new Exception("Не найдена заготовка таблицы на листе в файле шаблона Марки СБ.");

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.ImagePainting
 {
@@ -64,33 +65,40 @@ namespace AlbumPanelColorTiles.ImagePainting
 
       private void setPictureImage(Image bitmap)
       {
+         // Установка размера формы
          var proportionImage = bitmap.Width / (double)bitmap.Height;
-         int maxWidthPictureBox = getMaxWidthPictureBox();
-         int maxHeightPictureBox = getMaxWidthPictureBox();
+         int maxWidthForm = 1024;
+         int maxHeightForm = 1024;
 
-         double scaleW = bitmap.Width / (double)maxWidthPictureBox;
-         double scaleH = bitmap.Height / (double)maxHeightPictureBox;
+         double scaleW = bitmap.Width / (double)maxWidthForm;
+         double scaleH = bitmap.Height / (double)maxHeightForm;
          if (scaleW > scaleH)
          {
-            pictureBoxImage.Width = maxWidthPictureBox;
-            pictureBoxImage.Height = Convert.ToInt32( maxWidthPictureBox / proportionImage);
+            ClientSize = new Size(maxWidthForm, Convert.ToInt32(maxWidthForm / proportionImage));            
          }
          else
          {
-            pictureBoxImage.Height = maxHeightPictureBox;
-            pictureBoxImage.Width = Convert.ToInt32(maxHeightPictureBox * proportionImage);
-         }
+            ClientSize = new Size(Convert.ToInt32(maxHeightForm * proportionImage), maxHeightForm);            
+         }         
+
+         //// установка размера picturebox
+         //int maxWidthPictureBox = Width - 40;
+         //int maxHeightPictureBox = Height - 126;
+
+         //scaleW = bitmap.Width / (double)maxWidthPictureBox;
+         //scaleH = bitmap.Height / (double)maxHeightPictureBox;
+         //if (scaleW > scaleH)
+         //{
+         //   pictureBoxImage.Width = maxWidthPictureBox;
+         //   pictureBoxImage.Height = Convert.ToInt32(maxWidthPictureBox / proportionImage);
+         //}
+         //else
+         //{
+         //   pictureBoxImage.Height = maxHeightPictureBox;
+         //   pictureBoxImage.Width = Convert.ToInt32(maxHeightPictureBox * proportionImage);
+         //}
          pictureBoxImage.Image = bitmap;
          pictureBoxImage.SizeMode = PictureBoxSizeMode.Zoom; 
-      }
-
-      private int getMaxWidthPictureBox()
-      {
-         return Width - 40;
-      }
-      private int getMaxHeightPictureBox()
-      {
-         return Height - 126;
       }
 
       private void buttonFire_Click(object sender, EventArgs e)
@@ -157,18 +165,27 @@ namespace AlbumPanelColorTiles.ImagePainting
 
       private void FormImageCrop_SizeChanged(object sender, EventArgs e)
       {
-         if (pictureBoxImage.Image != null)
-         {
-            setPictureImage(pictureBoxImage.Image);
-            setUserRect();
-         }
+         //if (pictureBoxImage.Image != null)
+         //{
+         //   setPictureImage(pictureBoxImage.Image);
+         //   setUserRect();
+         //}
       }
 
       private void FormImageCrop_Activated(object sender, EventArgs e)
       {
          if (pictureBoxImage.Image != null)
          {
-            setPictureImage(pictureBoxImage.Image);
+            //setPictureImage(pictureBoxImage.Image);
+            setUserRect();
+         }
+      }
+
+      private void buttonSelect_Click(object sender, EventArgs e)
+      {
+         using (EditorUserInteraction UI = _imagePaintingService.Doc.Editor.StartUserInteraction(this))
+         {
+            _imagePaintingService.PromptExtents();
             setUserRect();
          }
       }

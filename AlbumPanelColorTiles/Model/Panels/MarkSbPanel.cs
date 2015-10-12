@@ -177,6 +177,11 @@ namespace AlbumPanelColorTiles.Panels
 
             foreach (ObjectId idEnt in ms)
             {
+               if (HostApplicationServices.Current.UserBreak())
+               {
+                  throw new System.Exception("Отменено пользователем.");
+               }
+
                progressMeter.MeterProgress();
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {

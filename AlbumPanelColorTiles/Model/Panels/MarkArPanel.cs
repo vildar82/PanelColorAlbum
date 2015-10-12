@@ -62,7 +62,7 @@ namespace AlbumPanelColorTiles.Panels
             if (_tilesCalc == null)
             {
                _tilesCalc = CalculateTiles();
-            }
+            }            
             return _tilesCalc;
          }
       }

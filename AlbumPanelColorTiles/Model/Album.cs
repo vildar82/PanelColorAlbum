@@ -214,6 +214,9 @@ namespace AlbumPanelColorTiles
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
             foreach (ObjectId idBtr in bt)
             {
+               if (HostApplicationServices.Current.UserBreak())
+                  throw new System.Exception("Отменено пользователем.");
+
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
                if (MarkSbPanel.IsBlockNamePanel(btr.Name))
                {
@@ -388,6 +391,9 @@ namespace AlbumPanelColorTiles
          foreach (var markSB in _marksSB)
          {
             progressMeter.MeterProgress();
+            if (HostApplicationServices.Current.UserBreak())            
+               throw new System.Exception("Отменено пользователем.");
+                        
             foreach (var markAR in markSB.MarksAR)
             {
                markAR.CreateBlock();
@@ -473,6 +479,9 @@ namespace AlbumPanelColorTiles
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(_db), OpenMode.ForWrite) as BlockTableRecord;
             foreach (var markSb in _marksSB)
             {
+               if (HostApplicationServices.Current.UserBreak())
+                  throw new System.Exception("Отменено пользователем.");
+
                markSb.ReplaceBlocksSbOnAr(t, ms);
                progressMeter.MeterProgress();
             }

@@ -32,6 +32,7 @@ namespace AlbumPanelColorTiles.ImagePainting
       }
 
       public ColorAreaSpotSize ColorAreaSize { get { return _colorAreaSize; } }
+      public Document Doc { get { return _doc; } }
 
       public void Go()
       {
@@ -87,7 +88,7 @@ namespace AlbumPanelColorTiles.ImagePainting
                   progressMeter.MeterProgress();
                   int x = i / bitmap.Height;
                   int y = i % bitmap.Height;                  
-                  Point3d position = ptStart.Add(new Vector3d(x * _colorAreaSize.LenghtSpot, -y * _colorAreaSize.HeightSpot, 0));
+                  Point3d position = ptStart.Add(new Vector3d(x * _colorAreaSize.LenghtSpot, -(y+1) * _colorAreaSize.HeightSpot, 0));
                   insertSpot(position, getLayerId(bitmap.GetPixel(x, y), _layers));
                }
                blRefColorAreaTemplate.Erase(true);
@@ -167,9 +168,14 @@ namespace AlbumPanelColorTiles.ImagePainting
       // Запрос выбора зоны покраски на чертеже
       public void PromptExtents()
       {
-         Extents3d ext = Lib.UserPrompt.PromptExtents(_doc.Editor, "Укажите первый угол зоны покраски", "Укажите второй угол зоны покраски");         
-         _colorAreaSize.ExtentsColorArea = ext;
+         string errMsg = string.Empty;
+         do
+         {
+            Extents3d ext = Lib.UserPrompt.PromptExtents(_doc.Editor, "\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
+            _colorAreaSize.ExtentsColorArea = ext;
+            errMsg = "\nНужно выбрать область побольше.";
 
+         } while (_colorAreaSize.LenghtSize < 1 || _colorAreaSize.HeightSize <1);
          _idsInsertBlRefColorArea = new List<ObjectId>();
       }
 

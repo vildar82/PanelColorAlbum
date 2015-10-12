@@ -22,6 +22,14 @@ namespace AlbumPanelColorTiles.Lib
                extentsPrompted.AddPoint(prPtRes.Value);
                extentsPrompted.AddPoint(prCornerRes.Value);
             }
+            else
+            {
+               throw new Exception("Отменено пользователем.");
+            }
+         }
+         else
+         {
+            throw new Exception("Отменено пользователем.");
          }
          return extentsPrompted;
       }

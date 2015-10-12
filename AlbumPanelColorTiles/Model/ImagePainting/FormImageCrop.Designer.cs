@@ -31,19 +31,18 @@
          this.pictureBoxImage = new System.Windows.Forms.PictureBox();
          this.buttonBrowse = new System.Windows.Forms.Button();
          this.buttonFire = new System.Windows.Forms.Button();
+         this.buttonSelect = new System.Windows.Forms.Button();
          ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).BeginInit();
          this.SuspendLayout();
          // 
          // pictureBoxImage
          // 
-         this.pictureBoxImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
          this.pictureBoxImage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
          this.pictureBoxImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-         this.pictureBoxImage.Location = new System.Drawing.Point(12, 41);
+         this.pictureBoxImage.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.pictureBoxImage.Location = new System.Drawing.Point(0, 0);
          this.pictureBoxImage.Name = "pictureBoxImage";
-         this.pictureBoxImage.Size = new System.Drawing.Size(950, 676);
+         this.pictureBoxImage.Size = new System.Drawing.Size(974, 764);
          this.pictureBoxImage.TabIndex = 0;
          this.pictureBoxImage.TabStop = false;
          // 
@@ -68,14 +67,28 @@
          this.buttonFire.UseVisualStyleBackColor = true;
          this.buttonFire.Click += new System.EventHandler(this.buttonFire_Click);
          // 
+         // buttonSelect
+         // 
+         this.buttonSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+         this.buttonSelect.BackgroundImage = global::AlbumPanelColorTiles.Properties.Resources.select;
+         this.buttonSelect.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+         this.buttonSelect.Location = new System.Drawing.Point(0, 739);
+         this.buttonSelect.Name = "buttonSelect";
+         this.buttonSelect.Size = new System.Drawing.Size(25, 25);
+         this.buttonSelect.TabIndex = 8;
+         this.buttonSelect.UseVisualStyleBackColor = true;
+         this.buttonSelect.Click += new System.EventHandler(this.buttonSelect_Click);
+         // 
          // FormImageCrop
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(974, 764);
+         this.Controls.Add(this.buttonSelect);
          this.Controls.Add(this.buttonFire);
          this.Controls.Add(this.buttonBrowse);
          this.Controls.Add(this.pictureBoxImage);
+         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
          this.MaximizeBox = false;
          this.MinimizeBox = false;
          this.Name = "FormImageCrop";
@@ -94,5 +107,6 @@
       private System.Windows.Forms.PictureBox pictureBoxImage;
       private System.Windows.Forms.Button buttonBrowse;
       private System.Windows.Forms.Button buttonFire;
+      private System.Windows.Forms.Button buttonSelect;
    }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using AlbumPanelColorTiles.Panels;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Sheets
@@ -62,6 +63,8 @@ namespace AlbumPanelColorTiles.Sheets
          int countMarkSB = 1;
          foreach (var sheetMarkSB in _sheetsMarkSB)
          {
+            if (HostApplicationServices.Current.UserBreak())
+               throw new System.Exception("Отменено пользователем.");
             progressMeter.MeterProgress();
             sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++, blFrameSearch);
          }

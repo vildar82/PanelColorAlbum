@@ -51,12 +51,12 @@ namespace AlbumPanelColorTiles.RandomPainting
       }
 
       private void calcSizes()
-      {
-         _lenght = Convert.ToInt32(_extentsColorArea.MaxPoint.X - _extentsColorArea.MinPoint.X);
-         _height = Convert.ToInt32(_extentsColorArea.MaxPoint.Y - _extentsColorArea.MinPoint.Y);
-         _lenghtSize =Convert.ToInt32( _lenght / (double)_lenghtSpot);
-         _heightSize = Convert.ToInt32(_height / (double)_heightSpot);
+      {         
+         _lenghtSize =Convert.ToInt32((_extentsColorArea.MaxPoint.X - _extentsColorArea.MinPoint.X) / _lenghtSpot);
+         _heightSize = Convert.ToInt32((_extentsColorArea.MaxPoint.Y - _extentsColorArea.MinPoint.Y) / _heightSpot);
          _proportionWidthToHeight = _lenghtSize / (double)_heightSize;
+         _lenght = _lenghtSize * _lenghtSpot;
+         _height = _heightSize * _heightSpot;
       }
 
       public void ChangeSize()
