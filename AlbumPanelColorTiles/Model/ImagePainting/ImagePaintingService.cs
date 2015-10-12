@@ -8,6 +8,7 @@ using AlbumPanelColorTiles.RandomPainting;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 using FreeImageAPI;
 
 namespace AlbumPanelColorTiles.ImagePainting
@@ -75,8 +76,15 @@ namespace AlbumPanelColorTiles.ImagePainting
 
                Dictionary<Color, ObjectId> _layers = new Dictionary<Color, ObjectId>();
 
+               ProgressMeter progressMeter = new ProgressMeter();
+               progressMeter.SetLimit(bitmap.Width * bitmap.Height);
+               progressMeter.Start("Вставка блоков зон покраски");
+
                for (int i = 0; i < bitmap.Width * bitmap.Height; i++)
                {
+                  if (HostApplicationServices.Current.UserBreak())
+                     break;
+                  progressMeter.MeterProgress();
                   int x = i / bitmap.Height;
                   int y = i % bitmap.Height;                  
                   Point3d position = ptStart.Add(new Vector3d(x * _colorAreaSize.LenghtSpot, -y * _colorAreaSize.HeightSpot, 0));
@@ -84,6 +92,9 @@ namespace AlbumPanelColorTiles.ImagePainting
                }
                blRefColorAreaTemplate.Erase(true);
                t.Commit();
+
+               progressMeter.Stop();
+               _doc.Editor.Regen();  
             }
          }
       }
@@ -157,7 +168,9 @@ namespace AlbumPanelColorTiles.ImagePainting
       public void PromptExtents()
       {
          Extents3d ext = Lib.UserPrompt.PromptExtents(_doc.Editor, "Укажите первый угол зоны покраски", "Укажите второй угол зоны покраски");         
-         _colorAreaSize.ExtentsColorArea = ext; 
+         _colorAreaSize.ExtentsColorArea = ext;
+
+         _idsInsertBlRefColorArea = new List<ObjectId>();
       }
 
       // Вставка ячейки покраски (пока = одной плитке)

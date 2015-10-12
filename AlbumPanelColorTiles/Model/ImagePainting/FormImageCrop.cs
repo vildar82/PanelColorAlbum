@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.ImagePainting
          fileDia.Filter = "Картинки | *.jpg; *.jpeg; *.png;";
          if (fileDia.ShowDialog() == DialogResult.OK)
          {
-            setPictureImage( new Bitmap(fileDia.FileName));
+            setPictureImage(new Bitmap(fileDia.FileName));
             setUserRect();
          }
       }
@@ -51,11 +51,18 @@ namespace AlbumPanelColorTiles.ImagePainting
             userRect.Height = pictureBoxImage.Height;
             userRect.Width = Convert.ToInt32(pictureBoxImage. Height * _imagePaintingService.ColorAreaSize.ProportionWidthToHeight);
          }
-         _userRect = new UserRect(userRect);
-         _userRect.SetPictureBox(pictureBoxImage);
+         if (_userRect == null)
+         {
+            _userRect = new UserRect(userRect);
+            _userRect.SetPictureBox(pictureBoxImage);
+         }
+         else
+         {
+            _userRect.rect = userRect; 
+         }         
       }
 
-      private void setPictureImage(Bitmap bitmap)
+      private void setPictureImage(Image bitmap)
       {
          var proportionImage = bitmap.Width / (double)bitmap.Height;
          int maxWidthPictureBox = getMaxWidthPictureBox();
@@ -88,13 +95,22 @@ namespace AlbumPanelColorTiles.ImagePainting
 
       private void buttonFire_Click(object sender, EventArgs e)
       {
-         _cropBitmap = getCropBitmap();
-         if (_cropBitmap == null)
+         try
          {
-            MessageBox.Show("Не определена обрезанная картинка", "АКР Покраска картинкой",  MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
+            _cropBitmap = getCropBitmap();
+            if (_cropBitmap == null)
+            {
+               MessageBox.Show("Не определена обрезанная картинка", "АКР Покраска картинкой", MessageBoxButtons.OK, MessageBoxIcon.Error);               
+            }
+            else
+            {
+               Fire(_cropBitmap, e);
+            }            
          }
-         Fire(_cropBitmap, e);
+         catch (Exception ex)
+         {
+            Log.Error(ex, "getCropBitmap()");            
+         }                           
       }
 
       private Bitmap getCropBitmap()
@@ -137,6 +153,24 @@ namespace AlbumPanelColorTiles.ImagePainting
          yCorrect = Convert.ToInt32(((double)rectCrop.Location.Y - dY) * scale);
 
          return new Rectangle(xCorrect, yCorrect, Convert.ToInt32(rectCrop.Width * scale), Convert.ToInt32(rectCrop.Height * scale));
+      }
+
+      private void FormImageCrop_SizeChanged(object sender, EventArgs e)
+      {
+         if (pictureBoxImage.Image != null)
+         {
+            setPictureImage(pictureBoxImage.Image);
+            setUserRect();
+         }
+      }
+
+      private void FormImageCrop_Activated(object sender, EventArgs e)
+      {
+         if (pictureBoxImage.Image != null)
+         {
+            setPictureImage(pictureBoxImage.Image);
+            setUserRect();
+         }
       }
    }
 }

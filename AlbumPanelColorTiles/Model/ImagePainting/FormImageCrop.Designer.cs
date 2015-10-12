@@ -43,7 +43,7 @@
          this.pictureBoxImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
          this.pictureBoxImage.Location = new System.Drawing.Point(12, 41);
          this.pictureBoxImage.Name = "pictureBoxImage";
-         this.pictureBoxImage.Size = new System.Drawing.Size(787, 571);
+         this.pictureBoxImage.Size = new System.Drawing.Size(950, 676);
          this.pictureBoxImage.TabIndex = 0;
          this.pictureBoxImage.TabStop = false;
          // 
@@ -60,7 +60,7 @@
          // buttonFire
          // 
          this.buttonFire.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-         this.buttonFire.Location = new System.Drawing.Point(724, 624);
+         this.buttonFire.Location = new System.Drawing.Point(887, 729);
          this.buttonFire.Name = "buttonFire";
          this.buttonFire.Size = new System.Drawing.Size(75, 23);
          this.buttonFire.TabIndex = 3;
@@ -72,7 +72,7 @@
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(811, 659);
+         this.ClientSize = new System.Drawing.Size(974, 764);
          this.Controls.Add(this.buttonFire);
          this.Controls.Add(this.buttonBrowse);
          this.Controls.Add(this.pictureBoxImage);
@@ -80,7 +80,10 @@
          this.MinimizeBox = false;
          this.Name = "FormImageCrop";
          this.ShowIcon = false;
+         this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
          this.Text = "Выбор картинки";
+         this.Activated += new System.EventHandler(this.FormImageCrop_Activated);
+         this.SizeChanged += new System.EventHandler(this.FormImageCrop_SizeChanged);
          ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
          this.ResumeLayout(false);
 
