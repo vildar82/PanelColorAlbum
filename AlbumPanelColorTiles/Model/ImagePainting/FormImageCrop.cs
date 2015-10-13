@@ -67,8 +67,8 @@ namespace AlbumPanelColorTiles.ImagePainting
       {
          // Установка размера формы
          var proportionImage = bitmap.Width / (double)bitmap.Height;
-         int maxWidthForm = 1024;
-         int maxHeightForm = 1024;
+         int maxWidthForm = 1200;
+         int maxHeightForm = 950;
 
          double scaleW = bitmap.Width / (double)maxWidthForm;
          double scaleH = bitmap.Height / (double)maxHeightForm;
@@ -185,8 +185,12 @@ namespace AlbumPanelColorTiles.ImagePainting
       {
          using (EditorUserInteraction UI = _imagePaintingService.Doc.Editor.StartUserInteraction(this))
          {
-            _imagePaintingService.PromptExtents();
-            setUserRect();
+            try
+            {
+               _imagePaintingService.PromptExtents();
+               setUserRect();
+            }
+            catch { }
          }
       }
    }

@@ -169,13 +169,19 @@ namespace AlbumPanelColorTiles.ImagePainting
       public void PromptExtents()
       {
          string errMsg = string.Empty;
+         Extents3d ext;
+         Vector3d len;
          do
          {
-            Extents3d ext = Lib.UserPrompt.PromptExtents(_doc.Editor, "\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
-            _colorAreaSize.ExtentsColorArea = ext;
+            if (errMsg != string.Empty)
+            {
+               _doc.Editor.WriteMessage("\n{0}", errMsg);
+            }
+            ext = Lib.UserPrompt.PromptExtents(_doc.Editor, "\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
+            len = ext.MaxPoint - ext.MinPoint;
             errMsg = "\nНужно выбрать область побольше.";
-
-         } while (_colorAreaSize.LenghtSize < 1 || _colorAreaSize.HeightSize <1);
+         } while (len.Length < 600);
+         _colorAreaSize.ExtentsColorArea = ext;
          _idsInsertBlRefColorArea = new List<ObjectId>();
       }
 
