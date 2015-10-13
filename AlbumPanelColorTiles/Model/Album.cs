@@ -408,7 +408,7 @@ namespace AlbumPanelColorTiles
          try
          {            
             var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
-            res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
+            res = (string)keyAKR.GetValue("Abbreviate", res);
          }
          catch { }
          return res;
