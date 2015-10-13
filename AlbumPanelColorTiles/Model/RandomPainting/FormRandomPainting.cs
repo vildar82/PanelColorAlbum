@@ -161,10 +161,8 @@ namespace AlbumPanelColorTiles.RandomPainting
       }
 
       private void buttonDraw_Click(object sender, EventArgs e)
-      {
-         Hide();
-         Fire(_trackPropers, e);
-         Show();
+      {         
+         Fire(_trackPropers, e);         
       }
 
       private void buttonSelect_Click(object sender, EventArgs e)

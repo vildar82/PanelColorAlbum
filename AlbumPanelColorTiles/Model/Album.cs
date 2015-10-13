@@ -459,7 +459,6 @@ namespace AlbumPanelColorTiles
       {
          // Определение этажа панели.
          IdentificationStoreys(marksSB);
-
          // Маркировка Марок АР по архитектурному индексу
          foreach (var markSB in marksSB)
          {
