@@ -345,7 +345,7 @@ namespace AlbumPanelColorTiles.RandomPainting
             Log.Debug("Время вставки блоков {0} сек.", _stopwatch.Elapsed.Seconds);
 
             _stopwatch.Restart();
-            _ed.Regen();
+            //_ed.Regen();
             _stopwatch.Stop();
             Log.Debug("Regen {0} сек.", _stopwatch.Elapsed.Seconds);
          }
