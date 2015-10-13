@@ -52,8 +52,7 @@ namespace AlbumPanelColorTiles.Plot
          progressMeter.SetLimit(filesDwg.Count());
          progressMeter.Start("Печать всех файлов в папке " + dir);
 
-         int i = 0;
-         int countFiles = filesDwg.Count();
+         int i = 0;         
          foreach (var fileDwg in filesDwg)
          {            
             if (_isCancelPublish || HostApplicationServices.Current.UserBreak())
@@ -72,7 +71,7 @@ namespace AlbumPanelColorTiles.Plot
                using (var lockDoc = docOpen.LockDocument())
                {
                   //MultiSheetPlot(Path.GetDirectoryName(docOpen.Name));                  
-                  MultiSheetPlot(string.Format("Печать {0} из {1} файлов в папке {2}", i++, countFiles, dirInfo.Name));
+                  MultiSheetPlot(string.Format("Печать {0} из {1} файлов в папке {2}", i++, filesDwg.Length, dirInfo.Name));
                }
             }
             catch (System.Exception ex)
