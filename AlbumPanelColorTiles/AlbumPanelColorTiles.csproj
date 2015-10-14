@@ -68,7 +68,6 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Checks\Error.cs" />
-    <Compile Include="Model\Checks\ErrorObject.cs" />
     <Compile Include="Model\Checks\FormError.cs">
       <SubType>Form</SubType>
     </Compile>

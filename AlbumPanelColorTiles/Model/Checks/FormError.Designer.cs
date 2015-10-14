@@ -67,6 +67,7 @@
          this.listBoxError.Name = "listBoxError";
          this.listBoxError.Size = new System.Drawing.Size(642, 292);
          this.listBoxError.TabIndex = 3;
+         this.listBoxError.SelectedIndexChanged += new System.EventHandler(this.listBoxError_SelectedIndexChanged);
          this.listBoxError.DoubleClick += new System.EventHandler(this.buttonShow_Click);
          // 
          // FormError

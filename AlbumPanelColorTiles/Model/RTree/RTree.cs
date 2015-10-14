@@ -346,7 +346,6 @@ namespace RTreeLib
          return retval;
       }
 
-
       private void nearest(Point p, intproc v, double furthestDistance)
       {
          Node<T> rootNode = getNode(rootNodeId);
@@ -373,7 +372,6 @@ namespace RTreeLib
          return retval;
       }
 
-
       private void intersects(Rectangle r, intproc v)
       {
          Node<T> rootNode = getNode(rootNodeId);
@@ -392,7 +390,6 @@ namespace RTreeLib
          {
             retval.Add(IdsToItems[id]);
          });
-
          return retval;
       }
 

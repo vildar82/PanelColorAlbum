@@ -299,8 +299,9 @@ namespace AlbumPanelColorTiles
          ResetBlocks();
 
          // Проверка чертежа
-         Inspector.Reset(); 
-         if (!Inspector.CheckDrawing())
+         Inspector.Reset();
+         Inspector.CheckDrawing();
+         if(Inspector.HasErrors)
          {
             throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");
          }
@@ -313,9 +314,9 @@ namespace AlbumPanelColorTiles
          }
 
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
-         if (!Inspector.CheckAllTileArePainted(_marksSB))
+         if (Inspector.HasErrors)
          {            
-            throw new System.Exception("\nПокраска не выполнена, не все плитки покрашены. См. подробности выше.");
+            throw new System.Exception("\nПокраска не выполнена, не все плитки покрашены. См. список непокрашенных плиток в форме ошибок.");
          }
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
