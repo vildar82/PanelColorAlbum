@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 
@@ -17,15 +18,17 @@ namespace AlbumPanelColorTiles.RenamePanels
       {
          InitializeComponent();
          _marksArForRename = MarkArRename.GetMarks(album);
+         // загрузка сохраненных переименований
+         DictNOD.LoadFromDict(ref _marksArForRename);
          // Сортировка панелей.
          _marksArForRename = _marksArForRename.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
-         _bindingsMarksArRename = new BindingSource();
+         _bindingsMarksArRename = new BindingSource();         
          _bindingsMarksArRename.DataSource = _marksArForRename.Values;
 
          listBoxMarksAR.DataSource = _bindingsMarksArRename;
-         listBoxMarksAR.DisplayMember = "MarkArCurFull";
-         textBoxOldMarkAR.DataBindings.Add("Text", _bindingsMarksArRename, "MarkPainting", false, DataSourceUpdateMode.OnPropertyChanged);
+         listBoxMarksAR.DisplayMember = "MarkArCurFull";         
+         textBoxOldMarkAR.DataBindings.Add("Text", _bindingsMarksArRename, "MarkAR.MarkPaintingCalulated", false, DataSourceUpdateMode.OnPropertyChanged);
       }
 
       public List<MarkArRename> RenamedMarksAr()
@@ -56,21 +59,22 @@ namespace AlbumPanelColorTiles.RenamePanels
             errorProviderError.SetError(buttonShow, "Не выбрана панель в списке.");
             return;
          }
-         string markArOld = markArForRename.MarkArCurFull;
-         string markArNew = markArForRename.GetMarkArPreview(newPaintingMark);
+         //string markArOld = markArForRename.MarkArCurFull;
+         //string markArNew = markArForRename.GetMarkArPreview(newPaintingMark);
 
          // Проверка новаой марки
-         if (_marksArForRename.ContainsKey(markArNew))
+         //if (_marksArForRename.ContainsKey(markArNew))
+         if (MarkArRename.ContainsRenamePainting(markArForRename, newPaintingMark, _marksArForRename))
          {
-            MessageBox.Show("Панель с такой маркой уже есть. Переименование отклонено.",
-               string.Format("{0} в {1}", markArOld, markArNew), MessageBoxButtons.OK, MessageBoxIcon.Hand);
+            MessageBox.Show("Панель с такой маркой уже есть. Переименование отклонено.");//, string.Format("{0} в {1}", markArOld, markArNew), MessageBoxButtons.OK, MessageBoxIcon.Hand);
             errorProviderError.SetError(textBoxNewMark, "Панель с такой маркой уже есть.");
          }
          else
          {
-            markArForRename.RenamePainting(newPaintingMark);
-            _marksArForRename.Remove(markArForRename.MarkArCurFull);
-            _marksArForRename.Add(markArForRename.MarkArCurFull, markArForRename);
+            markArForRename.RenameMark(newPaintingMark, _marksArForRename);
+            //markArForRename.RenamePainting(newPaintingMark);
+            //_marksArForRename.Remove(markArForRename.MarkArCurFull);
+            //_marksArForRename.Add(markArForRename.MarkArCurFull, markArForRename);
             _bindingsMarksArRename.ResetBindings(false);
             errorProviderOk.SetError(textBoxNewMark, "Панель переименована.");
          }
@@ -104,6 +108,10 @@ namespace AlbumPanelColorTiles.RenamePanels
          MarkArRename markArForRename = listBoxMarksAR.SelectedItem as MarkArRename;
          if (markArForRename == null) return;
          labelPreview.Text = getMarkArPreview();
+         if (markArForRename.IsRenamed)
+         {
+            textBoxNewMark.Text = markArForRename.MarkPainting;
+         }
          ClearErrors();
       }
 
@@ -133,6 +141,30 @@ namespace AlbumPanelColorTiles.RenamePanels
       private void FormRenameMarkAR_KeyUp(object sender, KeyEventArgs e)
       {
          if (e.KeyCode == Keys.Escape) this.Close(); 
-      }      
+      }
+
+      private void listBoxMarksAR_DrawItem(object sender, DrawItemEventArgs e)
+      {
+         e.DrawBackground();
+         MarkArRename markArForRename = ((ListBox)sender).Items[e.Index] as MarkArRename;
+         // Покраска
+         if (markArForRename.IsRenamed)
+         {            
+            if (listBoxMarksAR.SelectedIndex == e.Index)
+            {
+               e.Graphics.FillRectangle(System.Drawing.Brushes.Green, e.Bounds);
+            }
+            else
+            {
+               e.Graphics.FillRectangle(System.Drawing.Brushes.LightGreen, e.Bounds);
+            }
+         }
+         else
+         {
+            //e.Graphics.FillRectangle( System.Drawing.Brushes., e.Bounds);
+         }                       
+         // Текст
+         e.Graphics.DrawString(markArForRename.MarkArCurFull, ((Control)sender).Font, System.Drawing.Brushes.Black, e.Bounds.X, e.Bounds.Y);
+      }
    }
 }

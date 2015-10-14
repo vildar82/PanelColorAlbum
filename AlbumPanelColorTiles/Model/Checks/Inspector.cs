@@ -7,25 +7,36 @@ using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.Checks
 {
-   public class Inspector
+   public static class Inspector
    {
-      private Database _db;
-      private Document _doc;
-      private Editor _ed;
-      private List<string> _markArBtrNames;
+      private static Database _db;
+      private static Document _doc;
+      private static Editor _ed;
+      private static List<string> _markArBtrNames;
+      private static List<Error> _errors;
+
+      public static List<Error> Errors { get { return _errors; } }
 
       // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
-      private List<ErrorObject> _notPaintedTilesInMarkAR;
+      private static List<ErrorObject> _notPaintedTilesInMarkAR;
 
-      public Inspector()
+      static Inspector()
       {
+         _errors = new List<Error>();
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
          _ed = _doc.Editor;
       }
 
+      public static void Reset ()
+      {
+         _errors = new List<Error>();
+         _notPaintedTilesInMarkAR = new List<ErrorObject>();
+         _markArBtrNames = new List<string>();
+      }
+
       // Проверка, все ли плитки покрашены
-      public bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)
+      public static bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)
       {
          bool res = true;
          _notPaintedTilesInMarkAR = new List<ErrorObject>();
@@ -61,19 +72,16 @@ namespace AlbumPanelColorTiles.Checks
       }
 
       // Проверка чертежа
-      public bool CheckDrawing()
+      public static bool CheckDrawing()
       {
          bool res = true;
          using (var t = _db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
-
             // 1. Не должно быть блоков Марки АР.
             CheckBtrMarkAr(bt, t);
-
             t.Commit();
          }
-
          if (_markArBtrNames.Count > 0)
          {
             res = false;
@@ -85,7 +93,7 @@ namespace AlbumPanelColorTiles.Checks
       }
 
       // Проверка наличия определений блоков Марки АР
-      private bool CheckBtrMarkAr(BlockTable bt, Transaction t)
+      private static bool CheckBtrMarkAr(BlockTable bt, Transaction t)
       {
          bool res = true;
          _markArBtrNames = new List<string>();
@@ -99,6 +107,11 @@ namespace AlbumPanelColorTiles.Checks
             }
          }
          return res;
+      }
+
+      public static void Show()
+      {
+         Application.ShowModelessDialog(new FormError());
       }
    }
 }

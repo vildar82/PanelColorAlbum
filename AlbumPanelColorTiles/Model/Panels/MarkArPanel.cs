@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -13,8 +14,10 @@ namespace AlbumPanelColorTiles.Panels
       private ObjectId _idBtrAr;
       private string _markArBlockName;
       private string _markARPanelFullName;
+      private string _markARPanelFullNameCalculated;
       private string _markArTemp;
       private string _markPainting;
+      private string _markPaintingCalulated; // вычесленная программой марка покраски, в методе DefineArchitectMarks класса MarkSbPanel
       private MarkSbPanel _markSB;
       private List<Paint> _paints;
       private List<Panel> _panels;
@@ -32,22 +35,49 @@ namespace AlbumPanelColorTiles.Panels
 
       public string MarkArBlockName { get { return _markArBlockName; } }
 
-      public string MarkARPanelFullName { get { return _markARPanelFullName; } }
+      public string MarkPaintingCalulated
+      {
+         get { return _markPaintingCalulated; }
+         set {
+            _markPaintingCalulated = value;
+            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPaintingCalulated), _markSB.Abbr);
+            _markARPanelFullNameCalculated = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPaintingCalulated, _markSB.Abbr);
+         }
+      }
+
+      public string MarkARPanelFullName
+      {
+         get
+         {
+            if (string.IsNullOrEmpty (_markARPanelFullName) )
+            {
+               return _markARPanelFullNameCalculated;
+            }
+            return _markARPanelFullName;
+         }
+      }
+      public string MarkARPanelFullNameCalculated { get { return _markARPanelFullNameCalculated; } }
 
       public string MarkPainting
       {
-         get { return _markPainting; }
+         get {
+            if(string.IsNullOrEmpty(_markPainting))
+            {
+               return _markPaintingCalulated;
+            }
+            return _markPainting;
+         }
          set
          {
-            bool isRename = !string.IsNullOrEmpty(_markPainting);
+            //bool isRename = !string.IsNullOrEmpty(_markPainting);
             _markPainting = value;
-            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);
+            //_markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);
             _markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
-            if (isRename) // Переименование марки покраски пользователем.
-            {
-               // Переименование подписей марок панелей
+            //if (isRename) // Переименование марки покраски пользователем.
+            //{
+               // Переименование подписей марок панелей (текстовый объект внутри блока панелели)
                Album.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
-            }
+            //}
          }
       }
 
@@ -86,6 +116,9 @@ namespace AlbumPanelColorTiles.Panels
                {
                   //Ошибка. Не удалось определить покраску плитки.???
                   //В итоге, будет проверка, все ли плитки покрашены. Поэтому тут можно ничего ене делать.
+                  Extents3d ext = new Extents3d(new Point3d(centerTileInBlRef.X - 150, centerTileInBlRef.Y - 50, 0),
+                                                new Point3d(centerTileInBlRef.X + 150, centerTileInBlRef.Y + 50, 0));
+                  Inspector.Errors.Add(new Error(string.Format("{0} - плитка не покрашена.", markSb.MarkSbClean), ext, blRefPanel));
                }
             }
             else

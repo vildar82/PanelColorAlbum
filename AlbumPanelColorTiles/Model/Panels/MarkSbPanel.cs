@@ -268,7 +268,7 @@ namespace AlbumPanelColorTiles.Panels
                // Если одна марка покраски
                string markPaint = "ЭЧ";
                marksArArchitectIndex.Add(markPaint, MarksAR[0]);
-               MarksAR[0].MarkPainting = markPaint;
+               MarksAR[0].MarkPaintingCalulated = markPaint;               
             }
             else
             {
@@ -278,7 +278,7 @@ namespace AlbumPanelColorTiles.Panels
                {
                   string markPaint = string.Format("ЭЧ-{0}", i++);
                   marksArArchitectIndex.Add(markPaint, markAR);
-                  markAR.MarkPainting = markPaint;
+                  markAR.MarkPaintingCalulated = markPaint;
                }
             }
          }
@@ -303,7 +303,7 @@ namespace AlbumPanelColorTiles.Panels
                   markPaint = string.Format("Э{0}{1}-{2}", floor, endIndex, i++);
                }
                marksArArchitectIndex.Add(markPaint, markAR);
-               markAR.MarkPainting = markPaint;
+               markAR.MarkPaintingCalulated = markPaint;
             }
          }
          else
@@ -321,7 +321,7 @@ namespace AlbumPanelColorTiles.Panels
                   markPaint = string.Format("Э{0}-{1}", floor, i++);
                }
                marksArArchitectIndex.Add(markPaint, markAR);
-               markAR.MarkPainting = markPaint;
+               markAR.MarkPaintingCalulated = markPaint;
             }
          }
       }

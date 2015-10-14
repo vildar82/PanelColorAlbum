@@ -67,7 +67,14 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
+    <Compile Include="Model\Checks\Error.cs" />
     <Compile Include="Model\Checks\ErrorObject.cs" />
+    <Compile Include="Model\Checks\FormError.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\Checks\FormError.Designer.cs">
+      <DependentUpon>FormError.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\ImagePainting\FormImageCrop.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,6 +82,7 @@
       <DependentUpon>FormImageCrop.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
+    <Compile Include="Model\Lib\DictNOD.cs" />
     <Compile Include="Model\Lib\UserPrompt.cs" />
     <Compile Include="Model\Panels\ColorArea.cs" />
     <Compile Include="Model\Plot\PlotToFileConfig.cs" />
@@ -163,6 +171,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Model\Checks\FormError.resx">
+      <DependentUpon>FormError.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Model\ImagePainting\FormImageCrop.resx">
       <DependentUpon>FormImageCrop.cs</DependentUpon>
     </EmbeddedResource>

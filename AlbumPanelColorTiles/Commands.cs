@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Panels;
@@ -96,6 +97,7 @@ namespace AlbumPanelColorTiles
             {
                try
                {
+                  Inspector.Reset(); 
                   _album.ChecksBeforeCreateAlbum();
                   // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
                   // Нужно или выполнить перекраску панелей перед созданием альбома
@@ -107,8 +109,12 @@ namespace AlbumPanelColorTiles
                   FormRenameMarkAR formRenameMarkAR = new FormRenameMarkAR(_album);
                   if (Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
                   {
+                     var renamedMarksAR = formRenameMarkAR.RenamedMarksAr();
+                     // сохранить в словарь
+                     DictNOD.SaveToDict(renamedMarksAR);
+
                      // Переименовать марки АР
-                     formRenameMarkAR.RenamedMarksAr().ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
+                     renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);                     
 
                      // Покраска панелей
                      _album.CreateAlbum();
@@ -234,6 +240,10 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
+               if (Inspector.Errors.Count > 0)
+               {
+                  Inspector.Show();
+               }
                doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
                Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
             }

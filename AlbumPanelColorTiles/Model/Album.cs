@@ -296,8 +296,8 @@ namespace AlbumPanelColorTiles
          ResetBlocks();
 
          // Проверка чертежа
-         Inspector inspector = new Inspector();
-         if (!inspector.CheckDrawing())
+         Inspector.Reset(); 
+         if (!Inspector.CheckDrawing())
          {
             throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");
          }
@@ -310,8 +310,8 @@ namespace AlbumPanelColorTiles
          }
 
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
-         if (!inspector.CheckAllTileArePainted(_marksSB))
-         {
+         if (!Inspector.CheckAllTileArePainted(_marksSB))
+         {            
             throw new System.Exception("\nПокраска не выполнена, не все плитки покрашены. См. подробности выше.");
          }
 
@@ -332,6 +332,7 @@ namespace AlbumPanelColorTiles
       public void ResetData()
       {
          // Набор цветов используемых в альбоме.
+         Inspector.Reset(); 
          _colors = null;
          _colorAreas = null;
          ObjectId _idLayerMarks = ObjectId.Null;

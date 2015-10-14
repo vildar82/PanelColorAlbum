@@ -9,17 +9,17 @@ namespace AlbumPanelColorTiles.RenamePanels
       private static string _abbr;
       private bool _isRenamed;
       private MarkArPanel _markAR;
-      private string _markArCurFull;
+      private string _markArCurFull;      
       private string _markPainting;
       private string _markSB;
 
       public MarkArRename(MarkArPanel markAR)
       {
          _markAR = markAR;
-         _markPainting = _markAR.MarkPainting;
-         _markSB = _markAR.MarkSB.MarkSbClean;
+         _markPainting = _markAR.MarkPaintingCalulated;
+         _markSB = _markAR.MarkSB.MarkSbClean;         
          _abbr = _markAR.MarkSB.Abbr;
-         _markArCurFull = GetMarkArPreview(_markPainting);
+         _markArCurFull = _markAR.MarkARPanelFullNameCalculated;// GetMarkArPreview(_markPainting);
       }
 
       public static string Abbr
@@ -30,7 +30,7 @@ namespace AlbumPanelColorTiles.RenamePanels
 
       public bool IsRenamed { get { return _isRenamed; } }
       public MarkArPanel MarkAR { get { return _markAR; } }
-      public string MarkArCurFull { get { return _markArCurFull; } }
+      public string MarkArCurFull { get { return _markArCurFull; } }      
       public string MarkPainting { get { return _markPainting; } }
 
       public static Dictionary<string, MarkArRename> GetMarks(Album album)
@@ -42,6 +42,7 @@ namespace AlbumPanelColorTiles.RenamePanels
          foreach (var markAr in marksAR)
          {
             MarkArRename markArRename = new MarkArRename(markAr);
+            //markArRenames.Add(markArRename.MarkArCurFull, markArRename);
             markArRenames.Add(markArRename.MarkArCurFull, markArRename);
          }
          return markArRenames;
@@ -57,11 +58,25 @@ namespace AlbumPanelColorTiles.RenamePanels
          return string.Format("{0}({1}_{2})", _markSB, markPainting, _abbr);
       }
 
-      public void RenamePainting(string markPainting)
+      private void RenamePainting(string markPainting)
       {
          _isRenamed = markPainting != _markPainting;
          _markPainting = markPainting;
          _markArCurFull = GetMarkArPreview(_markPainting);
+      }
+
+      // Переименование марки покрааски
+      public void RenameMark(string newPaintingMark, Dictionary<string, MarkArRename> marksArForRename)
+      {
+         marksArForRename.Remove(MarkArCurFull);
+         RenamePainting(newPaintingMark);         
+         marksArForRename.Add(MarkArCurFull, this);
+      }
+
+      public static bool ContainsRenamePainting(MarkArRename markArForRename, string newPaintingMark, Dictionary<string, MarkArRename> renameDict)
+      {
+         string markArNew = markArForRename.GetMarkArPreview(newPaintingMark);
+         return renameDict.ContainsKey(markArNew);
       }
    }
 }

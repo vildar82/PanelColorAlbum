@@ -52,6 +52,7 @@
          this.listBoxMarksAR.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+         this.listBoxMarksAR.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
          this.listBoxMarksAR.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
          this.listBoxMarksAR.FormattingEnabled = true;
          this.listBoxMarksAR.ItemHeight = 16;
@@ -59,6 +60,7 @@
          this.listBoxMarksAR.Name = "listBoxMarksAR";
          this.listBoxMarksAR.Size = new System.Drawing.Size(565, 452);
          this.listBoxMarksAR.TabIndex = 0;
+         this.listBoxMarksAR.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listBoxMarksAR_DrawItem);
          this.listBoxMarksAR.SelectedIndexChanged += new System.EventHandler(this.listBoxMarksAR_SelectedIndexChanged);
          this.listBoxMarksAR.DoubleClick += new System.EventHandler(this.listBoxMarksAR_DoubleClick);
          // 
@@ -103,9 +105,9 @@
          this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
          this.label2.Location = new System.Drawing.Point(17, 488);
          this.label2.Name = "label2";
-         this.label2.Size = new System.Drawing.Size(162, 16);
+         this.label2.Size = new System.Drawing.Size(140, 16);
          this.label2.TabIndex = 2;
-         this.label2.Text = "Старая марка покраски";
+         this.label2.Text = "До переименования";
          // 
          // textBoxOldMarkAR
          // 
