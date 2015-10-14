@@ -5,6 +5,7 @@ using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using RTreeLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -19,6 +20,7 @@ namespace AlbumPanelColorTiles.Panels
 
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
       private List<ColorArea> _colorAreas;
+      private RTree<ColorArea> _rtreeColorArea;
 
       private ObjectId _idBtr;
       private bool _isEndLeftPanel;
@@ -46,6 +48,7 @@ namespace AlbumPanelColorTiles.Panels
          _isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix);
          _marksAR = new List<MarkArPanel>();
          _colorAreas = ColorArea.GetColorAreas(_idBtr);
+         _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
          //???
 
@@ -161,7 +164,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски панелей текущего чертежа (в Модели)
-      public static List<MarkSbPanel> GetMarksSB(List<ColorArea> colorAreas, string abbr, string progressMsg)
+      public static List<MarkSbPanel> GetMarksSB(RTree<ColorArea> rtreeColorAreas, string abbr, string progressMsg)
       {
          List<MarkSbPanel> _marksSb = new List<MarkSbPanel>();
          Database db = HostApplicationServices.WorkingDatabase;
@@ -194,7 +197,7 @@ namespace AlbumPanelColorTiles.Panels
                      continue;
                   }
                   //Определение покраски панели (Марки АР)
-                  List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, colorAreas);
+                  List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, rtreeColorAreas);
                   // Добавление панели АР в список панелей для Марки СБ
                   markSb.AddPanelAR(paintAR, blRefPanel, markSb);
                }
@@ -424,7 +427,7 @@ namespace AlbumPanelColorTiles.Panels
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки
-                     Paint paint = ColorArea.GetPaint(tile.CenterTile, _colorAreas);
+                     Paint paint = ColorArea.GetPaint(tile.CenterTile, _rtreeColorArea);
                      _tiles.Add(tile);
                      _paints.Add(paint);
                   }

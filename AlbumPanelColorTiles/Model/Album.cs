@@ -11,6 +11,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using RTreeLib;
 
 namespace AlbumPanelColorTiles
 {
@@ -241,7 +242,8 @@ namespace AlbumPanelColorTiles
 
          // Проверка панелей
          // Определение покраски панелей.
-         var marksSbCheck = MarkSbPanel.GetMarksSB(colorAreasCheck, _abbreviateProject, "Проверка панелей...");
+         var rtreeColorAreas= ColorArea.GetRTree(colorAreasCheck);
+         var marksSbCheck = MarkSbPanel.GetMarksSB(rtreeColorAreas, _abbreviateProject, "Проверка панелей...");
          //RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
@@ -291,6 +293,7 @@ namespace AlbumPanelColorTiles
 
          // Определение зон покраски в Модели
          _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
+         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);         
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
          ResetBlocks();
@@ -303,7 +306,7 @@ namespace AlbumPanelColorTiles
          }
 
          // Определение покраски панелей.
-         _marksSB = MarkSbPanel.GetMarksSB(_colorAreas, _abbreviateProject, "Покраска панелей...");
+         _marksSB = MarkSbPanel.GetMarksSB(rtreeColorAreas, _abbreviateProject, "Покраска панелей...");
          if (_marksSB?.Count == 0)
          {
             throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using RTreeLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -62,13 +63,19 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски. Попадание точки в зону окраски
-      public static Paint GetPaint(Point3d centerTile, List<ColorArea> colorAreas)
+      public static Paint GetPaint(Point3d centerTile, RTree<ColorArea> rtreeColorAreas)
       {
-         foreach (ColorArea colorArea in colorAreas)
+         if (rtreeColorAreas.Count > 0)
          {
-            if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
+            Point p = new Point(centerTile.X, centerTile.Y, 0);
+            var colorAreas = rtreeColorAreas.Nearest(p, 300);
+            colorAreas.Sort();
+            foreach (ColorArea colorArea in colorAreas)
             {
-               return colorArea.Paint;
+               if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
+               {
+                  return colorArea.Paint;
+               }
             }
          }
          return null;
@@ -82,6 +89,18 @@ namespace AlbumPanelColorTiles.Panels
       public bool Equals(ColorArea other)
       {
          return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
+      }
+
+      public static RTree<ColorArea> GetRTree(List<ColorArea> _colorAreas)
+      {
+         RTree<ColorArea> rtree = new RTree<ColorArea>();           
+         foreach (var colorArea in _colorAreas)
+         {
+            Rectangle rectTree = new Rectangle(colorArea.Bounds.MinPoint.X, colorArea.Bounds.MinPoint.Y,
+                                               colorArea.Bounds.MaxPoint.X, colorArea.Bounds.MaxPoint.Y, 0, 0);
+            rtree.Add(rectTree, colorArea);
+         }
+         return rtree;
       }
    }
 }

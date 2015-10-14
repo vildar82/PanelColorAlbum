@@ -5,6 +5,7 @@ using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using RTreeLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -98,7 +99,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
-      public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, List<ColorArea> colorAreas)
+      public static List<Paint> GetPanelMarkAR(MarkSbPanel markSb, BlockReference blRefPanel, RTree<ColorArea> rtreeColorAreas)
       {
          List<Paint> paintsAR = new List<Paint>();
 
@@ -111,7 +112,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                // Опрделение покраски по зонам
                Point3d centerTileInBlRef = GetCenterTileInBlockRef(blRefPanel.Position, tileMarSb.CenterTile);
-               paintAR = ColorArea.GetPaint(centerTileInBlRef, colorAreas);
+               paintAR = ColorArea.GetPaint(centerTileInBlRef, rtreeColorAreas);
                if (paintAR == null)
                {
                   //Ошибка. Не удалось определить покраску плитки.???

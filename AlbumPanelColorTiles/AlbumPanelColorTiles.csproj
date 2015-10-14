@@ -125,6 +125,10 @@
     <Compile Include="Model\RandomPainting\RandomPaint.cs" />
     <Compile Include="Model\RandomPainting\RandomPaintingService.cs" />
     <Compile Include="Model\RandomPainting\Spot.cs" />
+    <Compile Include="Model\RTree\Node.cs" />
+    <Compile Include="Model\RTree\Point.cs" />
+    <Compile Include="Model\RTree\Rectangle.cs" />
+    <Compile Include="Model\RTree\RTree.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
     <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />
