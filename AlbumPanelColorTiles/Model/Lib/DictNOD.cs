@@ -10,21 +10,18 @@ namespace AlbumPanelColorTiles.Lib
 {
    public static class DictNOD
    {
-      private const string DicName = "AlbumPanelColorTiles";
-      private const string RecNameRenameMarkAR = "MarkArRename";
+      private const string _dicName = "AlbumPanelColorTiles";
+      private const string _recNameRenameMarkAR = "MarkArRename";
+      private const string _recNameAbbr = "Abbr";
 
       public static void SaveToDict(List<MarkArRename> renameMarkARList)
       {
          ObjectId idDict = getDict();
-         if (idDict.IsNull)
-         {
+         if (idDict.IsNull)         
+            return;         
+         ObjectId idRec = getRec(idDict, _recNameRenameMarkAR+MarkArRename.Abbr.ToUpper());
+         if (idRec.IsNull)         
             return;
-         }
-         ObjectId idRec = getRec(idDict, RecNameRenameMarkAR+MarkArRename.Abbr.ToUpper());
-         if (idRec.IsNull)
-         {
-            return;
-         }
 
          using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
          {
@@ -46,15 +43,12 @@ namespace AlbumPanelColorTiles.Lib
       public static void LoadFromDict(ref Dictionary<string,MarkArRename> beforeRenameMarkARList)
       {
          ObjectId idDict = getDict();
-         if (idDict.IsNull)
-         {
+         if (idDict.IsNull)         
+            return;         
+         ObjectId idRec = getRec(idDict, _recNameRenameMarkAR + MarkArRename.Abbr.ToUpper());
+         if (idRec.IsNull)         
             return;
-         }
-         ObjectId idRec = getRec(idDict, RecNameRenameMarkAR + MarkArRename.Abbr.ToUpper());
-         if (idRec.IsNull)
-         {
-            return;
-         }
+                  
          using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
          {
             using (var data = xRec.Data)
@@ -95,16 +89,16 @@ namespace AlbumPanelColorTiles.Lib
 
          using (DBDictionary nod = (DBDictionary)db.NamedObjectsDictionaryId.Open(OpenMode.ForRead))
          { 
-            if (!nod.Contains(DicName))
+            if (!nod.Contains(_dicName))
             {
                nod.UpgradeOpen();
                using (var dic = new DBDictionary())
                {
-                  idDic = nod.SetAt(DicName, dic);
+                  idDic = nod.SetAt(_dicName, dic);
                   dic.TreatElementsAsHard = true;
                }               
             }
-            else idDic = nod.GetAt(DicName);            
+            else idDic = nod.GetAt(_dicName);            
          }
          return idDic;
       }
@@ -126,6 +120,50 @@ namespace AlbumPanelColorTiles.Lib
             else idRec = dic.GetAt(recName);
          }
          return idRec;
+      }
+
+      public static void SaveAbbr(string abbr)
+      {
+         ObjectId idDict = getDict();
+         if (idDict.IsNull)         
+            return;         
+         ObjectId idRec = getRec(idDict, _recNameAbbr);
+         if (idRec.IsNull)         
+            return;         
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Text, abbr));
+               xRec.Data = rb;
+            }
+         }
+      }
+
+      public static string LoadAbbr()
+      {
+         string res = string.Empty; 
+         ObjectId idDict = getDict();
+         if (idDict.IsNull)
+            return res;
+         ObjectId idRec = getRec(idDict, _recNameAbbr);
+         if (idRec.IsNull)
+            return res;
+
+         using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
+         {
+            using (var data = xRec.Data)
+            {
+               if (data == null)
+                  return res;
+               foreach (var typedValue in data)
+               {
+                  return typedValue.Value.ToString();
+               }
+            }
+         }
+         return res;
       }
    }
 }

@@ -20,18 +20,13 @@ namespace AlbumPanelColorTiles
    {
       // Набор цветов используемых в альбоме.
       private static List<Paint> _colors;
-
       private static Options _options;
-
       // Сокращенное имя проеккта
       private string _abbreviateProject;
       private const string _regAppPath = @"Software\Vildar\AKR";
-
       private string _albumDir;
-
       //private ColorAreaModel _colorAreaModel;
       private List<ColorArea> _colorAreas; // Зоны покраски
-
       private Database _db;
       private Document _doc;
       private List<MarkSbPanel> _marksSB;
@@ -411,9 +406,14 @@ namespace AlbumPanelColorTiles
       {
          string res = "Н47Г"; // default
          try
-         {            
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
-            res = (string)keyAKR.GetValue("Abbreviate", res);
+         {
+            // из словаря чертежа
+            res = DictNOD.LoadAbbr(); 
+            if (string.IsNullOrEmpty(res))
+            {
+               var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
+               res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
+            }                     
          }
          catch { }
          return res;
@@ -498,8 +498,11 @@ namespace AlbumPanelColorTiles
       {
          try
          {            
+            // в реестр
             var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegAppPath);
             keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
+            // в словарь чертежа
+            DictNOD.SaveAbbr(abbr);
          }
          catch { }
       }

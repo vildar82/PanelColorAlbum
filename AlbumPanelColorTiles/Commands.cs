@@ -87,6 +87,7 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          if (!File.Exists(doc.Name))
             throw new System.Exception("Нужно сохранить файл.");
+
          using (var DocLock = doc.LockDocument())
          {
             if (_album == null)
@@ -221,6 +222,7 @@ namespace AlbumPanelColorTiles
          {
             try
             {
+               Inspector.Reset(); 
                if (_album == null)
                {
                   _album = new Album();

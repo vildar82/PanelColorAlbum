@@ -23,15 +23,15 @@ namespace AlbumPanelColorTiles.Checks
       //private static List<Error> _notPaintedTilesInMarkAR;
 
       static Inspector()
-      {
-         _errors = new List<Error>();
-         _doc = Application.DocumentManager.MdiActiveDocument;
-         _db = _doc.Database;
-         _ed = _doc.Editor;
+      {         
+         Reset();
       }
 
       public static void Reset ()
       {
+         _doc = Application.DocumentManager.MdiActiveDocument;
+         _db = _doc.Database;
+         _ed = _doc.Editor;
          _errors = new List<Error>();
          //_notPaintedTilesInMarkAR = new List<ErrorObject>();
          //_markArBtrNames = new List<string>();
