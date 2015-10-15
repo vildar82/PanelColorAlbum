@@ -34,12 +34,8 @@ namespace AlbumPanelColorTiles
 
       public Album()
       {
-         _doc = Application.DocumentManager.MdiActiveDocument;
-         //if (!File.Exists(_doc.Name))
-         //   throw new System.Exception("Нужно сохранить файл.");
-         _db = _doc.Database;
-         // Запрос сокращенного имени проекта для добавления к индексу маркок АР
-         _abbreviateProject = abbreviateNameProject();
+         _doc = Application.DocumentManager.MdiActiveDocument;         
+         _db = _doc.Database;         
       }
 
       public static Options Options
@@ -278,6 +274,9 @@ namespace AlbumPanelColorTiles
       // Покраска панелей в модели (по блокам зон покраски)
       public void PaintPanels()
       {
+         // Запрос сокращенного имени проекта для добавления к индексу маркок АР
+         _abbreviateProject = abbreviateNameProject();
+
          // Определение марок покраски панелей (Марок АР).
          // Создание определениц блоков марок АР.
          // Покраска панелей в чертеже.
@@ -365,7 +364,15 @@ namespace AlbumPanelColorTiles
       private string abbreviateNameProject()
       {
          string abbrName;
-         string defName = loadAbbreviateName();// "Н47Г";
+         string defName;
+         if (string.IsNullOrEmpty(_abbreviateProject))
+         {
+            defName = loadAbbreviateName();// "Н47Г";
+         }
+         else
+         {
+            defName = _abbreviateProject;
+         }
          var opt = new PromptStringOptions("Введите сокращенное имя проекта для добавления к имени Марки АР:");
          opt.DefaultValue = defName;
          var res = _doc.Editor.GetString(opt);
