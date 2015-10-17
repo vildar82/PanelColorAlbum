@@ -38,9 +38,9 @@ namespace AlbumPanelColorTiles.RenamePanels
          Dictionary<string, MarkArRename> markArRenames = new Dictionary<string, MarkArRename>();
          // Все панели марки АР.
          List<MarkArPanel> marksAR = new List<MarkArPanel>();
-         album.MarksSB.ForEach(m => marksAR.AddRange(m.MarksAR));
+         album.MarksSB.ForEach(m => marksAR.AddRange(m.MarksAR));         
          foreach (var markAr in marksAR)
-         {
+         {            
             MarkArRename markArRename = new MarkArRename(markAr);
             //markArRenames.Add(markArRename.MarkArCurFull, markArRename);
             markArRenames.Add(markArRename.MarkArCurFull, markArRename);

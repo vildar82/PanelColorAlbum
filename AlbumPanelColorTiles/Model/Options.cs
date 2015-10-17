@@ -16,10 +16,11 @@
       public string BlockTileName = "АКР_Плитка";
 
       // Суффикс для торцевых панелей слева
-      public string endLeftPanelSuffix = "_тл";
+      public string EndLeftPanelSuffix = "_тл";
 
       // Суффикс для торцевых панелей справа
-      public string endRightPanelSuffix = "_тп";
+      public string EndRightPanelSuffix = "_тп";
+      public string WindowPanelSuffix = "_ок";// панель отличается формой окна. _ОК1, _ОК2 и т.д. - к марке покраске прибалять -ОК1, -ОК2 и т.д.
 
       public string LayerDimensionFacade = "АР_Размеры на фасаде";
 
