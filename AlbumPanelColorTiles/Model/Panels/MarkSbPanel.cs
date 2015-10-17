@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -26,6 +27,7 @@ namespace AlbumPanelColorTiles.Panels
       private bool _isEndLeftPanel;
       private bool _isEndRightPanel;
       private bool _isUpperStoreyPanel;
+      private int _windowSuffix;// индекс отличия панели по виду окна, 1,2,3 и т.д. по порядку.
       private List<MarkArPanel> _marksAR;
 
       private string _markSb; // может быть с _тп или _тл
@@ -37,15 +39,16 @@ namespace AlbumPanelColorTiles.Panels
       private List<Tile> _tiles;
 
       // Конструктор. Скрытый.
-      private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr)
+      private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr, List<MarkSbPanel> marksSb)
       {
          _abbr = abbr;
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
-         _isUpperStoreyPanel = (blRefPanel.Layer == Album.Options.LayerUpperStoreyPanels);
-         _isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix);
-         _isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix);
+         _isUpperStoreyPanel = (blRefPanel.Layer == Album.Options.LayerUpperStoreyPanels); // Панель чердака
+         checkPanelIndexes(markSbName, blRefPanel, marksSb);
+         //_isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
+         //_isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
          _marksAR = new List<MarkArPanel>();
          _colorAreas = ColorArea.GetColorAreas(_idBtr);
          _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
@@ -57,7 +60,7 @@ namespace AlbumPanelColorTiles.Panels
 
          // Центр панели
          _centerPanel = GetCenterPanel(_tiles);
-      }
+      }      
 
       public string Abbr { get { return _abbr; } }
 
@@ -66,9 +69,9 @@ namespace AlbumPanelColorTiles.Panels
 
       public ObjectId IdBtr { get { return _idBtr; } }
 
-      public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
-
+      public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }      
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
+      public int WindowSuffix { get { return _windowSuffix; } }
 
       /// <summary>
       /// Это панель чердака? true - да, false - нет.
@@ -87,17 +90,28 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (_markSbClean == null)
             {
-               if (_isEndLeftPanel || _isEndRightPanel)
-               {
-                  _markSbClean = _markSb.Substring(0, _markSb.Length - 3);
-               }
-               else
-               {
-                  _markSbClean = _markSb;
-               }
+               _markSbClean = getMarkSbCleanName(_markSb);
             }
             return _markSbClean;
          }
+      }
+
+      private string getMarkSbCleanName(string markSbName)
+      {
+         int indexEndLeftPanel = markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         indexEndLeftPanel = indexEndLeftPanel > 0 ? indexEndLeftPanel : 0;
+         int indexEndRightPanel = markSbName.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         indexEndRightPanel = indexEndRightPanel > 0 ? indexEndRightPanel : 0;
+         int indexWindow = markSbName.IndexOf(Album.Options.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         indexWindow = indexWindow > 0 ? indexWindow : 0;
+         int[] indexes = { indexEndLeftPanel, indexEndRightPanel, indexWindow };
+         var indexesAboveZero = indexes.Where(i => i > 0);
+         if (indexesAboveZero.Count() > 0)
+         {
+            int index = indexesAboveZero.Min();
+            return markSbName.Substring(0, index);
+         }
+         return markSbName;
       }
 
       public List<Paint> Paints { get { return _paints; } }
@@ -138,12 +152,42 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
+      // Проверка есть ли доп индексы в имени блока панели марки СБ - такие как ТП, ТЛ, ОК№
+      private void checkPanelIndexes(string markSbName, BlockReference blRefPanel, List<MarkSbPanel> marksSb)
+      {
+         // markSbName - марка СБ (без приставки АКР_Панель_)
+         // проверка торца
+         if (markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != 0)
+         {
+            _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
+         }
+         if (markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != 0)
+         {
+            _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва  
+         }
+         int indexWindowSuffix = markSbName.IndexOf(Album.Options.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         if (indexWindowSuffix != -1)
+         {
+            if (int.TryParse(markSbName.Substring(indexWindowSuffix + Album.Options.WindowPanelSuffix.Length, 1), out _windowSuffix))
+            {
+               if (_windowSuffix == 0)
+               {
+                  Inspector.Errors.Add (new Error(string.Format("Индекс окна не может быть равен 0, в блоке панели {0}", blRefPanel.Name), blRefPanel));
+               }               
+            }
+            else
+            {
+               Inspector.Errors.Add(new Error(string.Format("Не определен индекс окна в блоке панели {0}", blRefPanel.Name), blRefPanel));
+            }
+         }
+      }
+
       public static string GetMarkSbBlockName(string markSb)
       {
          return Album.Options.BlockPanelPrefixName + markSb;
       }
 
-      // Определение марки СБ (может быть с суффиксом торца _тл или _тп). Отбрасывается последняя часть имени в скобках (это марка АР).
+      // Определение марки СБ (может быть с суффиксом торца _тл или _тп, и индекс окна _ок1 и т.п.). Отбрасывается последняя часть имени в скобках (это марка АР).
       public static string GetMarkSbName(string blName)
       {
          string markSb = string.Empty;
@@ -260,7 +304,7 @@ namespace AlbumPanelColorTiles.Panels
       // Определение архитектурных Марок АР (Э1_Яр1)
       // Жуткий вид. ??? Переделать!!!
       public void DefineArchitectMarks(List<MarkSbPanel> marksSB)
-      {
+      {        
          Dictionary<string, MarkArPanel> marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
          if (IsUpperStoreyPanel)
          {
@@ -302,10 +346,14 @@ namespace AlbumPanelColorTiles.Panels
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
                string floor = String.Join(",", floors);
                markPaint = string.Format("Э{0}{1}", floor, endIndex);
+               if (markAR.MarkSB.WindowSuffix > 0)
+               {
+                  markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
+               }
                if (marksArArchitectIndex.ContainsKey(markPaint))
                {
-                  markPaint = string.Format("Э{0}{1}-{2}", floor, endIndex, i++);
-               }
+                  markPaint = string.Format("{0}-{1}", markPaint, i++);
+               }               
                marksArArchitectIndex.Add(markPaint, markAR);
                markAR.MarkPaintingCalulated = markPaint;
             }
@@ -321,10 +369,14 @@ namespace AlbumPanelColorTiles.Panels
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);               
                string floor = String.Join(",", floors);
                markPaint = string.Format("Э{0}", floor);
+               if (markAR.MarkSB.WindowSuffix > 0)
+               {
+                  markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
+               }
                if (marksArArchitectIndex.ContainsKey(markPaint))
                {
-                  markPaint = string.Format("Э{0}-{1}", floor, i++);
-               }
+                  markPaint = string.Format("{0}-{1}", markPaint, i++);
+               }               
                marksArArchitectIndex.Add(markPaint, markAR);
                markAR.MarkPaintingCalulated = markPaint;
             }
@@ -363,19 +415,19 @@ namespace AlbumPanelColorTiles.Panels
                markSb = marksSb.Find(m => m._markSb == markSbName);
                if (markSb == null)
                {
-                  // Блок Марки СБ
-                  Database db = HostApplicationServices.WorkingDatabase;
+                  // Блок Марки СБ                  
                   string markSbBlName = GetMarkSbBlockName(markSbName);
                   if (bt.Has(markSbBlName))
                   {
                      var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSbPanel(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr);
+                     markSb = new MarkSbPanel(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr, marksSb);
                      marksSb.Add(markSb);
                   }
                   else
                   {
                      //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
                      //???
+                     Inspector.Errors.Add(new Error(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanel.Name), blRefPanel));
                   }
                }
             }
