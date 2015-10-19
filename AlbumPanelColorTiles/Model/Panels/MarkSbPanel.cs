@@ -157,12 +157,12 @@ namespace AlbumPanelColorTiles.Panels
       {
          // markSbName - марка СБ (без приставки АКР_Панель_)
          // проверка торца
-         if (markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != 0)
+         if (markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
             _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          }
-         if (markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != 0)
-         {
+         if (markSbName.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         {            
             _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва  
          }
          int indexWindowSuffix = markSbName.IndexOf(Album.Options.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
