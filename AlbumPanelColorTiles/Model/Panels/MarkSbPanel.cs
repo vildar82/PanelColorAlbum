@@ -315,6 +315,10 @@ namespace AlbumPanelColorTiles.Panels
                // Если одна марка покраски
                string markPaint = "ЭЧ";
                marksArArchitectIndex.Add(markPaint, MarksAR[0]);
+               if (MarksAR[0].MarkSB.WindowSuffix > 0)
+               {
+                  markPaint += "-ОК" + MarksAR[0].MarkSB.WindowSuffix;
+               }
                MarksAR[0].MarkPaintingCalulated = markPaint;               
             }
             else
@@ -325,6 +329,10 @@ namespace AlbumPanelColorTiles.Panels
                {
                   string markPaint = string.Format("ЭЧ-{0}", i++);
                   marksArArchitectIndex.Add(markPaint, markAR);
+                  if (markAR.MarkSB.WindowSuffix > 0)
+                  {
+                     markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
+                  }
                   markAR.MarkPaintingCalulated = markPaint;
                }
             }
@@ -345,16 +353,16 @@ namespace AlbumPanelColorTiles.Panels
                //var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
                string floor = String.Join(",", floors);
-               markPaint = string.Format("Э{0}{1}", floor, endIndex);
-               if (markAR.MarkSB.WindowSuffix > 0)
-               {
-                  markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
-               }
+               markPaint = string.Format("Э{0}{1}", floor, endIndex);               
                if (marksArArchitectIndex.ContainsKey(markPaint))
                {
                   markPaint = string.Format("{0}-{1}", markPaint, i++);
                }               
                marksArArchitectIndex.Add(markPaint, markAR);
+               if (markAR.MarkSB.WindowSuffix > 0)
+               {
+                  markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
+               }
                markAR.MarkPaintingCalulated = markPaint;
             }
          }
@@ -368,16 +376,16 @@ namespace AlbumPanelColorTiles.Panels
                //var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
                var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);               
                string floor = String.Join(",", floors);
-               markPaint = string.Format("Э{0}", floor);
-               if (markAR.MarkSB.WindowSuffix > 0)
-               {
-                  markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
-               }
+               markPaint = string.Format("Э{0}", floor);               
                if (marksArArchitectIndex.ContainsKey(markPaint))
                {
                   markPaint = string.Format("{0}-{1}", markPaint, i++);
                }               
                marksArArchitectIndex.Add(markPaint, markAR);
+               if (markAR.MarkSB.WindowSuffix > 0)
+               {
+                  markPaint += "-ОК" + markAR.MarkSB.WindowSuffix;
+               }
                markAR.MarkPaintingCalulated = markPaint;
             }
          }
