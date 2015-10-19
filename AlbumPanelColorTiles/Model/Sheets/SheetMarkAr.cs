@@ -19,8 +19,7 @@ namespace AlbumPanelColorTiles.Sheets
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
       private MarkArPanel _markAR;
-
-      private string _markArDocumentation;
+      
       private Point3d _ptInsertBlRefMarkAR;
 
       // Наименование листа
@@ -31,7 +30,7 @@ namespace AlbumPanelColorTiles.Sheets
       public SheetMarkAr(MarkArPanel markAR)
       {
          _markAR = markAR;
-         _sheetName = string.Format("Наружная стеновая панель {0}", MarkArDocumentation);
+         _sheetName = string.Format("Наружная стеновая панель {0}", MarkArFullName);
       }
 
       public ObjectId IdBtrArSheet { get { return _idBtrArSheet; } set { _idBtrArSheet = value; } }
@@ -41,27 +40,7 @@ namespace AlbumPanelColorTiles.Sheets
          get { return _sheetNumber.ToString("00"); }
       }
 
-      public MarkArPanel MarkAR { get { return _markAR; } }
-
-      /// <summary>
-      /// Марка панели для документации (содержание, заполнения штампов на листах).
-      /// </summary>
-      public string MarkArDocumentation
-      {
-         get
-         {
-            if (_markArDocumentation == null)
-            {
-               if (_markAR.MarkSB.IsEndLeftPanel)
-                  _markArDocumentation = _markAR.MarkARPanelFullName.Replace("_тл", "");
-               else if (_markAR.MarkSB.IsEndRightPanel)
-                  _markArDocumentation = _markAR.MarkARPanelFullName.Replace("_тп", "");
-               else
-                  _markArDocumentation = _markAR.MarkARPanelFullName;
-            }
-            return _markArDocumentation;
-         }
-      }
+      public MarkArPanel MarkAR { get { return _markAR; } }      
 
       public string MarkArFullName { get { return _markAR.MarkARPanelFullName; } }
 
@@ -215,7 +194,7 @@ namespace AlbumPanelColorTiles.Sheets
                table.SetSize(tilesCalc.Count + 3, table.Columns.Count);
             }
             // Заголовок
-            table.Cells[0, 0].TextString = "Расход плитки на панель " + MarkArDocumentation;
+            table.Cells[0, 0].TextString = "Расход плитки на панель " + MarkArFullName;
             // Подсчет плитки
             int row = 2;
 
