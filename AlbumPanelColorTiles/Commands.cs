@@ -129,13 +129,13 @@ namespace AlbumPanelColorTiles
                      Log.Info("Отменено пользователем.");
                      throw new System.Exception("Отменено пользователем.");
                   }
-               }
-               catch (System.Exception ex)
-               {
-                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
-                  Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
-               }
             }
+               catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
+               Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
+            }
+         }
          }
       }
 
@@ -221,8 +221,8 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
-            try
-            {
+            //try
+            //{
                Inspector.Reset(); 
                if (_album == null)
                {
@@ -240,16 +240,16 @@ namespace AlbumPanelColorTiles
                doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
                doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
-            }
-            catch (System.Exception ex)
-            {
-               if (Inspector.Errors.Count > 0)
-               {
-                  Inspector.Show();
-               }
-               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
-               Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
-            }
+            //}
+            //catch (System.Exception ex)
+            //{
+            //   if (Inspector.Errors.Count > 0)
+            //   {
+            //      Inspector.Show();
+            //   }
+            //   doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
+            //   Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
+            //}
          }
       }
 
