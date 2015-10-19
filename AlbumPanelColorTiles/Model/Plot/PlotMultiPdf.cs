@@ -165,7 +165,7 @@ namespace AlbumPanelColorTiles.Plot
                      foreach (ObjectId btrId in layoutsToPlot)
                      {
                         var btr = (BlockTableRecord)t.GetObject(btrId, OpenMode.ForRead);
-                        var lo = (Layout)t.GetObject(btr.LayoutId, OpenMode.ForRead);
+                        var lo = (Layout)t.GetObject(btr.LayoutId, OpenMode.ForRead);                        
 
                         var psv = PlotSettingsValidator.Current;
                         pi.Layout = btr.LayoutId;
