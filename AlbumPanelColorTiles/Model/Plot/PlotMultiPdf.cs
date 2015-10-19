@@ -146,6 +146,8 @@ namespace AlbumPanelColorTiles.Plot
          Document doc = Application.DocumentManager.MdiActiveDocument;
          Database db = doc.Database;
 
+         var layoutsToPlot = GetLayouts(db);
+
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = (BlockTable)t.GetObject(db.BlockTableId, OpenMode.ForRead);
@@ -156,17 +158,7 @@ namespace AlbumPanelColorTiles.Plot
             if (PlotFactory.ProcessPlotState == ProcessPlotState.NotPlotting)
             {
                using (var pe = PlotFactory.CreatePublishEngine())
-               {
-                  var layouts = new List<Layout>();
-                  DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
-                  foreach (DBDictionaryEntry entry in layoutDict)
-                  {
-                     if (entry.Key != "Model")
-                        layouts.Add((Layout)t.GetObject(entry.Value, OpenMode.ForRead));
-                  }
-                  layouts.Sort((l1, l2) => l1.LayoutName.CompareTo(l2.LayoutName));
-                  var layoutsToPlot = new ObjectIdCollection(layouts.Select(l => l.BlockTableRecordId).ToArray());
-
+               {                  
                   using (var ppd = new PlotProgressDialog(false, layoutsToPlot.Count, false))
                   {
                      int numSheet = 1;
@@ -226,6 +218,26 @@ namespace AlbumPanelColorTiles.Plot
             }
             t.Commit();
          }
+      }
+
+      private static ObjectIdCollection GetLayouts(Database db)
+      {
+         List<KeyValuePair<string, ObjectId>> layouts = new List<KeyValuePair<string, ObjectId>>();
+         using (DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.Open(OpenMode.ForRead))
+         {
+            foreach (DBDictionaryEntry entry in layoutDict)
+            {
+               if (entry.Key != "Model")
+               {
+                  using (var layout = entry.Value.Open(OpenMode.ForRead) as Layout)
+                  {
+                     layouts.Add(new KeyValuePair<string, ObjectId>(layout.LayoutName, layout.BlockTableRecordId));
+                  }
+               }
+            }                        
+         }
+         layouts.Sort((l1, l2) => l1.Key.CompareTo(l2.Key));
+         return new ObjectIdCollection(layouts.Select(l => l.Value).ToArray());         
       }
    }
 }
