@@ -34,8 +34,7 @@ namespace AlbumPanelColorTiles.Plot
             throw new System.Exception("Нужно сохранить текущий чертеж.");
          }
          HostApplicationServices.WorkingDatabase = doc.Database;
-         MultiSheetPlot("Печать текущего чертежа");
-         //MultiSheetPlot(Path.GetDirectoryName(doc.Name));
+         MultiSheetPlot("Печать текущего чертежа");         
       }
 
       // Открытие и печать всех файлов в папке
@@ -58,7 +57,7 @@ namespace AlbumPanelColorTiles.Plot
             if (_isCancelPublish || HostApplicationServices.Current.UserBreak())
                break;            
                         
-            Document docOpen;
+            Document docOpen;            
             progressMeter.MeterProgress();
             if (!isAlreadyOpenDoc(fileDwg.FullName, out docOpen))
             { 
@@ -93,7 +92,7 @@ namespace AlbumPanelColorTiles.Plot
          {
             if (string.Equals(item.Name, fullName, StringComparison.CurrentCultureIgnoreCase))
             {
-               docOpen = item;
+               docOpen = item;                 
                return true;
             }
          }
@@ -162,14 +161,11 @@ namespace AlbumPanelColorTiles.Plot
                   using (var ppd = new PlotProgressDialog(false, layoutsToPlot.Count, false))
                   {
                      int numSheet = 1;
-                     foreach (ObjectId btrId in layoutsToPlot)
+                     foreach (var item in layoutsToPlot)
                      {
-                        var btr = (BlockTableRecord)t.GetObject(btrId, OpenMode.ForRead);
-                        var lo = (Layout)t.GetObject(btr.LayoutId, OpenMode.ForRead);                        
-
                         var psv = PlotSettingsValidator.Current;
-                        pi.Layout = btr.LayoutId;
-                        LayoutManager.Current.CurrentLayout = lo.LayoutName;
+                        pi.Layout = item.Value;
+                        LayoutManager.Current.CurrentLayout = item.Key;
                         piv.Validate(pi);
 
                         if (numSheet == 1)
@@ -220,7 +216,7 @@ namespace AlbumPanelColorTiles.Plot
          }
       }
 
-      private static ObjectIdCollection GetLayouts(Database db)
+      private static List<KeyValuePair<string, ObjectId>> GetLayouts(Database db)
       {
          List<KeyValuePair<string, ObjectId>> layouts = new List<KeyValuePair<string, ObjectId>>();
          using (DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.Open(OpenMode.ForRead))
@@ -231,13 +227,13 @@ namespace AlbumPanelColorTiles.Plot
                {
                   using (var layout = entry.Value.Open(OpenMode.ForRead) as Layout)
                   {
-                     layouts.Add(new KeyValuePair<string, ObjectId>(layout.LayoutName, layout.BlockTableRecordId));
+                     layouts.Add(new KeyValuePair<string, ObjectId>(layout.LayoutName, layout.Id));
                   }
                }
             }                        
          }
          layouts.Sort((l1, l2) => l1.Key.CompareTo(l2.Key));
-         return new ObjectIdCollection(layouts.Select(l => l.Value).ToArray());         
+         return layouts;
       }
    }
 }
