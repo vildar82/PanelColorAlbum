@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AlbumPanelColorTiles.Checks;
@@ -23,6 +24,7 @@ namespace AlbumPanelColorTiles
       private static Options _options;
       // Сокращенное имя проеккта
       private string _abbreviateProject;
+      private int _numberFirstFloor;
       private const string _regAppPath = @"Software\Vildar\AKR";
       private string _albumDir;
       //private ColorAreaModel _colorAreaModel;
@@ -277,6 +279,9 @@ namespace AlbumPanelColorTiles
          // Запрос сокращенного имени проекта для добавления к индексу маркок АР
          _abbreviateProject = abbreviateNameProject();
 
+         // Запрос номера первого этажа панелей
+         _numberFirstFloor = promptNumberFirtsFloor();
+
          // Определение марок покраски панелей (Марок АР).
          // Создание определениц блоков марок АР.
          // Покраска панелей в чертеже.
@@ -326,6 +331,42 @@ namespace AlbumPanelColorTiles
          CaptionPanels();
       }
 
+      private int promptNumberFirtsFloor()
+      {
+         int numberFirstFloor;
+         int defaultNumber;
+         if (_numberFirstFloor == 0)
+         {
+            defaultNumber = loadNumberFirstFloor();
+         }
+         else
+         {
+            defaultNumber = _numberFirstFloor;
+         }
+         var opt = new PromptStringOptions("\nВведите номер для первого этажа панелей:");
+         opt.DefaultValue = defaultNumber.ToString();
+         do
+         {
+            var res = _doc.Editor.GetString(opt);
+            if (res.Status == PromptStatus.OK)
+            {
+               if (int.TryParse(res.StringResult, out numberFirstFloor) && numberFirstFloor != 0)
+               {
+                  saveNumberFirstFloor(numberFirstFloor);
+               }
+               else
+               {
+                  _doc.Editor.WriteMessage("\nНомер не определен. Повтортите.");
+               }
+            }
+            else
+            {
+               throw new System.Exception("Прервано пользователем.");
+            }
+         } while (numberFirstFloor == 0);
+         return numberFirstFloor;
+      }     
+
       // Сброс данных расчета панелей
       public void ResetData()
       {
@@ -373,7 +414,7 @@ namespace AlbumPanelColorTiles
          {
             defName = _abbreviateProject;
          }
-         var opt = new PromptStringOptions("Введите сокращенное имя проекта для добавления к имени Марки АР:");
+         var opt = new PromptStringOptions("\nВведите сокращенное имя проекта для добавления к имени Марки АР:");
          opt.DefaultValue = defName;
          var res = _doc.Editor.GetString(opt);
          if (res.Status == PromptStatus.OK)
@@ -407,24 +448,7 @@ namespace AlbumPanelColorTiles
             }
          }
          progressMeter.Stop();
-      }
-
-      private string loadAbbreviateName()
-      {
-         string res = "Н47Г"; // default
-         try
-         {
-            // из словаря чертежа
-            res = DictNOD.LoadAbbr(); 
-            if (string.IsNullOrEmpty(res))
-            {
-               var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
-               res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
-            }                     
-         }
-         catch { }
-         return res;
-      }
+      }     
 
       // определение этажей панелей
       private void IdentificationStoreys(List<MarkSbPanel> marksSB)
@@ -459,7 +483,7 @@ namespace AlbumPanelColorTiles
             }
          }
          // Нумерация этажей
-         int i = 2;
+         int i = _numberFirstFloor;
          var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
          storeysOrders.ForEach((s) => s.Number = i++.ToString());
          storeysOrders.Last().Number = "П";
@@ -501,6 +525,41 @@ namespace AlbumPanelColorTiles
          progressMeter.Stop();
       }
 
+      private string loadAbbreviateName()
+      {
+         string res = "Н47Г"; // default
+         try
+         {
+            // из словаря чертежа
+            res = DictNOD.LoadAbbr();
+            if (string.IsNullOrEmpty(res))
+            {
+               var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
+               res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
+            }
+         }
+         catch { }
+         return res;
+      }
+
+      private int loadNumberFirstFloor()
+      {
+         int res = 2; // default
+         try
+         {
+            // из словаря чертежа
+            res = DictNOD.LoadNumberFirstFloor();
+            if (res == 0)
+            {
+               // из реестра
+               var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
+               res = (int)keyAKR.GetValue("NumberFirstFloor", 2);
+            }
+         }
+         catch { }
+         return res;
+      }
+
       private void saveAbbreviateName(string abbr)
       {
          try
@@ -510,6 +569,19 @@ namespace AlbumPanelColorTiles
             keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
             // в словарь чертежа
             DictNOD.SaveAbbr(abbr);
+         }
+         catch { }
+      }
+
+      private void saveNumberFirstFloor(int numberFirstFloor)
+      {
+         try
+         {
+            // в реестр
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegAppPath);
+            keyAKR.SetValue("NumberFirstFloor", numberFirstFloor, Microsoft.Win32.RegistryValueKind.DWord);
+            // в словарь чертежа
+            DictNOD.SaveNumberFirstFloor(numberFirstFloor);
          }
          catch { }
       }
