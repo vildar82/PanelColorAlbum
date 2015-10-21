@@ -19,7 +19,7 @@ namespace AlbumPanelColorTiles.RenamePanels
          InitializeComponent();
          _marksArForRename = MarkArRename.GetMarks(album);
          // загрузка сохраненных переименований
-         DictNOD.LoadFromDict(ref _marksArForRename);
+         DictNOD.LoadRenameMarkArFromDict(ref _marksArForRename);
          // Сортировка панелей.
          _marksArForRename = _marksArForRename.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 

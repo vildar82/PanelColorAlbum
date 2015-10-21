@@ -12,14 +12,12 @@ namespace AlbumPanelColorTiles.Lib
    {
       private const string _dicName = "AlbumPanelColorTiles";
       private const string _recNameRenameMarkAR = "MarkArRename";
+      private const string _recNameNumberFirstFloor = "NumberFirstFloor";
       private const string _recNameAbbr = "Abbr";
 
-      public static void SaveToDict(List<MarkArRename> renameMarkARList)
-      {
-         ObjectId idDict = getDict();
-         if (idDict.IsNull)         
-            return;         
-         ObjectId idRec = getRec(idDict, _recNameRenameMarkAR+MarkArRename.Abbr.ToUpper());
+      public static void SaveRenamedMarkArToDict(List<MarkArRename> renameMarkARList)
+      {             
+         ObjectId idRec = getRec(_recNameRenameMarkAR+MarkArRename.Abbr.ToUpper());
          if (idRec.IsNull)         
             return;
 
@@ -40,12 +38,9 @@ namespace AlbumPanelColorTiles.Lib
          }
       }
 
-      public static void LoadFromDict(ref Dictionary<string,MarkArRename> beforeRenameMarkARList)
-      {
-         ObjectId idDict = getDict();
-         if (idDict.IsNull)         
-            return;         
-         ObjectId idRec = getRec(idDict, _recNameRenameMarkAR + MarkArRename.Abbr.ToUpper());
+      public static void LoadRenameMarkArFromDict(ref Dictionary<string,MarkArRename> beforeRenameMarkARList)
+      {                      
+         ObjectId idRec = getRec(_recNameRenameMarkAR + MarkArRename.Abbr.ToUpper());
          if (idRec.IsNull)         
             return;
                   
@@ -75,11 +70,6 @@ namespace AlbumPanelColorTiles.Lib
       private static string getValueRenameMark(MarkArRename renameMark)
       {
          return string.Format("{0};{1}", renameMark.MarkAR.MarkARPanelFullNameCalculated, renameMark.MarkPainting);
-      }
-
-      private static string getRenameMarkFromValue(string value)
-      {
-         return value;
       }      
 
       private static ObjectId getDict()
@@ -104,8 +94,13 @@ namespace AlbumPanelColorTiles.Lib
       }
       
 
-      private static ObjectId getRec(ObjectId idDict, string recName)
-      {
+      private static ObjectId getRec(string recName)
+      {         
+         ObjectId idDict = getDict();
+         if (idDict.IsNull)
+         {
+            return ObjectId.Null;
+         }
          ObjectId idRec = ObjectId.Null;
          using (var dic = idDict.Open(OpenMode.ForRead) as DBDictionary)
          {
@@ -123,11 +118,8 @@ namespace AlbumPanelColorTiles.Lib
       }
 
       public static void SaveAbbr(string abbr)
-      {
-         ObjectId idDict = getDict();
-         if (idDict.IsNull)         
-            return;         
-         ObjectId idRec = getRec(idDict, _recNameAbbr);
+      {               
+         ObjectId idRec = getRec(_recNameAbbr);
          if (idRec.IsNull)         
             return;         
 
@@ -143,11 +135,8 @@ namespace AlbumPanelColorTiles.Lib
 
       public static string LoadAbbr()
       {
-         string res = string.Empty; 
-         ObjectId idDict = getDict();
-         if (idDict.IsNull)
-            return res;
-         ObjectId idRec = getRec(idDict, _recNameAbbr);
+         string res = string.Empty;          
+         ObjectId idRec = getRec( _recNameAbbr);
          if (idRec.IsNull)
             return res;
 
@@ -160,6 +149,44 @@ namespace AlbumPanelColorTiles.Lib
                foreach (var typedValue in data)
                {
                   return typedValue.Value.ToString();
+               }
+            }
+         }
+         return res;
+      }
+
+      public static void SaveNumberFirstFloor(int numberFirstFloor)
+      {
+         ObjectId idRec = getRec(_recNameNumberFirstFloor);
+         if (idRec.IsNull)
+            return;
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Int32, numberFirstFloor));
+               xRec.Data = rb;
+            }
+         }
+      }
+
+      public static int LoadNumberFirstFloor()
+      {
+         int res = 0;
+         ObjectId idRec = getRec(_recNameNumberFirstFloor);
+         if (idRec.IsNull)
+            return res;
+
+         using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
+         {
+            using (var data = xRec.Data)
+            {
+               if (data == null)
+                  return res;
+               foreach (var typedValue in data)
+               {
+                  return (int)typedValue.Value;
                }
             }
          }
