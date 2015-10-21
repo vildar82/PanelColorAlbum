@@ -19,6 +19,7 @@ namespace AlbumPanelColorTiles.Plot
       {
          _bgp = (short)AcAp.GetSystemVariable("BACKGROUNDPLOT");
          AcAp.SetSystemVariable("BACKGROUNDPLOT", 0);
+         Application.Publisher.CancelledOrFailedPublishing += Publisher_CancelledOrFailedPublishing;
       }
 
       ~PlotMultiPDF()
