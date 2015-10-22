@@ -104,6 +104,7 @@ namespace AlbumPanelColorTiles.Panels
          List<Paint> paintsAR = new List<Paint>();
 
          int i = 0;
+         bool hasTileWithoutPaint = false;
          foreach (Tile tileMarSb in markSb.Tiles)
          {
             Paint paintSb = markSb.Paints[i++];
@@ -115,11 +116,14 @@ namespace AlbumPanelColorTiles.Panels
                paintAR = ColorArea.GetPaint(centerTileInBlRef, rtreeColorAreas);
                if (paintAR == null)
                {
-                  //Ошибка. Не удалось определить покраску плитки.???
-                  //В итоге, будет проверка, все ли плитки покрашены. Поэтому тут можно ничего ене делать.
-                  Extents3d ext = new Extents3d(new Point3d(centerTileInBlRef.X - 150, centerTileInBlRef.Y - 50, 0),
-                                                new Point3d(centerTileInBlRef.X + 150, centerTileInBlRef.Y + 50, 0));
-                  Inspector.Errors.Add(new Error(string.Format("{0} - плитка не покрашена.", markSb.MarkSbClean), ext, blRefPanel));
+                  if (!hasTileWithoutPaint)
+                  {
+                     //Ошибка. Не удалось определить покраску плитки.???                  
+                     //Extents3d ext = new Extents3d(new Point3d(centerTileInBlRef.X - 150, centerTileInBlRef.Y - 50, 0),
+                     //                              new Point3d(centerTileInBlRef.X + 150, centerTileInBlRef.Y + 50, 0));                     
+                     Inspector.Errors.Add(new Error(string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean),blRefPanel));
+                     hasTileWithoutPaint = true;
+                  }
                }
             }
             else
