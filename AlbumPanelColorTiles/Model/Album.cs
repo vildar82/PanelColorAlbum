@@ -544,16 +544,14 @@ namespace AlbumPanelColorTiles
 
       private int loadNumberFirstFloor()
       {
-         int res = 2; // default
+         int res = 2;
          try
          {
             // из словаря чертежа
             res = DictNOD.LoadNumberFirstFloor();
             if (res == 0)
             {
-               // из реестра
-               var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
-               res = (int)keyAKR.GetValue("NumberFirstFloor", 2);
+                res = 2; // default
             }
          }
          catch { }
@@ -576,10 +574,7 @@ namespace AlbumPanelColorTiles
       private void saveNumberFirstFloor(int numberFirstFloor)
       {
          try
-         {
-            // в реестр
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegAppPath);
-            keyAKR.SetValue("NumberFirstFloor", numberFirstFloor, Microsoft.Win32.RegistryValueKind.DWord);
+         {            
             // в словарь чертежа
             DictNOD.SaveNumberFirstFloor(numberFirstFloor);
          }
