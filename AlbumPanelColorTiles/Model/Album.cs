@@ -84,16 +84,48 @@ namespace AlbumPanelColorTiles
             }
          }
          // Если марки нет, то создаем ее.
-         var text = new DBText();
-         text.TextString = panelMark;
-         text.Height = 200;
-         text.Annotative = AnnotativeStates.False;
-         text.Layer = GetLayerForMark();
-         text.Position = Point3d.Origin;
-         // Точка вставки и выравнивание ???
-         btr.UpgradeOpen();
-         btr.AppendEntity(text);
-         t.AddNewlyCreatedDBObject(text, true);
+         if(panelMark.EndsWith(")"))
+         {
+            int lastDirectBracket = panelMark.LastIndexOf('(');
+            string markSb = panelMark.Substring(0, lastDirectBracket);
+            string markAr = panelMark.Substring(lastDirectBracket);
+            using (var text = new DBText())
+            {
+               text.TextString = markAr;
+               text.Height = 180;
+               text.Annotative = AnnotativeStates.False;
+               text.Layer = GetLayerForMark();
+               text.Position = Point3d.Origin;
+               btr.UpgradeOpen();
+               btr.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);               
+            }
+            using (var text = new DBText())
+            {
+               text.TextString = markSb;
+               text.Height = 180;
+               text.Annotative = AnnotativeStates.False;
+               text.Layer = GetLayerForMark();
+               text.Position = new Point3d(0, 250, 0);
+               btr.UpgradeOpen();
+               btr.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);
+            }
+         }
+         else
+         {
+            using (var text = new DBText())
+            {
+               text.TextString = panelMark;
+               text.Height = 180;
+               text.Annotative = AnnotativeStates.False;
+               text.Layer = GetLayerForMark();
+               text.Position = Point3d.Origin;               
+               btr.UpgradeOpen();
+               btr.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);
+            }
+         }         
       }
 
       // Поиск цвета в списке цветов альбома

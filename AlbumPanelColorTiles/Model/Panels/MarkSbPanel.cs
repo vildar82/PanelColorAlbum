@@ -261,7 +261,7 @@ namespace AlbumPanelColorTiles.Panels
       {
          //return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
          string panelMark = string.Empty;
-         // Найти имя марки панели СБ или АР
+         // Найти имя марки панели СБ или АР         
          foreach (var markSB in marksSB)
          {
             if (markSB.MarkSbBlockName == blName)
