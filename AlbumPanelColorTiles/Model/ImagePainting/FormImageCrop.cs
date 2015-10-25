@@ -161,22 +161,12 @@ namespace AlbumPanelColorTiles.ImagePainting
          yCorrect = Convert.ToInt32(((double)rectCrop.Location.Y - dY) * scale);
 
          return new Rectangle(xCorrect, yCorrect, Convert.ToInt32(rectCrop.Width * scale), Convert.ToInt32(rectCrop.Height * scale));
-      }
-
-      private void FormImageCrop_SizeChanged(object sender, EventArgs e)
-      {
-         //if (pictureBoxImage.Image != null)
-         //{
-         //   setPictureImage(pictureBoxImage.Image);
-         //   setUserRect();
-         //}
-      }
+      }      
 
       private void FormImageCrop_Activated(object sender, EventArgs e)
       {
          if (pictureBoxImage.Image != null)
-         {
-            //setPictureImage(pictureBoxImage.Image);
+         {            
             setUserRect();
          }
       }

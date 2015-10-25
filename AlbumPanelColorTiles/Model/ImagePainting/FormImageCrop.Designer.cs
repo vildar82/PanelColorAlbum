@@ -95,8 +95,7 @@
          this.ShowIcon = false;
          this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
          this.Text = "Выбор картинки";
-         this.Activated += new System.EventHandler(this.FormImageCrop_Activated);
-         this.SizeChanged += new System.EventHandler(this.FormImageCrop_SizeChanged);
+         this.Activated += new System.EventHandler(this.FormImageCrop_Activated);         
          ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
          this.ResumeLayout(false);
 
