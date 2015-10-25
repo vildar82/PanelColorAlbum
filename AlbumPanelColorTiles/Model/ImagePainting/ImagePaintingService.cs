@@ -23,6 +23,7 @@ namespace AlbumPanelColorTiles.ImagePainting
       private ObjectIdCollection _idColCopy;
       private List<ObjectId> _idsInsertBlRefColorArea;
       FormImageCrop _formImage;
+      private Dictionary<Color, ObjectId> _layersColorArea;
 
       public ImagePaintingService(Document doc)
       {
@@ -49,61 +50,67 @@ namespace AlbumPanelColorTiles.ImagePainting
 
       private void FormImage_Fire(object sender, EventArgs e)
       {
-         Bitmap bitmap = getBitmapForColorArea ((Bitmap)sender);
-         using (var lockDoc = _doc.LockDocument())
+         try
          {
-            using (var t = _db.TransactionManager.StartTransaction())
+            Bitmap bitmap = getBitmapForColorArea((Bitmap)sender);
+            using (var lockDoc = _doc.LockDocument())
             {
-               // Проверка блока зоны покраски. если нет, то копирование из шаблона с блоками.
-               RandomPaintService.CheckBlockColorAre(_db);
-
-               clearPreviusBlocks();
-               _idsInsertBlRefColorArea = new List<ObjectId>();
-
-               // блок шаблона зоны покраски
-               var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
-               var cs = t.GetObject(_db.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
-               _idCS = cs.Id;
-               var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
-               var blRefColorAreaTemplate = new BlockReference(Point3d.Origin, btrColorArea.Id);
-               cs.AppendEntity(blRefColorAreaTemplate);
-               t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);
-               _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;
-               RandomPaintService.SetDynParamColorAreaBlock(blRefColorAreaTemplate, _colorAreaSize);
-               _idColCopy = new ObjectIdCollection();
-               _idColCopy.Add(_idBlRefColorAreaTemplate);
-
-               Point3d ptStart = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X, _colorAreaSize.ExtentsColorArea.MaxPoint.Y, 0);
-
-               Dictionary<Color, ObjectId> _layers = new Dictionary<Color, ObjectId>();
-
-               ProgressMeter progressMeter = new ProgressMeter();
-               progressMeter.SetLimit(bitmap.Width * bitmap.Height);
-               progressMeter.Start("Вставка блоков зон покраски");
-
-               for (int i = 0; i < bitmap.Width * bitmap.Height; i++)
+               using (var t = _db.TransactionManager.StartTransaction())
                {
-                  if (HostApplicationServices.Current.UserBreak())
-                     break;
-                  progressMeter.MeterProgress();
-                  int x = i / bitmap.Height;
-                  int y = i % bitmap.Height;                  
-                  Point3d position = ptStart.Add(new Vector3d(x * _colorAreaSize.LenghtSpot, -(y+1) * _colorAreaSize.HeightSpot, 0));
-                  insertSpot(position, getLayerId(bitmap.GetPixel(x, y), _layers));
-               }
-               blRefColorAreaTemplate.Erase(true);
-               t.Commit();
+                  // Проверка блока зоны покраски. если нет, то копирование из шаблона с блоками.
+                  RandomPaintService.CheckBlockColorAre(_db);
 
-               progressMeter.Stop();
-               _doc.Editor.Regen();  
+                  clearPreviusBlocks();
+                  _idsInsertBlRefColorArea = new List<ObjectId>();
+
+                  // блок шаблона зоны покраски
+                  var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                  var cs = t.GetObject(_db.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
+                  _idCS = cs.Id;
+                  var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
+                  var blRefColorAreaTemplate = new BlockReference(Point3d.Origin, btrColorArea.Id);
+                  cs.AppendEntity(blRefColorAreaTemplate);
+                  t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);
+                  _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;
+                  RandomPaintService.SetDynParamColorAreaBlock(blRefColorAreaTemplate, _colorAreaSize);
+                  _idColCopy = new ObjectIdCollection();
+                  _idColCopy.Add(_idBlRefColorAreaTemplate);
+
+                  Point3d ptStart = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X, _colorAreaSize.ExtentsColorArea.MaxPoint.Y, 0);
+                  _layersColorArea = new Dictionary<Color, ObjectId>();
+
+                  ProgressMeter progressMeter = new ProgressMeter();
+                  progressMeter.SetLimit(bitmap.Width * bitmap.Height);
+                  progressMeter.Start("Вставка блоков зон покраски");
+
+                  for (int i = 0; i < bitmap.Width * bitmap.Height; i++)
+                  {
+                     if (HostApplicationServices.Current.UserBreak())
+                        break;
+                     progressMeter.MeterProgress();
+                     int x = i / bitmap.Height;
+                     int y = i % bitmap.Height;
+                     Point3d position = ptStart.Add(new Vector3d(x * _colorAreaSize.LenghtSpot, -(y + 1) * _colorAreaSize.HeightSpot, 0));
+                     insertSpot(position, getLayerId(bitmap.GetPixel(x, y), _layersColorArea));
+                  }
+                  blRefColorAreaTemplate.Erase(true);
+                  t.Commit();                  
+
+                  progressMeter.Stop();
+                  _doc.Editor.Regen();
+               }
             }
          }
-      }
+         catch (System.Exception ex)
+         {
+            Log.Error(ex, "FormImage_Fire()");
+         }
+      }      
 
-      private ObjectId getLayerId(Color color, Dictionary<Color, ObjectId> _layers)
+      private ObjectId getLayerId(Color color, Dictionary<Color, ObjectId> layers)
       {
          ObjectId idLayer;
-         if (!_layers.TryGetValue(color, out idLayer))
+         if (!layers.TryGetValue(color, out idLayer))
          {
             using (var lt = _db.LayerTableId.GetObject(OpenMode.ForRead) as LayerTable)
             {
@@ -112,22 +119,23 @@ namespace AlbumPanelColorTiles.ImagePainting
                {
                   idLayer = lt[color.Name];
                   using (layer = idLayer.GetObject(OpenMode.ForWrite) as LayerTableRecord)
-                  {
-                     layer.Color = Autodesk.AutoCAD.Colors.Color.FromColor(color);
+                  {  
+                     layer.Color = Autodesk.AutoCAD.Colors.Color.FromColor(color);                     
                   }
                }
                else
                {
                   using (layer = new LayerTableRecord())
                   {
-                     layer.Name = color.Name;
-                     layer.Color = Autodesk.AutoCAD.Colors.Color.FromColor(color);
+                     layer.Name = color.Name;                     
                      lt.UpgradeOpen();
                      idLayer = lt.Add(layer);                     
+                     layer.Color = Autodesk.AutoCAD.Colors.Color.FromColor(color);                     
                   }
                }               
             }
-         }
+            layers.Add(color, idLayer);
+         }         
          return idLayer;
       }
 
@@ -159,7 +167,7 @@ namespace AlbumPanelColorTiles.ImagePainting
       {
          Bitmap res;
          FIBITMAP dib = FreeImage.CreateFromBitmap(img);
-         dib = FreeImage.ConvertColorDepth(dib, FREE_IMAGE_COLOR_DEPTH.FICD_04_BPP, true);
+         dib = FreeImage.ConvertColorDepth(dib, FREE_IMAGE_COLOR_DEPTH.FICD_04_BPP, true);         
          res = FreeImage.GetBitmap(dib);
          FreeImage.UnloadEx(ref dib);
          return res;
