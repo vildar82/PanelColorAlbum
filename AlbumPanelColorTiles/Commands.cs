@@ -118,8 +118,20 @@ namespace AlbumPanelColorTiles
                      // Переименовать марки АР
                      renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);                     
 
-                     // Покраска панелей
+                     // Создание альбома
                      _album.CreateAlbum();
+
+                     // Сохранение панелей в библиотеку
+                     try
+                     {
+                        PanelLibrary.PanelLibraryService panelLib = new PanelLibrary.PanelLibraryService(_album);
+                        panelLib.SavePanelsToLibrary();
+                     }
+                     catch (Exception ex)
+                     {
+                        Log.Error(ex, "Не удалось сохранить панели в бибилиотеку.");
+                     }
+
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
                      doc.Editor.Regen();
                      Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
