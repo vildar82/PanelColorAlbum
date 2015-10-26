@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,35 +37,50 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var libDwg = new Database(false, true))
-         {            
-            int waitCount=0;
-            bool isBusy = false;
-            do
-            {               
-               try
-               {
-                  libDwg.ReadDwgFile(libPanelsFilePath, FileShare.ReadWrite, true, "");
-                  isBusy = false;
-               }
-               catch
-               {
-                  if (++waitCount > 1)
-                  {
-                     Log.Error("Файл библиотеки панелей занят. Панели не сохранены в библиотеку.");
-                     return;
-                  }                  
-                  Thread.Sleep(1000);
-                  isBusy = true;
-               }
-            } while (isBusy);
-
-            // Переименовать блоки панелей которые уже есть в библиотеке
-            renameOlderPanels(libDwg);
+         {
+            libDwg.ReadDwgFile(libPanelsFilePath, FileShare.ReadWrite, true, "");
+            // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
+            copyLibPanelFile(libPanelsFilePath);
             // Копирование новых панелей
             copyNewPanels(libDwg);
-
+            // Сохранение файла библиотеки панелей
             libDwg.SaveAs(libPanelsFilePath, DwgVersion.Current);
+            // отправка отчета
+            SendReport();
+            // лог
+            Log.Info("Обновлена библиотека панелей.");
          }
+      }
+
+      private void SendReport()
+      {
+         StringBuilder msg = new StringBuilder();
+         msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
+         foreach (var markSb in _album.MarksSB)
+         {
+            msg.AppendLine(markSb.MarkSbBlockName);
+         }                  
+         using (var mail = new MailMessage())
+         { 
+            mail.To.Add("vildar82@gmail.com");
+            mail.To.Add("KhisyametdinovVT@pik.ru");
+            mail.From = new MailAddress("KhisyametdinovVT@pik.ru");
+            mail.Subject = string.Format("AKR - Изменение библиотеки панелей {0}", Environment.UserName);
+            mail.Body = msg.ToString();
+
+            SmtpClient client = new SmtpClient();
+            client.Host = "ex20pik.picompany.ru";                         
+            client.Send(mail);
+         }          
+      }
+
+      private void copyLibPanelFile(string libPanelsFilePath)
+      {
+         string suffix = string.Format("{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
+         string newFile = Path.Combine(
+            Path.GetDirectoryName(libPanelsFilePath), string.Format("{0}_{1}.{2}", 
+            Path.GetFileNameWithoutExtension(libPanelsFilePath), suffix, "dwg"));
+         File.Copy(libPanelsFilePath, newFile, true);
       }
 
       // Копирование новых панелей
@@ -83,23 +99,23 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      // Переименование старых блоков панелей
-      private void renameOlderPanels(Database dbLib)
-      {
-         string suffix = string.Format("_{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
-         using (var t = dbLib.TransactionManager.StartTransaction())
-         {
-            var bt = t.GetObject(dbLib.BlockTableId, OpenMode.ForRead) as BlockTable;
-            foreach (var markSb in _album.MarksSB)
-            {
-               if (bt.Has(markSb.MarkSbBlockName))
-               {
-                  var btr = t.GetObject(bt[markSb.MarkSbBlockName], OpenMode.ForWrite) as BlockTableRecord;
-                  btr.Name += suffix;
-               }
-            }
-            t.Commit();
-         }
-      }      
+      //// Переименование старых блоков панелей
+      //private void renameOlderPanels(Database dbLib)
+      //{
+      //   string suffix = string.Format("_{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
+      //   using (var t = dbLib.TransactionManager.StartTransaction())
+      //   {
+      //      var bt = t.GetObject(dbLib.BlockTableId, OpenMode.ForRead) as BlockTable;
+      //      foreach (var markSb in _album.MarksSB)
+      //      {
+      //         if (bt.Has(markSb.MarkSbBlockName))
+      //         {
+      //            var btr = t.GetObject(bt[markSb.MarkSbBlockName], OpenMode.ForWrite) as BlockTableRecord;
+      //            btr.Name += suffix;
+      //         }
+      //      }
+      //      t.Commit();
+      //   }
+      //}      
    }
 }
