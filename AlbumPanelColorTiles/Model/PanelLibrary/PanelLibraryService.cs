@@ -46,13 +46,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // Сохранение файла библиотеки панелей
             libDwg.SaveAs(libPanelsFilePath, DwgVersion.Current);
             // отправка отчета
-            SendReport();
+            sendReport();
             // лог
             Log.Info("Обновлена библиотека панелей.");
          }
       }
 
-      private void SendReport()
+      private void sendReport()
       {
          StringBuilder msg = new StringBuilder();
          msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
