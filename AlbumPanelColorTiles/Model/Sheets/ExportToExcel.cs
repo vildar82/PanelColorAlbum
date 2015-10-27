@@ -41,7 +41,7 @@ namespace AlbumPanelColorTiles.Sheets
             }
          }
 
-         // выгрузка списка панелей по этажам
+         // Список панелей по этажам
          listPanelsOnFloors(workBook, album, sheetsSet);
 
          // Показать ексель.
