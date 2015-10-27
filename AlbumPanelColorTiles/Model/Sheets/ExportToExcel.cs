@@ -1,4 +1,6 @@
-﻿using Microsoft.Office.Interop.Excel;
+﻿using System;
+using System.Linq;
+using Microsoft.Office.Interop.Excel;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -18,6 +20,7 @@ namespace AlbumPanelColorTiles.Sheets
 
          // Получаем активную таблицу
          Worksheet worksheet = workBook.ActiveSheet as Worksheet;
+         worksheet.Name = "Panels";
 
          int row = 1;
          // Название
@@ -38,9 +41,30 @@ namespace AlbumPanelColorTiles.Sheets
             }
          }
 
+         // выгрузка списка панелей по этажам
+         listPanelsOnFloors(workBook, album, sheetsSet);
+
          // Показать ексель.
          // Лучше сохранить файл и закрыть!!!???
          excelApp.Visible = true;
+      }
+
+      private static void listPanelsOnFloors(Workbook workBook, Album album, SheetsSet sheetsSet)
+      {
+         Worksheet sheetFloor = workBook.Sheets.Add();
+         sheetFloor.Name = "Floors";
+         int row = 1;
+         sheetFloor.Cells[row, 1].Value = "Этаж";
+         sheetFloor.Cells[row, 2].Value = "Панели";
+         
+         foreach (var storey in album.Storeys)
+         {            
+            foreach (var markAr in storey.MarksAr)
+            {
+               sheetFloor.Cells[++row, 1].Value = storey.Number;
+               sheetFloor.Cells[row, 2].Value = markAr.MarkARPanelFullName;
+            }
+         } 
       }
    }
 }

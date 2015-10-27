@@ -33,6 +33,7 @@ namespace AlbumPanelColorTiles
       private Document _doc;
       private List<MarkSbPanel> _marksSB;
       private SheetsSet _sheetsSet;
+      private List<Storey> _storeys;
 
       public Album()
       {
@@ -57,6 +58,7 @@ namespace AlbumPanelColorTiles
       public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
+      public List<Storey> Storeys { get { return _storeys; } }
 
       public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
       {
@@ -489,7 +491,7 @@ namespace AlbumPanelColorTiles
          var comparerStorey = new DoubleEqualityComparer(2000);
          HashSet<double> panelsStorey = new HashSet<double>(comparerStorey);
          // Этажи
-         List<Storey> storeys = new List<Storey>();
+         _storeys = new List<Storey>();
          foreach (var markSb in marksSB)
          {
             if (!markSb.IsUpperStoreyPanel)
@@ -503,20 +505,21 @@ namespace AlbumPanelColorTiles
                      {
                         // Новый этаж
                         storey = new Storey(panel.InsPt.Y);
-                        storeys.Add(storey);
+                        _storeys.Add(storey);
                      }
                      else
                      {
-                        storey = storeys.Single(s => comparerStorey.Equals(s.Y, panel.InsPt.Y));
+                        storey = _storeys.Single(s => comparerStorey.Equals(s.Y, panel.InsPt.Y));
                      }
                      panel.Storey = storey;
+                     storey.AddMarkAr(markAr);
                   }
                }
             }
          }
          // Нумерация этажей
          int i = _numberFirstFloor;
-         var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
+         var storeysOrders = _storeys.OrderBy(s => s.Y).ToList();
          storeysOrders.ForEach((s) => s.Number = i++.ToString());
          storeysOrders.Last().Number = "П";
          // В итоге у всех панелей (Panel) проставлены этажи (Storey).
