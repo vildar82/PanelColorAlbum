@@ -489,33 +489,22 @@ namespace AlbumPanelColorTiles
       {
          // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.
          var comparerStorey = new DoubleEqualityComparer(2000);
-         HashSet<double> panelsStorey = new HashSet<double>(comparerStorey);
+         //HashSet<double> panelsStorey = new HashSet<double>(comparerStorey);
          // Этажи
          _storeys = new List<Storey>();
-         foreach (var markSb in marksSB)
+         var panels = marksSB.Where(sb=>!sb.IsUpperStoreyPanel).SelectMany(sb => sb.MarksAR.SelectMany(ar => ar.Panels)).OrderBy(p=>p.InsPt.Y);
+         foreach (var panel in panels)
          {
-            if (!markSb.IsUpperStoreyPanel)
+            Storey storey = _storeys.Find(s => comparerStorey.Equals(s.Y, panel.InsPt.Y));
+            if (storey == null)
             {
-               foreach (var markAr in markSb.MarksAR)
-               {
-                  foreach (var panel in markAr.Panels)
-                  {
-                     Storey storey = null;
-                     if (panelsStorey.Add(panel.InsPt.Y))
-                     {
-                        // Новый этаж
-                        storey = new Storey(panel.InsPt.Y);
-                        _storeys.Add(storey);
-                     }
-                     else
-                     {
-                        storey = _storeys.Single(s => comparerStorey.Equals(s.Y, panel.InsPt.Y));
-                     }
-                     panel.Storey = storey;
-                     storey.AddMarkAr(markAr);
-                  }
-               }
+               // Новый этаж
+               storey = new Storey(panel.InsPt.Y);
+               _storeys.Add(storey);
+               _storeys.Sort((Storey s1, Storey s2) => s1.Y.CompareTo(s2.Y));
             }
+            panel.Storey = storey;
+            storey.AddMarkAr(panel.MarkAr);
          }
          // Нумерация этажей
          int i = _numberFirstFloor;

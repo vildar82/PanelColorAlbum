@@ -137,7 +137,7 @@ namespace AlbumPanelColorTiles.Panels
 
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
-         Panel panel = new Panel(blRefPanel);
+         Panel panel = new Panel(blRefPanel, this);
          _panels.Add(panel);
       }
 

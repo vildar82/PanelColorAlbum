@@ -22,12 +22,17 @@ namespace AlbumPanelColorTiles.Panels
       // Этаж панели
       private Storey _storey;
 
-      public Panel(BlockReference blRefPanel)
+      private MarkArPanel _markAr;
+
+      public Panel(BlockReference blRefPanel, MarkArPanel markAr)
       {
          _idBlRefSb = blRefPanel.ObjectId;
          _insPt = blRefPanel.Position;
          _extents = blRefPanel.GeometricExtents;
+         _markAr = markAr;
       }
+
+      public MarkArPanel MarkAr { get { return _markAr; } }
 
       /// <summary>
       ///  Границы блока по GeometricExtents
