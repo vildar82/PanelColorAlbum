@@ -349,9 +349,8 @@ namespace AlbumPanelColorTiles.Panels
             int i = 1;
             foreach (var markAR in MarksAR)
             {
-               string markPaint;
-               //var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
-               var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
+               string markPaint;               
+               var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f, new StoreyNumberComparer());
                string floor = String.Join(",", floors);
                markPaint = string.Format("Э{0}{1}", floor, endIndex);               
                if (marksArArchitectIndex.ContainsKey(markPaint))
@@ -372,9 +371,8 @@ namespace AlbumPanelColorTiles.Panels
             int i = 1;
             foreach (var markAR in MarksAR)
             {
-               string markPaint;
-               //var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number);
-               var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);               
+               string markPaint;               
+               var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f, new StoreyNumberComparer());
                string floor = String.Join(",", floors);
                markPaint = string.Format("Э{0}", floor);               
                if (marksArArchitectIndex.ContainsKey(markPaint))
