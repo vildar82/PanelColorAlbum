@@ -15,7 +15,7 @@ namespace AlbumPanelColorTiles.Panels
       public Tile(BlockReference blRefTile)
       {
          _idBlRef = blRefTile.ObjectId;
-         _bounds = blRefTile.Bounds.Value;
+         _bounds = blRefTile.GeometricExtents;
          _centerTile = new Point3d((_bounds.MaxPoint.X + _bounds.MinPoint.X) * 0.5,
                                    (_bounds.MaxPoint.Y + _bounds.MinPoint.Y) * 0.5, 0);
       }
