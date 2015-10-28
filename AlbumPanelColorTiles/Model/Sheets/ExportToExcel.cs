@@ -56,7 +56,8 @@ namespace AlbumPanelColorTiles.Sheets
          int row = 1;
          sheetFloor.Cells[row, 1].Value = "Этаж";
          sheetFloor.Cells[row, 2].Value = "Панели";
-         
+
+         album.Storeys.Sort();
          foreach (var storey in album.Storeys)
          {            
             foreach (var markAr in storey.MarksAr)

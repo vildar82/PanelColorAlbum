@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace AlbumPanelColorTiles.Panels
 {
    // Этаж
-   public class Storey : IEquatable<Storey>
+   public class Storey : IEquatable<Storey>, IComparable<Storey>
    {
       private string _number;
       private double _y;
@@ -43,6 +43,11 @@ namespace AlbumPanelColorTiles.Panels
       {
          return _number.Equals(other._number) &&
             _y.Equals(other._y);
+      }
+
+      public int CompareTo(Storey other)
+      {
+         return _number.CompareTo(other._number);
       }
    }
 }
