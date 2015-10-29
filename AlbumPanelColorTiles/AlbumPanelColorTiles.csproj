@@ -85,6 +85,7 @@
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
     <Compile Include="Model\Lib\UserPrompt.cs" />
+    <Compile Include="Model\PanelLibrary\MountingPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibraryService.cs" />
     <Compile Include="Model\Panels\ColorArea.cs" />
     <Compile Include="Model\Plot\PlotToFileConfig.cs" />

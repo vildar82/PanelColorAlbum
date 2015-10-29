@@ -12,6 +12,7 @@
       public string BlockFrameName = "АКР_Рамка";
 
       public string BlockPanelPrefixName = "АКР_Панель_";
+      public string BlockMountingPlanePrefixName = "АКР_Монтажка_";
 
       public string BlockTileName = "АКР_Плитка";
 

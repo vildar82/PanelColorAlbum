@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Plot;
 using AlbumPanelColorTiles.RandomPainting;
@@ -73,7 +74,7 @@ namespace AlbumPanelColorTiles
                       "\nСлой для окон в панелях (замораживается на листе формы панели марки АР) - " + Album.Options.LayerWindows +
                       "\nСлой для размеров на фасаде в панели (замораживается на листе формы) - " + Album.Options.LayerDimensionFacade +
                       "\nСлой для размеров в форме в панели (замораживается на листе фасада) - " + Album.Options.LayerDimensionFacade +
-                      "\nОбрабатываются только блоки в текущем чертеже в Модели. Внешние ссылки не учитываются.\n";                      
+                      "\nОбрабатываются только блоки в текущем чертеже в Модели. Внешние ссылки не учитываются.\n";
             }
             return _msgHelp;
          }
@@ -99,7 +100,7 @@ namespace AlbumPanelColorTiles
             {
                try
                {
-                  Inspector.Reset(); 
+                  Inspector.Reset();
                   _album.ChecksBeforeCreateAlbum();
                   // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
                   // Нужно или выполнить перекраску панелей перед созданием альбома
@@ -116,7 +117,7 @@ namespace AlbumPanelColorTiles
                      DictNOD.SaveRenamedMarkArToDict(renamedMarksAR);
 
                      // Переименовать марки АР
-                     renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);                     
+                     renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
 
                      // Создание альбома
                      _album.CreateAlbum();
@@ -141,13 +142,13 @@ namespace AlbumPanelColorTiles
                      Log.Info("Отменено пользователем.");
                      throw new System.Exception("Отменено пользователем.");
                   }
-            }
+               }
                catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
-               Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
+               {
+                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
+                  Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
+               }
             }
-         }
          }
       }
 
@@ -235,23 +236,23 @@ namespace AlbumPanelColorTiles
          {
             //try
             //{
-               Inspector.Reset(); 
-               if (_album == null)
-               {
-                  _album = new Album();
-               }
-               else
-               {
-                  // Повторный запуск программы покраски панелей.
-                  // Сброс данных
-                  _album.ResetData();
-               }
-               _album.PaintPanels();
-               doc.Editor.Regen();
-               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
-               doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
-               Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
+            Inspector.Reset();
+            if (_album == null)
+            {
+               _album = new Album();
+            }
+            else
+            {
+               // Повторный запуск программы покраски панелей.
+               // Сброс данных
+               _album.ResetData();
+            }
+            _album.PaintPanels();
+            doc.Editor.Regen();
+            doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+            doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+            doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
+            Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             //}
             //catch (System.Exception ex)
             //{
@@ -335,16 +336,16 @@ namespace AlbumPanelColorTiles
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
          try
-         {            
+         {
             // Произвольная покраска участка, с % распределением цветов зон покраски.
             if (_randomPainting == null)
             {
                _randomPainting = new RandomPaintService();
             }
-            _randomPainting.Start();            
+            _randomPainting.Start();
          }
          catch (System.Exception ex)
-         {            
+         {
             doc.Editor.WriteMessage("\n{0}", ex.ToString());
             Log.Error(ex, "Command: AKR-RandomPainting");
          }
@@ -443,13 +444,29 @@ namespace AlbumPanelColorTiles
             if (_imagePainting == null)
             {
                _imagePainting = new ImagePaintingService(doc);
-            }            
-            _imagePainting.Go(); 
+            }
+            _imagePainting.Go();
          }
          catch (System.Exception ex)
          {
             doc.Editor.WriteMessage("\n{0}", ex.ToString());
             Log.Error(ex, "Command: AKR-ImagePainting");
+         }
+      }
+
+      [CommandMethod("AKR", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void CreateMountingPlanBlocksCommand()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            MountingPlans mountingPlans = new MountingPlans();
+            mountingPlans.CreateMountingPlans();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
          }
       }
    }
