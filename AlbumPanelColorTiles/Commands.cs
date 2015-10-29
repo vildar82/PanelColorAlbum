@@ -125,7 +125,7 @@ namespace AlbumPanelColorTiles
                      // Сохранение панелей в библиотеку
                      try
                      {
-                        PanelLibrary.PanelLibraryService panelLib = new PanelLibrary.PanelLibraryService(_album);
+                        PanelLibrarySaveService panelLib = new PanelLibrarySaveService(_album);
                         panelLib.SavePanelsToLibrary();
                      }
                      catch (Exception ex)
@@ -454,9 +454,13 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      /// <summary>
+      /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
+      /// </summary>
       [CommandMethod("AKR", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void CreateMountingPlanBlocksCommand()
       {
+         Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
          try
@@ -467,6 +471,7 @@ namespace AlbumPanelColorTiles
          catch (System.Exception ex)
          {
             doc.Editor.WriteMessage(ex.ToString());
+            Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
          }
       }
    }

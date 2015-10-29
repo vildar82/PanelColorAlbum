@@ -12,11 +12,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Библиотека панелей покраски.
    // DWG файл
-   public class PanelLibraryService
+   public class PanelLibrarySaveService
    {
       private Album _album;
 
-      public PanelLibraryService(Album album)
+      public PanelLibrarySaveService(Album album)
       {
          _album = album;
       }
@@ -97,25 +97,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
             dbLib.WblockCloneObjects(ids, dbLib.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);            
             t.Commit();
          }
-      }
-
-      //// Переименование старых блоков панелей
-      //private void renameOlderPanels(Database dbLib)
-      //{
-      //   string suffix = string.Format("_{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
-      //   using (var t = dbLib.TransactionManager.StartTransaction())
-      //   {
-      //      var bt = t.GetObject(dbLib.BlockTableId, OpenMode.ForRead) as BlockTable;
-      //      foreach (var markSb in _album.MarksSB)
-      //      {
-      //         if (bt.Has(markSb.MarkSbBlockName))
-      //         {
-      //            var btr = t.GetObject(bt[markSb.MarkSbBlockName], OpenMode.ForWrite) as BlockTableRecord;
-      //            btr.Name += suffix;
-      //         }
-      //      }
-      //      t.Commit();
-      //   }
-      //}      
+      }      
    }
 }
