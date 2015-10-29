@@ -141,6 +141,18 @@ namespace AlbumPanelColorTiles.Sheets
                   layer.IsFrozen = false;
                }
             }
+
+            // отключение печати слоя АР_Марки
+            if (lt.Has(Album.Options.LayerMarks))
+            {
+               var layMarks = lt[Album.Options.LayerMarks].GetObject(OpenMode.ForRead) as LayerTableRecord;
+               if (layMarks.IsPlottable)
+               {
+                  layMarks.UpgradeOpen();
+                  layMarks.IsPlottable = false;  
+               }
+            }
+
             t.Commit();
          }
       }
