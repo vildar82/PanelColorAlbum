@@ -59,6 +59,7 @@ namespace AlbumPanelColorTiles
       public List<MarkSbPanel> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
       public List<Storey> Storeys { get { return _storeys; } }
+      public List<Paint> Colors { get { return _colors; } }
 
       public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
       {

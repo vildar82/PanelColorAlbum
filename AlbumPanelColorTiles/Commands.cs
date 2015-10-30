@@ -11,6 +11,7 @@ using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Plot;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
+using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -133,6 +134,17 @@ namespace AlbumPanelColorTiles
                         Log.Error(ex, "Не удалось сохранить панели в бибилиотеку.");
                      }
 
+                     // вставка итоговой таблицы по плитке
+                     try
+                     {
+                        TotalTileTable tableTileTotal = new TotalTileTable(_album);
+                        tableTileTotal.InsertTableTotalTile(doc);
+                     }
+                     catch (Exception ex)
+                     {
+                        Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
+                     }
+
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
                      doc.Editor.Regen();
                      Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
@@ -237,22 +249,22 @@ namespace AlbumPanelColorTiles
             try
             {
                Inspector.Reset();
-            if (_album == null)
-            {
-               _album = new Album();
-            }
-            else
-            {
-               // Повторный запуск программы покраски панелей.
-               // Сброс данных
-               _album.ResetData();
-            }
-            _album.PaintPanels();
-            doc.Editor.Regen();
-            doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-            doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
-            doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
-            Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
+               if (_album == null)
+               {
+                  _album = new Album();
+               }
+               else
+               {
+                  // Повторный запуск программы покраски панелей.
+                  // Сброс данных
+                  _album.ResetData();
+               }
+               _album.PaintPanels();
+               doc.Editor.Regen();
+               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+               doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
+               Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)
             {

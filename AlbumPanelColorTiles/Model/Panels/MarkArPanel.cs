@@ -113,7 +113,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                // Опрделение покраски по зонам
                Point3d centerTileInBlRef = GetCenterTileInBlockRef(blRefPanel.Position, tileMarSb.CenterTile);
-               paintAR = ColorArea.GetPaint(centerTileInBlRef, rtreeColorAreas);
+               paintAR = ColorArea.GetPaint(centerTileInBlRef, rtreeColorAreas);               
                if (paintAR == null)
                {
                   if (!hasTileWithoutPaint)
@@ -131,6 +131,8 @@ namespace AlbumPanelColorTiles.Panels
                paintAR = paintSb;
             }
             paintsAR.Add(paintAR);
+            // ведем подсчет плиток этого цвета для итоговой таблицы плиток на альбом                  
+            paintAR.AddOneTileCount();
          }
          return paintsAR;
       }

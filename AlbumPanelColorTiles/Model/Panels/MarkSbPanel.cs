@@ -489,7 +489,7 @@ namespace AlbumPanelColorTiles.Panels
                      //Определение покраски плитки
                      Paint paint = ColorArea.GetPaint(tile.CenterTile, _rtreeColorArea);
                      _tiles.Add(tile);
-                     _paints.Add(paint);
+                     _paints.Add(paint);                     
                   }
                }
             }

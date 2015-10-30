@@ -73,7 +73,7 @@ namespace AlbumPanelColorTiles.Panels
             foreach (ColorArea colorArea in colorAreas)
             {
                if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
-               {
+               {                  
                   return colorArea.Paint;
                }
             }
