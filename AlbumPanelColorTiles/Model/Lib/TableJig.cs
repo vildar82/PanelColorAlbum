@@ -14,20 +14,21 @@ namespace AlbumPanelColorTiles.Lib
       Point3d _position;
       Table _table;
       int _scale;
+      string _msg;
 
-      public TableJig(Table table, int scale) : base(table)
+      public TableJig(Table table, int scale, string msg) : base(table)
       {
+         _msg = msg;
          _scale = scale;
          _table = table;
          _position = _table.Position;
          _table.ScaleFactors = new Scale3d(scale);
-
       }
 
       protected override SamplerStatus Sampler(JigPrompts prompts)
       {
          var jigOpts = new JigPromptPointOptions();
-         jigOpts.Message = "\nВставка таблицы расхода материалов: ";
+         jigOpts.Message = _msg;
          var res = prompts.AcquirePoint(jigOpts);
          if (res.Status == PromptStatus.OK)
          {

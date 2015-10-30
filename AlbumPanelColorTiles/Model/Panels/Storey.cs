@@ -48,6 +48,7 @@ namespace AlbumPanelColorTiles.Panels
       private string _number;
       private double _y;
       private HashSet<MarkArPanel> _marksAr;
+      private static StoreyNumberComparer _comparer = new StoreyNumberComparer ();
 
       /// <summary>
       /// Высотная отметка этажа
@@ -84,8 +85,9 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       public int CompareTo(Storey other)
-      {
-         return _number.CompareTo(other._number);
+      {         
+         return _comparer.Compare(_number, other._number);
+         //return _number.CompareTo(other._number);
       }
    }
 }

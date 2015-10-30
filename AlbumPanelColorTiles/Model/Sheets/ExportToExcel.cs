@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AlbumPanelColorTiles.Panels;
 using Microsoft.Office.Interop.Excel;
 
 namespace AlbumPanelColorTiles.Sheets

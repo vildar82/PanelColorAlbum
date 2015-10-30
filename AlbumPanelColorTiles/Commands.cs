@@ -123,27 +123,7 @@ namespace AlbumPanelColorTiles
                      // Создание альбома
                      _album.CreateAlbum();
 
-                     // Сохранение панелей в библиотеку
-                     try
-                     {
-                        PanelLibrarySaveService panelLib = new PanelLibrarySaveService(_album);
-                        panelLib.SavePanelsToLibrary();
-                     }
-                     catch (Exception ex)
-                     {
-                        Log.Error(ex, "Не удалось сохранить панели в бибилиотеку.");
-                     }
-
-                     // вставка итоговой таблицы по плитке
-                     try
-                     {
-                        TotalTileTable tableTileTotal = new TotalTileTable(_album);
-                        tableTileTotal.InsertTableTotalTile(doc);
-                     }
-                     catch (Exception ex)
-                     {
-                        Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
-                     }
+                     
 
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
                      doc.Editor.Regen();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
@@ -70,13 +71,36 @@ namespace AlbumPanelColorTiles.Sheets
          }
          progressMeter.Stop();
 
+         // Сохранение панелей в библиотеку
+         try
+         {
+            PanelLibrarySaveService panelLib = new PanelLibrarySaveService(_album);
+            panelLib.SavePanelsToLibrary();
+         }
+         catch (Exception ex)
+         {
+            Log.Error(ex, "Не удалось сохранить панели в бибилиотеку.");
+         }         
+
          // Еспорт списка панелей в ексель.
          try
          {
             ExportToExcel.Export(this, _album);
          }
-         catch
+         catch (Exception ex)
          {
+            Log.Error(ex, "Не удалось экспортировать панели в Excel.");
+         }
+
+         // вставка итоговой таблицы по плитке
+         try
+         {
+            TotalTileTable tableTileTotal = new TotalTileTable(_album);
+            tableTileTotal.InsertTableTotalTile();
+         }
+         catch (Exception ex)
+         {
+            Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
          }
       }
 

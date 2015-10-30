@@ -23,15 +23,16 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // вставка итоговой таблицы расхода плитки на альбом
-      public void InsertTableTotalTile(Document doc)
+      public void InsertTableTotalTile()
       {
+         Document doc = Application.DocumentManager.MdiActiveDocument; 
          Database db = doc.Database;         
          Editor ed = doc.Editor;
 
          // подсчет итогового кол плитки
          Table table = getTable(db);        
 
-         TableJig jigTable = new TableJig(table, 100);
+         TableJig jigTable = new TableJig(table, 100, "\nВставка итоговой таблицы плитки на альбом");
          if (ed.Drag(jigTable).Status == PromptStatus.OK)
          {
             using (var t = db.TransactionManager.StartTransaction())
@@ -73,14 +74,18 @@ namespace AlbumPanelColorTiles.Sheets
 
          int row = 2;
          int i = 1;
-         double totalArea = 0;
-         foreach (var paint in _album.Colors.OrderBy(p=>p.Count))
+         double totalArea=0;
+         int totalCountTile = 0;
+         int countTile;
+         foreach (var paint in _album.Colors.OrderByDescending(p=>p.Count))
          {
             table.Cells[row, 0].TextString = i++.ToString(); //"Поз.";
             table.Cells[row, 1].TextString = paint.LayerName;  //"Цвет";
             table.Cells[row, 2].BackgroundColor = paint.Color;  // "Образец";            
-            table.Cells[row, 3].TextString = paint.Count.ToString();// "Расход, шт.";
-            var area = paint.Count * TileCalc.OneTileArea;
+            countTile = paint.Count / 2;
+            totalCountTile += countTile;
+            table.Cells[row, 3].TextString = countTile.ToString();// "Расход, шт.";
+            var area = countTile * TileCalc.OneTileArea;
             totalArea += area;
             table.Cells[row, 4].TextString = Math.Round(area, 2).ToString();  // "Расход, м.кв.";
             row++;
@@ -88,7 +93,7 @@ namespace AlbumPanelColorTiles.Sheets
          var mCells = CellRange.Create(table, row, 0, row, 2);
          table.MergeCells(mCells);
          table.Cells[row, 0].TextString = "Итого:";
-         table.Cells[row, 3].TextString = _album.Colors.Sum(p => p.Count).ToString();
+         table.Cells[row, 3].TextString = totalCountTile.ToString();
          table.Cells[row, 4].TextString = Math.Round(totalArea, 2).ToString();
 
          table.GenerateLayout();
