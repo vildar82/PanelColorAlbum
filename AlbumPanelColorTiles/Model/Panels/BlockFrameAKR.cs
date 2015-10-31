@@ -7,7 +7,8 @@ using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace AlbumPanelColorTiles.Panels
 {
-   public class BlockFrameFacade
+   // Блок рамки со штампом
+   public class BlockFrameAKR       
    {
       private Dictionary<string, string> _attrs;
       private string _blFrameName;

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Checks;
+using AlbumPanelColorTiles.PanelLibrary;
 
-namespace AlbumPanelColorTiles.Model.PanelLibrary
+namespace AlbumPanelColorTiles.PanelLibrary
 {
    // вставка панелей из библиотеки
    public class PanelLibraryLoadService
@@ -20,5 +22,27 @@ namespace AlbumPanelColorTiles.Model.PanelLibrary
 
       // найти блоки монтажек (они должны распологаться в столбик для каждого фасада)
       // допустимое отклонение по вертикали между точками вставки блоков монтажек = +- 1000мм.
+
+      // 1. Найти фасады в чертеже
+      // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана как фасада составляющие один фасада дома
+      
+
+      // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
+      public void LoadPanels()
+      {
+         Inspector.Clear();
+         // Попытка определить фасады по монтажкам
+         List<Facade> facades = Facade.GetFacadesFromMountingPlans();
+         if (Inspector.HasErrors)
+         {
+            // Показать ошибки.
+            Inspector.Show();
+            // запрос простой расстановки имеющихся в бибилтоеке АКР-Панелей
+         }
+
+         // загрузка АКР-панелей из библиотеки
+
+         // расстановка АКР-Панелей по фасадам
+      }
    }
 }

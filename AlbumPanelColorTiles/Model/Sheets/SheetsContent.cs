@@ -18,14 +18,14 @@ namespace AlbumPanelColorTiles.Sheets
       private readonly int _firstRowInTableForSheets = 2;
 
       private Album _album;
-      private BlockFrameFacade _blFrameInFacade;
+      private BlockFrameAKR _blFrameInFacade;
       private int _countContentSheets;
       private Database _dbContent;
       private Database _dbFacade;
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
 
-      public SheetsContent(SheetsSet sheetsSet, BlockFrameFacade blFrameInFacade)
+      public SheetsContent(SheetsSet sheetsSet, BlockFrameAKR blFrameInFacade)
       {
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;

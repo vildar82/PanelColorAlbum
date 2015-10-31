@@ -47,7 +47,7 @@ namespace AlbumPanelColorTiles.Panels
    {
       private string _number;
       private double _y;
-      private HashSet<MarkArPanel> _marksAr;
+      private HashSet<MarkArPanelAR> _marksAr;
       private static StoreyNumberComparer _comparer = new StoreyNumberComparer ();
 
       /// <summary>
@@ -57,12 +57,12 @@ namespace AlbumPanelColorTiles.Panels
       public Storey(double y)
       {
          _y = y;
-         _marksAr = new HashSet<MarkArPanel>();
+         _marksAr = new HashSet<MarkArPanelAR>();
       }
 
-      public List<MarkArPanel> MarksAr { get { return _marksAr.ToList(); } }
+      public List<MarkArPanelAR> MarksAr { get { return _marksAr.ToList(); } }
 
-      public void AddMarkAr(MarkArPanel markAr)
+      public void AddMarkAr(MarkArPanelAR markAr)
       {
          _marksAr.Add(markAr);
       }
@@ -86,8 +86,7 @@ namespace AlbumPanelColorTiles.Panels
 
       public int CompareTo(Storey other)
       {         
-         return _comparer.Compare(_number, other._number);
-         //return _number.CompareTo(other._number);
+         return _comparer.Compare(_number, other._number);         
       }
    }
 }

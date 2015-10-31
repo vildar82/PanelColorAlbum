@@ -101,7 +101,7 @@ namespace AlbumPanelColorTiles
             {
                try
                {
-                  Inspector.Reset();
+                  Inspector.Clear();
                   _album.ChecksBeforeCreateAlbum();
                   // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
                   // Нужно или выполнить перекраску панелей перед созданием альбома
@@ -122,8 +122,6 @@ namespace AlbumPanelColorTiles
 
                      // Создание альбома
                      _album.CreateAlbum();
-
-                     
 
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
                      doc.Editor.Regen();
@@ -228,7 +226,7 @@ namespace AlbumPanelColorTiles
          {
             try
             {
-               Inspector.Reset();
+               Inspector.Clear();
                if (_album == null)
                {
                   _album = new Album();
@@ -393,9 +391,9 @@ namespace AlbumPanelColorTiles
                   if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                   {
                      var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
-                     if (MarkSbPanel.IsBlockNamePanel(blRef.Name))
+                     if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
                      {
-                        if (MarkSbPanel.IsBlockNamePanelMarkAr(blRef.Name))
+                        if (MarkSbPanelAR.IsBlockNamePanelMarkAr(blRef.Name))
                            countMarkArPanels++;
                         else
                            countMarkSbPanels++;
@@ -464,6 +462,28 @@ namespace AlbumPanelColorTiles
          {
             doc.Editor.WriteMessage(ex.ToString());
             Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
+         }
+      }
+
+      /// <summary>
+      /// Создание фасадов из правильно расставленных блоков монтажных планов с блоками обозначения сторон фасада
+      /// Загрузка панелей-АКР из библиотеки
+      /// </summary>
+      [CommandMethod("AKR", "AKR-LoadPanelsFromLibrary", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void LoadPanelsFromLibraryCommand()
+      {
+         Log.Info("Start Command: AKR-LoadPanelsFromLibrary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {            
+            PanelLibraryLoadService loadPanelsService = new PanelLibraryLoadService();
+            loadPanelsService.LoadPanels();            
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
+            Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary");
          }
       }
    }

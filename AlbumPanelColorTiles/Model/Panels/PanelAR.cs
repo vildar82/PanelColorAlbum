@@ -5,7 +5,7 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Panels
 {
    // Панель Марки АР - вхождение блока на чертеже фасада.
-   public class Panel : IEquatable<Panel>
+   public class PanelAR : IEquatable<PanelAR>
    {
       // Границы блока
       private Extents3d _extents;
@@ -22,9 +22,9 @@ namespace AlbumPanelColorTiles.Panels
       // Этаж панели
       private Storey _storey;
 
-      private MarkArPanel _markAr;
+      private MarkArPanelAR _markAr;
 
-      public Panel(BlockReference blRefPanel, MarkArPanel markAr)
+      public PanelAR(BlockReference blRefPanel, MarkArPanelAR markAr)
       {
          _idBlRefSb = blRefPanel.ObjectId;
          _insPt = blRefPanel.Position;
@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.Panels
          _markAr = markAr;
       }
 
-      public MarkArPanel MarkAr { get { return _markAr; } }
+      public MarkArPanelAR MarkAr { get { return _markAr; } }
 
       /// <summary>
       ///  Границы блока по GeometricExtents
@@ -51,13 +51,13 @@ namespace AlbumPanelColorTiles.Panels
          set { _storey = value; }
       }
 
-      public bool Equals(Panel other)
+      public bool Equals(PanelAR other)
       {
          return _insPt.Equals(other._insPt);
       }
 
       // Замена вхождения блока СБ на АР
-      public void ReplaceBlockSbToAr(MarkArPanel markAr, Transaction t, BlockTableRecord ms)
+      public void ReplaceBlockSbToAr(MarkArPanelAR markAr, Transaction t, BlockTableRecord ms)
       {
          var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
          var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
@@ -91,7 +91,7 @@ namespace AlbumPanelColorTiles.Panels
       /// </summary>
       /// <param name="markSB"></param>
       /// <returns></returns>
-      public Extents3d GetExtentsTiles(MarkSbPanel markSB)
+      public Extents3d GetExtentsTiles(MarkSbPanelAR markSB)
       {
          // границы в определении блока
          var extTilesBtr = markSB.ExtentsTiles;

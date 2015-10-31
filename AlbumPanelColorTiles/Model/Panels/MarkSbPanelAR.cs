@@ -11,7 +11,7 @@ using RTreeLib;
 namespace AlbumPanelColorTiles.Panels
 {
    // Панели марки СБ
-   public class MarkSbPanel : IEquatable<MarkSbPanel>
+   public class MarkSbPanelAR : IEquatable<MarkSbPanelAR>
    {
       private string _abbr;
 
@@ -28,7 +28,7 @@ namespace AlbumPanelColorTiles.Panels
       private bool _isEndRightPanel;
       private bool _isUpperStoreyPanel;
       private int _windowSuffix;// индекс отличия панели по виду окна, 1,2,3 и т.д. по порядку.
-      private List<MarkArPanel> _marksAR;
+      private List<MarkArPanelAR> _marksAR;
 
       private string _markSb; // может быть с _тп или _тл
       private string _markSbBlockName;
@@ -39,7 +39,7 @@ namespace AlbumPanelColorTiles.Panels
       private List<Tile> _tiles;
 
       // Конструктор. Скрытый.
-      private MarkSbPanel(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr, List<MarkSbPanel> marksSb)
+      private MarkSbPanelAR(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr, List<MarkSbPanelAR> marksSb)
       {
          _abbr = abbr;
          _markSb = markSbName;
@@ -49,7 +49,7 @@ namespace AlbumPanelColorTiles.Panels
          checkPanelIndexes(markSbName, blRefPanel, marksSb);
          //_isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          //_isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
-         _marksAR = new List<MarkArPanel>();
+         _marksAR = new List<MarkArPanelAR>();
          _colorAreas = ColorArea.GetColorAreas(_idBtr);
          _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
@@ -78,7 +78,7 @@ namespace AlbumPanelColorTiles.Panels
       /// </summary>
       public bool IsUpperStoreyPanel { get { return _isUpperStoreyPanel; } }
 
-      public List<MarkArPanel> MarksAR { get { return _marksAR; } }
+      public List<MarkArPanelAR> MarksAR { get { return _marksAR; } }
 
       public string MarkSb { get { return _markSb; } }
 
@@ -153,7 +153,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Проверка есть ли доп индексы в имени блока панели марки СБ - такие как ТП, ТЛ, ОК№
-      private void checkPanelIndexes(string markSbName, BlockReference blRefPanel, List<MarkSbPanel> marksSb)
+      private void checkPanelIndexes(string markSbName, BlockReference blRefPanel, List<MarkSbPanelAR> marksSb)
       {
          // markSbName - марка СБ (без приставки АКР_Панель_)
          // проверка торца
@@ -208,9 +208,9 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски панелей текущего чертежа (в Модели)
-      public static List<MarkSbPanel> GetMarksSB(RTree<ColorArea> rtreeColorAreas, string abbr, string progressMsg)
+      public static List<MarkSbPanelAR> GetMarksSB(RTree<ColorArea> rtreeColorAreas, string abbr, string progressMsg)
       {
-         List<MarkSbPanel> _marksSb = new List<MarkSbPanel>();
+         List<MarkSbPanelAR> _marksSb = new List<MarkSbPanelAR>();
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
@@ -234,14 +234,14 @@ namespace AlbumPanelColorTiles.Panels
                {
                   var blRefPanel = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   // Определение Марки СБ панели. Если ее еще нет, то она создается и добавляется в список _marks.
-                  MarkSbPanel markSb = GetMarkSb(blRefPanel, _marksSb, bt, abbr);
+                  MarkSbPanelAR markSb = GetMarkSb(blRefPanel, _marksSb, bt, abbr);
                   if (markSb == null)
                   {
                      // Значит это не блок панели. Пропускаем.
                      continue;
                   }
                   //Определение покраски панели (Марки АР)
-                  List<Paint> paintAR = MarkArPanel.GetPanelMarkAR(markSb, blRefPanel, rtreeColorAreas);
+                  List<Paint> paintAR = MarkArPanelAR.GetPanelMarkAR(markSb, blRefPanel, rtreeColorAreas);
                   // Добавление панели АР в список панелей для Марки СБ
                   markSb.AddPanelAR(paintAR, blRefPanel, markSb);
                }
@@ -257,7 +257,7 @@ namespace AlbumPanelColorTiles.Panels
       /// </summary>
       /// <param name="blName">Имя блока панели</param>
       /// <returns>марка панели (СБ или СБ+АР)</returns>
-      public static string GetPanelMarkFromBlockName(string blName, List<MarkSbPanel> marksSB)
+      public static string GetPanelMarkFromBlockName(string blName, List<MarkSbPanelAR> marksSB)
       {
          //return blName.Substring(Album.Options.BlockPanelPrefixName.Length);
          string panelMark = string.Empty;
@@ -303,9 +303,9 @@ namespace AlbumPanelColorTiles.Panels
 
       // Определение архитектурных Марок АР (Э1_Яр1)
       // Жуткий вид. ??? Переделать!!!
-      public void DefineArchitectMarks(List<MarkSbPanel> marksSB)
+      public void DefineArchitectMarks(List<MarkSbPanelAR> marksSB)
       {        
-         Dictionary<string, MarkArPanel> marksArArchitectIndex = new Dictionary<string, MarkArPanel>();
+         Dictionary<string, MarkArPanelAR> marksArArchitectIndex = new Dictionary<string, MarkArPanelAR>();
          if (IsUpperStoreyPanel)
          {
             // Панели чердака
@@ -389,7 +389,7 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
-      public bool Equals(MarkSbPanel other)
+      public bool Equals(MarkSbPanelAR other)
       {
          return _markSb.Equals(other._markSb) &&
             _colorAreas.SequenceEqual(other._colorAreas) &&
@@ -409,9 +409,9 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
-      private static MarkSbPanel GetMarkSb(BlockReference blRefPanel, List<MarkSbPanel> marksSb, BlockTable bt, string abbr)
+      private static MarkSbPanelAR GetMarkSb(BlockReference blRefPanel, List<MarkSbPanelAR> marksSb, BlockTable bt, string abbr)
       {
-         MarkSbPanel markSb = null;
+         MarkSbPanelAR markSb = null;
          if (IsBlockNamePanel(blRefPanel.Name))
          {
             string markSbName = GetMarkSbName(blRefPanel.Name);
@@ -426,7 +426,7 @@ namespace AlbumPanelColorTiles.Panels
                   if (bt.Has(markSbBlName))
                   {
                      var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSbPanel(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr, marksSb);
+                     markSb = new MarkSbPanelAR(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr, marksSb);
                      marksSb.Add(markSb);
                   }
                   else
@@ -442,13 +442,13 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Добавление панели АР по списку ее покраски
-      private void AddPanelAR(List<Paint> paintAR, BlockReference blRefPanel, MarkSbPanel markSb)
+      private void AddPanelAR(List<Paint> paintAR, BlockReference blRefPanel, MarkSbPanelAR markSb)
       {
          // Проверка нет ли уже такой марки покраси АР
-         MarkArPanel panelAR = HasPanelAR(paintAR);
+         MarkArPanelAR panelAR = HasPanelAR(paintAR);
          if (panelAR == null)
          {
-            panelAR = new MarkArPanel(paintAR, markSb, blRefPanel);
+            panelAR = new MarkArPanelAR(paintAR, markSb, blRefPanel);
             _marksAR.Add(panelAR);
          }
          panelAR.AddBlockRefPanel(blRefPanel);
@@ -498,12 +498,12 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Поиск покраски марки АР в списке _marksAR
-      private MarkArPanel HasPanelAR(List<Paint> paintAR)
+      private MarkArPanelAR HasPanelAR(List<Paint> paintAR)
       {
          //Поиск панели АР по покраске
-         MarkArPanel resPanelAR = null;
+         MarkArPanelAR resPanelAR = null;
          //Сравнение списков покраски
-         foreach (MarkArPanel panelAR in _marksAR)
+         foreach (MarkArPanelAR panelAR in _marksAR)
          {
             if (panelAR.EqualPaint(paintAR))
             {

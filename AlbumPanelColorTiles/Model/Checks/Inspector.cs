@@ -24,10 +24,10 @@ namespace AlbumPanelColorTiles.Checks
 
       static Inspector()
       {         
-         Reset();
+         Clear();
       }
 
-      public static void Reset ()
+      public static void Clear ()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
@@ -35,6 +35,22 @@ namespace AlbumPanelColorTiles.Checks
          _errors = new List<Error>();
          //_notPaintedTilesInMarkAR = new List<ErrorObject>();
          //_markArBtrNames = new List<string>();
+      }
+
+      public static void AddError (string msg)
+      {
+         var err = new Error(msg);
+         _errors.Add(err);
+      }
+      public static void AddError(string msg, Entity ent)
+      {
+         var err = new Error(msg, ent);
+         _errors.Add(err);
+      }
+      public static void AddError(string msg, Entity ent, Extents3d ext)
+      {
+         var err = new Error(msg, ext, ent);
+         _errors.Add(err);
       }
 
       // Проверка, все ли плитки покрашены
@@ -99,7 +115,7 @@ namespace AlbumPanelColorTiles.Checks
             {
                using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
                {
-                  if (MarkSbPanel.IsBlockNamePanelMarkAr(btr.Name))
+                  if (MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
                   {
                      markArBtrNames.Add(btr.Name);
                   }

@@ -96,11 +96,15 @@ namespace AlbumPanelColorTiles.Panels
          RTree<ColorArea> rtree = new RTree<ColorArea>();           
          foreach (var colorArea in _colorAreas)
          {
-            Rectangle rectTree = new Rectangle(colorArea.Bounds.MinPoint.X, colorArea.Bounds.MinPoint.Y,
-                                               colorArea.Bounds.MaxPoint.X, colorArea.Bounds.MaxPoint.Y, 0, 0);
+            Rectangle rectTree = GetRectangleRTree(colorArea.Bounds);
             rtree.Add(rectTree, colorArea);
          }
          return rtree;
+      }
+
+      public static Rectangle GetRectangleRTree(Extents3d extents)
+      {
+         return new Rectangle(extents.MinPoint.X, extents.MinPoint.Y, extents.MaxPoint.X, extents.MaxPoint.Y, 0, 0);
       }
    }
 }

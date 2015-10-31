@@ -18,7 +18,7 @@ namespace AlbumPanelColorTiles.Sheets
       // Блок Марки АР.
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
-      private MarkArPanel _markAR;
+      private MarkArPanelAR _markAR;
       
       private Point3d _ptInsertBlRefMarkAR;
 
@@ -27,7 +27,7 @@ namespace AlbumPanelColorTiles.Sheets
       private int _sheetNumber;
       private string _sheetNumberInForm;
 
-      public SheetMarkAr(MarkArPanel markAR)
+      public SheetMarkAr(MarkArPanelAR markAR)
       {
          _markAR = markAR;
          _sheetName = string.Format("Наружная стеновая панель {0}", MarkArFullName);
@@ -40,7 +40,7 @@ namespace AlbumPanelColorTiles.Sheets
          get { return _sheetNumber.ToString("00"); }
       }
 
-      public MarkArPanel MarkAR { get { return _markAR; } }      
+      public MarkArPanelAR MarkAR { get { return _markAR; } }      
 
       public string MarkArFullName { get { return _markAR.MarkARPanelFullName; } }
 

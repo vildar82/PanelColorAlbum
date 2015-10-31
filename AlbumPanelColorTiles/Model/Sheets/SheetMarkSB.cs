@@ -13,12 +13,12 @@ namespace AlbumPanelColorTiles.Sheets
       private string _fileMarkSB;
 
       // Файл панели Марки СБ с листами Маркок АР.
-      private MarkSbPanel _markSB;
+      private MarkSbPanelAR _markSB;
 
       private List<SheetMarkAr> _sheetsMarkAR;
 
       // Конструктор
-      public SheetMarkSB(MarkSbPanel markSB)
+      public SheetMarkSB(MarkSbPanelAR markSB)
       {
          _markSB = markSB;
          _sheetsMarkAR = new List<SheetMarkAr>();
@@ -42,7 +42,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание файла марки СБ и листов с панелями марок АР
-      public void CreateSheetMarkSB(SheetsSet sheetSet, int count, BlockFrameFacade blFrameFacade)
+      public void CreateSheetMarkSB(SheetsSet sheetSet, int count, BlockFrameAKR blFrameFacade)
       {
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateFileMarkSB(_markSB, sheetSet.Album.AlbumDir, sheetSet.SheetTemplateFileMarkSB, count);
@@ -103,7 +103,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание файла Марки СБ
-      private string CreateFileMarkSB(MarkSbPanel markSB, string albumFolder, string templateFileMarkSB, int count)
+      private string CreateFileMarkSB(MarkSbPanelAR markSB, string albumFolder, string templateFileMarkSB, int count)
       {
          string fileDest = Path.Combine(albumFolder, count.ToString("00") + "_" + markSB.MarkSb + ".dwg");
          File.Copy(templateFileMarkSB, fileDest);

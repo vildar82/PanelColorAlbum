@@ -50,7 +50,7 @@ namespace AlbumPanelColorTiles.Sheets
          CreateAlbumFolder();
 
          //Поиск блока рамки на текущем чертеже фасада
-         BlockFrameFacade blFrameSearch = new BlockFrameFacade();
+         BlockFrameAKR blFrameSearch = new BlockFrameAKR();
          blFrameSearch.Search();
 
          // Титульные листы и обложеи в одном файле "Содержание".
@@ -119,7 +119,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
-      private List<SheetMarkSB> ProcessingSheets(List<MarkSbPanel> marksSB)
+      private List<SheetMarkSB> ProcessingSheets(List<MarkSbPanelAR> marksSB)
       {
          List<SheetMarkSB> sheetsMarkSb = new List<SheetMarkSB>();
          foreach (var markSB in marksSB)
