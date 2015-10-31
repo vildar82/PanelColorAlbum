@@ -5,12 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.PanelLibrary;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // вставка панелей из библиотеки
    public class PanelLibraryLoadService
    {
+      // все блоки панелей-СБ в чертеже
+      private List<PanelSB> _allPanelsSB = new List<PanelSB> ();      
+
+      public List<PanelSB> AllPanelsSB { get { return _allPanelsSB; } }
+
       // в чертеже должны быть расставлены монтажки с блоками обозначения фасадов на них.
       // нужно для блоков панелей СБ найти соответствующую панель покраски в библиотеки 
       // но, марки панелей у СБ и у АР могут немного отличаться пробелами и -, нужно это учесть.
@@ -25,14 +31,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       // 1. Найти фасады в чертеже
       // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана как фасада составляющие один фасада дома
-      
+
 
       // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
       public void LoadPanels()
       {
          Inspector.Clear();
          // Попытка определить фасады по монтажкам
-         List<Facade> facades = Facade.GetFacadesFromMountingPlans();
+         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
          if (Inspector.HasErrors)
          {
             // Показать ошибки.

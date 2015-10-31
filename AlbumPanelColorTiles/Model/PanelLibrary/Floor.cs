@@ -20,22 +20,28 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Точка вставки блока монтажки
       private Point3d _ptBlMounting;
       // Имя/номер этажа 
-      private string _name;      
+      private string _name;
+      // Панели СБ
+      private List<PanelSB> _panelsSB;
 
-      public Floor(BlockReference blRefMounting, FacadeFrontBlock facadeFrontBlock)
-      {
-         _facadeFrontBlock = facadeFrontBlock;
+      public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
+      {         
          _idBlRefMounting = blRefMounting.Id;
          _ptBlMounting = blRefMounting.Position; 
          _name = getFloorName(blRefMounting);
+         // Получение всех блоков панелей СБ из блока монтажки
+         _panelsSB = PanelSB.GetPanels(blRefMounting.BlockTableRecord);
+         // добавление блоков паненлей в общий список панелей СБ
+         libLoadServ.AllPanelsSB.AddRange(_panelsSB);
       }
 
       public Point3d PtBlMounting { get { return _ptBlMounting; } }
+      public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } private set { _facadeFrontBlock = value; } }
 
       /// <summary>
       /// Поиск всех блоков монтажек в модели
       /// </summary>      
-      public static List<Floor> GetMountingBlocks()
+      public static List<Floor> GetMountingBlocks(PanelLibraryLoadService libLoadServ)
       {
          List<Floor> floors = new List<Floor>();
 
@@ -52,6 +58,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            // Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
+            libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id));
             foreach (ObjectId idEnt in ms)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
@@ -60,6 +68,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
                   if (blRefMounting.Name.StartsWith(Album.Options.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
+                     Floor floor = new Floor(blRefMounting, libLoadServ);                     
                      // найти соотв обозн стороны фасада
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
                      // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в фасады, просто так вставлен
@@ -74,7 +83,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      }
                      else
                      {
-                        Floor floor = new Floor(blRefMounting, frontsIntersects[0]);
+                        floor.FacadeFrontBlock = frontsIntersects[0];
                         floors.Add(floor);
                      }                     
                   }

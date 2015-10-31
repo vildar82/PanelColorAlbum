@@ -10,7 +10,13 @@
       public string BlockPanelPrefixName = "АКР_Панель_";      
       public string BlockTileName = "АКР_Плитка";
       public string BlockMountingPlanePrefixName = "АКР_Монтажка_";
-      public string BlockFacadeName = "АКР_Фасад"; // Блок обозначения стороны фасада на монтажном плане
+      public string BlockFacadeName = "АКР_Фасад"; // Блок обозначения стороны фасада на монтажном плане      
+      //
+      // Атибуты блоков
+      //
+      public string AttributePanelSbPaint = "ПОКРАСКА";
+      public string AttributePanelSbMark = "МАРКА";
+
       //
       // Суффиксы (приставки к именам блоков панелей)
       //
