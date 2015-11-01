@@ -47,6 +47,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
 
          // загрузка АКР-панелей из библиотеки
+         PanelSB.LoadBtrPanels(_allPanelsSB);
 
          // расстановка АКР-Панелей по фасадам
       }

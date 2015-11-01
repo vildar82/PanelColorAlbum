@@ -15,6 +15,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public class PanelLibrarySaveService
    {
       private Album _album;
+      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
 
       public PanelLibrarySaveService(Album album)
       {
@@ -29,22 +30,22 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Если файл занят другим процессом? - подождать 3 секунды и повторить.
 
          // Файл библиотеки блоков панелей.
-         string libPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
-         if (!File.Exists(libPanelsFilePath))
+         //string libPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
+         if (!File.Exists(LibPanelsFilePath))
          {
-            Log.Error("Нет файла библиотеки панелей {0}", libPanelsFilePath);
+            Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
             return;
          }
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var libDwg = new Database(false, true))
          {
-            libDwg.ReadDwgFile(libPanelsFilePath, FileShare.ReadWrite, true, "");
+            libDwg.ReadDwgFile(LibPanelsFilePath, FileShare.ReadWrite, true, "");
             // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
-            copyLibPanelFile(libPanelsFilePath);
+            copyLibPanelFile(LibPanelsFilePath);
             // Копирование новых панелей
             copyNewPanels(libDwg);
             // Сохранение файла библиотеки панелей
-            libDwg.SaveAs(libPanelsFilePath, DwgVersion.Current);
+            libDwg.SaveAs(LibPanelsFilePath, DwgVersion.Current);
             // отправка отчета
             sendReport();
             // лог

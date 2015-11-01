@@ -90,6 +90,7 @@
     <Compile Include="Model\PanelLibrary\Facade.cs" />
     <Compile Include="Model\PanelLibrary\FacadeFrontBlock.cs" />
     <Compile Include="Model\PanelLibrary\Floor.cs" />
+    <Compile Include="Model\PanelLibrary\LevenshteinDistanceExtensions.cs" />
     <Compile Include="Model\PanelLibrary\MountingPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibraryLoadService.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibrarySaveService.cs" />
