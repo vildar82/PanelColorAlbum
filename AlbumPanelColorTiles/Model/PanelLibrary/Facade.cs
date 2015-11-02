@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.Lib;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -18,6 +20,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public Facade(double x)
       {
          _x = x;
+         _floors = new List<Floor>();
       }
 
       public List<Floor> Floors { get { return _floors; } }
@@ -49,6 +52,40 @@ namespace AlbumPanelColorTiles.PanelLibrary
             facade._floors.Add(floor);
          }
          return facades;
+      }
+
+      // Создание фасадов по монтажным планам
+      public static void CreateFacades(List<Facade> facades)
+      {
+         if (facades.Count == 0) return;
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction()) 
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
+            double yFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
+            foreach (var facade in facades)
+            {               
+               foreach (var floor in facade.Floors)
+               {                  
+                  foreach (var panelSb in floor.PanelsSB)
+                  {
+                     Point3d ptPanelAkr = new Point3d(panelSb.PanelAKR.GetPtInModel().X, yFloor, 0);
+                     var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
+                     panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
+                     t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                  }
+                  yFloor += 2800;// высота этажа
+               } 
+            }
+            t.Commit();
+         }
+      }
+
+      // определение уровня по Y для первого этажа всех фасадов - отступить 10000 вверх от самого верхнего блока панели СБ.
+      private static double getFirstFloorY(List<Facade> facades)
+      {
+         double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.PanelsSB).Max(p => p.PtCenterPanelSbInModel.Y);
+         return maxYblRefPanelInModel + 10000;
       }
    }
 }

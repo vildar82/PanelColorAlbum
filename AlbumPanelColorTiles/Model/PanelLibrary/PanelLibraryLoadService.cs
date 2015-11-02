@@ -39,17 +39,48 @@ namespace AlbumPanelColorTiles.PanelLibrary
          Inspector.Clear();
          // Попытка определить фасады по монтажкам
          List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
-         if (Inspector.HasErrors)
-         {
-            // Показать ошибки.
-            Inspector.Show();
-            // запрос простой расстановки имеющихся в бибилтоеке АКР-Панелей
-         }
-
          // загрузка АКР-панелей из библиотеки
          PanelSB.LoadBtrPanels(_allPanelsSB);
 
-         // расстановка АКР-Панелей по фасадам
+         // Test - проверка точек
+         testCenterPanels();
+
+         //if (Inspector.HasErrors)
+         //{
+         //   // Показать ошибки.
+         //   Inspector.Show();
+         //   Inspector.Clear();
+         //   // простая расстановки имеющихся в бибилтоеке АКР-Панелей
+         //   PanelAKR.SimpleInsert(_allPanelsSB);
+         //}
+         //if (facades.Count > 0)
+         //{
+         //   // расстановка АКР-Панелей по фасадам
+         //   Facade.CreateFacades(facades);
+         //}
+         //else
+         //{
+         //   PanelAKR.SimpleInsert(_allPanelsSB);
+         //}
+      }
+
+      private void testCenterPanels()
+      {
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
+            
+            foreach (var panelSb in _allPanelsSB)
+            {
+               // вставка панелей АКР
+               var ptInsertAkr = panelSb.PanelAKR.GetPtInModel();
+               DBPoint dbPt = new DBPoint(ptInsertAkr);
+               ms.AppendEntity(dbPt);
+               t.AddNewlyCreatedDBObject(dbPt, true);
+            }
+            t.Commit();
+         }
       }
    }
 }

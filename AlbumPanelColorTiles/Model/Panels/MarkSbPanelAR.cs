@@ -39,14 +39,14 @@ namespace AlbumPanelColorTiles.Panels
       private List<Tile> _tiles;
 
       // Конструктор. Скрытый.
-      private MarkSbPanelAR(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr, List<MarkSbPanelAR> marksSb)
+      private MarkSbPanelAR(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr)
       {
          _abbr = abbr;
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
          _isUpperStoreyPanel = (blRefPanel.Layer == Album.Options.LayerUpperStoreyPanels); // Панель чердака
-         checkPanelIndexes(markSbName, blRefPanel, marksSb);
+         checkPanelIndexes(markSbName, blRefPanel);
          //_isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          //_isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
          _marksAR = new List<MarkArPanelAR>();
@@ -90,13 +90,18 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (_markSbClean == null)
             {
-               _markSbClean = getMarkSbCleanName(_markSb);
+               _markSbClean = GetMarkSbCleanName(_markSb);
             }
             return _markSbClean;
          }
       }
 
-      private string getMarkSbCleanName(string markSbName)
+      /// <summary>
+      /// Чистая марка СБ - без суффиксов _ТП, _ТЛ, _ОК
+      /// </summary>
+      /// <param name="markSbName"></param>
+      /// <returns></returns>
+      public static string GetMarkSbCleanName(string markSbName)
       {
          int indexEndLeftPanel = markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase);
          indexEndLeftPanel = indexEndLeftPanel > 0 ? indexEndLeftPanel : 0;
@@ -153,7 +158,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Проверка есть ли доп индексы в имени блока панели марки СБ - такие как ТП, ТЛ, ОК№
-      private void checkPanelIndexes(string markSbName, BlockReference blRefPanel, List<MarkSbPanelAR> marksSb)
+      private void checkPanelIndexes(string markSbName, BlockReference blRefPanel)
       {
          // markSbName - марка СБ (без приставки АКР_Панель_)
          // проверка торца
@@ -186,8 +191,12 @@ namespace AlbumPanelColorTiles.Panels
       {
          return Album.Options.BlockPanelPrefixName + markSb;
       }
-
-      // Определение марки СБ (может быть с суффиксом торца _тл или _тп, и индекс окна _ок1 и т.п.). Отбрасывается последняя часть имени в скобках (это марка АР).
+      
+      /// <summary>
+      /// Определение марки СБ (может быть с суффиксом торца _тл или _тп, и индекс окна _ок1 и т.п.). Отбрасывается последняя часть имени в скобках (это марка АР).
+      /// </summary>
+      /// <param name="blName">Имя блока</param>
+      /// <returns>Марка СБ - без приставки АКР_Панель_, и без () марки покраски</returns>
       public static string GetMarkSbName(string blName)
       {
          string markSb = string.Empty;
@@ -426,7 +435,7 @@ namespace AlbumPanelColorTiles.Panels
                   if (bt.Has(markSbBlName))
                   {
                      var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSbPanelAR(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr, marksSb);
+                     markSb = new MarkSbPanelAR(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr);
                      marksSb.Add(markSb);
                   }
                   else
@@ -463,7 +472,7 @@ namespace AlbumPanelColorTiles.Panels
             _extentsTiles.AddPoint(tile.CenterTile);
          }
          return new Point2d((_extentsTiles.MinPoint.X + _extentsTiles.MaxPoint.X) * 0.5, (_extentsTiles.MinPoint.Y + _extentsTiles.MaxPoint.Y) * 0.5);
-      }
+      }      
 
       private string GetMarkArNextName()
       {

@@ -11,8 +11,11 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Этаж - блоки АКР-панелей этажа и связаннный с ним блок монтажки с блоком обозначения стороны фасада
-   public class Floor
-   {      
+   public class Floor : IComparable<Floor>
+   {
+      // для сортировки этажей (строка имени этажа = номеру этажа)
+      private static StoreyNumberComparer _comparer = new StoreyNumberComparer();
+
       // обозначение стороны фасада на монтажном плане
       private FacadeFrontBlock _facadeFrontBlock;
       // Блок монтажного плана
@@ -30,12 +33,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _ptBlMounting = blRefMounting.Position; 
          _name = getFloorName(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _panelsSB = PanelSB.GetPanels(blRefMounting.BlockTableRecord);
+         _panelsSB = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position);
          // добавление блоков паненлей в общий список панелей СБ
          libLoadServ.AllPanelsSB.AddRange(_panelsSB);
       }
 
       public Point3d PtBlMounting { get { return _ptBlMounting; } }
+      public List<PanelSB> PanelsSB { get { return _panelsSB; } }
       public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } private set { _facadeFrontBlock = value; } }
 
       /// <summary>
@@ -59,7 +63,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
             // Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
-            libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id));
+            libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin));
             foreach (ObjectId idEnt in ms)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
@@ -97,6 +101,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private string getFloorName(BlockReference blRefMounting)
       {
          return blRefMounting.Name.Substring(Album.Options.BlockMountingPlanePrefixName.Length);
+      }
+
+      public int CompareTo(Floor other)
+      {
+         // Сортировка этажей по именам
+         return _comparer.Compare(_name, other._name);
       }
    }
 }

@@ -91,13 +91,11 @@ namespace AlbumPanelColorTiles.Checks
 
       // Проверка чертежа
       public static void CheckDrawing()
-      {
-         bool res = true;
+      {         
          // 1. Не должно быть блоков Марки АР. Т.к. может получится так, что при текущем расчте получится марка панели которая уже определенва в чертеже, и она не сможет создаться, т.к. такой блок уже есть.
          var markArBtrNames = checkBtrMarkAr();                     
          if (markArBtrNames.Count > 0)
-         {
-            res = false;
+         {            
             // Выдать сообщение, со списком блоков панелей марки АР. Которых не должно быть перед расчетом.
             string msg = string.Join(", ", markArBtrNames.ToArray());
             //_ed.WriteMessage("\n" + msg);            
