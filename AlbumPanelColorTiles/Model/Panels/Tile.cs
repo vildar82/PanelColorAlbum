@@ -1,6 +1,7 @@
 ﻿using System;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using RTreeLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -26,6 +27,37 @@ namespace AlbumPanelColorTiles.Panels
       {
          return _idBlRef.Equals(other._idBlRef) &&
             _bounds.IsEqualTo(other._bounds, Album.Tolerance);
+      }
+
+      /// <summary>
+      /// Покраска блоков плитки в Модели (без блоков АКР-Панелей)
+      /// </summary>      
+      public static void PaintTileInModel(RTree<ColorArea> rtreeColorAreas)
+      {
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  if (Lib.Blocks.EffectiveName(blRefTile) == Album.Options.BlockTileName)
+                  {
+                     Tile tile = new Tile(blRefTile);
+                     //Определение покраски плитки
+                     Paint paint = ColorArea.GetPaint(tile.CenterTile, rtreeColorAreas);
+                     if (paint != null)
+                     {
+                        blRefTile.UpgradeOpen();
+                        blRefTile.Layer = paint.LayerName;
+                     }
+                  }
+               }
+            }
+            t.Commit();
+         }
       }
    }
 }
