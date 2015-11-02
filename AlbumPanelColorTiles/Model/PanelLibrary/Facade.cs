@@ -62,17 +62,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
          using (var t = db.TransactionManager.StartTransaction()) 
          {
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            double yFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
+            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
             foreach (var facade in facades)
-            {               
+            {
+               double yFloor = yFirstFloor;
                foreach (var floor in facade.Floors)
                {                  
-                  foreach (var panelSb in floor.PanelsSB)
+                  foreach (var panelSb in floor.PanelsSbInFront)
                   {
-                     Point3d ptPanelAkr = new Point3d(panelSb.PanelAKR.GetPtInModel().X, yFloor, 0);
-                     var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
-                     panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
-                     t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                     if (panelSb.PanelAKR != null)
+                     {
+                        Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
+                        var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
+                        panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
+                        t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                     }
                   }
                   yFloor += 2800;// высота этажа
                } 
@@ -84,7 +88,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // определение уровня по Y для первого этажа всех фасадов - отступить 10000 вверх от самого верхнего блока панели СБ.
       private static double getFirstFloorY(List<Facade> facades)
       {
-         double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.PanelsSB).Max(p => p.PtCenterPanelSbInModel.Y);
+         double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.AllPanelsSbInFloor).Max(p => p.PtCenterPanelSbInModel.Y);
          return maxYblRefPanelInModel + 10000;
       }
    }

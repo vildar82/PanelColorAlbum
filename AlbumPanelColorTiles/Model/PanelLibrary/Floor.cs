@@ -24,8 +24,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private Point3d _ptBlMounting;
       // Имя/номер этажа 
       private string _name;
-      // Панели СБ
-      private List<PanelSB> _panelsSB;
+      // Панели СБ - все что есть внутри блока монтажки
+      private List<PanelSB> _allPanelsSbInFloor;
+      private List<PanelSB> _panelsSbInFront; // блоки панелей СБ входящие внутрь блока стороны фасада
 
       public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {         
@@ -33,14 +34,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _ptBlMounting = blRefMounting.Position; 
          _name = getFloorName(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _panelsSB = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position);
+         _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position);
          // добавление блоков паненлей в общий список панелей СБ
-         libLoadServ.AllPanelsSB.AddRange(_panelsSB);
+         libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
 
       public Point3d PtBlMounting { get { return _ptBlMounting; } }
-      public List<PanelSB> PanelsSB { get { return _panelsSB; } }
-      public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } private set { _facadeFrontBlock = value; } }
+      public List<PanelSB> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }
+      public List<PanelSB> PanelsSbInFront { get { return _panelsSbInFront; } }
+      public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }
 
       /// <summary>
       /// Поиск всех блоков монтажек в модели
@@ -87,7 +89,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      }
                      else
                      {
-                        floor.FacadeFrontBlock = frontsIntersects[0];
+                        floor.SetFacadeFrontBlock(frontsIntersects[0]);
                         floors.Add(floor);
                      }                     
                   }
@@ -96,6 +98,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
             t.Commit();
          }
          return floors;
+      }
+
+      // Добавление стороны фасада в этаж
+      private void SetFacadeFrontBlock(FacadeFrontBlock facadeFrontBlock)
+      {
+         _facadeFrontBlock = facadeFrontBlock;
+         _panelsSbInFront = new List<PanelSB>();
+         // найти блоки панелей-СБ входящих внутрь границ блока стороны фасада
+         foreach (var panelSb in _allPanelsSbInFloor)            
+         {
+            if (Lib.Geometry.IsPointInBounds(panelSb.PtCenterPanelSbInModel, facadeFrontBlock.Extents))
+            {
+               _panelsSbInFront.Add(panelSb);
+            }
+         }
       }
 
       private string getFloorName(BlockReference blRefMounting)

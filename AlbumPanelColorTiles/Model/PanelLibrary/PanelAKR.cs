@@ -57,21 +57,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
             foreach (var panelSb in _allPanelsSB)
             {
+               int countNull = 0;
                if (panelSb.PanelAKR != null )
                {
-                  var blRefPanelAkr = new BlockReference((panelSb.PanelAKR.GetPtInModel()), panelSb.PanelAKR.IdBtrAkrPanelInFacade);
+                  var blRefPanelAkr = new BlockReference((panelSb.GetPtInModel(panelSb.PanelAKR)), panelSb.PanelAKR.IdBtrAkrPanelInFacade);
                   panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
                   t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+               }
+               else
+               {
+                  countNull++;
                }
             }
             t.Commit();
          }
-      }
-
-      public Point3d GetPtInModel()
-      {
-         return new Point3d(_panelSb.PtCenterPanelSbInModel.X - DistToCenterFromBase, _panelSb.PtCenterPanelSbInModel.Y + 500, 0);
-      }
+      }      
 
       private double getDistToCenter(ObjectId idBtrPanelAkr)
       {
@@ -97,11 +97,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          double shiftEnd = 0;
          if (blName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
-            shiftEnd = -444.5;// Торец слева - сдвинуть влево
+            shiftEnd = -446.7;// Торец слева - сдвинуть влево
          }
          else if (blName.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
-            shiftEnd = -444.5; // Торец спрва - сдвинуть вправо
+            shiftEnd = -447;// Торец спрва - сдвинуть вправо
          }
          return (extTiles.MaxPoint.X - extTiles.MinPoint.X)*0.5 + shiftEnd;
       }

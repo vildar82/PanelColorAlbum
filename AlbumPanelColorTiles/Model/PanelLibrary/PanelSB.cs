@@ -19,11 +19,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private PanelAKR _panelAKR;
       private Point3d _ptCenterPanelSbInModel; // точка вставки в Модели
 
-      public PanelSB(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Point3d ptCenterPanelSbInModel)
+      public PanelSB(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Point3d ptBase)
       {
          _idBlRef = blRefPanelSB.Id;
-         _attrsDet = attrsDet;
-         _ptCenterPanelSbInModel = ptCenterPanelSbInModel;
+         _attrsDet = attrsDet;         
+         _ptCenterPanelSbInModel = getCenterPanelInModel(blRefPanelSB, ptBase);
       }
 
       public List<AttributeRefDetail> AttrDet { get { return _attrsDet; } }
@@ -65,7 +65,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         }
                         if (attrsDet.Count == 2)
                         {
-                           PanelSB panelSb = new PanelSB(blRefPanelSB, attrsDet, getCenterPanelInModel(blRefPanelSB, ptBase));
+                           PanelSB panelSb = new PanelSB(blRefPanelSB, attrsDet, ptBase);
                            panelsSB.Add(panelSb);
                         }                        
                      }
@@ -77,11 +77,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // Определение точки центра блока панели СБ в Модели
-      private static Point3d getCenterPanelInModel(BlockReference blRefPanelSB, Point3d ptBase)
+      private Point3d getCenterPanelInModel(BlockReference blRefPanelSB, Point3d ptBase)
       {
          var ext = blRefPanelSB.GeometricExtents;
          Point3d ptCenter = new Point3d(ext.MinPoint.X + (ext.MaxPoint.X-ext.MinPoint.X)*0.5, ext.MaxPoint.Y, 0);
          return new Point3d(ptBase.X+ptCenter.X, ptBase.Y+ptCenter.Y, 0);
+      }
+
+      public Point3d GetPtInModel(PanelAKR panelAkr)
+      {
+         return new Point3d(PtCenterPanelSbInModel.X - panelAkr.DistToCenterFromBase, PtCenterPanelSbInModel.Y + 500, 0);
       }
 
       /// <summary>
@@ -109,21 +114,24 @@ namespace AlbumPanelColorTiles.PanelLibrary
                Dictionary<ObjectId, string> blAkrPanelsNames = getAkrPanelNames(dbLib);               
                // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
                Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
+               int countNotFound = 0;
                foreach (var panelSb in _allPanelsSB)
                {
                   ObjectId idBtrAkrPanelInLib = findAkrPanelFromPanelSb(panelSb, blAkrPanelsNames);
                   if (idBtrAkrPanelInLib.IsNull)
                   {
                      // Не найден блок в библиотеке
+                     countNotFound++;
                   }
                   else
-                  {                     
-                     if (!idsPanelsAkrInLibAndFacade.ContainsKey(idBtrAkrPanelInLib))
-                     {
-                        PanelAKR panelAkr = new PanelAKR(idBtrAkrPanelInLib, panelSb);
-                        panelSb.PanelAKR = panelAkr;
+                  {
+                     PanelAKR panelAkr;
+                     if (!idsPanelsAkrInLibAndFacade.TryGetValue(idBtrAkrPanelInLib, out panelAkr))                     
+                     {                     
+                        panelAkr = new PanelAKR(idBtrAkrPanelInLib, panelSb);                        
                         idsPanelsAkrInLibAndFacade.Add(idBtrAkrPanelInLib, panelAkr);
-                     }                     
+                     }
+                     panelSb.PanelAKR = panelAkr;
                   }
                }
                // Копирование блоков в базу чертежа фасада

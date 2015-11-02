@@ -12,15 +12,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public class FacadeFrontBlock
    {
       private ObjectId _idBlRef;
-      RTreeLib.Rectangle _rectangleRTree;
+      private RTreeLib.Rectangle _rectangleRTree;
+      private Extents3d _extents;
 
       public FacadeFrontBlock(BlockReference blRef)
       {
          _idBlRef = blRef.Id;
-         _rectangleRTree = ColorArea.GetRectangleRTree(blRef.GeometricExtents); 
+         _extents = blRef.GeometricExtents;
+         _rectangleRTree = ColorArea.GetRectangleRTree(_extents); 
       }
 
       public ObjectId IdBlRef { get { return _idBlRef; } }
+      public Extents3d Extents { get { return _extents; } }
       public RTreeLib.Rectangle RectangleRTree { get { return _rectangleRTree; } }
 
       public static List<FacadeFrontBlock> GetFacadeFrontBlocks()

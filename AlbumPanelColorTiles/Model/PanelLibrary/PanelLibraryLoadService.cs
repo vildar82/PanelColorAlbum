@@ -42,45 +42,23 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // загрузка АКР-панелей из библиотеки
          PanelSB.LoadBtrPanels(_allPanelsSB);
 
-         // Test - проверка точек
-         testCenterPanels();
-
-         //if (Inspector.HasErrors)
-         //{
-         //   // Показать ошибки.
-         //   Inspector.Show();
-         //   Inspector.Clear();
-         //   // простая расстановки имеющихся в бибилтоеке АКР-Панелей
-         //   PanelAKR.SimpleInsert(_allPanelsSB);
-         //}
-         //if (facades.Count > 0)
-         //{
-         //   // расстановка АКР-Панелей по фасадам
-         //   Facade.CreateFacades(facades);
-         //}
-         //else
-         //{
-         //   PanelAKR.SimpleInsert(_allPanelsSB);
-         //}
-      }
-
-      private void testCenterPanels()
-      {
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
+         if (Inspector.HasErrors)
          {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            
-            foreach (var panelSb in _allPanelsSB)
-            {
-               // вставка панелей АКР
-               var ptInsertAkr = panelSb.PanelAKR.GetPtInModel();
-               DBPoint dbPt = new DBPoint(ptInsertAkr);
-               ms.AppendEntity(dbPt);
-               t.AddNewlyCreatedDBObject(dbPt, true);
-            }
-            t.Commit();
+            // Показать ошибки.
+            Inspector.Show();
+            Inspector.Clear();
+            // простая расстановки имеющихся в бибилтоеке АКР-Панелей
+            PanelAKR.SimpleInsert(_allPanelsSB);
          }
-      }
+         if (facades.Count > 0)
+         {
+            // расстановка АКР-Панелей по фасадам
+            Facade.CreateFacades(facades);
+         }
+         else
+         {
+            PanelAKR.SimpleInsert(_allPanelsSB);
+         }
+      }      
    }
 }
