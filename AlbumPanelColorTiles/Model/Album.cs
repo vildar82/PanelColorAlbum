@@ -327,7 +327,10 @@ namespace AlbumPanelColorTiles
 
          // Определение зон покраски в Модели
          _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
-         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);         
+         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);
+
+         // Бонус - покраска блоков плитки разложенных просто в Модели
+         Tile.PaintTileInModel(rtreeColorAreas);
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
          ResetBlocks();
