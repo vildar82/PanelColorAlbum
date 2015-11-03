@@ -22,6 +22,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private ObjectId _idBlRefMounting;
       // Точка вставки блока монтажки
       private Point3d _ptBlMounting;
+      private double _xmin; // мин значение х среди всех границ блоков панелей внктри этажа
+      private Extents3d _extBlMounting;
       // Имя/номер этажа 
       private string _name;
       // Панели СБ - все что есть внутри блока монтажки
@@ -31,15 +33,24 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {         
          _idBlRefMounting = blRefMounting.Id;
+         _extBlMounting = blRefMounting.GeometricExtents;
          _ptBlMounting = blRefMounting.Position; 
          _name = getFloorName(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position);
+         _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position, blRefMounting.BlockTransform);
+         _xmin = getXMinFloor();
          // добавление блоков паненлей в общий список панелей СБ
          libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
 
-      public Point3d PtBlMounting { get { return _ptBlMounting; } }
+      private double getXMinFloor()
+      {         
+         return _allPanelsSbInFloor.Min(p => p.ExtTransToModel.MinPoint.X);         
+      }
+
+      public double XMin { get { return _xmin; } }
+      public string Name { get { return _name; } }
+      //public Point3d PtBlMounting { get { return _ptBlMounting; } }
       public List<PanelSB> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }
       public List<PanelSB> PanelsSbInFront { get { return _panelsSbInFront; } }
       public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }
@@ -65,7 +76,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
             // Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
-            libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin));
+            libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
             foreach (ObjectId idEnt in ms)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
@@ -108,7 +119,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // найти блоки панелей-СБ входящих внутрь границ блока стороны фасада
          foreach (var panelSb in _allPanelsSbInFloor)            
          {
-            if (Lib.Geometry.IsPointInBounds(panelSb.PtCenterPanelSbInModel, facadeFrontBlock.Extents))
+            if (Lib.Geometry.IsPointInBounds(panelSb.ExtTransToModel.MinPoint, facadeFrontBlock.Extents) &&
+               Lib.Geometry.IsPointInBounds(panelSb.ExtTransToModel.MaxPoint, facadeFrontBlock.Extents))
             {
                _panelsSbInFront.Add(panelSb);
             }

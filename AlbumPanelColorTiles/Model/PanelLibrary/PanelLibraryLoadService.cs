@@ -31,33 +31,26 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       // 1. Найти фасады в чертеже
       // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана как фасада составляющие один фасада дома
-
-
+      
       // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
       public void LoadPanels()
       {
          Inspector.Clear();
          // Попытка определить фасады по монтажкам
-         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
+         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);    
          // загрузка АКР-панелей из библиотеки
          PanelSB.LoadBtrPanels(_allPanelsSB);
-
          if (Inspector.HasErrors)
          {
-            // Показать ошибки.
-            Inspector.Show();
-            Inspector.Clear();
-            // простая расстановки имеющихся в бибилтоеке АКР-Панелей
-            PanelAKR.SimpleInsert(_allPanelsSB);
+            // Показать ошибки.            
+            Inspector.Show();                        
          }
+         // простая расстановки имеющихся в бибилтоеке АКР-Панелей
+         PanelAKR.SimpleInsert(_allPanelsSB);
          if (facades.Count > 0)
          {
             // расстановка АКР-Панелей по фасадам
             Facade.CreateFacades(facades);
-         }
-         else
-         {
-            PanelAKR.SimpleInsert(_allPanelsSB);
          }
       }      
    }

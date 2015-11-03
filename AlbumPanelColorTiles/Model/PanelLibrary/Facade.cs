@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -42,11 +43,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var comparerFloors = new DoubleEqualityComparer(1000);
          foreach (var floor in floors)
          {
-            Facade facade = facades.Find(f => comparerFloors.Equals(f.X, floor.PtBlMounting.X));
+            Facade facade = facades.Find(f => comparerFloors.Equals(f.X, floor.XMin));
             if (facade == null)
             {
                // Новый фасад
-               facade = new Facade(floor.PtBlMounting.X);
+               facade = new Facade(floor.XMin);
                facades.Add(facade);
             }
             facade._floors.Add(floor);
@@ -59,30 +60,54 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          if (facades.Count == 0) return;
          Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction()) 
+         using (var t = db.TransactionManager.StartTransaction())
          {
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
             double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
-            foreach (var facade in facades)
+
+            using (ProgressMeter progress = new ProgressMeter())
             {
-               double yFloor = yFirstFloor;
-               foreach (var floor in facade.Floors)
-               {                  
-                  foreach (var panelSb in floor.PanelsSbInFront)
+               progress.SetLimit(facades.SelectMany(f => f.Floors).Count());
+               progress.Start("Создание фасадов");
+
+               foreach (var facade in facades)
+               {
+                  double yFloor = yFirstFloor;
+                  foreach (var floor in facade.Floors)
                   {
-                     if (panelSb.PanelAKR != null)
+                     // Подпись номера этажа
+                     captionFloor(facade.X, yFloor, floor.Name, ms, t);
+                     foreach (var panelSb in floor.PanelsSbInFront)
                      {
-                        Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
-                        var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
-                        panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
-                        t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                        if (panelSb.PanelAKR != null)
+                        {
+                           Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
+                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
+                           panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
+                           t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                        }
                      }
+                     yFloor += 2800;// высота этажа
+                     progress.MeterProgress();
                   }
-                  yFloor += 2800;// высота этажа
-               } 
+               }
+               t.Commit();
+               progress.Stop();
             }
-            t.Commit();
          }
+      }
+
+      // Подпись номера этажа
+      private static void captionFloor(double x, double yFloor, string name, BlockTableRecord ms, Transaction t)
+      {
+         DBText textFloor = new DBText();
+         textFloor.SetDatabaseDefaults(ms.Database);
+         textFloor.Annotative = AnnotativeStates.False;
+         textFloor.Height = 250;
+         textFloor.TextString = name;
+         textFloor.Position = new Point3d(x - 3000, yFloor + 1400, 0);
+         ms.AppendEntity(textFloor);
+         t.AddNewlyCreatedDBObject(textFloor, true);
       }
 
       // определение уровня по Y для первого этажа всех фасадов - отступить 10000 вверх от самого верхнего блока панели СБ.

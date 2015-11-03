@@ -52,6 +52,11 @@ namespace AlbumPanelColorTiles.Checks
          var err = new Error(msg, ext, ent);
          _errors.Add(err);
       }
+      public static void AddError(string msg, Extents3d ext, ObjectId idEnt)
+      {
+         var err = new Error(msg, ext, idEnt);
+         _errors.Add(err);
+      }
 
       // Проверка, все ли плитки покрашены
       //public static bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)

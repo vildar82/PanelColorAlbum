@@ -46,6 +46,15 @@ namespace AlbumPanelColorTiles.Checks
          _hasEntity = true;
       }
 
+      public Error(string message, Extents3d ext, ObjectId idEnt)
+      {
+         _msg = message;
+         _shortMsg = getShortMsg(_msg);
+         _idEnt = idEnt;
+         _extents = ext;
+         _hasEntity = true;
+      }
+
       private string getShortMsg(string msg)
       {
          if (msg.Length > 100)

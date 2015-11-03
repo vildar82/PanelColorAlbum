@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -54,22 +55,30 @@ namespace AlbumPanelColorTiles.PanelLibrary
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            foreach (var panelSb in _allPanelsSB)
+            using (ProgressMeter progress = new ProgressMeter())
             {
-               int countNull = 0;
-               if (panelSb.PanelAKR != null )
+               progress.SetLimit(_allPanelsSB.Count);
+               progress.Start("Простая расстановка панелей");
+
+               var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
+               foreach (var panelSb in _allPanelsSB)
                {
-                  var blRefPanelAkr = new BlockReference((panelSb.GetPtInModel(panelSb.PanelAKR)), panelSb.PanelAKR.IdBtrAkrPanelInFacade);
-                  panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
-                  t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                  int countNull = 0;
+                  if (panelSb.PanelAKR != null)
+                  {
+                     var blRefPanelAkr = new BlockReference((panelSb.GetPtInModel(panelSb.PanelAKR)), panelSb.PanelAKR.IdBtrAkrPanelInFacade);
+                     panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
+                     t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                  }
+                  else
+                  {
+                     countNull++;
+                  }
+                  progress.MeterProgress();
                }
-               else
-               {
-                  countNull++;
-               }
+               t.Commit();
+               progress.Stop();
             }
-            t.Commit();
          }
       }      
 
