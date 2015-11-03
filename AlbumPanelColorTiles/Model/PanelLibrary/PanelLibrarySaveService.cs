@@ -6,6 +6,8 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Panels;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.PanelLibrary
@@ -14,12 +16,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // DWG файл
    public class PanelLibrarySaveService
    {
-      private Album _album;
+      //private Album _album;
       public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
 
-      public PanelLibrarySaveService(Album album)
+      public PanelLibrarySaveService ()//(Album album)
       {
-         _album = album;
+         //_album = album;
       }
 
       public void SavePanelsToLibrary()
@@ -36,6 +38,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
             Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
             return;
          }
+
+         // сбор блоков для сохранения
+         var panelsBtr = GetPanels();
+
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var libDwg = new Database(false, true))
          {
@@ -43,23 +49,105 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
             copyLibPanelFile(LibPanelsFilePath);
             // Копирование новых панелей
-            copyNewPanels(libDwg);
+            copyNewPanels(libDwg, panelsBtr);
             // Сохранение файла библиотеки панелей
             libDwg.SaveAs(LibPanelsFilePath, DwgVersion.Current);
             // отправка отчета
-            sendReport();
+            sendReport(panelsBtr);
             // лог
             Log.Info("Обновлена библиотека панелей.");
          }
       }
 
-      private void sendReport()
+      public static Dictionary<ObjectId, string> GetPanels()
+      {
+         Dictionary<ObjectId, string> panels = new Dictionary<ObjectId, string>();
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (!btr.IsLayout)
+               {
+                  if (MarkSbPanelAR.IsBlockNamePanel(btr.Name) && !MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
+                  {
+                     panels.Add(btr.Id, btr.Name);
+                  }
+               }
+            }
+            t.Commit();
+         }
+         return panels;
+      }
+
+      /// <summary>
+      /// Проверка есть ли в текущем чертеже фасада новые панели, которых нет в библиотеке
+      /// </summary>
+      public static void CheckNewPanels()
+      {
+         var doc = Application.DocumentManager.MdiActiveDocument;
+         var ed = doc.Editor;
+
+         // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
+         var panelsInFacade = GetPanels();
+         // список панелей в бибилиотеке
+         var panelsInLib = GetPanelsInLib();
+         // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
+         List<string> panelsNotInLib = new List<string>();
+         foreach (var panelInFacade in panelsInFacade)
+         {
+            if (!panelsInLib.Values.Contains(panelInFacade.Value, StringComparer.CurrentCultureIgnoreCase))
+            {
+               panelsNotInLib.Add(panelInFacade.Value);
+            }
+         }
+         if (panelsNotInLib.Count > 0)
+         {
+            ed.WriteMessage("\nБлоки панелей которых нет в библиотеке:");
+            foreach (var panel in panelsNotInLib)
+            {
+               ed.WriteMessage("\n{0}", panel);
+            }
+            ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку. Спасибо!");
+         }
+      }
+
+      public static Dictionary<ObjectId, string> GetPanelsInLib()
+      {
+         Dictionary<ObjectId, string> panelsInLib = new Dictionary<ObjectId, string>();
+         // Получение списка панелей в библиотеке
+         // файл библиотеки
+         if (!File.Exists(PanelLibrarySaveService.LibPanelsFilePath))
+         {
+            throw new Exception("Не найден файл библиотеки АКР-Панелей - " + PanelLibrarySaveService.LibPanelsFilePath);
+         }
+         // копирование в temp
+         string fileLibPanelsTemp = Path.GetTempFileName();
+         File.Copy(PanelLibrarySaveService.LibPanelsFilePath, fileLibPanelsTemp, true);
+
+         Database dbFacade = HostApplicationServices.WorkingDatabase;
+         using (Database dbLib = new Database(false, true))
+         {
+            dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");
+            using (var t = dbLib.TransactionManager.StartTransaction())
+            {
+               // список блоков АКР-Панелей в библиотеке (полные имена блоков).
+               panelsInLib = PanelSB.GetAkrPanelNames(dbLib);
+            }
+         }
+         return panelsInLib;
+      }
+
+      private void sendReport(Dictionary<ObjectId, string> panels)
       {
          StringBuilder msg = new StringBuilder();
          msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
-         foreach (var markSb in _album.MarksSB)
+         foreach (var panel in panels.Values)
          {
-            msg.AppendLine(markSb.MarkSbBlockName);
+            msg.AppendLine(panel);
          }                  
          using (var mail = new MailMessage())
          { 
@@ -85,13 +173,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // Копирование новых панелей
-      private void copyNewPanels(Database dbLib)
+      private void copyNewPanels(Database dbLib, Dictionary<ObjectId, string> panels)
       {
-         var ids = new ObjectIdCollection();
-         foreach (var markSb in _album.MarksSB)
-         {
-            ids.Add(markSb.IdBtr);
-         }
+         var ids = new ObjectIdCollection(panels.Keys.ToArray());
          using (var t = dbLib.TransactionManager.StartTransaction())
          {            
             IdMapping iMap = new IdMapping();

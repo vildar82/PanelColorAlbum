@@ -59,11 +59,7 @@ namespace AlbumPanelColorTiles
                       "\nAKR-PlotPdf - печать в PDF текущего чертежа или выбранной папки с чертежами. Файлы создается в корне чертежа с тем же именем. Печать выполняется по настройкам на листах." +
                       "\nAKR-SelectPanels - выбор блоков панелей в Модели." +
                       "\nAKR-RandomPainting - случайное распределение зон покраски в указанной области." +
-                      "\nAKR-ImagePainting - покраска области по выбранной картинке." +
-                      "\nAKR-InsertBlockColorArea - вставка блока зоны покраски." +
-                      "\nAKR-InsertBlockPanel - вставка блока зоны покраски." +
-                      "\nAKR-InsertBlockFrame - вставка блока зоны покраски." +
-                      "\nAKR-InsertBlockTile - вставка блока зоны покраски." +
+                      "\nAKR-ImagePainting - покраска области по выбранной картинке." +                      
                       "\nСправка: имена блоков:" +
                       "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
@@ -149,72 +145,7 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          Editor ed = doc.Editor;
          ed.WriteMessage("\n{0}", MsgHelp);
-      }
-
-      [CommandMethod("AKR", "AKR-InsertBlockColorArea", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void InsertBlockColorAreaCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Database db = doc.Database;
-         Editor ed = doc.Editor;
-         try
-         {
-            BlockInsert.Insert(Album.Options.BlockColorAreaName);
-         }
-         catch (System.Exception ex)
-         {
-            ed.WriteMessage("\n" + ex.Message);
-         }
-      }
-
-      [CommandMethod("AKR", "AKR-InsertBlockFrame", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void InsertBlockFrameCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Editor ed = doc.Editor;
-         try
-         {
-            BlockInsert.Insert("АКР_Рамка");
-         }
-         catch (System.Exception ex)
-         {
-            ed.WriteMessage("\n" + ex.Message);
-         }
-      }
-
-      [CommandMethod("AKR", "AKR-InsertBlockPanel", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void InsertBlockPanelCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Editor ed = doc.Editor;
-         try
-         {
-            BlockInsert.Insert("АКР_Панель_[Марка СБ]");
-         }
-         catch (System.Exception ex)
-         {
-            ed.WriteMessage("\n" + ex.Message);
-         }
-      }
-
-      [CommandMethod("AKR", "AKR-InsertBlockTile", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void InsertBlockTileCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Editor ed = doc.Editor;
-         try
-         {
-            BlockInsert.Insert("АКР_Плитка");
-         }
-         catch (System.Exception ex)
-         {
-            ed.WriteMessage("\n" + ex.Message);
-         }
-      }
+      }      
 
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
@@ -256,7 +187,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
+      [CommandMethod("PIK", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
       public void PlotPdf()
       {
          Log.Info("Start Command AKR-PlotPdf");
@@ -319,7 +250,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-RandomPainting", CommandFlags.Modal)]
+      [CommandMethod("PIK", "AKR-RandomPainting", CommandFlags.Modal)]
       public void RandomPaintingCommand()
       {
          Log.Info("Start Command: AKR-RandomPainting");
@@ -368,7 +299,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      [CommandMethod("PIK", "AKR-SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void SelectPanelsCommand()
       {
          Log.Info("Start Command: AKR-SelectPanels");
@@ -423,7 +354,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("AKR", "AKR-ImagePainting", CommandFlags.Modal)]
+      [CommandMethod("PIK", "AKR-ImagePainting", CommandFlags.Modal)]
       public void ImagePaintingCommand()
       {
          Log.Info("Start Command: AKR-ImagePainting");
@@ -447,7 +378,7 @@ namespace AlbumPanelColorTiles
       /// <summary>
       /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
       /// </summary>
-      [CommandMethod("AKR", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void CreateMountingPlanBlocksCommand()
       {
          Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
@@ -465,11 +396,29 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("PIK", "AKR-SavePanelsToLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
+      public void SavePanelsToLibraryCommand()
+      {
+         Log.Info("Start Command: AKR-SavePanelsToLibrary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
+            panelLib.SavePanelsToLibrary();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
+            Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
+         }
+      }
+
       /// <summary>
       /// Создание фасадов из правильно расставленных блоков монтажных планов с блоками обозначения сторон фасада
       /// Загрузка панелей-АКР из библиотеки
       /// </summary>
-      [CommandMethod("AKR", "AKR-LoadPanelsFromLibrary", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      [CommandMethod("PIK", "AKR-LoadPanelsFromLibrary", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void LoadPanelsFromLibraryCommand()
       {
          Log.Info("Start Command: AKR-LoadPanelsFromLibrary");

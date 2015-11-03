@@ -111,7 +111,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             using (var t = dbLib.TransactionManager.StartTransaction())
             {
                // список блоков АКР-Панелей в библиотеке (полные имена блоков).
-               Dictionary<ObjectId, string> blAkrPanelsNames = getAkrPanelNames(dbLib);               
+               Dictionary<ObjectId, string> blAkrPanelsNames = GetAkrPanelNames(dbLib);               
                // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
                Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
                int countNotFound = 0;
@@ -177,10 +177,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return idBtrAkrPanel;
       }
 
-      private static Dictionary<ObjectId, string> getAkrPanelNames(Database db)
+      public static Dictionary<ObjectId, string> GetAkrPanelNames(Database dbLib)
       {
          Dictionary<ObjectId, string> names = new Dictionary<ObjectId, string>();
-         using (var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
+         using (var bt = dbLib.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             foreach (ObjectId idBtr in bt)
             {

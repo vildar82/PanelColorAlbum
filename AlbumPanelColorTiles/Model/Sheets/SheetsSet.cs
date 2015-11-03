@@ -71,16 +71,15 @@ namespace AlbumPanelColorTiles.Sheets
          }
          progressMeter.Stop();
 
-         // Сохранение панелей в библиотеку
+         // Проверка новых панелей, которых нет в библиотеке
          try
          {
-            PanelLibrarySaveService panelLib = new PanelLibrarySaveService(_album);
-            panelLib.SavePanelsToLibrary();
+            PanelLibrarySaveService.CheckNewPanels();
          }
          catch (Exception ex)
          {
-            Log.Error(ex, "Не удалось сохранить панели в бибилиотеку.");
-         }         
+            Log.Error(ex, "Не удалось проверить есть ли новые панели в чертеже фасада, которых нет в библиотеке.");
+         }
 
          // Еспорт списка панелей в ексель.
          try
