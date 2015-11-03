@@ -52,6 +52,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             facade._floors.Add(floor);
          }
+         // сортировка этажей в фасадах
+         facades.ForEach(f => f.Floors.Sort());
+
          return facades;
       }
 
@@ -66,7 +69,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
 
             using (ProgressMeter progress = new ProgressMeter())
-            {
+            {               
                progress.SetLimit(facades.SelectMany(f => f.Floors).Count());
                progress.Start("Создание фасадов");
 
