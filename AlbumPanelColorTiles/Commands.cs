@@ -60,13 +60,14 @@ namespace AlbumPanelColorTiles
                       "\nAKR-SelectPanels - выбор блоков панелей в Модели." +
                       "\nAKR-RandomPainting - случайное распределение зон покраски в указанной области." +
                       "\nAKR-ImagePainting - покраска области по выбранной картинке." +
-                      "\nAKR - SavePanelsToLibrary - сохранение АКР-Панелей из текущего чертежа в библиотеку." +
-                      "\nAKR - LoadPanelsFromLibrary - загрузка АКР-Панелей из библиотеку в текущий чертеж в соответствии с монтажными планами конструкторов." +
-                      "\nAKR - CreateMountingPlanBlocks - создание блоков монтажек из монтажных планов конструкторов." +
+                      "\nAKR-SavePanelsToLibrary - сохранение АКР-Панелей из текущего чертежа в библиотеку." +
+                      "\nAKR-LoadPanelsFromLibrary - загрузка АКР-Панелей из библиотеки в текущий чертеж в соответствии с монтажными планами конструкторов." +
+                      "\nAKR-CreateMountingPlanBlocks - создание блоков монтажек из монтажных планов конструкторов." +
                       "\nСправка: имена блоков:" +
                       "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
                       "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName +
+                      "\nБлок обозначения стороны фасада на монтажном плане - " + Album.Options.BlockFacadeName +
                       "\nБлок рамки со штампом - " + Album.Options.BlockFrameName +
                       "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels +
                       "\nПанели торцевые с суффиксом _тп или _тл после марки СБ в конце имени блока панели." +
