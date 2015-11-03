@@ -8,7 +8,7 @@ namespace AlbumPanelColorTiles.Panels
    public class PanelAR : IEquatable<PanelAR>
    {
       // Границы блока
-      private Extents3d _extents;
+      private Extents3d _extents;      
 
       // Вхождение блок Марки АР после выполнения операции замены блоков мрарки СБ на АР (после определения всех Марок Ар).
       private ObjectId _idBlRefAr;
@@ -33,12 +33,13 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       public MarkArPanelAR MarkAr { get { return _markAr; } }
+      public ObjectId IdBlRefAr { get { return _idBlRefAr; } }
 
       /// <summary>
       ///  Границы блока по GeometricExtents
       ///  Для границ по плитке используй getExtentsTiles(MarkSbPanel)
       /// </summary>
-      public Extents3d Extents { get { return _extents; } }
+      public Extents3d Extents { get { return _extents; } }      
 
       /// <summary>
       /// Точка вставки блока панели

@@ -16,23 +16,25 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Этажи фасада (блоки АКР-Панелей и соотв блок Монтажки)
       private List<Floor> _floors;
       // коорднината X для данного фасада
-      private double _x;
+      private double _xmin;
+      private double _xmax;
 
       public Facade(double x)
       {
-         _x = x;
+         _xmin = x;
          _floors = new List<Floor>();
       }
 
       public List<Floor> Floors { get { return _floors; } }
-      public double X { get { return _x; } }
+      public double XMin { get { return _xmin; } }
+      public double XMax { get { return _xmax; } }
 
       /// <summary>
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
       /// </summary>
       /// <returns></returns>
       public static List<Facade> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ)
-      {         
+      {
          List<Facade> facades = new List<Facade>();
 
          // Поиск всех блоков монтажных планов в Модели чертежа с соотв обозначением стороны фасада
@@ -43,7 +45,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var comparerFloors = new DoubleEqualityComparer(1000);
          foreach (var floor in floors)
          {
-            Facade facade = facades.Find(f => comparerFloors.Equals(f.X, floor.XMin));
+            Facade facade = facades.Find(f => comparerFloors.Equals(f.XMin, floor.XMin));
             if (facade == null)
             {
                // Новый фасад
@@ -53,8 +55,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             facade._floors.Add(floor);
          }
          // сортировка этажей в фасадах
-         facades.ForEach(f => f.Floors.Sort());
-
+         facades.ForEach(f =>
+         {
+            f.Floors.Sort();
+            f._xmax = f.Floors.Max(l => l.XMax);
+         });
          return facades;
       }
 
@@ -79,7 +84,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   foreach (var floor in facade.Floors)
                   {
                      // Подпись номера этажа
-                     captionFloor(facade.X, yFloor, floor.Name, ms, t);
+                     captionFloor(facade.XMin, yFloor, floor.Name, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
                      {
                         if (panelSb.PanelAKR != null)

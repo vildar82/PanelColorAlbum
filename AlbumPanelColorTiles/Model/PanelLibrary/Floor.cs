@@ -23,6 +23,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Точка вставки блока монтажки
       private Point3d _ptBlMounting;
       private double _xmin; // мин значение х среди всех границ блоков панелей внктри этажа
+      private double _xmax; // макс значение х среди всех границ блоков панелей внктри этажа
       private Extents3d _extBlMounting;
       // Имя/номер этажа 
       private string _name;
@@ -39,6 +40,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Получение всех блоков панелей СБ из блока монтажки
          _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position, blRefMounting.BlockTransform);
          _xmin = getXMinFloor();
+         _xmax = getXMaxFloor();
          // добавление блоков паненлей в общий список панелей СБ
          libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
@@ -47,8 +49,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {         
          return _allPanelsSbInFloor.Min(p => p.ExtTransToModel.MinPoint.X);         
       }
+      private double getXMaxFloor()
+      {
+         return _allPanelsSbInFloor.Max(p => p.ExtTransToModel.MaxPoint.X);
+      }
 
       public double XMin { get { return _xmin; } }
+      public double XMax { get { return _xmax; } }
       public string Name { get { return _name; } }
       //public Point3d PtBlMounting { get { return _ptBlMounting; } }
       public List<PanelSB> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }

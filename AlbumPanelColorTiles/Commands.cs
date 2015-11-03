@@ -123,6 +123,11 @@ namespace AlbumPanelColorTiles
                      // Создание альбома
                      _album.CreateAlbum();
 
+                     if (Inspector.HasErrors)
+                     {
+                        Inspector.Show();
+                     }
+
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
                      doc.Editor.Regen();
                      Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
@@ -177,8 +182,7 @@ namespace AlbumPanelColorTiles
                _album.PaintPanels();
                doc.Editor.Regen();
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
-               doc.Editor.WriteMessage("\nИли ResetPanels для сброса блоков панелей до марок СБ.");
+               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");               
                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)

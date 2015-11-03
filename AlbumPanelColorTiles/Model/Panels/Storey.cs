@@ -8,6 +8,7 @@ namespace AlbumPanelColorTiles.Panels
    public class Storey : IEquatable<Storey>, IComparable<Storey>
    {
       private string _number;
+      private string _numberAsNumber;
       private double _y;
       private HashSet<MarkArPanelAR> _marksAr;
       private static StoreyNumberComparer _comparer = new StoreyNumberComparer ();
@@ -32,13 +33,14 @@ namespace AlbumPanelColorTiles.Panels
       public string Number
       {
          get { return _number; }
-         set { _number = value; }
+         set
+         {
+            _number = value;
+            _numberAsNumber = value;
+         }
       }
-
-      public double Y
-      {
-         get { return _y; }
-      }      
+      public string NumberAsNumber { get { return _numberAsNumber; } }
+      public double Y { get { return _y; } }
 
       public bool Equals(Storey other)
       {

@@ -71,6 +71,16 @@ namespace AlbumPanelColorTiles.Sheets
          }
          progressMeter.Stop();
 
+         try
+         {
+            PanelLibraryLoadService libService = new PanelLibraryLoadService();
+            libService.FillMarkPainting(_album);
+         }
+         catch (Exception ex)
+         {
+            Log.Error(ex, "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);");
+         }
+
          // Проверка новых панелей, которых нет в библиотеке
          try
          {
