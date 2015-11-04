@@ -111,7 +111,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   }
                   if (!isFound)
                   {
-                     Inspector.AddError("Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.", extPanelAkr, panelAr.IdBlRefAr);
+                     Inspector.AddError(
+                        string.Format("{0} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.", markAr.MarkARPanelFullName),
+                        extPanelAkr, panelAr.IdBlRefAr);
                   }
                }
             }

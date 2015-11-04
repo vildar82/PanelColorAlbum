@@ -211,8 +211,8 @@ namespace AlbumPanelColorTiles
                   // Если это блок панели Марки АР
                   if (MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
                   {
-                     // Блок Марки АР.
-                     var idsBlRef = btr.GetBlockReferenceIds(false, true);
+                     // Удаление всех вхожденний бллока
+                     var idsBlRef = btr.GetBlockReferenceIds(true, true);
                      foreach (ObjectId idBlRef in idsBlRef)
                      {
                         var blRef = t.GetObject(idBlRef, OpenMode.ForWrite, false, true) as BlockReference;

@@ -71,6 +71,7 @@ namespace AlbumPanelColorTiles.Sheets
          }
          progressMeter.Stop();
 
+         // Заполнение атрибутов марок покраски в блоках монтажек
          try
          {
             PanelLibraryLoadService libService = new PanelLibraryLoadService();
