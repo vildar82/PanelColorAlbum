@@ -92,14 +92,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var ed = doc.Editor;
 
          // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
-         var panelsInFacade = GetPanels();
+         var panelsAkrInFacade = GetPanels();
          // список панелей в бибилиотеке
-         var panelsInLib = GetPanelsInLib();
+         List<PanelAKR> panelsAkrInLib = GetPanelsInLib();
          // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
          List<string> panelsNotInLib = new List<string>();
-         foreach (var panelInFacade in panelsInFacade)
+         foreach (var panelInFacade in panelsAkrInFacade)
          {
-            if (!panelsInLib.Values.Contains(panelInFacade.Value, StringComparer.CurrentCultureIgnoreCase))
+            if (!panelsAkrInLib.Exists(p => string.Equals(p.BlNameInLib, panelInFacade.Value, StringComparison.CurrentCultureIgnoreCase)))
             {
                panelsNotInLib.Add(panelInFacade.Value);
             }
@@ -116,9 +116,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      public static Dictionary<ObjectId, string> GetPanelsInLib()
+      public static List<PanelAKR> GetPanelsInLib()
       {
-         Dictionary<ObjectId, string> panelsInLib = new Dictionary<ObjectId, string>();
+         List<PanelAKR> panelsInLib = new List<PanelAKR>();
          // Получение списка панелей в библиотеке
          // файл библиотеки
          if (!File.Exists(PanelLibrarySaveService.LibPanelsFilePath))

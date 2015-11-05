@@ -40,6 +40,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Поиск всех блоков монтажных планов в Модели чертежа с соотв обозначением стороны фасада
          List<Floor> floors = Floor.GetMountingBlocks(libLoadServ);
 
+         // определение торцов панелей
+         floors.ForEach(f => f.DefineEndsPanelSb());
+
          // Упорядочивание блоков этажей в фасады (блоки монтажек по вертикали образуют фасад)
          // сортировка блоков монтажек по X, потом по Y (все монтажки в одну вертикаль снизу вверх)
          var comparerFloors = new DoubleEqualityComparer(1000);
@@ -93,6 +96,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
                            panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                           if(panelSb.PanelAKR.IsElectricCopy)
+                           {
+                              blRefPanelAkr.Draw();
+                           }
                         }
                      }
                      yFloor += 2800;// высота этажа

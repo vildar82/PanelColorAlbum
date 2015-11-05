@@ -65,16 +65,16 @@ namespace AlbumPanelColorTiles.Lib
       /// <summary>
       /// Копирование определения блока и добавление его в таблицу блоков.
       /// </summary>
-      /// <param name="idBtr">Копируемый блок</param>
+      /// <param name="idBtrSource">Копируемый блок</param>
       /// <param name="name">Имя для нового блока</param>
       /// <returns>ID скопированного блока, или существующего в чертеже с таким именем.</returns>
-      public static ObjectId CopyBtr(ObjectId idBtr, string name)
+      public static ObjectId CopyBtr(ObjectId idBtrSource, string name)
       {
          ObjectId idBtrCopy = ObjectId.Null;
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var btrSource = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+            var btrSource = t.GetObject(idBtrSource, OpenMode.ForRead) as BlockTableRecord;
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             //проверка имени блока
             if (bt.Has(name))

@@ -41,8 +41,19 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position, blRefMounting.BlockTransform);
          _xmin = getXMinFloor();
          _xmax = getXMaxFloor();
-         // добавление блоков паненлей в общий список панелей СБ
-         libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
+         //// добавление блоков паненлей в общий список панелей СБ
+         //libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
+      }
+
+      // определение торцов панелей
+      public void DefineEndsPanelSb()
+      {
+         // панель с самым меньшим X это торцевая панель слева
+         var min = _panelsSbInFront.Aggregate((p1, p2) => p1.PtCenterPanelSbInModel.X < p2.PtCenterPanelSbInModel.X ? p1 : p2);
+         min.IsEndLeftPanel = true;
+         // панель с самым большим X это торцевая панель справа
+         var max = _panelsSbInFront.Aggregate((p1, p2) => p1.PtCenterPanelSbInModel.X > p2.PtCenterPanelSbInModel.X ? p1 : p2);
+         max.IsEndRightPanel = true;
       }
 
       private double getXMinFloor()
@@ -82,8 +93,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
-            // Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
-            libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
+            //// Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
+            //libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
             foreach (ObjectId idEnt in ms)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
@@ -129,6 +140,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (Lib.Geometry.IsPointInBounds(panelSb.ExtTransToModel.MinPoint, facadeFrontBlock.Extents) &&
                Lib.Geometry.IsPointInBounds(panelSb.ExtTransToModel.MaxPoint, facadeFrontBlock.Extents))
             {
+               panelSb.IsInFloor = true;
                _panelsSbInFront.Add(panelSb);
             }
          }

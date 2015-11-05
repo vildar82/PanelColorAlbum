@@ -13,9 +13,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public class PanelLibraryLoadService
    {
       // все блоки панелей-СБ в чертеже
-      private List<PanelSB> _allPanelsSB = new List<PanelSB> ();      
+      //private List<PanelSB> _allPanelsSB = new List<PanelSB> ();      
 
-      public List<PanelSB> AllPanelsSB { get { return _allPanelsSB; } }
+      //public List<PanelSB> AllPanelsSB { get { return _allPanelsSB; } }
 
       // в чертеже должны быть расставлены монтажки с блоками обозначения фасадов на них.
       // нужно для блоков панелей СБ найти соответствующую панель покраски в библиотеки 
@@ -39,18 +39,22 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Попытка определить фасады по монтажкам
          List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);    
          // загрузка АКР-панелей из библиотеки
-         PanelSB.LoadBtrPanels(_allPanelsSB);
-         if (Inspector.HasErrors)
-         {
-            // Показать ошибки.            
-            Inspector.Show();                        
-         }
-         // простая расстановки имеющихся в бибилтоеке АКР-Панелей
-         PanelAKR.SimpleInsert(_allPanelsSB);
+         PanelSB.LoadBtrPanels(facades);                  
          if (facades.Count > 0)
          {
             // расстановка АКР-Панелей по фасадам
             Facade.CreateFacades(facades);
+         }
+         else
+         {
+            // простая расстановки имеющихся в бибилтоеке АКР-Панелей
+            //PanelAKR.SimpleInsert(_allPanelsSB);
+            Inspector.AddError("Не удалось определить фасады по монтажным планам.");
+         }
+         if (Inspector.HasErrors)
+         {
+            // Показать ошибки.            
+            Inspector.Show();
          }
       }
 
@@ -100,10 +104,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            {
                               // Заполнение атрибута покраски
                               var atrInfo = mountingPanelSb.AttrDet.Find(a => string.Equals(a.Tag, Album.Options.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
-                              using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                              if (atrInfo != null)
                               {
-                                 atrRef.TextString = string.Format("{0}_{1}",markAr.MarkPainting , markSbAkr.Abbr);
-                                 isFound = true;
+                                 using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                                 {
+                                    atrRef.TextString = string.Format("{0}_{1}", markAr.MarkPainting, markSbAkr.Abbr);
+                                    isFound = true;
+                                 }
                               }
                            }
                         }
