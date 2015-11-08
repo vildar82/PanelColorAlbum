@@ -134,8 +134,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          Database dbFacade = HostApplicationServices.WorkingDatabase;
          using (Database dbLib = new Database(false, true))
          {
-            dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");
-            HostApplicationServices.WorkingDatabase = dbLib;
+            dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");            
             using (var t = dbLib.TransactionManager.StartTransaction())
             {
                // список блоков АКР-Панелей в библиотеке (полные имена блоков).
@@ -176,8 +175,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                }
                t.Commit();
             }
-         }
-         HostApplicationServices.WorkingDatabase = dbFacade;
+         }         
          try
          {
             File.Delete(fileLibPanelsTemp);

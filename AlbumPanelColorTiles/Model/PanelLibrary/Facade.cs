@@ -96,10 +96,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
                            panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
-                           if(panelSb.PanelAKR.IsElectricCopy)
-                           {
-                              blRefPanelAkr.Draw();
-                           }
+                           blRefPanelAkr.Draw();
                         }
                      }
                      yFloor += 2800;// высота этажа

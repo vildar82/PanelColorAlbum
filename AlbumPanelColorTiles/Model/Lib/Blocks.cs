@@ -71,7 +71,7 @@ namespace AlbumPanelColorTiles.Lib
       public static ObjectId CopyBtr(ObjectId idBtrSource, string name)
       {
          ObjectId idBtrCopy = ObjectId.Null;
-         Database db = HostApplicationServices.WorkingDatabase;
+         Database db = idBtrSource.Database;
          using (var t = db.TransactionManager.StartTransaction())
          {
             var btrSource = t.GetObject(idBtrSource, OpenMode.ForRead) as BlockTableRecord;
