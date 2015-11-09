@@ -62,45 +62,45 @@ namespace AlbumPanelColorTiles.Lib
       //   }
       //}
 
-      ///// <summary>
-      ///// Копирование определения блока и добавление его в таблицу блоков.
-      ///// </summary>
-      ///// <param name="idBtrSource">Копируемый блок</param>
-      ///// <param name="name">Имя для нового блока</param>
-      ///// <returns>ID скопированного блока, или существующего в чертеже с таким именем.</returns>
-      //public static ObjectId CopyBtr(ObjectId idBtrSource, string name)
-      //{
-      //   ObjectId idBtrCopy = ObjectId.Null;
-      //   Database db = idBtrSource.Database;
-      //   using (var t = db.TransactionManager.StartTransaction())
-      //   {
-      //      var btrSource = t.GetObject(idBtrSource, OpenMode.ForRead) as BlockTableRecord;
-      //      var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-      //      //проверка имени блока
-      //      if (bt.Has(name))
-      //      {
-      //         idBtrCopy = bt[name];
-      //      }
-      //      else
-      //      {
-      //         var btrCopy = btrSource.Clone() as BlockTableRecord;
-      //         btrCopy.Name = name;
-      //         bt.UpgradeOpen();
-      //         idBtrCopy = bt.Add(btrCopy);
-      //         t.AddNewlyCreatedDBObject(btrCopy, true);
-      //         // Копирование объектов блока
-      //         ObjectIdCollection ids = new ObjectIdCollection();
-      //         foreach (ObjectId idEnt in btrSource)
-      //         {
-      //            ids.Add(idEnt);
-      //         }
-      //         IdMapping map = new IdMapping();
-      //         db.DeepCloneObjects(ids, idBtrCopy, map, false);
-      //      }
-      //      t.Commit();
-      //   }
-      //   return idBtrCopy;
-      //}
+      /// <summary>
+      /// Копирование определения блока и добавление его в таблицу блоков.
+      /// </summary>
+      /// <param name="idBtrSource">Копируемый блок</param>
+      /// <param name="name">Имя для нового блока</param>
+      /// <returns>ID скопированного блока, или существующего в чертеже с таким именем.</returns>
+      public static ObjectId CopyBtr(ObjectId idBtrSource, string name)
+      {
+         ObjectId idBtrCopy = ObjectId.Null;
+         Database db = idBtrSource.Database;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var btrSource = t.GetObject(idBtrSource, OpenMode.ForRead) as BlockTableRecord;
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            //проверка имени блока
+            if (bt.Has(name))
+            {
+               idBtrCopy = bt[name];
+            }
+            else
+            {
+               var btrCopy = btrSource.Clone() as BlockTableRecord;
+               btrCopy.Name = name;
+               bt.UpgradeOpen();
+               idBtrCopy = bt.Add(btrCopy);
+               t.AddNewlyCreatedDBObject(btrCopy, true);
+               // Копирование объектов блока
+               ObjectIdCollection ids = new ObjectIdCollection();
+               foreach (ObjectId idEnt in btrSource)
+               {
+                  ids.Add(idEnt);
+               }
+               IdMapping map = new IdMapping();
+               db.DeepCloneObjects(ids, idBtrCopy, map, false);
+            }
+            t.Commit();
+         }
+         return idBtrCopy;
+      }
 
       ///// <summary>
       ///// Копирование листа

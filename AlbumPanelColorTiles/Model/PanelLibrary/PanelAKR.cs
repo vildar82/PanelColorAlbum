@@ -161,7 +161,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             SymbolUtilityServices.ValidateSymbolName(markAkr, false);
             // копирование блока с новым именем с электрикой
-            ObjectId idBtrAkeElectricInTempLib = Block.CopyBtr(_idBtrAkrPanelInLib, markAkr);
+            ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanelInLib, markAkr);
             panelAkr = new PanelAKR(idBtrAkeElectricInTempLib, markAkr);
             panelAkr.IsElectricCopy = true;
          }

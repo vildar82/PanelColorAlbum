@@ -161,7 +161,9 @@ namespace AlbumPanelColorTiles.Panels
             }
             var btrMarkSb = t.GetObject(_markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
-            _idBtrAr = AcadLib.Blocks.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);
+            Log.Debug("Копирование определения блока _markSB.IdBtr={0}, _markArBlockName = {1}", _markSB.IdBtr.ToString(), _markArBlockName);
+            _idBtrAr = Lib.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);
+            Log.Debug("После Копирование определения блока");
             var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)

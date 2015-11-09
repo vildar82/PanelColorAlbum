@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,7 +31,7 @@ namespace AlbumPanelColorTiles
       private Album _album;
       private string _msgHelp;
       private RandomPaintService _randomPainting;
-      private ImagePaintingService _imagePainting;
+      private ImagePaintingService _imagePainting;      
 
       public static string CurDllDir
       {

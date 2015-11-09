@@ -116,7 +116,7 @@
     <Compile Include="Model\ImagePainting\UserRect.cs" />
     <Compile Include="Model\Lib\BlockInsert.cs" />
     <Compile Include="Model\Checks\Inspector.cs" />
-    <Compile Include="Model\Lib\Blocks.cs" />
+    <Compile Include="Model\Lib\Block.cs" />
     <Compile Include="Model\Panels\MarkArPanelAR.cs" />
     <Compile Include="Model\Panels\MarkSbPanelAR.cs" />
     <Compile Include="Model\Options.cs" />

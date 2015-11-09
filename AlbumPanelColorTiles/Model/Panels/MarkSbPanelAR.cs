@@ -136,7 +136,7 @@ namespace AlbumPanelColorTiles.Panels
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
       {
-         var idBtrMarkSb = AcadLib.Blocks.Block.CopyBtr(idBtrMarkAr, markSbBlName);
+         var idBtrMarkSb = Lib.Block.CopyBtr(idBtrMarkAr, markSbBlName);
          // Перенос блоков плиток на слой 0
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
