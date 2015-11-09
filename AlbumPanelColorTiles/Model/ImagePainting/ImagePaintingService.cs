@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AlbumPanelColorTiles.RandomPainting;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using FreeImageAPI;
@@ -185,7 +186,7 @@ namespace AlbumPanelColorTiles.ImagePainting
             {
                _doc.Editor.WriteMessage("\n{0}", errMsg);
             }
-            ext = Lib.UserPrompt.PromptExtents(_doc.Editor, "\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
+            ext = _doc.Editor.PromptExtents("\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
             len = ext.MaxPoint - ext.MinPoint;
             errMsg = "\nНужно выбрать область побольше.";
          } while (len.Length < 600);

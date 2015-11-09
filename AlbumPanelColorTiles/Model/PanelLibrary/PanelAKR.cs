@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcadLib.Blocks;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -124,7 +125,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   using (var blRefTile = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
                   {
-                     if (string.Equals(Lib.Blocks.EffectiveName(blRefTile), Album.Options.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                     if (string.Equals(blRefTile.GetEffectiveName(), Album.Options.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         extTiles.AddExtents(blRefTile.GeometricExtents);
                      }
@@ -160,7 +161,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             SymbolUtilityServices.ValidateSymbolName(markAkr, false);
             // копирование блока с новым именем с электрикой
-            ObjectId idBtrAkeElectricInTempLib = Lib.Blocks.CopyBtr(_idBtrAkrPanelInLib, markAkr);
+            ObjectId idBtrAkeElectricInTempLib = Block.CopyBtr(_idBtrAkrPanelInLib, markAkr);
             panelAkr = new PanelAKR(idBtrAkeElectricInTempLib, markAkr);
             panelAkr.IsElectricCopy = true;
          }

@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AcadLib">
+      <HintPath>..\..\..\..\AcadLib\AcadLib\bin\Release\AcadLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="AcCoreMgd">
       <HintPath>..\..\..\..\ObjectARX\ObjectARX2015\inc\AcCoreMgd.dll</HintPath>
       <Private>False</Private>
@@ -84,8 +88,6 @@
     </Compile>
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
-    <Compile Include="Model\Lib\TableJig.cs" />
-    <Compile Include="Model\Lib\UserPrompt.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
     <Compile Include="Model\PanelLibrary\Facade.cs" />
     <Compile Include="Model\PanelLibrary\FacadeFrontBlock.cs" />
@@ -97,7 +99,6 @@
     <Compile Include="Model\PanelLibrary\PanelSB.cs" />
     <Compile Include="Model\Panels\ColorArea.cs" />
     <Compile Include="Model\Panels\StoreyNumberComparer.cs" />
-    <Compile Include="Model\Plot\PlotToFileConfig.cs" />
     <Compile Include="Model\RandomPainting\ColorAreaSpotSize.cs" />
     <Compile Include="Model\RandomPainting\FormColorAreaSize.cs">
       <SubType>Form</SubType>
@@ -114,12 +115,8 @@
     <Compile Include="Model\RenamePanels\MarkArRename.cs" />
     <Compile Include="Model\ImagePainting\UserRect.cs" />
     <Compile Include="Model\Lib\BlockInsert.cs" />
-    <Compile Include="Model\Lib\DoubleEqualityComparer.cs" />
-    <Compile Include="Model\Lib\Geometry.cs" />
     <Compile Include="Model\Checks\Inspector.cs" />
     <Compile Include="Model\Lib\Blocks.cs" />
-    <Compile Include="Model\Lib\BlockInsertJig.cs" />
-    <Compile Include="Model\Lib\Zoom.cs" />
     <Compile Include="Model\Panels\MarkArPanelAR.cs" />
     <Compile Include="Model\Panels\MarkSbPanelAR.cs" />
     <Compile Include="Model\Options.cs" />
@@ -137,10 +134,6 @@
     <Compile Include="Model\RandomPainting\RandomPaint.cs" />
     <Compile Include="Model\RandomPainting\RandomPaintingService.cs" />
     <Compile Include="Model\RandomPainting\Spot.cs" />
-    <Compile Include="Model\RTree\Node.cs" />
-    <Compile Include="Model\RTree\Point.cs" />
-    <Compile Include="Model\RTree\Rectangle.cs" />
-    <Compile Include="Model\RTree\RTree.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
     <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />

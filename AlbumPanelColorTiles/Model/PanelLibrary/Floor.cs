@@ -137,8 +137,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // найти блоки панелей-СБ входящих внутрь границ блока стороны фасада
          foreach (var panelSb in _allPanelsSbInFloor)            
          {
-            if (Lib.Geometry.IsPointInBounds(panelSb.ExtTransToModel.MinPoint, facadeFrontBlock.Extents) &&
-               Lib.Geometry.IsPointInBounds(panelSb.ExtTransToModel.MaxPoint, facadeFrontBlock.Extents))
+            if (facadeFrontBlock.Extents.IsPointInBounds(panelSb.ExtTransToModel.MinPoint) &&
+               facadeFrontBlock.Extents.IsPointInBounds(panelSb.ExtTransToModel.MaxPoint))
             {
                panelSb.IsInFloor = true;
                _panelsSbInFront.Add(panelSb);

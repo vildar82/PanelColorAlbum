@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using AcadLib.Blocks;
+using AcadLib.Jigs;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -24,7 +26,7 @@ namespace AlbumPanelColorTiles.Lib
          {
             throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
          }
-         Blocks.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
+         AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
       }
 
       public static void Insert(string blName)

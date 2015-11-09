@@ -72,11 +72,11 @@ namespace AlbumPanelColorTiles.Sheets
             //
             //Создание листа для Марки АР ("на Фасаде").
             //
-            var idLayoutMarkAR = Blocks.CopyLayout(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
+            var idLayoutMarkAR =AcadLib.Blocks.Block.CopyLayout(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
             // Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
             if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary).Count == 3)
             {
-               Blocks.ConvertLayoutNames(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
+               Block.ConvertLayoutNames(dbMarkSB, Album.Options.SheetTemplateLayoutNameForMarkAR, LayoutName);
                HostApplicationServices.WorkingDatabase = dbMarkSB;
                LayoutManager lm = LayoutManager.Current;
                idLayoutMarkAR = lm.GetLayoutId(LayoutName);
@@ -105,7 +105,7 @@ namespace AlbumPanelColorTiles.Sheets
             var idBlRefMarkArForm = InsertBlRefMarkAR(dbMarkSB, ptInsertMarkArForm);
             // Зеркалирование блока
             MirrorMarkArForFormSheet(idBlRefMarkArForm);
-            var idLayoutMarkArForm = Blocks.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
+            var idLayoutMarkArForm =AcadLib.Blocks.Block.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
             // Направение видового экрана на блок марки АР(з).
             var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t,
                            dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false, out extentsViewPort);
@@ -122,7 +122,7 @@ namespace AlbumPanelColorTiles.Sheets
          using (var table = idTable.GetObject(OpenMode.ForRead) as Table)
          {
             var extTable = table.GeometricExtents;
-            if (!Geometry.IsPointInBounds(extTable.MinPoint, extentsViewPort))
+            if (!extentsViewPort.IsPointInBounds(extTable.MinPoint))
             {
                Point3d newPt = new Point3d(table.Position.X,
                   extentsViewPort.MinPoint.Y + (extTable.MaxPoint.Y - extTable.MinPoint.Y), 0);
@@ -232,7 +232,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
-               if (Blocks.EffectiveName(blRefStampContent) == Album.Options.BlockFrameName)
+               if (blRefStampContent.GetEffectiveName() == Album.Options.BlockFrameName)
                {
                   return blRefStampContent;
                }

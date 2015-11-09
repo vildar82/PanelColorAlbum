@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AcadLib.Comparers;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Panels;
@@ -452,7 +453,7 @@ namespace AlbumPanelColorTiles
          {
             defName = _abbreviateProject;
          }
-         var opt = new PromptStringOptions("\nВведите сокращенное имя проекта для добавления к имени Марки АР:");
+         var opt = new PromptStringOptions("\nВведите сокращенное имя проекта:");
          opt.DefaultValue = defName;
          var res = _doc.Editor.GetString(opt);
          if (res.Status == PromptStatus.OK)

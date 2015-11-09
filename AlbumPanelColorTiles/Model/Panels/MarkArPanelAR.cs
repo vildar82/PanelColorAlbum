@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AcadLib.Blocks;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -41,7 +42,7 @@ namespace AlbumPanelColorTiles.Panels
          get { return _markPaintingCalulated; }
          set {
             _markPaintingCalulated = value;
-            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPaintingCalulated), _markSB.Abbr);
+            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, AcadLib.Blocks.Block.GetValidNameForBlock(_markPaintingCalulated), _markSB.Abbr);
             _markARPanelFullNameCalculated = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPaintingCalulated, _markSB.Abbr);
          }
       }
@@ -160,7 +161,7 @@ namespace AlbumPanelColorTiles.Panels
             }
             var btrMarkSb = t.GetObject(_markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
             // Копирование определения блока
-            _idBtrAr = Lib.Blocks.CopyBtr(_markSB.IdBtr, _markArBlockName);
+            _idBtrAr = AcadLib.Blocks.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);
             var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)
@@ -168,7 +169,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (Blocks.EffectiveName(blRef) == Album.Options.BlockTileName)
+                  if (blRef.GetEffectiveName() == Album.Options.BlockTileName)
                   {
                      // это блок плитки. Покраска плитки.
                      var paintAr = _paints[i++];
@@ -181,7 +182,7 @@ namespace AlbumPanelColorTiles.Panels
                         blRef.Layer = paintAr.LayerName;
                      }
                   }
-                  else if (Lib.Blocks.EffectiveName(blRef) == Album.Options.BlockColorAreaName)
+                  else if (blRef.GetEffectiveName() == Album.Options.BlockColorAreaName)
                   {
                      // Блок зоны покраски. Удаляем его
                      blRef.Erase(true);

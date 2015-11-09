@@ -211,7 +211,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-               if (Blocks.EffectiveName(blRefStampContent).Equals(Album.Options.BlockFrameName, StringComparison.OrdinalIgnoreCase))
+               if (blRefStampContent.GetEffectiveName().Equals(Album.Options.BlockFrameName, StringComparison.OrdinalIgnoreCase))
                {
                   return blRefStampContent;
                }

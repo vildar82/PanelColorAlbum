@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AlbumPanelColorTiles.Lib;
+using AcadLib.Jigs;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -50,7 +46,7 @@ namespace AlbumPanelColorTiles.Sheets
       {
          Table table = new Table();
          table.SetDatabaseDefaults(db);
-         table.TableStyle = getTableStyle(db);
+         table.TableStyle = db.GetTableStylePIK(); //getTableStyle(db);
 
          table.SetSize(_album.Colors.Count + 3, 5);
          table.Columns[0].Width = 10; // Поз
@@ -98,18 +94,6 @@ namespace AlbumPanelColorTiles.Sheets
 
          table.GenerateLayout();
          return table;
-      }
-
-      private static ObjectId getTableStyle(Database db)
-      {
-         using (var dictTableStyles = db.TableStyleDictionaryId.Open(OpenMode.ForRead) as DBDictionary)
-         {
-            if (dictTableStyles.Contains("ПИК"))
-            {
-               return dictTableStyles.GetAt("ПИК");
-            }
-         }
-         return db.Tablestyle;
-      }
+      }      
    }
 }

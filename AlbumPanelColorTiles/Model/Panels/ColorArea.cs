@@ -46,7 +46,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (string.Equals(Lib.Blocks.EffectiveName(blRefColorArea),
+                  if (string.Equals(blRefColorArea.GetEffectiveName(),
                      Album.Options.BlockColorAreaName,
                      System.StringComparison.InvariantCultureIgnoreCase))
                   {
@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.Panels
             colorAreas.Sort();
             foreach (ColorArea colorArea in colorAreas)
             {
-               if (Geometry.IsPointInBounds(centerTile, colorArea.Bounds))
+               if (colorArea.Bounds.IsPointInBounds(centerTile))
                {                  
                   return colorArea.Paint;
                }

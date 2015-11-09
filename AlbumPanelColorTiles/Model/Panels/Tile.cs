@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (Lib.Blocks.EffectiveName(blRefTile) == Album.Options.BlockTileName)
+                  if (blRefTile.GetEffectiveName() == Album.Options.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки

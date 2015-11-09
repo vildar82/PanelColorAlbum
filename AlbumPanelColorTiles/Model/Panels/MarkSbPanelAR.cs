@@ -136,7 +136,7 @@ namespace AlbumPanelColorTiles.Panels
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
       {
-         var idBtrMarkSb = Lib.Blocks.CopyBtr(idBtrMarkAr, markSbBlName);
+         var idBtrMarkSb = AcadLib.Blocks.Block.CopyBtr(idBtrMarkAr, markSbBlName);
          // Перенос блоков плиток на слой 0
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
@@ -147,7 +147,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (Blocks.EffectiveName(blRef) == Album.Options.BlockTileName)
+                  if (blRef.GetEffectiveName() == Album.Options.BlockTileName)
                   {
                      blRef.Layer = "0";
                   }
@@ -492,7 +492,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (Blocks.EffectiveName(blRefTile) == Album.Options.BlockTileName)
+                  if (blRefTile.GetEffectiveName() == Album.Options.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки

@@ -96,7 +96,7 @@ namespace AlbumPanelColorTiles.Panels
                      if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                      {
                         var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
-                        if (Blocks.EffectiveName(blRef).Equals(blName))
+                        if (blRef.GetEffectiveName().Equals(blName))
                         {
                            updateBlRefFrame(blRef, btrFrame, t);
                         }
@@ -117,7 +117,7 @@ namespace AlbumPanelColorTiles.Panels
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
-               if (Blocks.EffectiveName(blRef).Equals(_blFrameName, StringComparison.OrdinalIgnoreCase))
+               if (blRef.GetEffectiveName().Equals(_blFrameName, StringComparison.OrdinalIgnoreCase))
                {
                   // считывание атрибутов
                   var atrCol = blRef.AttributeCollection;
