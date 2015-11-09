@@ -324,25 +324,17 @@ namespace AlbumPanelColorTiles
 
          // В Модели должны быть расставлены панели Марки СБ и зоны покраски.
          // сброс списка цветов.
-         _colors = new List<Paint>();
-
-         Log.Debug("Определение зон покраски в Модели");
+         _colors = new List<Paint>();         
 
          // Определение зон покраски в Модели
          _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
-         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);
-
-         Log.Debug("Бонус - покраска блоков плитки разложенных просто в Модели");
+         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);         
 
          // Бонус - покраска блоков плитки разложенных просто в Модели
-         Tile.PaintTileInModel(rtreeColorAreas);
-
-         Log.Debug("Сброс блоков панелей Марки АР на панели марки СБ.");
+         Tile.PaintTileInModel(rtreeColorAreas);         
 
          // Сброс блоков панелей Марки АР на панели марки СБ.
-         ResetBlocks();
-
-         Log.Debug("Проверка чертежа");
+         ResetBlocks();         
 
          // Проверка чертежа
          Inspector.Clear();
@@ -350,41 +342,29 @@ namespace AlbumPanelColorTiles
          if(Inspector.HasErrors)
          {
             throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");
-         }
-
-         Log.Debug("Определение покраски панелей.");
+         }        
 
          // Определение покраски панелей.
          _marksSB = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, _abbreviateProject, "Покраска панелей...");
          if (_marksSB?.Count == 0)
          {
             throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
-         }
-
-         Log.Debug("Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.");
+         }         
 
          // Проверить всели плитки покрашены. Если есть непокрашенные плитки, то выдать сообщение об ошибке.
          if (Inspector.HasErrors)
          {            
             throw new System.Exception("\nПокраска не выполнена, не все плитки покрашены. См. список непокрашенных плиток в форме ошибок.");
-         }
-
-         Log.Debug("RenamePanelsToArchitectIndex");
+         }         
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
-         RenamePanelsToArchitectIndex(_marksSB);
-
-         Log.Debug("CreatePanelsMarkAR");
+         RenamePanelsToArchitectIndex(_marksSB);         
 
          // Создание определений блоков панелей покраски МаркиАР
-         CreatePanelsMarkAR();
-
-         Log.Debug("ReplaceBlocksMarkSbOnMarkAr");
+         CreatePanelsMarkAR();         
 
          // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
-         ReplaceBlocksMarkSbOnMarkAr();
-
-         Log.Debug("CaptionPanels");
+         ReplaceBlocksMarkSbOnMarkAr();         
 
          // Добавление подписей к панелям
          CaptionPanels();
@@ -494,9 +474,7 @@ namespace AlbumPanelColorTiles
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.Start("Создание определений блоков панелей марки АР ");
          progressMeter.SetLimit(_marksSB.Count);
-         progressMeter.Start();
-
-         Log.Debug("CreatePanelsMarkAR - _marksSB.Count = {0}", _marksSB.Count);
+         progressMeter.Start();         
 
          foreach (var markSB in _marksSB)
          {
@@ -506,8 +484,7 @@ namespace AlbumPanelColorTiles
                         
             foreach (var markAR in markSB.MarksAR)
             {
-               markAR.CreateBlock();
-               Log.Debug("CreateBlock - markAR = {0}", markAR.MarkARPanelFullName);
+               markAR.CreateBlock();               
             }
          }
          progressMeter.Stop();
