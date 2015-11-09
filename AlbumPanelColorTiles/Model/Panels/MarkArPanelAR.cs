@@ -71,15 +71,10 @@ namespace AlbumPanelColorTiles.Panels
          }
          set
          {
-            //bool isRename = !string.IsNullOrEmpty(_markPainting);
             _markPainting = value;
-            //_markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, Blocks.GetValidNameForBlock(_markPainting), _markSB.Abbr);
             _markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
-            //if (isRename) // Переименование марки покраски пользователем.
-            //{
-               // Переименование подписей марок панелей (текстовый объект внутри блока панелели)
-               Album.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
-            //}
+            // Переименование подписей марок панелей (текстовый объект внутри блока панелели)
+            Album.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
          }
       }
 
@@ -119,9 +114,7 @@ namespace AlbumPanelColorTiles.Panels
                {
                   if (!hasTileWithoutPaint)
                   {
-                     //Ошибка. Не удалось определить покраску плитки.???                  
-                     //Extents3d ext = new Extents3d(new Point3d(centerTileInBlRef.X - 150, centerTileInBlRef.Y - 50, 0),
-                     //                              new Point3d(centerTileInBlRef.X + 150, centerTileInBlRef.Y + 50, 0));                     
+                     //Ошибка. Не удалось определить покраску плитки.???                    
                      Inspector.Errors.Add(new Error(string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean),blRefPanel));
                      hasTileWithoutPaint = true;
                   }
