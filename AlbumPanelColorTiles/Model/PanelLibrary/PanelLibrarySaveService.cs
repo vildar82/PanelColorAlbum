@@ -112,7 +112,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                ed.WriteMessage("\n{0}", panel);
             }
             ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку. Спасибо!");            
-            Log.Error("Есть новые панели, которых нет в библиотеке: ", string.Join("; ", panelsNotInLib));
+            Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
          }
       }
 
