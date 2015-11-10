@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;

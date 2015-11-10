@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Panels;
@@ -254,7 +255,8 @@ namespace AlbumPanelColorTiles
 
          // Проверка чертежа
          Inspector.Clear();
-         Inspector.CheckDrawing();
+         CheckDrawing checkDrawing = new CheckDrawing();
+         checkDrawing.Check();                  
          if (Inspector.HasErrors)
          {
             throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");

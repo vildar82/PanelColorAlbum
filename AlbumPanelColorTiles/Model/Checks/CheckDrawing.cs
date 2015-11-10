@@ -6,19 +6,19 @@ using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.Checks
 {
-   public static class Inspector
+   public class CheckDrawing
    {
       private static Database _db;
       private static Document _doc;
       private static Editor _ed;
 
-      static Inspector()
+      static CheckDrawing()
       {
          Clear();
       }
       
       // Проверка чертежа
-      public static void CheckDrawing()
+      public void Check()
       {
          // 1. Не должно быть блоков Марки АР. Т.к. может получится так, что при текущем расчте получится марка панели которая уже определенва в чертеже, и она не сможет создаться, т.к. такой блок уже есть.
          var markArBtrNames = checkBtrMarkAr();
@@ -79,7 +79,7 @@ namespace AlbumPanelColorTiles.Checks
       //   return res;
       //}
       // Проверка наличия определений блоков Марки АР
-      private static List<string> checkBtrMarkAr()
+      private List<string> checkBtrMarkAr()
       {
          List<string> markArBtrNames = new List<string>();
          using (var bt = _db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)

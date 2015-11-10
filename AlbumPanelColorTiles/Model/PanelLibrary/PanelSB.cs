@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Properties;

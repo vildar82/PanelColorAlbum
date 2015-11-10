@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -418,7 +419,7 @@ namespace AlbumPanelColorTiles.Panels
                   {
                      //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
                      //???
-                     Inspector.Errors.Add(new Error(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanel.Name), blRefPanel));
+                     Inspector.AddError(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanel.Name), blRefPanel);
                   }
                }
             }

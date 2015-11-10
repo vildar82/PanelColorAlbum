@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
@@ -259,16 +260,16 @@ namespace AlbumPanelColorTiles
                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)
-            {
-               if (Inspector.Errors.Count > 0)
-               {
-                  Inspector.Show();
-               }
+            {               
                doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {
                   Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
                }
+            }
+            if (Inspector.HasErrors)
+            {
+               Inspector.Show();
             }
          }
       }
