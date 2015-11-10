@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -83,10 +84,10 @@ namespace AlbumPanelColorTiles.RandomPainting
          {
             var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
 
-            if (!bt.Has(Album.Options.BlockColorAreaName))
+            if (!bt.Has(Settings.Default.BlockColorAreaName))
             {
                // Скопировать из шаблона
-               BlockInsert.CopyBlockFromTemplate(Album.Options.BlockColorAreaName, db);
+               BlockInsert.CopyBlockFromTemplate(Settings.Default.BlockColorAreaName, db);
             }
             t.Commit();
          }
@@ -401,7 +402,7 @@ namespace AlbumPanelColorTiles.RandomPainting
                var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
                var cs = t.GetObject(_db.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
                _idMS = cs.Id;
-               var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
+               var btrColorArea = t.GetObject(bt[Settings.Default.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
                var blRefColorAreaTemplate = new BlockReference(Point3d.Origin, btrColorArea.Id);
                cs.AppendEntity(blRefColorAreaTemplate);
                t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);

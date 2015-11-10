@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -77,13 +78,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         {
                            var atrRef = idAtrRef.GetObject(OpenMode.ForRead) as AttributeReference;
                            // Покраска
-                           if (string.Equals(atrRef.Tag, Album.Options.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
+                           if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                            {
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
                            }
                            // МАРКА
-                           else if (string.Equals(atrRef.Tag, Album.Options.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
+                           else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
                            {
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);

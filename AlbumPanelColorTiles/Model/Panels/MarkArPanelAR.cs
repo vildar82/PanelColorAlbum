@@ -4,6 +4,7 @@ using System.Linq;
 using AcadLib.Blocks;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
@@ -162,7 +163,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.GetEffectiveName() == Album.Options.BlockTileName)
+                  if (blRef.GetEffectiveName() == Settings.Default.BlockTileName)
                   {
                      // это блок плитки. Покраска плитки.
                      var paintAr = _paints[i++];
@@ -175,7 +176,7 @@ namespace AlbumPanelColorTiles.Panels
                         blRef.Layer = paintAr.LayerName;
                      }
                   }
-                  else if (blRef.GetEffectiveName() == Album.Options.BlockColorAreaName)
+                  else if (blRef.GetEffectiveName() == Settings.Default.BlockColorAreaName)
                   {
                      // Блок зоны покраски. Удаляем его
                      blRef.Erase(true);

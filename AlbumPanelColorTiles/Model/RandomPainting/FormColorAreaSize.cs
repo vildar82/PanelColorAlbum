@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AlbumPanelColorTiles.Properties;
 
 namespace AlbumPanelColorTiles.RandomPainting
 {
@@ -53,11 +54,11 @@ namespace AlbumPanelColorTiles.RandomPainting
 
       private void textBoxLenght_Leave(object sender, EventArgs e)
       {  
-         textBoxLenght.Text = correctionValue(textBoxLenght.Text, Album.Options.TileLenght + Album.Options.TileSeam); 
+         textBoxLenght.Text = correctionValue(textBoxLenght.Text, Settings.Default.TileLenght + Settings.Default.TileSeam); 
       }
       private void textBoxHeight_Leave(object sender, EventArgs e)
       {
-         textBoxHeight.Text = correctionValue(textBoxHeight.Text, Album.Options.TileHeight + Album.Options.TileSeam);
+         textBoxHeight.Text = correctionValue(textBoxHeight.Text, Settings.Default.TileHeight + Settings.Default.TileSeam);
       }
 
       private string correctionValue(string slen, int tileValue)

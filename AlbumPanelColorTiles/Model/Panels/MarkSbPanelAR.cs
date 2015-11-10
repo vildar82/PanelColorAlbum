@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -45,7 +46,7 @@ namespace AlbumPanelColorTiles.Panels
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
-         _isUpperStoreyPanel = (blRefPanel.Layer == Album.Options.LayerUpperStoreyPanels); // Панель чердака
+         _isUpperStoreyPanel = (blRefPanel.Layer == Settings.Default.LayerUpperStoreyPanels); // Панель чердака
          checkPanelIndexes(markSbName, blRefPanel);
          //_isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          //_isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
@@ -103,11 +104,11 @@ namespace AlbumPanelColorTiles.Panels
       /// <returns></returns>
       public static string GetMarkSbCleanName(string markSbName)
       {
-         int indexEndLeftPanel = markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         int indexEndLeftPanel = markSbName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase);
          indexEndLeftPanel = indexEndLeftPanel > 0 ? indexEndLeftPanel : 0;
-         int indexEndRightPanel = markSbName.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         int indexEndRightPanel = markSbName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase);
          indexEndRightPanel = indexEndRightPanel > 0 ? indexEndRightPanel : 0;
-         int indexWindow = markSbName.IndexOf(Album.Options.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         int indexWindow = markSbName.IndexOf(Settings.Default.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
          indexWindow = indexWindow > 0 ? indexWindow : 0;
          int[] indexes = { indexEndLeftPanel, indexEndRightPanel, indexWindow };
          var indexesAboveZero = indexes.Where(i => i > 0);
@@ -147,7 +148,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.GetEffectiveName() == Album.Options.BlockTileName)
+                  if (blRef.GetEffectiveName() == Settings.Default.BlockTileName)
                   {
                      blRef.Layer = "0";
                   }
@@ -162,18 +163,18 @@ namespace AlbumPanelColorTiles.Panels
       {
          // markSbName - марка СБ (без приставки АКР_Панель_)
          // проверка торца
-         if (markSbName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         if (markSbName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
             _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          }
-         if (markSbName.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         if (markSbName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {            
             _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва  
          }
-         int indexWindowSuffix = markSbName.IndexOf(Album.Options.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
+         int indexWindowSuffix = markSbName.IndexOf(Settings.Default.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
          if (indexWindowSuffix != -1)
          {
-            if (int.TryParse(markSbName.Substring(indexWindowSuffix + Album.Options.WindowPanelSuffix.Length, 1), out _windowSuffix))
+            if (int.TryParse(markSbName.Substring(indexWindowSuffix + Settings.Default.WindowPanelSuffix.Length, 1), out _windowSuffix))
             {
                if (_windowSuffix == 0)
                {
@@ -189,7 +190,7 @@ namespace AlbumPanelColorTiles.Panels
 
       public static string GetMarkSbBlockName(string markSb)
       {
-         return Album.Options.BlockPanelPrefixName + markSb;
+         return Settings.Default.BlockPanelPrefixName + markSb;
       }
       
       /// <summary>
@@ -203,7 +204,7 @@ namespace AlbumPanelColorTiles.Panels
          if (IsBlockNamePanel(blName))
          {
             // Хвостовая часть
-            markSb = blName.Substring(Album.Options.BlockPanelPrefixName.Length);
+            markSb = blName.Substring(Settings.Default.BlockPanelPrefixName.Length);
             if (markSb.EndsWith(")"))
             {
                int lastDirectBracket = markSb.LastIndexOf('(');
@@ -294,7 +295,7 @@ namespace AlbumPanelColorTiles.Panels
       // Проверка, это блок панели, по имени (Марки СБ или Марки АР)
       public static bool IsBlockNamePanel(string blName)
       {
-         return blName.StartsWith(Album.Options.BlockPanelPrefixName);
+         return blName.StartsWith(Settings.Default.BlockPanelPrefixName);
       }
 
       // Проверка, это имя блоки марки АР, по имени блока.
@@ -492,7 +493,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (blRefTile.GetEffectiveName() == Album.Options.BlockTileName)
+                  if (blRefTile.GetEffectiveName() == Settings.Default.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки

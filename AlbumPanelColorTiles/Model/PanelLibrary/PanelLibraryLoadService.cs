@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.PanelLibrary;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.PanelLibrary
@@ -103,7 +104,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                            {
                               // Заполнение атрибута покраски
-                              var atrInfo = mountingPanelSb.AttrDet.Find(a => string.Equals(a.Tag, Album.Options.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
+                              var atrInfo = mountingPanelSb.AttrDet.Find
+                                 (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
                               if (atrInfo != null)
                               {
                                  using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)

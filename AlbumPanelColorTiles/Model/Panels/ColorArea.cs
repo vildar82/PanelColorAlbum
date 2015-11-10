@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
@@ -47,7 +48,7 @@ namespace AlbumPanelColorTiles.Panels
                {
                   var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   if (string.Equals(blRefColorArea.GetEffectiveName(),
-                     Album.Options.BlockColorAreaName,
+                     Settings.Default.BlockColorAreaName,
                      System.StringComparison.InvariantCultureIgnoreCase))
                   {
                      ColorArea colorArea = new ColorArea(blRefColorArea);

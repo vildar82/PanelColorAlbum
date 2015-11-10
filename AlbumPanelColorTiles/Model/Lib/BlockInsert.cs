@@ -2,6 +2,7 @@
 using System.IO;
 using AcadLib.Blocks;
 using AcadLib.Jigs;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -21,7 +22,7 @@ namespace AlbumPanelColorTiles.Lib
       public static void CopyBlockFromTemplate(string blName, Database db)
       {
          // Копирование определения блока из файла с блоками.
-         string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Album.Options.TemplateBlocksAKRFileName);
+         string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Settings.Default.TemplateBlocksAKRFileName);
          if (!File.Exists(fileBlocksTemplate))
          {
             throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);

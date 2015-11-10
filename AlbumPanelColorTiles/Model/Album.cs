@@ -6,6 +6,7 @@ using AcadLib.Comparers;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
@@ -80,7 +81,7 @@ namespace AlbumPanelColorTiles
             if (idEnt.ObjectClass.Name == "AcDbText")
             {
                var textMark = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
-               if (textMark.Layer == Album.Options.LayerMarks)
+               if (textMark.Layer == Settings.Default.LayerMarks)
                {
                   textMark.UpgradeOpen();
                   textMark.Erase(true);
@@ -226,7 +227,7 @@ namespace AlbumPanelColorTiles
                   else
                   {
                      // Подпись марки блока
-                     string panelMark = btr.Name.Substring(Album.Options.BlockPanelPrefixName.Length);
+                     string panelMark = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
                      AddMarkToPanelBtr(panelMark, t, btr);
                   }
                }
@@ -426,11 +427,11 @@ namespace AlbumPanelColorTiles
          using (var t = db.TransactionManager.StartTransaction())
          {
             var lt = t.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
-            if (!lt.Has(Album.Options.LayerMarks))
+            if (!lt.Has(Settings.Default.LayerMarks))
             {
                // Если слоя нет, то он создается.
                var ltrMarks = new LayerTableRecord();
-               ltrMarks.Name = Album.Options.LayerMarks;
+               ltrMarks.Name = Settings.Default.LayerMarks;
                ltrMarks.IsPlottable = false;
                lt.UpgradeOpen();
                lt.Add(ltrMarks);
@@ -438,7 +439,7 @@ namespace AlbumPanelColorTiles
             }
             t.Commit();
          }
-         return Album.Options.LayerMarks;
+         return Settings.Default.LayerMarks;
       }
 
       private string abbreviateNameProject()

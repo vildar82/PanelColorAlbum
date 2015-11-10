@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 
@@ -86,7 +87,7 @@ namespace AlbumPanelColorTiles.Sheets
             _dbContent.CloseInput(true);
 
             // Замена блока рамки из чертежа фасада, если он есть
-            _blFrameInFacade.ChangeBlockFrame(_dbContent, Album.Options.BlockFrameName);
+            _blFrameInFacade.ChangeBlockFrame(_dbContent, Settings.Default.BlockFrameName);
 
             using (var t = _dbContent.TransactionManager.StartTransaction())
             {
@@ -149,7 +150,7 @@ namespace AlbumPanelColorTiles.Sheets
                // Удаление последнего листа содержания (пустой копии)
                HostApplicationServices.WorkingDatabase = _dbContent;
                LayoutManager lm = LayoutManager.Current;
-               string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
+               string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
                lm.DeleteLayout(layoutNameToDel);
 
                t.Commit();
@@ -211,7 +212,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-               if (blRefStampContent.GetEffectiveName().Equals(Album.Options.BlockFrameName, StringComparison.OrdinalIgnoreCase))
+               if (blRefStampContent.GetEffectiveName().Equals(Settings.Default.BlockFrameName, StringComparison.OrdinalIgnoreCase))
                {
                   return blRefStampContent;
                }
@@ -242,16 +243,16 @@ namespace AlbumPanelColorTiles.Sheets
          string nameCopy;
          if (curSheetContentNum == 1)
          {
-            nameLay = Album.Options.SheetTemplateLayoutNameForContent;
-            nameCopy = (_countSheetsBeforContent + 2).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
+            nameLay = Settings.Default.SheetTemplateLayoutNameForContent;
+            nameCopy = (_countSheetsBeforContent + 2).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
             idLayoutContentCur = lm.GetLayoutId(nameLay);
             lm.CopyLayout(nameLay, nameCopy);
-            lm.RenameLayout(nameLay, (_countSheetsBeforContent + 1).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent);
+            lm.RenameLayout(nameLay, (_countSheetsBeforContent + 1).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent);
          }
          else
          {
-            nameLay = (_countSheetsBeforContent + curSheetContentNum).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
-            nameCopy = (_countSheetsBeforContent + (++curSheetContentNum)).ToString("00") + "_" + Album.Options.SheetTemplateLayoutNameForContent;
+            nameLay = (_countSheetsBeforContent + curSheetContentNum).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
+            nameCopy = (_countSheetsBeforContent + (++curSheetContentNum)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
             idLayoutContentCur = lm.GetLayoutId(nameLay);
             lm.CopyLayout(nameLay, nameCopy);
          }

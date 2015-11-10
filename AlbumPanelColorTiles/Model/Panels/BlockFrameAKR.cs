@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -37,7 +38,7 @@ namespace AlbumPanelColorTiles.Panels
          // Поиск блока рамки на текущем чертеже фасада
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          _db = doc.Database;
-         _blFrameName = Album.Options.BlockFrameName;
+         _blFrameName = Settings.Default.BlockFrameName;
          using (var t = _db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -77,8 +78,8 @@ namespace AlbumPanelColorTiles.Panels
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             ObjectId idBtrFrame;
-            if (bt.Has(Album.Options.BlockFrameName))
-               idBtrFrame = bt[Album.Options.BlockFrameName];
+            if (bt.Has(Settings.Default.BlockFrameName))
+               idBtrFrame = bt[Settings.Default.BlockFrameName];
             else
                return;
 

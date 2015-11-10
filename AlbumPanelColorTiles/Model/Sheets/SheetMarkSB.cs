@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -55,7 +56,7 @@ namespace AlbumPanelColorTiles.Sheets
             dbMarkSB.CloseInput(true);
 
             // Замена блока рамки
-            blFrameFacade.ChangeBlockFrame(dbMarkSB, Album.Options.BlockFrameName);
+            blFrameFacade.ChangeBlockFrame(dbMarkSB, Settings.Default.BlockFrameName);
 
             // Копирование всех определений блоков марки АР в файл Марки СБ
             CopyBtrMarksARToSheetMarkSB(dbMarkSB);
@@ -78,7 +79,7 @@ namespace AlbumPanelColorTiles.Sheets
             //// Удаление шаблона листа из фала Марки СБ
             HostApplicationServices.WorkingDatabase = dbMarkSB;
             LayoutManager lm = LayoutManager.Current;
-            lm.DeleteLayout(Album.Options.SheetTemplateLayoutNameForMarkAR);
+            lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForMarkAR);
 
             HostApplicationServices.WorkingDatabase = dbOrig;
             dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
@@ -118,17 +119,17 @@ namespace AlbumPanelColorTiles.Sheets
          using (var t = dbMarkSB.TransactionManager.StartTransaction())
          {
             var lt = t.GetObject(dbMarkSB.LayerTableId, OpenMode.ForRead) as LayerTable;
-            if (lt.Has(Album.Options.LayerDimensionFacade))
+            if (lt.Has(Settings.Default.LayerDimensionFacade))
             {
-               layersToFreezeOnFormSheet.Add(lt[Album.Options.LayerDimensionFacade]);
+               layersToFreezeOnFormSheet.Add(lt[Settings.Default.LayerDimensionFacade]);
             }
-            if (lt.Has(Album.Options.LayerWindows))
+            if (lt.Has(Settings.Default.LayerWindows))
             {
-               layersToFreezeOnFormSheet.Add(lt[Album.Options.LayerWindows]);
+               layersToFreezeOnFormSheet.Add(lt[Settings.Default.LayerWindows]);
             }
-            if (lt.Has(Album.Options.LayerDimensionForm))
+            if (lt.Has(Settings.Default.LayerDimensionForm))
             {
-               layersToFreezeOnFacadeSheet.Add(lt[Album.Options.LayerDimensionForm]);
+               layersToFreezeOnFacadeSheet.Add(lt[Settings.Default.LayerDimensionForm]);
             }
             // Включение и разморозка всех слоев
             foreach (var idLayer in lt)
@@ -143,9 +144,9 @@ namespace AlbumPanelColorTiles.Sheets
             }
 
             // отключение печати слоя АР_Марки
-            if (lt.Has(Album.Options.LayerMarks))
+            if (lt.Has(Settings.Default.LayerMarks))
             {
-               var layMarks = lt[Album.Options.LayerMarks].GetObject(OpenMode.ForRead) as LayerTableRecord;
+               var layMarks = lt[Settings.Default.LayerMarks].GetObject(OpenMode.ForRead) as LayerTableRecord;
                if (layMarks.IsPlottable)
                {
                   layMarks.UpgradeOpen();

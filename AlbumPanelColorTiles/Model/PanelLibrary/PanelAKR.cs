@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AcadLib.Blocks;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -66,11 +67,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       private void defineEndsPanel(string markAkrWithoutWhite)
       {
-         if (markAkrWithoutWhite.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         if (markAkrWithoutWhite.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
             _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          }
-         if (markAkrWithoutWhite.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         if (markAkrWithoutWhite.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
             _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва  
          }
@@ -125,7 +126,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   using (var blRefTile = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
                   {
-                     if (string.Equals(blRefTile.GetEffectiveName(), Album.Options.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                     if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         extTiles.AddExtents(blRefTile.GeometricExtents);
                      }
@@ -134,11 +135,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          double shiftEnd = 0;
-         if (blName.IndexOf(Album.Options.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         if (blName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
             shiftEnd = -446.7;// Торец слева - сдвинуть влево
          }
-         else if (blName.IndexOf(Album.Options.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         else if (blName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
             shiftEnd = -447;// Торец спрва - сдвинуть вправо
          }
@@ -153,11 +154,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             string markAkr = panelSb.MarkSb;
             if (panelSb.IsEndLeftPanel)
             {
-               markAkr += Album.Options.EndLeftPanelSuffix;
+               markAkr += Settings.Default.EndLeftPanelSuffix;
             }
             else if (panelSb.IsEndRightPanel)
             {
-               markAkr += Album.Options.EndRightPanelSuffix;
+               markAkr += Settings.Default.EndRightPanelSuffix;
             }
             SymbolUtilityServices.ValidateSymbolName(markAkr, false);
             // копирование блока с новым именем с электрикой

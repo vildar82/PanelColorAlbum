@@ -1,4 +1,5 @@
 ﻿using System;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.Colors;
 
 namespace AlbumPanelColorTiles.Panels
@@ -24,7 +25,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (_oneTileArea == 0.0)
             {
-               _oneTileArea = Album.Options.TileLenght * Album.Options.TileHeight * 0.000001;//   0.025344;//288*88 в м2
+               _oneTileArea = Settings.Default.TileLenght * Settings.Default.TileHeight * 0.000001;//   0.025344;//288*88 в м2
             }
             return _oneTileArea;
          }

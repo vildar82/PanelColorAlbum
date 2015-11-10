@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Properties;
 using AlbumPanelColorTiles.RandomPainting;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -68,7 +69,7 @@ namespace AlbumPanelColorTiles.ImagePainting
                   var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
                   var cs = t.GetObject(_db.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
                   _idCS = cs.Id;
-                  var btrColorArea = t.GetObject(bt[Album.Options.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
+                  var btrColorArea = t.GetObject(bt[Settings.Default.BlockColorAreaName], OpenMode.ForRead) as BlockTableRecord;
                   var blRefColorAreaTemplate = new BlockReference(Point3d.Origin, btrColorArea.Id);
                   cs.AppendEntity(blRefColorAreaTemplate);
                   t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);

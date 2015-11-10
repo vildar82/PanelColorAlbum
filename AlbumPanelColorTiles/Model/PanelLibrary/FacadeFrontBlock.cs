@@ -39,7 +39,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   using (var blRef = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
                   {
                      // Если это блок обозначения стороны фасада - по имени блока
-                     if (string.Equals(blRef.GetEffectiveName(), Album.Options.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
+                     if (string.Equals(blRef.GetEffectiveName(), Properties.Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         FacadeFrontBlock front = new FacadeFrontBlock(blRef);
                         facadeFrontBlocks.Add(front);

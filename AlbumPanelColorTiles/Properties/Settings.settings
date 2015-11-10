@@ -1,0 +1,78 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AlbumPanelColorTiles.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BlockColorAreaName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Зона-покраски</Value>
+    </Setting>
+    <Setting Name="BlockFrameName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Рамка</Value>
+    </Setting>
+    <Setting Name="BlockPanelPrefixName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Панель_</Value>
+    </Setting>
+    <Setting Name="BlockMountingPlanePrefixName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Монтажка_</Value>
+    </Setting>
+    <Setting Name="BlockFacadeName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Фасад</Value>
+    </Setting>
+    <Setting Name="BlockTileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Плитка</Value>
+    </Setting>
+    <Setting Name="AttributePanelSbPaint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ПОКРАСКА</Value>
+    </Setting>
+    <Setting Name="AttributePanelSbMark" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">МАРКА</Value>
+    </Setting>
+    <Setting Name="EndLeftPanelSuffix" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">_тл</Value>
+    </Setting>
+    <Setting Name="EndRightPanelSuffix" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">_тп</Value>
+    </Setting>
+    <Setting Name="WindowPanelSuffix" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">_ок</Value>
+    </Setting>
+    <Setting Name="LayerMarks" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АР_Марки</Value>
+    </Setting>
+    <Setting Name="LayerUpperStoreyPanels" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АР_Панели_Чердак</Value>
+    </Setting>
+    <Setting Name="LayerWindows" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АР_Окна</Value>
+    </Setting>
+    <Setting Name="LayerDimensionFacade" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АР_Размеры на фасаде</Value>
+    </Setting>
+    <Setting Name="LayerDimensionForm" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АР_Размеры в форме</Value>
+    </Setting>
+    <Setting Name="TemplateBlocksAKRFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Блоки.dwg</Value>
+    </Setting>
+    <Setting Name="SheetTemplateLayoutNameForContent" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Содержание</Value>
+    </Setting>
+    <Setting Name="TemplateSheetContentFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Шаблон_Содержание.dwg</Value>
+    </Setting>
+    <Setting Name="TemplateSheetMarkSBFileName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">АКР_Шаблон_МаркаСБ.dwg</Value>
+    </Setting>
+    <Setting Name="SheetTemplateLayoutNameForMarkAR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">TemplateMarkAR</Value>
+    </Setting>
+    <Setting Name="TileHeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">88</Value>
+    </Setting>
+    <Setting Name="TileLenght" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">288</Value>
+    </Setting>
+    <Setting Name="TileSeam" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">12</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

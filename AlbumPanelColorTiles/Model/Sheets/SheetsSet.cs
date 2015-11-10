@@ -2,6 +2,7 @@
 using System.IO;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 
@@ -32,8 +33,8 @@ namespace AlbumPanelColorTiles.Sheets
       {
          //Создание файлов марок СБ и листов марок АР в них.
          // Проверка наличия файла шаблона листов
-         _sheetTemplateFileMarkSB = Path.Combine(Commands.CurDllDir, Album.Options.TemplateSheetMarkSBFileName);
-         _sheetTemplateFileContent = Path.Combine(Commands.CurDllDir, Album.Options.TemplateSheetContentFileName);
+         _sheetTemplateFileMarkSB = Path.Combine(Commands.CurDllDir, Settings.Default.TemplateSheetMarkSBFileName);
+         _sheetTemplateFileContent = Path.Combine(Commands.CurDllDir, Settings.Default.TemplateSheetContentFileName);
          if (!File.Exists(_sheetTemplateFileMarkSB))
             throw new System.Exception("\nНе найден файл шаблона для листов панелей - " + _sheetTemplateFileMarkSB);
          if (!File.Exists(_sheetTemplateFileContent))

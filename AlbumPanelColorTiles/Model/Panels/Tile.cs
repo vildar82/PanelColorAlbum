@@ -1,4 +1,5 @@
 ﻿using System;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
@@ -43,7 +44,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (blRefTile.GetEffectiveName() == Album.Options.BlockTileName)
+                  if (blRefTile.GetEffectiveName() == Settings.Default.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки

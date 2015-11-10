@@ -10,6 +10,7 @@ using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Plot;
+using AlbumPanelColorTiles.Properties;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
 using AlbumPanelColorTiles.Sheets;
@@ -65,17 +66,17 @@ namespace AlbumPanelColorTiles
                       "\nAKR-LoadPanelsFromLibrary - загрузка АКР-Панелей из библиотеки в текущий чертеж в соответствии с монтажными планами конструкторов." +
                       "\nAKR-CreateMountingPlanBlocks - создание блоков монтажек из монтажных планов конструкторов." +
                       "\nСправка: имена блоков:" +
-                      "\nБлоки панелей с префиксом - " + Album.Options.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
-                      "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Album.Options.BlockColorAreaName +
-                      "\nБлок плитки (разложенная в блоке панели) - " + Album.Options.BlockTileName +
-                      "\nБлок обозначения стороны фасада на монтажном плане - " + Album.Options.BlockFacadeName +
-                      "\nБлок рамки со штампом - " + Album.Options.BlockFrameName +
-                      "\nПанели чердака на слое - " + Album.Options.LayerUpperStoreyPanels +
+                      "\nБлоки панелей с префиксом - " + Settings.Default.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
+                      "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Settings.Default.BlockColorAreaName +
+                      "\nБлок плитки (разложенная в блоке панели) - " + Settings.Default.BlockTileName +
+                      "\nБлок обозначения стороны фасада на монтажном плане - " + Settings.Default.BlockFacadeName +
+                      "\nБлок рамки со штампом - " + Settings.Default.BlockFrameName +
+                      "\nПанели чердака на слое - " + Settings.Default.LayerUpperStoreyPanels +
                       "\nПанели торцевые с суффиксом _тп или _тл после марки СБ в конце имени блока панели." +
                       "\nПанели с разными окнами - с суффиксом _ок (русскими буквами) и номером в конце имени блока панели. Например _ОК1" +
-                      "\nСлой для окон в панелях (замораживается на листе формы панели марки АР) - " + Album.Options.LayerWindows +
-                      "\nСлой для размеров на фасаде в панели (замораживается на листе формы) - " + Album.Options.LayerDimensionFacade +
-                      "\nСлой для размеров в форме в панели (замораживается на листе фасада) - " + Album.Options.LayerDimensionFacade +
+                      "\nСлой для окон в панелях (замораживается на листе формы панели марки АР) - " + Settings.Default.LayerWindows +
+                      "\nСлой для размеров на фасаде в панели (замораживается на листе формы) - " + Settings.Default.LayerDimensionFacade +
+                      "\nСлой для размеров в форме в панели (замораживается на листе фасада) - " + Settings.Default.LayerDimensionFacade +
                       "\nОбрабатываются только блоки в текущем чертеже в Модели. Внешние ссылки не учитываются.\n";
             }
             return _msgHelp;

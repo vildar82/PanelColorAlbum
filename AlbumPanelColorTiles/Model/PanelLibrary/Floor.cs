@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -101,7 +102,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
                   // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
-                  if (blRefMounting.Name.StartsWith(Album.Options.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);                     
                      // найти соотв обозн стороны фасада
@@ -148,7 +149,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       private string getFloorName(BlockReference blRefMounting)
       {
-         return blRefMounting.Name.Substring(Album.Options.BlockMountingPlanePrefixName.Length);
+         return blRefMounting.Name.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
       }
 
       public int CompareTo(Floor other)

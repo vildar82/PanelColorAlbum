@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -37,7 +38,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // запрос номера этажа
          numberFloor = getNumberFloor(numberFloor);
          // проверка наличия блока монтажки с этим номером
-         string floorBlockName = string.Format("{0}{1}", Album.Options.BlockMountingPlanePrefixName , numberFloor);
+         string floorBlockName = string.Format("{0}{1}", Settings.Default.BlockMountingPlanePrefixName , numberFloor);
          if (!checkBlock(floorBlockName))         
          {            
             // запрос объектов плана этажа
