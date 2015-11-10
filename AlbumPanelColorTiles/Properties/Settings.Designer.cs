@@ -256,5 +256,89 @@ namespace AlbumPanelColorTiles.Properties {
                 return ((int)(this["CaptionPanelSecondTextShift"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int ImagePaintSpotLength {
+            get {
+                return ((int)(this["ImagePaintSpotLength"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int ImagePaintSpotHeight {
+            get {
+                return ((int)(this["ImagePaintSpotHeight"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1200")]
+        public int ImagePaintFormWidth {
+            get {
+                return ((int)(this["ImagePaintFormWidth"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("900")]
+        public int ImagePaintFormHeight {
+            get {
+                return ((int)(this["ImagePaintFormHeight"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2800")]
+        public int FacadeFloorHeight {
+            get {
+                return ((int)(this["FacadeFloorHeight"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public int FacadeCaptionFloorTextHeight {
+            get {
+                return ((int)(this["FacadeCaptionFloorTextHeight"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3000")]
+        public int FacadeCaptionFloorIndent {
+            get {
+                return ((int)(this["FacadeCaptionFloorIndent"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
+        public int FacadeIndentFromMountingPlanes {
+            get {
+                return ((int)(this["FacadeIndentFromMountingPlanes"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("447")]
+        public int FacadeEndsPanelIndent {
+            get {
+                return ((int)(this["FacadeEndsPanelIndent"]));
+            }
+            set {
+                this["FacadeEndsPanelIndent"] = value;
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace AlbumPanelColorTiles.ImagePainting
       {
          _doc = doc;
          _db = doc.Database;
-         _colorAreaSize = new ColorAreaSpotSize(300, 300, "ImagePainting");
+         _colorAreaSize = new ColorAreaSpotSize(Settings.Default.ImagePaintSpotLength, Settings.Default.ImagePaintSpotHeight, "ImagePainting");
       }
 
       public ColorAreaSpotSize ColorAreaSize { get { return _colorAreaSize; } }
@@ -71,8 +71,8 @@ namespace AlbumPanelColorTiles.ImagePainting
             }
             ext = _doc.Editor.PromptExtents("\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
             len = ext.MaxPoint - ext.MinPoint;
-            errMsg = "\nНужно выбрать область побольше.";
-         } while (len.Length < 600);
+            errMsg = "\nНужно выбрать область больше.";
+         } while (len.Length < (Settings.Default.ImagePaintSpotLength+ Settings.Default.ImagePaintSpotHeight));
          _colorAreaSize.ExtentsColorArea = ext;
          _idsInsertBlRefColorArea = new List<ObjectId>();
       }

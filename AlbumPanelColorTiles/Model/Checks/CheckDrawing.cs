@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -18,16 +19,18 @@ namespace AlbumPanelColorTiles.Checks
       }
       
       // Проверка чертежа
-      public void Check()
+      public void CheckForPaint()
       {
          // 1. Не должно быть блоков Марки АР. Т.к. может получится так, что при текущем расчте получится марка панели которая уже определенва в чертеже, и она не сможет создаться, т.к. такой блок уже есть.
          var markArBtrNames = checkBtrMarkAr();
          if (markArBtrNames.Count > 0)
          {
             // Выдать сообщение, со списком блоков панелей марки АР. Которых не должно быть перед расчетом.
-            string msg = string.Join(", ", markArBtrNames.ToArray());
+            string msg = "В чертеже не должно быть блоков панелей Марки АР перед покраской. ";
+            msg += string.Join(", ", markArBtrNames.ToArray());
             //_ed.WriteMessage("\n" + msg);
             //_errors.Add(new Error(msg));
+            Inspector.AddError(msg);
          }
       }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -61,7 +62,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            blRefPanelAkr.Draw();
                         }
                      }
-                     yFloor += 2800;// высота этажа
+                     yFloor += Settings.Default.FacadeFloorHeight;// 2800;// высота этажа
                      progress.MeterProgress();
                   }
                }
@@ -87,7 +88,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          // Упорядочивание блоков этажей в фасады (блоки монтажек по вертикали образуют фасад)
          // сортировка блоков монтажек по X, потом по Y (все монтажки в одну вертикаль снизу вверх)
-         var comparerFloors = new DoubleEqualityComparer(1000);
+         var comparerFloors = new DoubleEqualityComparer(1000); // FacadeVerticalDeviation
          foreach (var floor in floors)
          {
             Facade facade = facades.Find(f => comparerFloors.Equals(f.XMin, floor.XMin));
@@ -114,9 +115,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          DBText textFloor = new DBText();
          textFloor.SetDatabaseDefaults(ms.Database);
          textFloor.Annotative = AnnotativeStates.False;
-         textFloor.Height = 250;
+         textFloor.Height = Settings.Default.FacadeCaptionFloorTextHeight;// 250;// FacadeCaptionFloorTextHeight
          textFloor.TextString = name;
-         textFloor.Position = new Point3d(x - 3000, yFloor + 1400, 0);
+         textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (Settings.Default.FacadeFloorHeight*0.5), 0);
          ms.AppendEntity(textFloor);
          t.AddNewlyCreatedDBObject(textFloor, true);
       }
@@ -125,7 +126,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private static double getFirstFloorY(List<Facade> facades)
       {
          double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.AllPanelsSbInFloor).Max(p => p.PtCenterPanelSbInModel.Y);
-         return maxYblRefPanelInModel + 10000;
+         return maxYblRefPanelInModel + Settings.Default.FacadeIndentFromMountingPlanes;// 10000; // FacadeIndentFromMountingPlanes
       }
    }
 }

@@ -20,7 +20,8 @@ namespace AlbumPanelColorTiles
    // Альбом колористических решений.
    public class Album
    {
-      private const string _regAppPath = @"Software\Vildar\AKR";      
+      private const string _regAppPath = @"Software\Vildar\AKR";
+      private const string _regKeyAbbreviate = "Abbreviate";
       private List<Paint> _colors; // Набор цветов используемых в альбоме.
       private string _abbreviateProject;// Сокращенное имя проеккта
       private int _numberFirstFloor;
@@ -256,7 +257,7 @@ namespace AlbumPanelColorTiles
          // Проверка чертежа
          Inspector.Clear();
          CheckDrawing checkDrawing = new CheckDrawing();
-         checkDrawing.Check();                  
+         checkDrawing.CheckForPaint();                  
          if (Inspector.HasErrors)
          {
             throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");
@@ -361,7 +362,7 @@ namespace AlbumPanelColorTiles
             if (string.IsNullOrEmpty(res))
             {
                var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(RegAppPath);
-               res = (string)keyAKR.GetValue("Abbreviate", "Н47Г");
+               res = (string)keyAKR.GetValue(_regKeyAbbreviate, "Н47Г");
             }
          }
          catch { }
@@ -461,7 +462,7 @@ namespace AlbumPanelColorTiles
          {
             // в реестр
             var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegAppPath);
-            keyAKR.SetValue("Abbreviate", abbr, Microsoft.Win32.RegistryValueKind.String);
+            keyAKR.SetValue(_regKeyAbbreviate, abbr, Microsoft.Win32.RegistryValueKind.String);
             // в словарь чертежа
             DictNOD.SaveAbbr(abbr);
          }

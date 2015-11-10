@@ -68,7 +68,7 @@ namespace AlbumPanelColorTiles.Panels
          if (rtreeColorAreas.Count > 0)
          {
             Point p = new Point(centerTile.X, centerTile.Y, 0);
-            var colorAreas = rtreeColorAreas.Nearest(p, 300);
+            var colorAreas = rtreeColorAreas.Nearest(p, Settings.Default.TileLenght); 
             colorAreas.Sort();
             foreach (ColorArea colorArea in colorAreas)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.ImagePainting
@@ -120,8 +121,8 @@ namespace AlbumPanelColorTiles.ImagePainting
       {
          // Установка размера формы
          var proportionImage = bitmap.Width / (double)bitmap.Height;
-         int maxWidthForm = 1200;
-         int maxHeightForm = 950;
+         int maxWidthForm = Settings.Default.ImagePaintFormWidth;// 1200; // ImagePaintFormWidth
+         int maxHeightForm = Settings.Default.ImagePaintFormHeight;// 950; // ImagePaintFormHeight
 
          double scaleW = bitmap.Width / (double)maxWidthForm;
          double scaleH = bitmap.Height / (double)maxHeightForm;

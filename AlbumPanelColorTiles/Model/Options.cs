@@ -1,7 +1,7 @@
-﻿namespace AlbumPanelColorTiles
-{
-   public class Options
-   {
+﻿//namespace AlbumPanelColorTiles
+//{
+   //public class Options
+   //{
       //
       // Имена блоков
       //
@@ -45,5 +45,5 @@
       //public int TileHeight = 88; //Высота плитки
       //public int TileLenght = 288; // Длина плитки
       //public int TileSeam = 12; // Ширина шва между плитками
-   }
-}
+   //}
+//}

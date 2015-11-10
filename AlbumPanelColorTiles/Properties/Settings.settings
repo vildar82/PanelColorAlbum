@@ -80,5 +80,32 @@
     <Setting Name="CaptionPanelSecondTextShift" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">250</Value>
     </Setting>
+    <Setting Name="ImagePaintSpotLength" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">300</Value>
+    </Setting>
+    <Setting Name="ImagePaintSpotHeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">300</Value>
+    </Setting>
+    <Setting Name="ImagePaintFormWidth" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1200</Value>
+    </Setting>
+    <Setting Name="ImagePaintFormHeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">900</Value>
+    </Setting>
+    <Setting Name="FacadeFloorHeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">2800</Value>
+    </Setting>
+    <Setting Name="FacadeCaptionFloorTextHeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">250</Value>
+    </Setting>
+    <Setting Name="FacadeCaptionFloorIndent" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">3000</Value>
+    </Setting>
+    <Setting Name="FacadeIndentFromMountingPlanes" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="FacadeEndsPanelIndent" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">447</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
