@@ -8,9 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.ComponentModel;
-
-namespace AlbumPanelColorTiles.Properties {    
+namespace AlbumPanelColorTiles.Properties {
+    
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
@@ -24,7 +23,6 @@ namespace AlbumPanelColorTiles.Properties {
             }
         }
         
-        [Description("Имя блока зоны покраски")]
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("АКР_Зона-покраски")]
@@ -238,6 +236,24 @@ namespace AlbumPanelColorTiles.Properties {
         public int TileSeam {
             get {
                 return ((int)(this["TileSeam"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("180")]
+        public int CaptionPanelTextHeight {
+            get {
+                return ((int)(this["CaptionPanelTextHeight"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public int CaptionPanelSecondTextShift {
+            get {
+                return ((int)(this["CaptionPanelSecondTextShift"]));
             }
         }
     }

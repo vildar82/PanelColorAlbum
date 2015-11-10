@@ -15,12 +15,12 @@ namespace AlbumPanelColorTiles.Panels
       private Paint _paint;
       private double _size;
 
-      public ColorArea(BlockReference blRef)
+      public ColorArea(BlockReference blRef, Album album)
       {
          _idblRef = blRef.ObjectId;
          // Определение габаритов
          _bounds = blRef.GeometricExtents;
-         _paint = Album.FindPaint(blRef.Layer);
+         _paint = album.GetPaint(blRef.Layer);
          _size = (_bounds.MaxPoint.X - _bounds.MinPoint.X) * (_bounds.MaxPoint.Y - _bounds.MinPoint.Y);
       }
 
@@ -35,7 +35,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение зон покраски в определении блока
-      public static List<ColorArea> GetColorAreas(ObjectId idBtr)
+      public static List<ColorArea> GetColorAreas(ObjectId idBtr, Album album)
       {
          List<ColorArea> colorAreas = new List<ColorArea>();
          using (var t = idBtr.Database.TransactionManager.StartTransaction())
@@ -50,7 +50,7 @@ namespace AlbumPanelColorTiles.Panels
                      Settings.Default.BlockColorAreaName,
                      System.StringComparison.InvariantCultureIgnoreCase))
                   {
-                     ColorArea colorArea = new ColorArea(blRefColorArea);
+                     ColorArea colorArea = new ColorArea(blRefColorArea, album);
                      colorAreas.Add(colorArea);
                   }
                }

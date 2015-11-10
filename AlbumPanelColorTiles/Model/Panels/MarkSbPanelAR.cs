@@ -46,9 +46,9 @@ namespace AlbumPanelColorTiles.Panels
       private int _windowSuffix;// индекс отличия панели по виду окна, 1,2,3 и т.д. по порядку.
 
       // Конструктор. Скрытый.
-      private MarkSbPanelAR(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, string abbr)
+      private MarkSbPanelAR(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, Album album)
       {
-         _abbr = abbr;
+         _abbr = album.AbbreviateProject;
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
@@ -57,7 +57,7 @@ namespace AlbumPanelColorTiles.Panels
          //_isEndLeftPanel = markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
          //_isEndRightPanel = markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
          _marksAR = new List<MarkArPanelAR>();
-         _colorAreas = ColorArea.GetColorAreas(_idBtr);
+         _colorAreas = ColorArea.GetColorAreas(_idBtr, album);
          _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
          //TODO: Проверка пересечений зон покраски (не должно быть пересечений). Пока непонятно как сделать.
          //???
@@ -193,7 +193,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски панелей текущего чертежа (в Модели)
-      public static List<MarkSbPanelAR> GetMarksSB(RTree<ColorArea> rtreeColorAreas, string abbr, string progressMsg)
+      public static List<MarkSbPanelAR> GetMarksSB(RTree<ColorArea> rtreeColorAreas, Album album, string progressMsg)
       {
          List<MarkSbPanelAR> _marksSb = new List<MarkSbPanelAR>();
          Database db = HostApplicationServices.WorkingDatabase;
@@ -219,7 +219,7 @@ namespace AlbumPanelColorTiles.Panels
                {
                   var blRefPanel = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   // Определение Марки СБ панели. Если ее еще нет, то она создается и добавляется в список _marks.
-                  MarkSbPanelAR markSb = GetMarkSb(blRefPanel, _marksSb, bt, abbr);
+                  MarkSbPanelAR markSb = GetMarkSb(blRefPanel, _marksSb, bt, album);
                   if (markSb == null)
                   {
                      // Значит это не блок панели. Пропускаем.
@@ -394,7 +394,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
-      private static MarkSbPanelAR GetMarkSb(BlockReference blRefPanel, List<MarkSbPanelAR> marksSb, BlockTable bt, string abbr)
+      private static MarkSbPanelAR GetMarkSb(BlockReference blRefPanel, List<MarkSbPanelAR> marksSb, BlockTable bt, Album album)
       {
          MarkSbPanelAR markSb = null;
          if (IsBlockNamePanel(blRefPanel.Name))
@@ -411,7 +411,7 @@ namespace AlbumPanelColorTiles.Panels
                   if (bt.Has(markSbBlName))
                   {
                      var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSbPanelAR(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, abbr);
+                     markSb = new MarkSbPanelAR(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, album);
                      marksSb.Add(markSb);
                   }
                   else

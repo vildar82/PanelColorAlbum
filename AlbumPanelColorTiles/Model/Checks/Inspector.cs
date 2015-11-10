@@ -12,42 +12,11 @@ namespace AlbumPanelColorTiles.Checks
       private static Document _doc;
       private static Editor _ed;
 
-      //private static List<string> _markArBtrNames;
-      private static List<Error> _errors;
-
       static Inspector()
       {
          Clear();
       }
-
-      public static List<Error> Errors { get { return _errors; } }
-
-      public static bool HasErrors { get { return _errors.Count > 0; } }
-
-      public static void AddError(string msg)
-      {
-         var err = new Error(msg);
-         _errors.Add(err);
-      }
-
-      public static void AddError(string msg, Entity ent)
-      {
-         var err = new Error(msg, ent);
-         _errors.Add(err);
-      }
-
-      public static void AddError(string msg, Entity ent, Extents3d ext)
-      {
-         var err = new Error(msg, ext, ent);
-         _errors.Add(err);
-      }
-
-      public static void AddError(string msg, Extents3d ext, ObjectId idEnt)
-      {
-         var err = new Error(msg, ext, idEnt);
-         _errors.Add(err);
-      }
-
+      
       // Проверка чертежа
       public static void CheckDrawing()
       {
@@ -58,7 +27,7 @@ namespace AlbumPanelColorTiles.Checks
             // Выдать сообщение, со списком блоков панелей марки АР. Которых не должно быть перед расчетом.
             string msg = string.Join(", ", markArBtrNames.ToArray());
             //_ed.WriteMessage("\n" + msg);
-            _errors.Add(new Error(msg));
+            //_errors.Add(new Error(msg));
          }
       }
 
@@ -69,7 +38,7 @@ namespace AlbumPanelColorTiles.Checks
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
          _ed = _doc.Editor;
-         _errors = new List<Error>();
+         //_errors = new List<Error>();
          //_notPaintedTilesInMarkAR = new List<ErrorObject>();
          //_markArBtrNames = new List<string>();
       }
@@ -85,12 +54,7 @@ namespace AlbumPanelColorTiles.Checks
       //      {
       //         // Такого не должно быть. Марка СБ есть, а марок АР нет.
       //         Error err = new Error(string.Format("\nЕсть Марка СБ {0}, а Марки АР не определены. Ошибка в программе(.", markSb.MarkSb));
-      //      }
-
-      public static void Show()
-      {
-         Application.ShowModelessDialog(new FormError());
-      }
+      //      }      
 
       //      foreach (var markAr in markSb.MarksAR)
       //      {

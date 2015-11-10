@@ -1,4 +1,5 @@
 ﻿using System;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -109,6 +110,99 @@ namespace AlbumPanelColorTiles.Panels
          //   t.AddNewlyCreatedDBObject(blRefPanelAr, true);
          //   t.Commit();
          //}
+      }
+
+      public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
+      {
+         using (var t = idBtr.Database.TransactionManager.StartTransaction())
+         {
+            var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+            PanelAR.AddMarkToPanelBtr(panelMark, t, btr);
+            t.Commit();
+         }
+      }
+
+      public static void AddMarkToPanelBtr(string panelMark, Transaction t, BlockTableRecord btr)
+      {
+         // Найти панель марки СБ или АР по имени блока
+         foreach (ObjectId idEnt in btr)
+         {
+            if (idEnt.ObjectClass.Name == "AcDbText")
+            {
+               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
+               if (textMark.Layer == Settings.Default.LayerMarks)
+               {
+                  textMark.UpgradeOpen();
+                  textMark.Erase(true);
+               }
+            }
+         }
+         // Если марки нет, то создаем ее.
+         if (panelMark.EndsWith(")"))
+         {
+            int lastDirectBracket = panelMark.LastIndexOf('(');
+            string markSb = panelMark.Substring(0, lastDirectBracket);
+            string markAr = panelMark.Substring(lastDirectBracket);
+            using (var text = new DBText())
+            {
+               text.TextString = markAr;
+               text.Height = Settings.Default.CaptionPanelTextHeight;
+               text.Annotative = AnnotativeStates.False;
+               text.Layer = getLayerForMark();
+               text.Position = Point3d.Origin;
+               btr.UpgradeOpen();
+               btr.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);
+            }
+            using (var text = new DBText())
+            {
+               text.TextString = markSb;
+               text.Height = Settings.Default.CaptionPanelTextHeight;
+               text.Annotative = AnnotativeStates.False;
+               text.Layer = getLayerForMark();
+               text.Position = new Point3d(0, Settings.Default.CaptionPanelSecondTextShift, 0);
+               btr.UpgradeOpen();
+               btr.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);
+            }
+         }
+         else
+         {
+            using (var text = new DBText())
+            {
+               text.TextString = panelMark;
+               text.Height = Settings.Default.CaptionPanelTextHeight;
+               text.Annotative = AnnotativeStates.False;
+               text.Layer = getLayerForMark();
+               text.Position = Point3d.Origin;
+               btr.UpgradeOpen();
+               btr.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);
+            }
+         }
+      }
+
+      // Получение слоя для марок (АР_Марки)
+      private static string getLayerForMark()
+      {
+         Database db = HostApplicationServices.WorkingDatabase;
+         // Если уже был создан слой, то возвращаем его. Опасно, т.к. перед повторным запуском команды покраски, могут удалить/переименовать слой марок.
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var lt = t.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+            if (!lt.Has(Settings.Default.LayerMarks))
+            {
+               // Если слоя нет, то он создается.
+               var ltrMarks = new LayerTableRecord();
+               ltrMarks.Name = Settings.Default.LayerMarks;
+               ltrMarks.IsPlottable = false;
+               lt.UpgradeOpen();
+               lt.Add(ltrMarks);
+               t.AddNewlyCreatedDBObject(ltrMarks, true);
+            }
+            t.Commit();
+         }
+         return Settings.Default.LayerMarks;
       }
    }
 }

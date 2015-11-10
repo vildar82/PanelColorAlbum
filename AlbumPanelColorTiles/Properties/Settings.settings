@@ -74,5 +74,11 @@
     <Setting Name="TileSeam" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">12</Value>
     </Setting>
+    <Setting Name="CaptionPanelTextHeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">180</Value>
+    </Setting>
+    <Setting Name="CaptionPanelSecondTextShift" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">250</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

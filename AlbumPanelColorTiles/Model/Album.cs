@@ -19,27 +19,15 @@ namespace AlbumPanelColorTiles
    // Альбом колористических решений.
    public class Album
    {
-      private const string _regAppPath = @"Software\Vildar\AKR";
-
-      // Набор цветов используемых в альбоме.
-      private static List<Paint> _colors;
-
-      private static Options _options;
-
-      // Сокращенное имя проеккта
-      private string _abbreviateProject;
-
-      private string _albumDir;
-
-      //private ColorAreaModel _colorAreaModel;
-      private List<ColorArea> _colorAreas;
-
-      // Зоны покраски
-      private Database _db;
-
-      private Document _doc;
-      private List<MarkSbPanelAR> _marksSB;
+      private const string _regAppPath = @"Software\Vildar\AKR";      
+      private List<Paint> _colors; // Набор цветов используемых в альбоме.
+      private string _abbreviateProject;// Сокращенное имя проеккта
       private int _numberFirstFloor;
+      private string _albumDir;      
+      private List<ColorArea> _colorAreas;      
+      private Database _db;
+      private Document _doc;
+      private List<MarkSbPanelAR> _marksSB;      
       private SheetsSet _sheetsSet;
       private List<Storey> _storeys;
 
@@ -47,17 +35,7 @@ namespace AlbumPanelColorTiles
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
-      }
-
-      public static Options Options
-      {
-         get
-         {
-            if (_options == null)
-               _options = new Options();
-            return _options;
-         }
-      }
+      }      
 
       public static string RegAppPath { get { return _regAppPath; } }
       public static Tolerance Tolerance { get { return Tolerance.Global; } }
@@ -67,80 +45,10 @@ namespace AlbumPanelColorTiles
       public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSbPanelAR> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
-      public List<Storey> Storeys { get { return _storeys; } }
-
-      public static void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
-      {
-         using (var t = idBtr.Database.TransactionManager.StartTransaction())
-         {
-            var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-            AddMarkToPanelBtr(panelMark, t, btr);
-            t.Commit();
-         }
-      }
-
-      public static void AddMarkToPanelBtr(string panelMark, Transaction t, BlockTableRecord btr)
-      {
-         // Найти панель марки СБ или АР по имени блока
-         foreach (ObjectId idEnt in btr)
-         {
-            if (idEnt.ObjectClass.Name == "AcDbText")
-            {
-               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
-               if (textMark.Layer == Settings.Default.LayerMarks)
-               {
-                  textMark.UpgradeOpen();
-                  textMark.Erase(true);
-               }
-            }
-         }
-         // Если марки нет, то создаем ее.
-         if (panelMark.EndsWith(")"))
-         {
-            int lastDirectBracket = panelMark.LastIndexOf('(');
-            string markSb = panelMark.Substring(0, lastDirectBracket);
-            string markAr = panelMark.Substring(lastDirectBracket);
-            using (var text = new DBText())
-            {
-               text.TextString = markAr;
-               text.Height = 180;
-               text.Annotative = AnnotativeStates.False;
-               text.Layer = GetLayerForMark();
-               text.Position = Point3d.Origin;
-               btr.UpgradeOpen();
-               btr.AppendEntity(text);
-               t.AddNewlyCreatedDBObject(text, true);
-            }
-            using (var text = new DBText())
-            {
-               text.TextString = markSb;
-               text.Height = 180;
-               text.Annotative = AnnotativeStates.False;
-               text.Layer = GetLayerForMark();
-               text.Position = new Point3d(0, 250, 0);
-               btr.UpgradeOpen();
-               btr.AppendEntity(text);
-               t.AddNewlyCreatedDBObject(text, true);
-            }
-         }
-         else
-         {
-            using (var text = new DBText())
-            {
-               text.TextString = panelMark;
-               text.Height = 180;
-               text.Annotative = AnnotativeStates.False;
-               text.Layer = GetLayerForMark();
-               text.Position = Point3d.Origin;
-               btr.UpgradeOpen();
-               btr.AppendEntity(text);
-               t.AddNewlyCreatedDBObject(text, true);
-            }
-         }
-      }
+      public List<Storey> Storeys { get { return _storeys; } }      
 
       // Поиск цвета в списке цветов альбома
-      public static Paint FindPaint(string layerName)
+      public Paint GetPaint(string layerName)
       {
          Paint paint = _colors.Find(c => c.LayerName == layerName);
          if (paint == null)
@@ -195,7 +103,8 @@ namespace AlbumPanelColorTiles
                            // Такое возможно, если после покраски панелей, сделать очистку чертежа (блоки марки СБ удалятся).
                            MarkSbPanelAR.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);
                            string errMsg = "\nНет определения блока для панели Марки СБ " + markSbBlName +
-                                          ". Оно создано из панели Марки АР " + blRef.Name + ". Зоны покраски внутри блока не определены." +
+                                          ". Оно создано из панели Марки АР " + blRef.Name + 
+                                          ". Если внутри блока Марки СБ были зоны покраски, то в блоке Марки АР они были удалены." +
                                           "Необходимо проверить блоки и заново запустить программу.";
                            ed.WriteMessage("\n" + errMsg);
                            // Надо чтобы проектировщик проверил эти блоки, может в них нужно добавить зоны покраски (т.к. в блоках марки АР их нет).
@@ -234,7 +143,7 @@ namespace AlbumPanelColorTiles
                   {
                      // Подпись марки блока
                      string panelMark = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
-                     AddMarkToPanelBtr(panelMark, t, btr);
+                     PanelAR.AddMarkToPanelBtr(panelMark, t, btr);
                   }
                }
             }
@@ -258,7 +167,7 @@ namespace AlbumPanelColorTiles
                if (MarkSbPanelAR.IsBlockNamePanel(btr.Name))
                {
                   string panelMark = MarkSbPanelAR.GetPanelMarkFromBlockName(btr.Name, _marksSB);
-                  AddMarkToPanelBtr(panelMark, t, btr);
+                  PanelAR.AddMarkToPanelBtr(panelMark, t, btr);
                }
             }
             t.Commit();
@@ -269,7 +178,7 @@ namespace AlbumPanelColorTiles
       public void CheckPanelsInDrawingAndMemory()
       {
          // Проверка зон покраски
-         var colorAreasCheck = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
+         var colorAreasCheck = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db), this);
          // сравнение фоновых зон
          if (!colorAreasCheck.SequenceEqual(_colorAreas))
          {
@@ -279,7 +188,7 @@ namespace AlbumPanelColorTiles
          // Проверка панелей
          // Определение покраски панелей.
          var rtreeColorAreas = ColorArea.GetRTree(colorAreasCheck);
-         var marksSbCheck = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, _abbreviateProject, "Проверка панелей...");
+         var marksSbCheck = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, this, "Проверка панелей...");
          //RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
@@ -334,7 +243,7 @@ namespace AlbumPanelColorTiles
          _colors = new List<Paint>();
 
          // Определение зон покраски в Модели
-         _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db));
+         _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db), this);
          RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);
 
          // Бонус - покраска блоков плитки разложенных просто в Модели
@@ -352,7 +261,7 @@ namespace AlbumPanelColorTiles
          }
 
          // Определение покраски панелей.
-         _marksSB = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, _abbreviateProject, "Покраска панелей...");
+         _marksSB = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, this, "Покраска панелей...");
          if (_marksSB?.Count == 0)
          {
             throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
@@ -387,30 +296,7 @@ namespace AlbumPanelColorTiles
          ObjectId _idLayerMarks = ObjectId.Null;
          _marksSB = null;
          _sheetsSet = null;
-      }
-
-      // Получение слоя для марок (АР_Марки)
-      private static string GetLayerForMark()
-      {
-         Database db = HostApplicationServices.WorkingDatabase;
-         // Если уже был создан слой, то возвращаем его. Опасно, т.к. перед повторным запуском команды покраски, могут удалить/переименовать слой марок.
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var lt = t.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
-            if (!lt.Has(Settings.Default.LayerMarks))
-            {
-               // Если слоя нет, то он создается.
-               var ltrMarks = new LayerTableRecord();
-               ltrMarks.Name = Settings.Default.LayerMarks;
-               ltrMarks.IsPlottable = false;
-               lt.UpgradeOpen();
-               lt.Add(ltrMarks);
-               t.AddNewlyCreatedDBObject(ltrMarks, true);
-            }
-            t.Commit();
-         }
-         return Settings.Default.LayerMarks;
-      }
+      }      
 
       private string abbreviateNameProject()
       {
@@ -461,35 +347,7 @@ namespace AlbumPanelColorTiles
          progressMeter.Stop();
       }
 
-      // определение этажей панелей
-      private void IdentificationStoreys(List<MarkSbPanelAR> marksSB)
-      {
-         // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.
-         var comparerStorey = new DoubleEqualityComparer(2000);
-         //HashSet<double> panelsStorey = new HashSet<double>(comparerStorey);
-         // Этажи
-         _storeys = new List<Storey>();
-         var panels = marksSB.Where(sb => !sb.IsUpperStoreyPanel).SelectMany(sb => sb.MarksAR.SelectMany(ar => ar.Panels)).OrderBy(p => p.InsPt.Y);
-         foreach (var panel in panels)
-         {
-            Storey storey = _storeys.Find(s => comparerStorey.Equals(s.Y, panel.InsPt.Y));
-            if (storey == null)
-            {
-               // Новый этаж
-               storey = new Storey(panel.InsPt.Y);
-               _storeys.Add(storey);
-               _storeys.Sort((Storey s1, Storey s2) => s1.Y.CompareTo(s2.Y));
-            }
-            panel.Storey = storey;
-            storey.AddMarkAr(panel.MarkAr);
-         }
-         // Нумерация этажей
-         int i = _numberFirstFloor;
-         var storeysOrders = _storeys.OrderBy(s => s.Y).ToList();
-         storeysOrders.ForEach((s) => s.Number = i++.ToString());
-         storeysOrders.Last().Number = "П";
-         // В итоге у всех панелей (Panel) проставлены этажи (Storey).
-      }
+      
 
       private string loadAbbreviateName()
       {
@@ -564,7 +422,7 @@ namespace AlbumPanelColorTiles
       private void RenamePanelsToArchitectIndex(List<MarkSbPanelAR> marksSB)
       {
          // Определение этажа панели.
-         IdentificationStoreys(marksSB);
+         _storeys = Storey.IdentificationStoreys(marksSB, _numberFirstFloor);
          // Маркировка Марок АР по архитектурному индексу
          foreach (var markSB in marksSB)
          {

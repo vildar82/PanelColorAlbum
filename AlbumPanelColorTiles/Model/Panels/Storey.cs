@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AcadLib.Comparers;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -53,6 +54,37 @@ namespace AlbumPanelColorTiles.Panels
       {
          return _number.Equals(other._number) &&
             _y.Equals(other._y);
+      }
+
+      // определение этажей панелей
+      public static List<Storey> IdentificationStoreys(List<MarkSbPanelAR> marksSB, int numberFirstFloor)
+      {
+         // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.
+         var comparerStorey = new DoubleEqualityComparer(2000);
+         //HashSet<double> panelsStorey = new HashSet<double>(comparerStorey);
+         // Этажи
+         var storeys = new List<Storey>();
+         var panels = marksSB.Where(sb => !sb.IsUpperStoreyPanel).SelectMany(sb => sb.MarksAR.SelectMany(ar => ar.Panels)).OrderBy(p => p.InsPt.Y);
+         foreach (var panel in panels)
+         {
+            Storey storey = storeys.Find(s => comparerStorey.Equals(s.Y, panel.InsPt.Y));
+            if (storey == null)
+            {
+               // Новый этаж
+               storey = new Storey(panel.InsPt.Y);
+               storeys.Add(storey);
+               storeys.Sort((Storey s1, Storey s2) => s1.Y.CompareTo(s2.Y));
+            }
+            panel.Storey = storey;
+            storey.AddMarkAr(panel.MarkAr);
+         }
+         // Нумерация этажей
+         int i = numberFirstFloor;
+         var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
+         storeysOrders.ForEach((s) => s.Number = i++.ToString());
+         storeysOrders.Last().Number = "П";
+         // В итоге у всех панелей (Panel) проставлены этажи (Storey).
+         return storeys;
       }
    }
 }
