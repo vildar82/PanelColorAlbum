@@ -17,7 +17,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       private RandomPaintService _randomPaintingService;
       private Dictionary<string, RandomPaint> _trackPropers;
       private bool isMouseDown = false;
-      private Point mouseOffset;      
+      private Point mouseOffset;
 
       public FormRandomPainting(Dictionary<string, RandomPaint> propers,
          RandomPaintService randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
@@ -161,15 +161,15 @@ namespace AlbumPanelColorTiles.RandomPainting
       }
 
       private void buttonDraw_Click(object sender, EventArgs e)
-      {         
-         Fire(_trackPropers, e);         
+      {
+         Fire(_trackPropers, e);
       }
 
       private void buttonSelect_Click(object sender, EventArgs e)
       {
          using (EditorUserInteraction UI = _randomPaintingService.Ed.StartUserInteraction(this))
          {
-            _randomPaintingService.PromptExtents();            
+            _randomPaintingService.PromptExtents();
          }
       }
 
@@ -198,7 +198,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          // распределено на данный момент
          return _trackPropers.Values.Sum(p => p.Percent);
       }
-      
+
       private void Form_KeyUp(object sender, KeyEventArgs e)
       {
          if (e.KeyCode == Keys.Escape) this.Close();

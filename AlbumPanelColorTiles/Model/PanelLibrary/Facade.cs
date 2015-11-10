@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AcadLib.Comparers;
-using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -13,12 +9,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана фасада - составляющие один фасада дома
    public class Facade
-   {      
+   {
       // Этажи фасада (блоки АКР-Панелей и соотв блок Монтажки)
       private List<Floor> _floors;
+
+      private double _xmax;
+
       // коорднината X для данного фасада
       private double _xmin;
-      private double _xmax;
 
       public Facade(double x)
       {
@@ -27,8 +25,51 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       public List<Floor> Floors { get { return _floors; } }
-      public double XMin { get { return _xmin; } }
       public double XMax { get { return _xmax; } }
+      public double XMin { get { return _xmin; } }
+
+      // Создание фасадов по монтажным планам
+      public static void CreateFacades(List<Facade> facades)
+      {
+         if (facades.Count == 0) return;
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
+            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
+
+            using (ProgressMeter progress = new ProgressMeter())
+            {
+               progress.SetLimit(facades.SelectMany(f => f.Floors).Count());
+               progress.Start("Создание фасадов");
+
+               foreach (var facade in facades)
+               {
+                  double yFloor = yFirstFloor;
+                  foreach (var floor in facade.Floors)
+                  {
+                     // Подпись номера этажа
+                     captionFloor(facade.XMin, yFloor, floor.Name, ms, t);
+                     foreach (var panelSb in floor.PanelsSbInFront)
+                     {
+                        if (panelSb.PanelAKR != null)
+                        {
+                           Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
+                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
+                           panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
+                           t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                           blRefPanelAkr.Draw();
+                        }
+                     }
+                     yFloor += 2800;// высота этажа
+                     progress.MeterProgress();
+                  }
+               }
+               t.Commit();
+               progress.Stop();
+            }
+         }
+      }
 
       /// <summary>
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
@@ -65,49 +106,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
             f._xmax = f.Floors.Max(l => l.XMax);
          });
          return facades;
-      }
-
-      // Создание фасадов по монтажным планам
-      public static void CreateFacades(List<Facade> facades)
-      {
-         if (facades.Count == 0) return;
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
-
-            using (ProgressMeter progress = new ProgressMeter())
-            {               
-               progress.SetLimit(facades.SelectMany(f => f.Floors).Count());
-               progress.Start("Создание фасадов");
-
-               foreach (var facade in facades)
-               {
-                  double yFloor = yFirstFloor;
-                  foreach (var floor in facade.Floors)
-                  {
-                     // Подпись номера этажа
-                     captionFloor(facade.XMin, yFloor, floor.Name, ms, t);
-                     foreach (var panelSb in floor.PanelsSbInFront)
-                     {
-                        if (panelSb.PanelAKR != null)
-                        {
-                           Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
-                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
-                           panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
-                           t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
-                           blRefPanelAkr.Draw();
-                        }
-                     }
-                     yFloor += 2800;// высота этажа
-                     progress.MeterProgress();
-                  }
-               }
-               t.Commit();
-               progress.Stop();
-            }
-         }
       }
 
       // Подпись номера этажа

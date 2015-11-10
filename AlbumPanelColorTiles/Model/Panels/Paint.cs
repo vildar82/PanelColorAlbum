@@ -8,8 +8,10 @@ namespace AlbumPanelColorTiles.Panels
    {
       // цвет плтитки
       private Color _color;
+
       // кол плиток этого цвета - для итоговой таблицы плитки
       private int _count;
+
       // Имя слоя. (для каждой краски свой слой с именем марки краски)
       private string _layerName;
 
@@ -19,8 +21,8 @@ namespace AlbumPanelColorTiles.Panels
          _color = color;
       }
 
-      public int Count { get { return _count; } }
       public Color Color { get { return _color; } }
+      public int Count { get { return _count; } }
       public string LayerName { get { return _layerName; } }
 
       /// <summary>

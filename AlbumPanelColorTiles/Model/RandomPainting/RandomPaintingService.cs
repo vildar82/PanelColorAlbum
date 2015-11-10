@@ -43,11 +43,37 @@ namespace AlbumPanelColorTiles.RandomPainting
 
       public Editor Ed { get { return _ed; } }
 
+      public static void CheckBlockColorAre(Database db)
+      {
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+
+            if (!bt.Has(Settings.Default.BlockColorAreaName))
+            {
+               // Скопировать из шаблона
+               BlockInsert.CopyBlockFromTemplate(Settings.Default.BlockColorAreaName, db);
+            }
+            t.Commit();
+         }
+      }
+
+      public static void SetDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot, ColorAreaSpotSize _colorAreaSize)
+      {
+         foreach (DynamicBlockReferenceProperty item in blRefcolorAreaSpot.DynamicBlockReferencePropertyCollection)
+         {
+            if (string.Equals(item.PropertyName, "Длина", StringComparison.InvariantCultureIgnoreCase))
+               item.Value = (double)_colorAreaSize.LenghtSpot;
+            else if (string.Equals(item.PropertyName, "Высота", StringComparison.InvariantCultureIgnoreCase))
+               item.Value = (double)_colorAreaSize.HeightSpot;
+         }
+      }
+
       public void PromptExtents()
       {
-         _extentsPrompted =UserPrompt.PromptExtents(_ed, "Укажите первую точку зоны произвольной покраски", "Укажите вторую точку зоны произвольной покраски");
+         _extentsPrompted = UserPrompt.PromptExtents(_ed, "Укажите первую точку зоны произвольной покраски", "Укажите вторую точку зоны произвольной покраски");
          _spots = new List<Spot>();
-      }      
+      }
 
       public void Start()
       {
@@ -55,7 +81,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          // Проверка наличия блока зоны покраски
          CheckBlockColorAre(_db);
          // Запрос области для покраски
-         PromptExtents();         
+         PromptExtents();
          // Список всех цветов (по списку листов) - которые можно добавить в распределение покраски зоны
          Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
          // Форма для распределения цветов
@@ -76,21 +102,6 @@ namespace AlbumPanelColorTiles.RandomPainting
             }
          }
          return true;
-      }
-
-      public static void CheckBlockColorAre(Database db)
-      {
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
-
-            if (!bt.Has(Settings.Default.BlockColorAreaName))
-            {
-               // Скопировать из шаблона
-               BlockInsert.CopyBlockFromTemplate(Settings.Default.BlockColorAreaName, db);
-            }
-            t.Commit();
-         }
       }
 
       private void deleteSpots(List<Spot> spots)
@@ -296,7 +307,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       private void FormProper_Fire(object sender, EventArgs e)
       {
          try
-         {            
+         {
             // Удаление предыдущей покраски
             if (_spots.Count > 0)
             {
@@ -444,15 +455,5 @@ namespace AlbumPanelColorTiles.RandomPainting
                item.Value = 100d;
          }
       }
-      public static void SetDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot, ColorAreaSpotSize _colorAreaSize)
-      {
-         foreach (DynamicBlockReferenceProperty item in blRefcolorAreaSpot.DynamicBlockReferencePropertyCollection)
-         {
-            if (string.Equals(item.PropertyName, "Длина", StringComparison.InvariantCultureIgnoreCase))
-               item.Value = (double)_colorAreaSize.LenghtSpot;
-            else if (string.Equals(item.PropertyName, "Высота", StringComparison.InvariantCultureIgnoreCase))
-               item.Value = (double)_colorAreaSize.HeightSpot;
-         }
-      }      
    }
 }

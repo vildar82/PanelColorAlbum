@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -74,12 +73,28 @@ namespace AlbumPanelColorTiles.Panels
             foreach (ColorArea colorArea in colorAreas)
             {
                if (colorArea.Bounds.IsPointInBounds(centerTile))
-               {                  
+               {
                   return colorArea.Paint;
                }
             }
          }
          return null;
+      }
+
+      public static Rectangle GetRectangleRTree(Extents3d extents)
+      {
+         return new Rectangle(extents.MinPoint.X, extents.MinPoint.Y, extents.MaxPoint.X, extents.MaxPoint.Y, 0, 0);
+      }
+
+      public static RTree<ColorArea> GetRTree(List<ColorArea> _colorAreas)
+      {
+         RTree<ColorArea> rtree = new RTree<ColorArea>();
+         foreach (var colorArea in _colorAreas)
+         {
+            Rectangle rectTree = GetRectangleRTree(colorArea.Bounds);
+            rtree.Add(rectTree, colorArea);
+         }
+         return rtree;
       }
 
       public int CompareTo(ColorArea other)
@@ -90,22 +105,6 @@ namespace AlbumPanelColorTiles.Panels
       public bool Equals(ColorArea other)
       {
          return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
-      }
-
-      public static RTree<ColorArea> GetRTree(List<ColorArea> _colorAreas)
-      {
-         RTree<ColorArea> rtree = new RTree<ColorArea>();           
-         foreach (var colorArea in _colorAreas)
-         {
-            Rectangle rectTree = GetRectangleRTree(colorArea.Bounds);
-            rtree.Add(rectTree, colorArea);
-         }
-         return rtree;
-      }
-
-      public static Rectangle GetRectangleRTree(Extents3d extents)
-      {
-         return new Rectangle(extents.MinPoint.X, extents.MinPoint.Y, extents.MaxPoint.X, extents.MaxPoint.Y, 0, 0);
       }
    }
 }

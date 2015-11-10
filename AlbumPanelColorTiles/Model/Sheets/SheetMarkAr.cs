@@ -20,7 +20,7 @@ namespace AlbumPanelColorTiles.Sheets
       // Лист раскладки плитки на фасаде
       // Лист раскладки плитки в форме (зеркально, без видов и разрезов панели).
       private MarkArPanelAR _markAR;
-      
+
       private Point3d _ptInsertBlRefMarkAR;
 
       // Наименование листа
@@ -41,7 +41,7 @@ namespace AlbumPanelColorTiles.Sheets
          get { return _sheetNumber.ToString("00"); }
       }
 
-      public MarkArPanelAR MarkAR { get { return _markAR; } }      
+      public MarkArPanelAR MarkAR { get { return _markAR; } }
 
       public string MarkArFullName { get { return _markAR.MarkARPanelFullName; } }
 
@@ -73,7 +73,7 @@ namespace AlbumPanelColorTiles.Sheets
             //
             //Создание листа для Марки АР ("на Фасаде").
             //
-            var idLayoutMarkAR =AcadLib.Blocks.Block.CopyLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
+            var idLayoutMarkAR = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
             // Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
             if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary).Count == 3)
             {
@@ -88,7 +88,7 @@ namespace AlbumPanelColorTiles.Sheets
             Extents3d extentsViewPort;
             var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t,
                               dbMarkSB, layersToFreezeOnFacadeSheet, null, true, out extentsViewPort);
-            // Заполнение таблицы            
+            // Заполнение таблицы
             ObjectId idTable;
             FillTableTiles(idBtrLayoutMarkAR, out idTable);
 
@@ -106,7 +106,7 @@ namespace AlbumPanelColorTiles.Sheets
             var idBlRefMarkArForm = InsertBlRefMarkAR(dbMarkSB, ptInsertMarkArForm);
             // Зеркалирование блока
             MirrorMarkArForFormSheet(idBlRefMarkArForm);
-            var idLayoutMarkArForm =AcadLib.Blocks.Block.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
+            var idLayoutMarkArForm = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
             // Направение видового экрана на блок марки АР(з).
             var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t,
                            dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false, out extentsViewPort);
@@ -232,7 +232,7 @@ namespace AlbumPanelColorTiles.Sheets
          {
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               var blRefStampContent = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
+               var blRefStampContent = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                if (blRefStampContent.GetEffectiveName() == Settings.Default.BlockFrameName)
                {
                   return blRefStampContent;
@@ -249,7 +249,7 @@ namespace AlbumPanelColorTiles.Sheets
          {
             if (idEnt.ObjectClass.Name == "AcDbTable")
             {
-               return idEnt.GetObject( OpenMode.ForWrite, false, true) as Table;
+               return idEnt.GetObject(OpenMode.ForWrite, false, true) as Table;
             }
          }
          throw new Exception("Не найдена заготовка таблицы на листе в файле шаблона Марки СБ.");

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using AcadLib.Blocks;
 using AcadLib.Jigs;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;

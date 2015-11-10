@@ -35,7 +35,7 @@ namespace AlbumPanelColorTiles.Plot
             throw new System.Exception("Нужно сохранить текущий чертеж.");
          }
          HostApplicationServices.WorkingDatabase = doc.Database;
-         MultiSheetPlot("Печать текущего чертежа");         
+         MultiSheetPlot("Печать текущего чертежа");
       }
 
       // Открытие и печать всех файлов в папке
@@ -52,16 +52,16 @@ namespace AlbumPanelColorTiles.Plot
          progressMeter.SetLimit(filesDwg.Count());
          progressMeter.Start("Печать всех файлов в папке " + dir);
 
-         int i = 0;         
+         int i = 0;
          foreach (var fileDwg in filesDwg)
-         {            
+         {
             if (_isCancelPublish || HostApplicationServices.Current.UserBreak())
-               break;            
-                        
-            Document docOpen;            
+               break;
+
+            Document docOpen;
             progressMeter.MeterProgress();
             if (!isAlreadyOpenDoc(fileDwg.FullName, out docOpen))
-            { 
+            {
                docOpen = Application.DocumentManager.Open(fileDwg.FullName);
             }
             Application.DocumentManager.MdiActiveDocument = docOpen;
@@ -70,7 +70,7 @@ namespace AlbumPanelColorTiles.Plot
             {
                using (var lockDoc = docOpen.LockDocument())
                {
-                  //MultiSheetPlot(Path.GetDirectoryName(docOpen.Name));                  
+                  //MultiSheetPlot(Path.GetDirectoryName(docOpen.Name));
                   MultiSheetPlot(string.Format("Печать {0} из {1} файлов в папке {2}", i++, filesDwg.Length, dirInfo.Name));
                }
             }
@@ -84,7 +84,27 @@ namespace AlbumPanelColorTiles.Plot
                HostApplicationServices.WorkingDatabase = dbOrig;
             }
          }
-         progressMeter.Stop(); 
+         progressMeter.Stop();
+      }
+
+      private static List<KeyValuePair<string, ObjectId>> GetLayouts(Database db)
+      {
+         List<KeyValuePair<string, ObjectId>> layouts = new List<KeyValuePair<string, ObjectId>>();
+         using (DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.Open(OpenMode.ForRead))
+         {
+            foreach (DBDictionaryEntry entry in layoutDict)
+            {
+               if (entry.Key != "Model")
+               {
+                  using (var layout = entry.Value.Open(OpenMode.ForRead) as Layout)
+                  {
+                     layouts.Add(new KeyValuePair<string, ObjectId>(layout.LayoutName, layout.Id));
+                  }
+               }
+            }
+         }
+         layouts.Sort((l1, l2) => l1.Key.CompareTo(l2.Key));
+         return layouts;
       }
 
       private bool isAlreadyOpenDoc(string fullName, out Document docOpen)
@@ -93,7 +113,7 @@ namespace AlbumPanelColorTiles.Plot
          {
             if (string.Equals(item.Name, fullName, StringComparison.CurrentCultureIgnoreCase))
             {
-               docOpen = item;                 
+               docOpen = item;
                return true;
             }
          }
@@ -106,7 +126,7 @@ namespace AlbumPanelColorTiles.Plot
       //{
       //   Document doc = Application.DocumentManager.MdiActiveDocument;
       //   Database db = doc.Database;
-      //   Application.Publisher.CancelledOrFailedPublishing += Publisher_CancelledOrFailedPublishing; 
+      //   Application.Publisher.CancelledOrFailedPublishing += Publisher_CancelledOrFailedPublishing;
 
       //   using (var t = db.TransactionManager.StartTransaction())
       //   {
@@ -114,7 +134,7 @@ namespace AlbumPanelColorTiles.Plot
 
       //      if (PlotFactory.ProcessPlotState == ProcessPlotState.NotPlotting)
       //      {
-      //         var layouts = new List<Layout>();                
+      //         var layouts = new List<Layout>();
       //         DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.GetObject(OpenMode.ForRead);
       //         foreach (DBDictionaryEntry entry in layoutDict)
       //         {
@@ -135,11 +155,6 @@ namespace AlbumPanelColorTiles.Plot
       //   }
       //}
 
-      private void Publisher_CancelledOrFailedPublishing(object sender, Autodesk.AutoCAD.Publishing.PublishEventArgs e)
-      {
-         _isCancelPublish = true;
-      }
-
       //Печать всех листов в текущем документе
       private void MultiSheetPlot(string title)
       {
@@ -158,7 +173,7 @@ namespace AlbumPanelColorTiles.Plot
             if (PlotFactory.ProcessPlotState == ProcessPlotState.NotPlotting)
             {
                using (var pe = PlotFactory.CreatePublishEngine())
-               {                  
+               {
                   using (var ppd = new PlotProgressDialog(false, layoutsToPlot.Count, false))
                   {
                      int numSheet = 1;
@@ -217,24 +232,9 @@ namespace AlbumPanelColorTiles.Plot
          }
       }
 
-      private static List<KeyValuePair<string, ObjectId>> GetLayouts(Database db)
+      private void Publisher_CancelledOrFailedPublishing(object sender, Autodesk.AutoCAD.Publishing.PublishEventArgs e)
       {
-         List<KeyValuePair<string, ObjectId>> layouts = new List<KeyValuePair<string, ObjectId>>();
-         using (DBDictionary layoutDict = (DBDictionary)db.LayoutDictionaryId.Open(OpenMode.ForRead))
-         {
-            foreach (DBDictionaryEntry entry in layoutDict)
-            {
-               if (entry.Key != "Model")
-               {
-                  using (var layout = entry.Value.Open(OpenMode.ForRead) as Layout)
-                  {
-                     layouts.Add(new KeyValuePair<string, ObjectId>(layout.LayoutName, layout.Id));
-                  }
-               }
-            }                        
-         }
-         layouts.Sort((l1, l2) => l1.Key.CompareTo(l2.Key));
-         return layouts;
+         _isCancelPublish = true;
       }
    }
 }

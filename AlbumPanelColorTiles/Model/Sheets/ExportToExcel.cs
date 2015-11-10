@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using AlbumPanelColorTiles.Panels;
-using Microsoft.Office.Interop.Excel;
+﻿using Microsoft.Office.Interop.Excel;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -68,13 +65,13 @@ namespace AlbumPanelColorTiles.Sheets
 
          album.Storeys.Sort();
          foreach (var storey in album.Storeys)
-         {            
+         {
             foreach (var markAr in storey.MarksAr)
             {
                sheetFloor.Cells[++row, 1].Value = storey.Number;
                sheetFloor.Cells[row, 2].Value = markAr.MarkARPanelFullName;
             }
-         } 
+         }
       }
    }
 }

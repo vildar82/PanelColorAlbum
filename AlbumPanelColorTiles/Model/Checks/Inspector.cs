@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -12,22 +11,60 @@ namespace AlbumPanelColorTiles.Checks
       private static Database _db;
       private static Document _doc;
       private static Editor _ed;
+
       //private static List<string> _markArBtrNames;
       private static List<Error> _errors;
+
+      static Inspector()
+      {
+         Clear();
+      }
 
       public static List<Error> Errors { get { return _errors; } }
 
       public static bool HasErrors { get { return _errors.Count > 0; } }
 
-      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
-      //private static List<Error> _notPaintedTilesInMarkAR;
-
-      static Inspector()
-      {         
-         Clear();
+      public static void AddError(string msg)
+      {
+         var err = new Error(msg);
+         _errors.Add(err);
       }
 
-      public static void Clear ()
+      public static void AddError(string msg, Entity ent)
+      {
+         var err = new Error(msg, ent);
+         _errors.Add(err);
+      }
+
+      public static void AddError(string msg, Entity ent, Extents3d ext)
+      {
+         var err = new Error(msg, ext, ent);
+         _errors.Add(err);
+      }
+
+      public static void AddError(string msg, Extents3d ext, ObjectId idEnt)
+      {
+         var err = new Error(msg, ext, idEnt);
+         _errors.Add(err);
+      }
+
+      // Проверка чертежа
+      public static void CheckDrawing()
+      {
+         // 1. Не должно быть блоков Марки АР. Т.к. может получится так, что при текущем расчте получится марка панели которая уже определенва в чертеже, и она не сможет создаться, т.к. такой блок уже есть.
+         var markArBtrNames = checkBtrMarkAr();
+         if (markArBtrNames.Count > 0)
+         {
+            // Выдать сообщение, со списком блоков панелей марки АР. Которых не должно быть перед расчетом.
+            string msg = string.Join(", ", markArBtrNames.ToArray());
+            //_ed.WriteMessage("\n" + msg);
+            _errors.Add(new Error(msg));
+         }
+      }
+
+      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
+      //private static List<Error> _notPaintedTilesInMarkAR;
+      public static void Clear()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
@@ -35,27 +72,6 @@ namespace AlbumPanelColorTiles.Checks
          _errors = new List<Error>();
          //_notPaintedTilesInMarkAR = new List<ErrorObject>();
          //_markArBtrNames = new List<string>();
-      }
-
-      public static void AddError (string msg)
-      {
-         var err = new Error(msg);
-         _errors.Add(err);
-      }
-      public static void AddError(string msg, Entity ent)
-      {
-         var err = new Error(msg, ent);
-         _errors.Add(err);
-      }
-      public static void AddError(string msg, Entity ent, Extents3d ext)
-      {
-         var err = new Error(msg, ext, ent);
-         _errors.Add(err);
-      }
-      public static void AddError(string msg, Extents3d ext, ObjectId idEnt)
-      {
-         var err = new Error(msg, ext, idEnt);
-         _errors.Add(err);
       }
 
       // Проверка, все ли плитки покрашены
@@ -70,6 +86,11 @@ namespace AlbumPanelColorTiles.Checks
       //         // Такого не должно быть. Марка СБ есть, а марок АР нет.
       //         Error err = new Error(string.Format("\nЕсть Марка СБ {0}, а Марки АР не определены. Ошибка в программе(.", markSb.MarkSb));
       //      }
+
+      public static void Show()
+      {
+         Application.ShowModelessDialog(new FormError());
+      }
 
       //      foreach (var markAr in markSb.MarksAR)
       //      {
@@ -93,27 +114,12 @@ namespace AlbumPanelColorTiles.Checks
       //   }
       //   return res;
       //}
-
-      // Проверка чертежа
-      public static void CheckDrawing()
-      {         
-         // 1. Не должно быть блоков Марки АР. Т.к. может получится так, что при текущем расчте получится марка панели которая уже определенва в чертеже, и она не сможет создаться, т.к. такой блок уже есть.
-         var markArBtrNames = checkBtrMarkAr();                     
-         if (markArBtrNames.Count > 0)
-         {            
-            // Выдать сообщение, со списком блоков панелей марки АР. Которых не должно быть перед расчетом.
-            string msg = string.Join(", ", markArBtrNames.ToArray());
-            //_ed.WriteMessage("\n" + msg);            
-            _errors.Add(new Error(msg));
-         }         
-      }
-
       // Проверка наличия определений блоков Марки АР
       private static List<string> checkBtrMarkAr()
       {
          List<string> markArBtrNames = new List<string>();
-         using (var bt = _db.BlockTableId.Open( OpenMode.ForRead) as BlockTable)
-         {            
+         using (var bt = _db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
+         {
             foreach (var idBtr in bt)
             {
                using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
@@ -126,11 +132,6 @@ namespace AlbumPanelColorTiles.Checks
             }
          }
          return markArBtrNames;
-      }
-
-      public static void Show()
-      {
-         Application.ShowModelessDialog(new FormError());
       }
    }
 }

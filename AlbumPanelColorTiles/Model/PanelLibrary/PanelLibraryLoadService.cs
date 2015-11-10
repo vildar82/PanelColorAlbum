@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 
@@ -14,16 +10,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public class PanelLibraryLoadService
    {
       // все блоки панелей-СБ в чертеже
-      //private List<PanelSB> _allPanelsSB = new List<PanelSB> ();      
+      //private List<PanelSB> _allPanelsSB = new List<PanelSB> ();
 
       //public List<PanelSB> AllPanelsSB { get { return _allPanelsSB; } }
 
       // в чертеже должны быть расставлены монтажки с блоками обозначения фасадов на них.
-      // нужно для блоков панелей СБ найти соответствующую панель покраски в библиотеки 
+      // нужно для блоков панелей СБ найти соответствующую панель покраски в библиотеки
       // но, марки панелей у СБ и у АР могут немного отличаться пробелами и -, нужно это учесть.
       // в результате должны получится фасады из панелей
 
-      // задача архитектора: 
+      // задача архитектора:
       // проверить вставленные блоки панелей, т.к. могут быть новые изменения, а вставленные панели не соответствовать этим изменениям.
       // проверить расстановку панелей по фасаду. хз как оно должно быть.
 
@@ -32,39 +28,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       // 1. Найти фасады в чертеже
       // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана как фасада составляющие один фасада дома
-      
-      // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
-      public void LoadPanels()
-      {
-         Inspector.Clear();
-         // Попытка определить фасады по монтажкам
-         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);    
-         // загрузка АКР-панелей из библиотеки
-         PanelSB.LoadBtrPanels(facades);                  
-         if (facades.Count > 0)
-         {
-            // расстановка АКР-Панелей по фасадам
-            Facade.CreateFacades(facades);
-         }
-         else
-         {
-            // простая расстановки имеющихся в бибилтоеке АКР-Панелей
-            //PanelAKR.SimpleInsert(_allPanelsSB);
-            Inspector.AddError("Не удалось определить фасады по монтажным планам.");
-         }
-         if (Inspector.HasErrors)
-         {
-            // Показать ошибки.            
-            Inspector.Show();
-         }
-      }
 
       /// <summary>
       /// Заполнение марок покраски в блоки монтажных панелей СБ
       /// </summary>
       public void FillMarkPainting(Album album)
-      {         
-         // Определение фасадов по монтажным планам                  
+      {
+         // Определение фасадов по монтажным планам
          List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
          Inspector.Clear();
 
@@ -74,7 +44,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             return;
          }
 
-         // список всех блоков АКР-Панелей      
+         // список всех блоков АКР-Панелей
          foreach (var markSbAkr in album.MarksSB)
          {
             foreach (var markAr in markSbAkr.MarksAR)
@@ -89,8 +59,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   var facade = facades.Find(f => f.XMin < xCenterPanelAkr && f.XMax > xCenterPanelAkr);
                   if (facade != null)
                   {
-                     // поиск нужного этажа                     
-                     var floor = facade.Floors.Find(f=> string.Equals(f.Name, panelAr.Storey.NumberAsNumber, StringComparison.OrdinalIgnoreCase));
+                     // поиск нужного этажа
+                     var floor = facade.Floors.Find(f => string.Equals(f.Name, panelAr.Storey.NumberAsNumber, StringComparison.OrdinalIgnoreCase));
                      if (floor != null)
                      {
                         // Поск монтажки по линии от центра панели АКР
@@ -99,7 +69,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         // Проверка имени панели
                         if (mountingPanelSb != null)
                         {
-                           string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');                           
+                           string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
                            string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
                            if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                            {
@@ -126,7 +96,33 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   }
                }
             }
-         }   
+         }
+      }
+
+      // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
+      public void LoadPanels()
+      {
+         Inspector.Clear();
+         // Попытка определить фасады по монтажкам
+         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
+         // загрузка АКР-панелей из библиотеки
+         PanelSB.LoadBtrPanels(facades);
+         if (facades.Count > 0)
+         {
+            // расстановка АКР-Панелей по фасадам
+            Facade.CreateFacades(facades);
+         }
+         else
+         {
+            // простая расстановки имеющихся в бибилтоеке АКР-Панелей
+            //PanelAKR.SimpleInsert(_allPanelsSB);
+            Inspector.AddError("Не удалось определить фасады по монтажным планам.");
+         }
+         if (Inspector.HasErrors)
+         {
+            // Показать ошибки.
+            Inspector.Show();
+         }
       }
    }
 }

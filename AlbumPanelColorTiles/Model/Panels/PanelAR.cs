@@ -8,7 +8,7 @@ namespace AlbumPanelColorTiles.Panels
    public class PanelAR : IEquatable<PanelAR>
    {
       // Границы блока
-      private Extents3d _extents;      
+      private Extents3d _extents;
 
       // Вхождение блок Марки АР после выполнения операции замены блоков мрарки СБ на АР (после определения всех Марок Ар).
       private ObjectId _idBlRefAr;
@@ -19,10 +19,10 @@ namespace AlbumPanelColorTiles.Panels
       // Точка вставки блока исходного (Марки СБ)
       private Point3d _insPt;
 
+      private MarkArPanelAR _markAr;
+
       // Этаж панели
       private Storey _storey;
-
-      private MarkArPanelAR _markAr;
 
       public PanelAR(BlockReference blRefPanel, MarkArPanelAR markAr)
       {
@@ -32,19 +32,20 @@ namespace AlbumPanelColorTiles.Panels
          _markAr = markAr;
       }
 
-      public MarkArPanelAR MarkAr { get { return _markAr; } }
-      public ObjectId IdBlRefAr { get { return _idBlRefAr; } }
-
       /// <summary>
       ///  Границы блока по GeometricExtents
       ///  Для границ по плитке используй getExtentsTiles(MarkSbPanel)
       /// </summary>
-      public Extents3d Extents { get { return _extents; } }      
+      public Extents3d Extents { get { return _extents; } }
+
+      public ObjectId IdBlRefAr { get { return _idBlRefAr; } }
 
       /// <summary>
       /// Точка вставки блока панели
       /// </summary>
       public Point3d InsPt { get { return _insPt; } }
+
+      public MarkArPanelAR MarkAr { get { return _markAr; } }
 
       public Storey Storey
       {
@@ -55,6 +56,29 @@ namespace AlbumPanelColorTiles.Panels
       public bool Equals(PanelAR other)
       {
          return _insPt.Equals(other._insPt);
+      }
+
+      /// <summary>
+      /// Определение границ блока по блокам плитки внутри
+      /// </summary>
+      /// <param name="markSB"></param>
+      /// <returns></returns>
+      public Extents3d GetExtentsTiles(MarkSbPanelAR markSB)
+      {
+         // границы в определении блока
+         var extTilesBtr = markSB.ExtentsTiles;
+         // трансформация границ из BTR в BlRef
+         if (_idBlRefAr.IsNull || _idBlRefAr.IsErased || !_idBlRefAr.IsValid)
+         {
+            return _extents;
+         }
+         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead) as BlockReference)
+         {
+            var matrix = blRef.BlockTransform;
+            extTilesBtr.TransformBy(matrix);
+            _extents = extTilesBtr;
+         }
+         return extTilesBtr;
       }
 
       // Замена вхождения блока СБ на АР
@@ -85,29 +109,6 @@ namespace AlbumPanelColorTiles.Panels
          //   t.AddNewlyCreatedDBObject(blRefPanelAr, true);
          //   t.Commit();
          //}
-      }
-
-      /// <summary>
-      /// Определение границ блока по блокам плитки внутри
-      /// </summary>
-      /// <param name="markSB"></param>
-      /// <returns></returns>
-      public Extents3d GetExtentsTiles(MarkSbPanelAR markSB)
-      {
-         // границы в определении блока
-         var extTilesBtr = markSB.ExtentsTiles;
-         // трансформация границ из BTR в BlRef
-         if (_idBlRefAr.IsNull || _idBlRefAr.IsErased || !_idBlRefAr.IsValid)
-         {
-            return _extents;
-         }
-         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead) as BlockReference)
-         {
-            var matrix = blRef.BlockTransform;
-            extTilesBtr.TransformBy(matrix);
-            _extents = extTilesBtr;
-         }
-         return extTilesBtr;
       }
    }
 }

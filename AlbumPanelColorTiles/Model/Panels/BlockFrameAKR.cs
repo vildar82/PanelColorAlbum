@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -9,7 +8,7 @@ using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 namespace AlbumPanelColorTiles.Panels
 {
    // Блок рамки со штампом
-   public class BlockFrameAKR       
+   public class BlockFrameAKR
    {
       private Dictionary<string, string> _attrs;
       private string _blFrameName;

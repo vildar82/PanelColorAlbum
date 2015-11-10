@@ -150,7 +150,7 @@ namespace AlbumPanelColorTiles.Sheets
                if (layMarks.IsPlottable)
                {
                   layMarks.UpgradeOpen();
-                  layMarks.IsPlottable = false;  
+                  layMarks.IsPlottable = false;
                }
             }
 

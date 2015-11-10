@@ -1,48 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AcadLib.Blocks;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Панель АКР - под покраску - блок из библиотеки панелей АКР.
    public class PanelAKR
-   {      
+   {
       private string _blNameInLib;
-      private string _markAkrWithoutWhite;
-      private ObjectId _idBtrAkrPanelInLib; // блок панели АКР в файле библиотеки панелей
-      private ObjectId _idBtrAkrPanelInFacade; // блок панели АКР в файле фасада
+      private double _distToCenterFromBase;
       private ObjectId _idBlRef;
-      private PanelSB _panelSb;
-      private double _distToCenterFromBase; // расстояние от точки вставки панели до центра (по плитке) по X
-      private bool _isEndLeftPanel;
-      private bool _isEndRightPanel;
+      private ObjectId _idBtrAkrPanelInFacade;
+      private ObjectId _idBtrAkrPanelInLib;
       private bool _isElectricCopy;
 
-      public ObjectId IdBtrAkrPanelInLib { get { return _idBtrAkrPanelInLib; } }
-      public ObjectId IdBtrAkrPanelInFacade
-      {
-         get { return _idBtrAkrPanelInFacade; }
-         set { _idBtrAkrPanelInFacade = value; }
-      } 
+      // расстояние от точки вставки панели до центра (по плитке) по X
+      private bool _isEndLeftPanel;
 
-      /// <summary>
-      /// Вхождение блока в файле фасада
-      /// </summary>
-      public ObjectId IdBlRef { get { return _idBlRef; } set { _idBlRef = value; } }
+      private bool _isEndRightPanel;
+      private string _markAkrWithoutWhite;
+
+      // блок панели АКР в файле библиотеки панелей
+      // блок панели АКР в файле фасада
+      private PanelSB _panelSb;
+
+      public PanelAKR(ObjectId idBtrAkrPanelInLib, string blName)
+      {
+         _idBtrAkrPanelInLib = idBtrAkrPanelInLib;
+         _blNameInLib = blName;
+         _markAkrWithoutWhite = MarkSbPanelAR.GetMarkSbCleanName(MarkSbPanelAR.GetMarkSbName(blName)).Replace(' ', '-');
+         // определение - торцов панели
+         defineEndsPanel(blName);
+      }
+
       public string BlNameInLib { get { return _blNameInLib; } }
-      public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
-      public bool IsEndRightPanel { get { return _isEndRightPanel; } }
-      public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
-      public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
-      public PanelSB PanelSb { get { return _panelSb; } set { _panelSb = value; } }
 
       public double DistToCenterFromBase
       {
@@ -56,26 +50,23 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      public PanelAKR(ObjectId idBtrAkrPanelInLib, string blName)
+      /// <summary>
+      /// Вхождение блока в файле фасада
+      /// </summary>
+      public ObjectId IdBlRef { get { return _idBlRef; } set { _idBlRef = value; } }
+
+      public ObjectId IdBtrAkrPanelInFacade
       {
-         _idBtrAkrPanelInLib = idBtrAkrPanelInLib;
-         _blNameInLib = blName;
-         _markAkrWithoutWhite = MarkSbPanelAR.GetMarkSbCleanName(MarkSbPanelAR.GetMarkSbName(blName)).Replace(' ', '-');
-         // определение - торцов панели
-         defineEndsPanel(blName);
+         get { return _idBtrAkrPanelInFacade; }
+         set { _idBtrAkrPanelInFacade = value; }
       }
 
-      private void defineEndsPanel(string markAkrWithoutWhite)
-      {
-         if (markAkrWithoutWhite.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
-         {
-            _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
-         }
-         if (markAkrWithoutWhite.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
-         {
-            _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва  
-         }
-      }
+      public ObjectId IdBtrAkrPanelInLib { get { return _idBtrAkrPanelInLib; } }
+      public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
+      public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
+      public bool IsEndRightPanel { get { return _isEndRightPanel; } }
+      public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
+      public PanelSB PanelSb { get { return _panelSb; } set { _panelSb = value; } }
 
       /// <summary>
       /// Простая расстановка АКР-панелей в точуи вставки панелей СБ
@@ -99,7 +90,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      var blRefPanelAkr = new BlockReference((panelSb.GetPtInModel(panelSb.PanelAKR)), panelSb.PanelAKR.IdBtrAkrPanelInFacade);
                      panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
-                     t.AddNewlyCreatedDBObject(blRefPanelAkr, true);                     
+                     t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
                   }
                   else
                   {
@@ -111,44 +102,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                progress.Stop();
             }
          }
-      }      
-
-      private double getDistToCenter(ObjectId idBtrPanelAkr)
-      {
-         var extTiles = new Extents3d();
-         string blName;
-         using (var btrAkr = idBtrPanelAkr.GetObject(OpenMode.ForRead) as BlockTableRecord)
-         {
-            blName = btrAkr.Name;
-            foreach (ObjectId idEnt in btrAkr)
-            {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-               {
-                  using (var blRefTile = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
-                  {
-                     if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
-                     {
-                        extTiles.AddExtents(blRefTile.GeometricExtents);
-                     }
-                  }
-               }               
-            }
-         }
-         double shiftEnd = 0;
-         if (blName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
-         {
-            shiftEnd = -446.7;// Торец слева - сдвинуть влево
-         }
-         else if (blName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
-         {
-            shiftEnd = -447;// Торец спрва - сдвинуть вправо
-         }
-         return (extTiles.MaxPoint.X - extTiles.MinPoint.X)*0.5 + shiftEnd;
       }
 
       public PanelAKR CopyLibBlockElectricInTempFile(PanelSB panelSb)
       {
-         PanelAKR panelAkr = null; 
+         PanelAKR panelAkr = null;
          try
          {
             string markAkr = panelSb.MarkSb;
@@ -170,6 +128,51 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
          }
          return panelAkr;
+      }
+
+      private void defineEndsPanel(string markAkrWithoutWhite)
+      {
+         if (markAkrWithoutWhite.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         {
+            _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
+         }
+         if (markAkrWithoutWhite.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         {
+            _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
+         }
+      }
+
+      private double getDistToCenter(ObjectId idBtrPanelAkr)
+      {
+         var extTiles = new Extents3d();
+         string blName;
+         using (var btrAkr = idBtrPanelAkr.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         {
+            blName = btrAkr.Name;
+            foreach (ObjectId idEnt in btrAkr)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  using (var blRefTile = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
+                  {
+                     if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        extTiles.AddExtents(blRefTile.GeometricExtents);
+                     }
+                  }
+               }
+            }
+         }
+         double shiftEnd = 0;
+         if (blName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         {
+            shiftEnd = -446.7;// Торец слева - сдвинуть влево
+         }
+         else if (blName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
+         {
+            shiftEnd = -447;// Торец спрва - сдвинуть вправо
+         }
+         return (extTiles.MaxPoint.X - extTiles.MinPoint.X) * 0.5 + shiftEnd;
       }
    }
 }

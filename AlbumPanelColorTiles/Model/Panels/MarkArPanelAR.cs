@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AcadLib.Blocks;
 using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -38,33 +36,25 @@ namespace AlbumPanelColorTiles.Panels
 
       public string MarkArBlockName { get { return _markArBlockName; } }
 
-      public string MarkPaintingCalulated
-      {
-         get { return _markPaintingCalulated; }
-         set {
-            _markPaintingCalulated = value;
-            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, AcadLib.Blocks.Block.GetValidNameForBlock(_markPaintingCalulated), _markSB.Abbr);
-            _markARPanelFullNameCalculated = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPaintingCalulated, _markSB.Abbr);
-         }
-      }
-
       public string MarkARPanelFullName
       {
          get
          {
-            if (string.IsNullOrEmpty (_markARPanelFullName) )
+            if (string.IsNullOrEmpty(_markARPanelFullName))
             {
                return _markARPanelFullNameCalculated;
             }
             return _markARPanelFullName;
          }
       }
+
       public string MarkARPanelFullNameCalculated { get { return _markARPanelFullNameCalculated; } }
 
       public string MarkPainting
       {
-         get {
-            if(string.IsNullOrEmpty(_markPainting))
+         get
+         {
+            if (string.IsNullOrEmpty(_markPainting))
             {
                return _markPaintingCalulated;
             }
@@ -79,6 +69,17 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
+      public string MarkPaintingCalulated
+      {
+         get { return _markPaintingCalulated; }
+         set
+         {
+            _markPaintingCalulated = value;
+            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, AcadLib.Blocks.Block.GetValidNameForBlock(_markPaintingCalulated), _markSB.Abbr);
+            _markARPanelFullNameCalculated = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPaintingCalulated, _markSB.Abbr);
+         }
+      }
+
       public MarkSbPanelAR MarkSB { get { return _markSB; } }
       public List<Paint> Paints { get { return _paints; } }
       public List<PanelAR> Panels { get { return _panels; } }
@@ -90,7 +91,7 @@ namespace AlbumPanelColorTiles.Panels
             if (_tilesCalc == null)
             {
                _tilesCalc = CalculateTiles();
-            }            
+            }
             return _tilesCalc;
          }
       }
@@ -110,13 +111,13 @@ namespace AlbumPanelColorTiles.Panels
             {
                // Опрделение покраски по зонам
                Point3d centerTileInBlRef = GetCenterTileInBlockRef(blRefPanel.Position, tileMarSb.CenterTile);
-               paintAR = ColorArea.GetPaint(centerTileInBlRef, rtreeColorAreas);               
+               paintAR = ColorArea.GetPaint(centerTileInBlRef, rtreeColorAreas);
                if (paintAR == null)
                {
                   if (!hasTileWithoutPaint)
                   {
-                     //Ошибка. Не удалось определить покраску плитки.???                    
-                     Inspector.Errors.Add(new Error(string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean),blRefPanel));
+                     //Ошибка. Не удалось определить покраску плитки.???
+                     Inspector.Errors.Add(new Error(string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean), blRefPanel));
                      hasTileWithoutPaint = true;
                   }
                }
@@ -126,7 +127,7 @@ namespace AlbumPanelColorTiles.Panels
                paintAR = paintSb;
             }
             paintsAR.Add(paintAR);
-            // ведем подсчет плиток этого цвета для итоговой таблицы плиток на альбом                  
+            // ведем подсчет плиток этого цвета для итоговой таблицы плиток на альбом
             paintAR.AddOneTileCount();
          }
          return paintsAR;
@@ -154,8 +155,8 @@ namespace AlbumPanelColorTiles.Panels
                            "\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");
             }
             var btrMarkSb = t.GetObject(_markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
-            // Копирование определения блока            
-            _idBtrAr = Lib.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);            
+            // Копирование определения блока
+            _idBtrAr = Lib.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);
             var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)

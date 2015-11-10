@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +12,6 @@ using AlbumPanelColorTiles.Plot;
 using AlbumPanelColorTiles.Properties;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
-using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -30,9 +28,9 @@ namespace AlbumPanelColorTiles
    {
       private static string _curDllDir;
       private Album _album;
+      private ImagePaintingService _imagePainting;
       private string _msgHelp;
       private RandomPaintService _randomPainting;
-      private ImagePaintingService _imagePainting;      
 
       public static string CurDllDir
       {
@@ -136,7 +134,7 @@ namespace AlbumPanelColorTiles
                   }
                   else
                   {
-                     doc.Editor.WriteMessage("\nОтменено пользователем.");                     
+                     doc.Editor.WriteMessage("\nОтменено пользователем.");
                   }
                }
                catch (System.Exception ex)
@@ -151,6 +149,30 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      /// <summary>
+      /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
+      /// </summary>
+      [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void CreateMountingPlanBlocksCommand()
+      {
+         Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            MountingPlans mountingPlans = new MountingPlans();
+            mountingPlans.CreateMountingPlans();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
+            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            {
+               Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
+            }
+         }
+      }
+
       [CommandMethod("PIK", "AKR-Help", CommandFlags.Modal)]
       public void HelpCommand()
       {
@@ -158,7 +180,56 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;
          Editor ed = doc.Editor;
          ed.WriteMessage("\n{0}", MsgHelp);
-      }      
+      }
+
+      [CommandMethod("PIK", "AKR-ImagePainting", CommandFlags.Modal)]
+      public void ImagePaintingCommand()
+      {
+         Log.Info("Start Command: AKR-ImagePainting");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            if (_imagePainting == null)
+            {
+               _imagePainting = new ImagePaintingService(doc);
+            }
+            _imagePainting.Go();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage("\n{0}", ex.ToString());
+            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            {
+               Log.Error(ex, "Command: AKR-ImagePainting");
+            }
+         }
+      }
+
+      /// <summary>
+      /// Создание фасадов из правильно расставленных блоков монтажных планов с блоками обозначения сторон фасада
+      /// Загрузка панелей-АКР из библиотеки
+      /// </summary>
+      [CommandMethod("PIK", "AKR-LoadPanelsFromLibrary", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void LoadPanelsFromLibraryCommand()
+      {
+         Log.Info("Start Command: AKR-LoadPanelsFromLibrary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            PanelLibraryLoadService loadPanelsService = new PanelLibraryLoadService();
+            loadPanelsService.LoadPanels();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
+            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            {
+               Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary");
+            }
+         }
+      }
 
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
@@ -184,7 +255,7 @@ namespace AlbumPanelColorTiles
                _album.PaintPanels();
                doc.Editor.Regen();
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");               
+               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)
@@ -326,6 +397,27 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("PIK", "AKR-SavePanelsToLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
+      public void SavePanelsToLibraryCommand()
+      {
+         Log.Info("Start Command: AKR-SavePanelsToLibrary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         try
+         {
+            PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
+            panelLib.SavePanelsToLibrary();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
+            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            {
+               Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
+            }
+         }
+      }
+
       [CommandMethod("PIK", "AKR-SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void SelectPanelsCommand()
       {
@@ -378,100 +470,6 @@ namespace AlbumPanelColorTiles
             ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
             ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
             Log.Info("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
-         }
-      }
-
-      [CommandMethod("PIK", "AKR-ImagePainting", CommandFlags.Modal)]
-      public void ImagePaintingCommand()
-      {
-         Log.Info("Start Command: AKR-ImagePainting");
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         try
-         {
-            if (_imagePainting == null)
-            {
-               _imagePainting = new ImagePaintingService(doc);
-            }
-            _imagePainting.Go();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage("\n{0}", ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
-            {
-               Log.Error(ex, "Command: AKR-ImagePainting");
-            }
-         }
-      }
-
-      /// <summary>
-      /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
-      /// </summary>
-      [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
-      public void CreateMountingPlanBlocksCommand()
-      {
-         Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         try
-         {
-            MountingPlans mountingPlans = new MountingPlans();
-            mountingPlans.CreateMountingPlans();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
-            {
-               Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
-            }
-         }
-      }
-
-      [CommandMethod("PIK", "AKR-SavePanelsToLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
-      public void SavePanelsToLibraryCommand()
-      {
-         Log.Info("Start Command: AKR-SavePanelsToLibrary");
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         try
-         {
-            PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
-            panelLib.SavePanelsToLibrary();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
-            {
-               Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
-            }
-         }
-      }
-
-      /// <summary>
-      /// Создание фасадов из правильно расставленных блоков монтажных планов с блоками обозначения сторон фасада
-      /// Загрузка панелей-АКР из библиотеки
-      /// </summary>
-      [CommandMethod("PIK", "AKR-LoadPanelsFromLibrary", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
-      public void LoadPanelsFromLibraryCommand()
-      {
-         Log.Info("Start Command: AKR-LoadPanelsFromLibrary");
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         try
-         {            
-            PanelLibraryLoadService loadPanelsService = new PanelLibraryLoadService();
-            loadPanelsService.LoadPanels();            
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
-            {
-               Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary");
-            }
          }
       }
    }

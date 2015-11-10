@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlbumPanelColorTiles.Panels
 {
    // Этаж
    public class Storey : IEquatable<Storey>, IComparable<Storey>
    {
+      private static StoreyNumberComparer _comparer = new StoreyNumberComparer();
+      private HashSet<MarkArPanelAR> _marksAr;
       private string _number;
       private string _numberAsNumber;
       private double _y;
-      private HashSet<MarkArPanelAR> _marksAr;
-      private static StoreyNumberComparer _comparer = new StoreyNumberComparer ();
 
       /// <summary>
       /// Высотная отметка этажа
@@ -25,11 +25,6 @@ namespace AlbumPanelColorTiles.Panels
 
       public List<MarkArPanelAR> MarksAr { get { return _marksAr.ToList(); } }
 
-      public void AddMarkAr(MarkArPanelAR markAr)
-      {
-         _marksAr.Add(markAr);
-      }
-
       public string Number
       {
          get { return _number; }
@@ -39,18 +34,25 @@ namespace AlbumPanelColorTiles.Panels
             _numberAsNumber = value;
          }
       }
+
       public string NumberAsNumber { get { return _numberAsNumber; } }
+
       public double Y { get { return _y; } }
+
+      public void AddMarkAr(MarkArPanelAR markAr)
+      {
+         _marksAr.Add(markAr);
+      }
+
+      public int CompareTo(Storey other)
+      {
+         return _comparer.Compare(_number, other._number);
+      }
 
       public bool Equals(Storey other)
       {
          return _number.Equals(other._number) &&
             _y.Equals(other._y);
-      }
-
-      public int CompareTo(Storey other)
-      {         
-         return _comparer.Compare(_number, other._number);         
       }
    }
 }

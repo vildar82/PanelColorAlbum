@@ -4,7 +4,7 @@ using Autodesk.AutoCAD.Colors;
 
 namespace AlbumPanelColorTiles.Panels
 {
-   public class TileCalc : IComparable <TileCalc>
+   public class TileCalc : IComparable<TileCalc>
    {
       private static double _oneTileArea;
       private string _colorMark;

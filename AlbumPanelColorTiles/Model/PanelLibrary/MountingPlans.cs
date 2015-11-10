@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -13,9 +11,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    public class MountingPlans
    {
+      private Database _db;
       private Document _doc;
       private Editor _ed;
-      private Database _db;
 
       public MountingPlans()
       {
@@ -33,20 +31,42 @@ namespace AlbumPanelColorTiles.PanelLibrary
          createFloor(numberFloor);
       }
 
-      private void createFloor(int numberFloor)
+      // проверка наличия блока монтажки этого этажа
+      private bool checkBlock(string floorBlockName)
       {
-         // запрос номера этажа
-         numberFloor = getNumberFloor(numberFloor);
-         // проверка наличия блока монтажки с этим номером
-         string floorBlockName = string.Format("{0}{1}", Settings.Default.BlockMountingPlanePrefixName , numberFloor);
-         if (!checkBlock(floorBlockName))         
-         {            
-            // запрос объектов плана этажа
-            var idsFloor = selectFloor(numberFloor);
-            createBlock(idsFloor, floorBlockName);
+         bool skipOrRedefine = false; // true - skip, false - нет такого блока, можно создавать
+         using (var bt = _db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
+         {
+            if (bt.Has(floorBlockName))
+            {
+               var prOpt = new PromptKeywordOptions(string.Format("Блок монтажки {0} уже определен в чертеже. Что делать?", floorBlockName));
+               prOpt.Keywords.Add("Выход");
+               prOpt.Keywords.Add("Пропустить");
+               prOpt.Keywords.Default = "Выход";
+
+               var res = _ed.GetKeywords(prOpt);
+
+               if (res.Status == PromptStatus.OK)
+               {
+                  switch (res.StringResult)
+                  {
+                     case "Выход":
+                        throw new Exception("\nОтменено пользователем");
+                     case "Пропустить":
+                        skipOrRedefine = true;
+                        break;
+
+                     default:
+                        throw new Exception("\nОтменено пользователем");
+                  }
+               }
+               else
+               {
+                  throw new Exception("\nОтменено пользователем");
+               }
+            }
          }
-         // создание следующего этажа
-         createFloor(++numberFloor);
+         return skipOrRedefine;
       }
 
       // создаение блока монтажки
@@ -55,13 +75,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          Point3d location = getPoint(string.Format("Точка вставки блока монтажного плана {0}", floorBlockName)).TransformBy(_ed.CurrentUserCoordinateSystem);
          using (var t = _db.TransactionManager.StartTransaction())
          {
-            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForWrite) as BlockTable;            
+            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForWrite) as BlockTable;
             ObjectId idBtr;
             BlockTableRecord btr;
             // создание определения блока
             using (btr = new BlockTableRecord())
             {
-               btr.Name = floorBlockName;                              
+               btr.Name = floorBlockName;
                idBtr = bt.Add(btr);
                t.AddNewlyCreatedDBObject(btr, true);
             }
@@ -90,7 +110,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             using (var blRef = new BlockReference(location, idBtr))
             {
                blRef.SetDatabaseDefaults(_db);
-               var ms = t.GetObject (bt[BlockTableRecord.ModelSpace],OpenMode.ForWrite) as BlockTableRecord;               
+               var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                ms.AppendEntity(blRef);
                t.AddNewlyCreatedDBObject(blRef, true);
             }
@@ -98,10 +118,29 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      private Point3d getPoint(string msg)
+      private void createFloor(int numberFloor)
       {
-         var res = _ed.GetPoint(msg);
-         if (res.Status == PromptStatus.OK )
+         // запрос номера этажа
+         numberFloor = getNumberFloor(numberFloor);
+         // проверка наличия блока монтажки с этим номером
+         string floorBlockName = string.Format("{0}{1}", Settings.Default.BlockMountingPlanePrefixName, numberFloor);
+         if (!checkBlock(floorBlockName))
+         {
+            // запрос объектов плана этажа
+            var idsFloor = selectFloor(numberFloor);
+            createBlock(idsFloor, floorBlockName);
+         }
+         // создание следующего этажа
+         createFloor(++numberFloor);
+      }
+
+      // Запрос номера этажа
+      private int getNumberFloor(int defaultNumber)
+      {
+         var prOpt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
+         prOpt.DefaultValue = defaultNumber;
+         var res = _ed.GetInteger(prOpt);
+         if (res.Status == PromptStatus.OK)
          {
             return res.Value;
          }
@@ -111,41 +150,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      // проверка наличия блока монтажки этого этажа
-      private bool checkBlock(string floorBlockName)
+      private Point3d getPoint(string msg)
       {
-         bool skipOrRedefine = false; // true - skip, false - нет такого блока, можно создавать
-         using (var bt = _db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
+         var res = _ed.GetPoint(msg);
+         if (res.Status == PromptStatus.OK)
          {
-            if (bt.Has(floorBlockName))
-            {
-               var prOpt = new PromptKeywordOptions(string.Format("Блок монтажки {0} уже определен в чертеже. Что делать?", floorBlockName));
-               prOpt.Keywords.Add("Выход");
-               prOpt.Keywords.Add("Пропустить");               
-               prOpt.Keywords.Default = "Выход";
-
-               var res = _ed.GetKeywords(prOpt);
-
-               if (res.Status == PromptStatus.OK)
-               {
-                  switch (res.StringResult)
-                  {
-                     case "Выход":
-                        throw new Exception("\nОтменено пользователем");
-                     case "Пропустить":
-                        skipOrRedefine = true;                                             
-                        break;
-                     default:
-                        throw new Exception("\nОтменено пользователем");                        
-                  }
-               }
-               else
-               {
-                  throw new Exception("\nОтменено пользователем");
-               }
-            }
+            return res.Value;
          }
-         return skipOrRedefine;
+         else
+         {
+            throw new Exception("\nОтменено пользователем");
+         }
       }
 
       // запрос выбора объектов этажа
@@ -157,22 +172,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
          if (selRes.Status == PromptStatus.OK)
          {
             return selRes.Value.GetObjectIds().ToList();
-         }
-         else
-         {
-            throw new Exception("\nОтменено пользователем");
-         }
-      }
-
-      // Запрос номера этажа
-      private int getNumberFloor(int defaultNumber)
-      {         
-         var prOpt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
-         prOpt.DefaultValue = defaultNumber;         
-         var res = _ed.GetInteger(prOpt);
-         if (res.Status == PromptStatus.OK)
-         {
-            return res.Value;            
          }
          else
          {

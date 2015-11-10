@@ -24,15 +24,9 @@ namespace AlbumPanelColorTiles.Panels
 
       public Point3d CenterTile { get { return _centerTile; } }
 
-      public bool Equals(Tile other)
-      {
-         return _idBlRef.Equals(other._idBlRef) &&
-            _bounds.IsEqualTo(other._bounds, Album.Tolerance);
-      }
-
       /// <summary>
       /// Покраска блоков плитки в Модели (без блоков АКР-Панелей)
-      /// </summary>      
+      /// </summary>
       public static void PaintTileInModel(RTree<ColorArea> rtreeColorAreas)
       {
          Database db = HostApplicationServices.WorkingDatabase;
@@ -59,6 +53,12 @@ namespace AlbumPanelColorTiles.Panels
             }
             t.Commit();
          }
+      }
+
+      public bool Equals(Tile other)
+      {
+         return _idBlRef.Equals(other._idBlRef) &&
+            _bounds.IsEqualTo(other._bounds, Album.Tolerance);
       }
    }
 }

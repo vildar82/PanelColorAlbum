@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -37,7 +33,7 @@ namespace AlbumPanelColorTiles.Panels
             }
             else
             {
-               // y - строка.               
+               // y - строка.
                return x.CompareTo(y);
             }
          }

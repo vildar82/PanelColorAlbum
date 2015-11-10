@@ -13,7 +13,7 @@ namespace AlbumPanelColorTiles.Sheets
    {
       private Album _album;
 
-      public TotalTileTable (Album album)
+      public TotalTileTable(Album album)
       {
          _album = album;
       }
@@ -21,12 +21,12 @@ namespace AlbumPanelColorTiles.Sheets
       // вставка итоговой таблицы расхода плитки на альбом
       public void InsertTableTotalTile()
       {
-         Document doc = Application.DocumentManager.MdiActiveDocument; 
-         Database db = doc.Database;         
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+         Database db = doc.Database;
          Editor ed = doc.Editor;
 
          // подсчет итогового кол плитки
-         Table table = getTable(db);        
+         Table table = getTable(db);
 
          TableJig jigTable = new TableJig(table, 100, "\nВставка итоговой таблицы плитки на альбом");
          if (ed.Drag(jigTable).Status == PromptStatus.OK)
@@ -52,7 +52,7 @@ namespace AlbumPanelColorTiles.Sheets
          table.Columns[0].Width = 10; // Поз
          table.Columns[1].Width = 40; // Цвет
          table.Columns[2].Width = 20; // Образец
-         table.Columns[3].Width = 20; // Расход шт         
+         table.Columns[3].Width = 20; // Расход шт
          table.Columns[4].Width = 20; // Расход м.кв.
 
          table.Columns[0].Alignment = CellAlignment.MiddleCenter;
@@ -70,14 +70,14 @@ namespace AlbumPanelColorTiles.Sheets
 
          int row = 2;
          int i = 1;
-         double totalArea=0;
+         double totalArea = 0;
          int totalCountTile = 0;
          int countTile;
-         foreach (var paint in _album.Colors.OrderByDescending(p=>p.Count))
+         foreach (var paint in _album.Colors.OrderByDescending(p => p.Count))
          {
             table.Cells[row, 0].TextString = i++.ToString(); //"Поз.";
             table.Cells[row, 1].TextString = paint.LayerName;  //"Цвет";
-            table.Cells[row, 2].BackgroundColor = paint.Color;  // "Образец";            
+            table.Cells[row, 2].BackgroundColor = paint.Color;  // "Образец";
             countTile = paint.Count / 2;
             totalCountTile += countTile;
             table.Cells[row, 3].TextString = countTile.ToString();// "Расход, шт.";
@@ -94,6 +94,6 @@ namespace AlbumPanelColorTiles.Sheets
 
          table.GenerateLayout();
          return table;
-      }      
+      }
    }
 }
