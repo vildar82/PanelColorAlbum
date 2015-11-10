@@ -8,8 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AlbumPanelColorTiles.Properties {
-    
+using System.ComponentModel;
+
+namespace AlbumPanelColorTiles.Properties {    
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
@@ -23,6 +24,7 @@ namespace AlbumPanelColorTiles.Properties {
             }
         }
         
+        [Description("Имя блока зоны покраски")]
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("АКР_Зона-покраски")]
