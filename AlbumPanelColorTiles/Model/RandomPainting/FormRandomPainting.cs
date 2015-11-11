@@ -295,6 +295,7 @@ namespace AlbumPanelColorTiles.RandomPainting
             this.Height = _location.Y + 40;
             buttonDraw.Location = new Point(buttonDraw.Location.X, this.Height - 38);
             buttonSelect.Location = new Point(buttonSelect.Location.X, this.Height - 28);
+            buttonSpotSize.Location = new Point(buttonSpotSize.Location.X, this.Height - 28);
          }
       }
 

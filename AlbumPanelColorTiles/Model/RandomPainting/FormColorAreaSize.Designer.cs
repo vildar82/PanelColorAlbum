@@ -36,6 +36,7 @@
          this.label2 = new System.Windows.Forms.Label();
          this.textBoxHeight = new System.Windows.Forms.TextBox();
          this.errorProviderError = new System.Windows.Forms.ErrorProvider(this.components);
+         this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
          ((System.ComponentModel.ISupportInitialize)(this.errorProviderError)).BeginInit();
          this.SuspendLayout();
          // 
@@ -77,6 +78,7 @@
          this.textBoxLenght.Name = "textBoxLenght";
          this.textBoxLenght.Size = new System.Drawing.Size(100, 20);
          this.textBoxLenght.TabIndex = 2;
+         this.toolTip1.SetToolTip(this.textBoxLenght, "Длина зоны покраски. Должна быть кратна длине плитки со швом");
          this.textBoxLenght.Leave += new System.EventHandler(this.textBoxLenght_Leave);
          // 
          // label2
@@ -94,6 +96,7 @@
          this.textBoxHeight.Name = "textBoxHeight";
          this.textBoxHeight.Size = new System.Drawing.Size(100, 20);
          this.textBoxHeight.TabIndex = 2;
+         this.toolTip1.SetToolTip(this.textBoxHeight, "Высота зоны покраски. Должна быть кратна высоте плитки со швом");
          this.textBoxHeight.Leave += new System.EventHandler(this.textBoxHeight_Leave);
          // 
          // errorProviderError
@@ -133,5 +136,6 @@
       private System.Windows.Forms.Label label2;
       private System.Windows.Forms.TextBox textBoxHeight;
       private System.Windows.Forms.ErrorProvider errorProviderError;
+      private System.Windows.Forms.ToolTip toolTip1;
    }
 }

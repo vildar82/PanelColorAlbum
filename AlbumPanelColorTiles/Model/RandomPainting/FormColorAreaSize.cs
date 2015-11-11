@@ -45,22 +45,28 @@ namespace AlbumPanelColorTiles.RandomPainting
          return value > 0;
       }
 
-      private string correctionValue(string slen, int tileValue)
+      private string correctionValue(TextBox textBox, int tileValue)
       {
+         string slen = textBox.Text;
          int len;
          int.TryParse(slen, out len);
          int div = len / tileValue;
-         return (len * div).ToString();
+         string res = (tileValue * div).ToString();         
+         if (!string.Equals(slen, res, StringComparison.CurrentCultureIgnoreCase))
+         {
+            errorProviderError.SetError(te)
+         }
+         return res;
       }
 
       private void textBoxHeight_Leave(object sender, EventArgs e)
       {
-         textBoxHeight.Text = correctionValue(textBoxHeight.Text, Settings.Default.TileHeight + Settings.Default.TileSeam);
+         textBoxHeight.Text = correctionValue(textBoxHeight, Settings.Default.TileHeight + Settings.Default.TileSeam);
       }
 
       private void textBoxLenght_Leave(object sender, EventArgs e)
       {
-         textBoxLenght.Text = correctionValue(textBoxLenght.Text, Settings.Default.TileLenght + Settings.Default.TileSeam);
-      }
+         textBoxLenght.Text = correctionValue(textBoxLenght, Settings.Default.TileLenght + Settings.Default.TileSeam);
+      }    
    }
 }

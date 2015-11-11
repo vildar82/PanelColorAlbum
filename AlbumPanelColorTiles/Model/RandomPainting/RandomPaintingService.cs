@@ -349,22 +349,13 @@ namespace AlbumPanelColorTiles.RandomPainting
                _spots.AddRange(Spot.GetSpots(proper));
             }
 
-            // Распределение зон покраски
-            _stopwatch.Restart();
-            List<Spot> distributedSpots = distributeSpots(_spots, totalTileCount);
-            _stopwatch.Stop();
-            Log.Debug("После перемешивания списка, время {0} сек.", _stopwatch.Elapsed.Seconds);
+            // Распределение зон покраски            
+            List<Spot> distributedSpots = distributeSpots(_spots, totalTileCount);            
 
-            // Вставка блоков зон
-            _stopwatch.Restart();
-            placementSpots(distributedSpots);
-            _stopwatch.Stop();
-            Log.Debug("Время вставки блоков {0} сек.", _stopwatch.Elapsed.Seconds);
-
-            _stopwatch.Restart();
-            _ed.Regen();
-            _stopwatch.Stop();
-            Log.Debug("Regen {0} сек.", _stopwatch.Elapsed.Seconds);
+            // Вставка блоков зон            
+            placementSpots(distributedSpots);            
+            
+            _ed.Regen();            
          }
          catch (System.Exception ex)
          {
