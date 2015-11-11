@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
+using AlbumPanelColorTiles.Properties;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -60,7 +61,7 @@ namespace AlbumPanelColorTiles.Panels
       public static List<Storey> IdentificationStoreys(List<MarkSbPanelAR> marksSB, int numberFirstFloor)
       {
          // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.
-         var comparerStorey = new DoubleEqualityComparer(2000);
+         var comparerStorey = new DoubleEqualityComparer(Settings.Default.StoreyDefineDeviation); // 2000
          //HashSet<double> panelsStorey = new HashSet<double>(comparerStorey);
          // Этажи
          var storeys = new List<Storey>();
@@ -82,7 +83,7 @@ namespace AlbumPanelColorTiles.Panels
          int i = numberFirstFloor;
          var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
          storeysOrders.ForEach((s) => s.Number = i++.ToString());
-         storeysOrders.Last().Number = "П";
+         storeysOrders.Last().Number = Settings.Default.PaintIndexLastStorey;// "П"
          // В итоге у всех панелей (Panel) проставлены этажи (Storey).
          return storeys;
       }

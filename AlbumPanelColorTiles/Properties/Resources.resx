@@ -118,19 +118,66 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="image" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\image.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="select" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\select.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="errorProviderOk" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        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
+        AAAAAAAAAAAAAGuna7sAAAAA
+</value>
+  </data>
+  <data name="size" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\size.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="close" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="delete" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="add" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="select" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\select.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="errorProviderError" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAgAEBAAAAEAIABoBAAAhgAAAAMDAAABACAAWAAAAO4EAAACAgAAAQAgAEAAAABGBQAAAQEAAAEA
@@ -182,48 +229,10 @@
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAHuQ7NUAAAAA
 </value>
   </data>
-  <data name="errorProviderOk" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        AAABAAkAEBAAAAEAIABoBAAAlgAAAAgIAAABACAASAEAAP4EAAAGBgAAAQAgANAAAABGBgAABQUAAAEA
-        IACgAAAAFgcAAAQEAAABACAAeAAAALYHAAADAwAAAQAgAFgAAAAuCAAAAgIAAAEAIABAAAAAhggAAAIC
-        AAABACAAQAAAAMYIAAABAQAAAQAgADAAAAAGCQAAKAAAABAAAAAgAAAAAQAgAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAADFgMPQVaBYsDWwOsA1kDrQVTBY4LTgtDAAAAAAAx
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANWQ0uAl4C4wBqAP8AdwD/AHwA/wB5AP8AbgD/AFwA/wJM
-        AuoLRgs5AAAAAAAAAAAAAAAAAAAAAAAAAAAZZBlTAGQA/wB8AP8AjAD/AJgA/wCcAP8AmgD/AJAA/wB+
-        AP8AZgD/AEwA/wdAB2MAAAAAAAAAADZ6NgA5dzkuA2QD/wB9AP8AkQD/AJ4A/wCnAP8AqwD/AKoA/wCk
-        AP8AlgD/AIAA/wBlAP8ASAD/BjoGPQARAAAAAAAAGGkY4QB0AP8AiQD/AJgA/wChAP8AnQD/Wrda/wCn
-        AP8ApgD/AJ4A/wCPAP8AdwD/AFkA/wE9Ae8AAAAAOnc6OwhpCP8AfAD/AIoA/wSWBP8RmhH/qdCp////
-        //9ZsFn/K7Ar/xumG/8DkwP/AIAA/wBmAP8ARwD/AzQDTTV4NYgAZwD/AHsA/xKPEv9Hokf/z+HP////
-        //+8zLz//P38/0KkQv86rDr/NqY2/xGKEf8AawD/AE4A/wE3AZkxdzGrAGcA/w+AD/89nj3/VZ5V/8jU
-        yP/T4dP/P5c///j2+P/t8u3/R55H/0SnRP8/nj//DnMO/wBRAP8AOAC6N3o3qwBiAP88lDz/SZ5J/1Cl
-        UP9Ook7/XKVc/12xXf+MsYz///////L18v9tqm3/Sp5K/zyMPP8ATwD/ATkBuzl6OYsQaxD/TppO/1ag
-        Vv9ep17/Zaxl/2qwav9tsm3/ZKpk/8nSyf//////utC6/1ehV/9SlVL/B1IH/wM6A5wnbCdAL3ov/1qc
-        Wv9ipGL/bKps/3Owc/95tHn/fLZ8/323ff9xp3H/2NzY/7XMtf9lpWX/XZhd/w9RD/8KPApTAAAAADl9
-        OehloGX/bqhu/3muef+BtYH/h7mH/4u7i/+LvIv/ibqJ/3mpef+Pro//cKdw/2qbav8EQgT1AAAAAEuH
-        SwAeaR43bKFs/3erd/+DtIP/jbqN/5W+lf+ZwZn/mcKZ/5bAlv+Qu5D/hrWG/3yqfP9JfUn/B0IHSAAA
-        AAAAAAAAAAAAADZ6NmKOuI7/jbmN/5jAmP+gx6D/pcql/6bLpv+ix6L/msGa/5C4kP93oXf/FFEUdAAA
-        AAAAAAAAAAAAAAAAAAAAAAAANno2O4+3j+2uza7/qsyq/6/Pr/+vz6//q8yr/6fFp/+Bp4H0M2ozRwAA
-        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAKjIqAAAAAAAV49XTJq9mpioxqi6p8Wnu5a4lptikWJTAAAAAAAA
-        AAAAAAAAAAAAAAAAAAD8PwAA8A8AAOAHAADAAwAAgAEAAIABAAAAAAAAAAAAAAAAAAAAAAAAgAEAAIAB
-        AADAAwAA4AcAAPAPAAD8PwAAKAAAAAgAAAAQAAAAAQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABRj
-        FAD/AP8AA2ADiAFsAc8BZgHQA1EDi0ApQAIHQwcA////AARpBOcAjwD/AKMA/wCgAP8AfwD/AU0B7CYd
-        JgMVaRWHAIEA/wCYAP+Mzoz/FagV/wWaBf8AbgD/AT0BkBFsEc4VihX/lsCW/7XRtf/X6Nf/OKM4/xaC
-        Fv8ARADWFWsVz0ycTP9VpVX/YK1g/6/Lr//R4dH/SplK/wBDANcxeDGKZKJk/3avdv+Ct4L/fLN8/6nB
-        qf9noWf/BUIFkwAAAAJypXLsjbqN/53Enf+exZ7/kbuR/1uMW/EAAAAFRYVFAAAAAAOWvJaOqcqp1qnI
-        qdeMsIySAAYABSFcIQDDAAAAgQAAAAAAAAAAAAAAAAAAAAAAAACBAAAAwwAAACgAAAAGAAAADAAAAAEA
-        IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABGIEbQF3AdUBbwHXA00DcgAAAAAPZw9tAIkA/xWp
-        Ff8AowD/AHgA/wJBAnMKbgrVLpgu/9Lg0v+WzZb/IpYi/wBLANsmeCbWV6RX/1+qX/++1L7/hLiE/xZZ
-        FttIiEhweq96/467jv+KuYr/ha+F/yFbIXcAAAAAhK+Ec6bIptqmx6bbcpxydwAAAADMAAAAhAAAAAAA
-        AAAAAAAAhAAAAMwAAAAoAAAABQAAAAoAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADFYMDAFy
-        AaEAfQDiAmECpAU3BQ4KcAqhDp4O/1G9Uf8ElgT/AU4Bpxx4HOJeqF7/h7uH/3G2cf8OXA7nS4xLpHav
-        dv+FuIX/lbmV/zNuM6lcklwNkbqRpqnKqeeLsoupLmUuD4gAAAAAAAAAAAAAAAAAAACIAAAAKAAAAAQA
-        AAAIAAAAAQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhjCDIAgwDZAHsA2gNEAzUHdwfZgcSB/0e1
-        R/8EXwTdQoxC2mWsZf+yzLL/MXUx3mufazWcwpzdm8Cb3k6ATjeQAAAAAAAAAAAAAACQAAAAKAAAAAMA
-        AAAGAAAAAQAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB2AHEAjwDvAF4AdCyJLO+u0K7/LX4t8nKm
-        cnOawpryaJZodqAAAAAAAAAAoAAAACgAAAACAAAABAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAskyy5HIMcu22obbp7qHu8AAAAAAAAAAAoAAAAAgAAAAQAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAH4sfqx9/H6xuqG6sa6BrrgAAAAAAAAAAKAAAAAEAAAACAAAAAQAgAAAAAAAAAAAAAAAAAAAA
-        AAAAAAAAAAAAAGuna7sAAAAA
-</value>
+  <data name="add" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Fire" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Fire.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

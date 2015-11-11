@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.RandomPainting;
 using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.ImagePainting
@@ -178,6 +179,11 @@ namespace AlbumPanelColorTiles.ImagePainting
          {
             _userRect.rect = userRect;
          }
+      }
+
+      private void buttonSpotSize_Click(object sender, EventArgs e)
+      {
+         _imagePaintingService.ColorAreaSize.ChangeSize();         
       }
    }
 }

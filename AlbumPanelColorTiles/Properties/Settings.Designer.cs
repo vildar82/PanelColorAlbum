@@ -329,15 +329,93 @@ namespace AlbumPanelColorTiles.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("447")]
         public int FacadeEndsPanelIndent {
             get {
                 return ((int)(this["FacadeEndsPanelIndent"]));
             }
-            set {
-                this["FacadeEndsPanelIndent"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ч")]
+        public string PaintIndexUpperStorey {
+            get {
+                return ((string)(this["PaintIndexUpperStorey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-ОК")]
+        public string PaintIndexWindow {
+            get {
+                return ((string)(this["PaintIndexWindow"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ТЛ")]
+        public string PaintIndexEndLeftPanel {
+            get {
+                return ((string)(this["PaintIndexEndLeftPanel"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ТП")]
+        public string PaintIndexEndRightPanel {
+            get {
+                return ((string)(this["PaintIndexEndRightPanel"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Э")]
+        public string PaintIndexStorey {
+            get {
+                return ((string)(this["PaintIndexStorey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("П")]
+        public string PaintIndexLastStorey {
+            get {
+                return ((string)(this["PaintIndexLastStorey"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2000")]
+        public int StoreyDefineDeviation {
+            get {
+                return ((int)(this["StoreyDefineDeviation"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Длина")]
+        public string BlockColorAreaDynPropLength {
+            get {
+                return ((string)(this["BlockColorAreaDynPropLength"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Высота")]
+        public string BlockColorAreaDynPropHeight {
+            get {
+                return ((string)(this["BlockColorAreaDynPropHeight"]));
             }
         }
     }

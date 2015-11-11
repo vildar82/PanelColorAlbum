@@ -18,10 +18,11 @@ namespace AlbumPanelColorTiles.RandomPainting
       private Database _db;
       private Document _doc;
       private Editor _ed;
-      private Extents3d _extentsPrompted;
+      //private Extents3d _extentsPrompted;
       private ObjectId _idBlRefColorAreaTemplate;
       private ObjectIdCollection _idColCopy;
       private ObjectId _idMS;
+      private ColorAreaSpotSize _colorAreaSize;
 
       // зона произвольной покраски
       private Random _rnd;
@@ -39,9 +40,13 @@ namespace AlbumPanelColorTiles.RandomPainting
          _ed = _doc.Editor;
          _db = _doc.Database;
          _rnd = new Random();
+         _colorAreaSize = new ColorAreaSpotSize(Settings.Default.TileLenght + Settings.Default.TileSeam,
+                                    Settings.Default.TileHeight + Settings.Default.TileSeam, "RandomPaint");
       }
 
       public Editor Ed { get { return _ed; } }
+
+      public ColorAreaSpotSize ColorAreaSpotSize { get { return _colorAreaSize; } }
 
       public static void CheckBlockColorAre(Database db)
       {
@@ -58,20 +63,20 @@ namespace AlbumPanelColorTiles.RandomPainting
          }
       }
 
-      public static void SetDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot, ColorAreaSpotSize _colorAreaSize)
+      public static void SetDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot, ColorAreaSpotSize colorAreaSize)
       {
          foreach (DynamicBlockReferenceProperty item in blRefcolorAreaSpot.DynamicBlockReferencePropertyCollection)
          {
-            if (string.Equals(item.PropertyName, "Длина", StringComparison.InvariantCultureIgnoreCase))
-               item.Value = (double)_colorAreaSize.LenghtSpot;
-            else if (string.Equals(item.PropertyName, "Высота", StringComparison.InvariantCultureIgnoreCase))
-               item.Value = (double)_colorAreaSize.HeightSpot;
+            if (string.Equals(item.PropertyName, Settings.Default.BlockColorAreaDynPropLength, StringComparison.InvariantCultureIgnoreCase))
+               item.Value = (double)colorAreaSize.LenghtSpot;
+            else if (string.Equals(item.PropertyName, Settings.Default.BlockColorAreaDynPropHeight, StringComparison.InvariantCultureIgnoreCase))
+               item.Value = (double)colorAreaSize.HeightSpot;
          }
       }
 
       public void PromptExtents()
       {
-         _extentsPrompted = UserPrompt.PromptExtents(_ed, "Укажите первую точку зоны произвольной покраски", "Укажите вторую точку зоны произвольной покраски");
+         _colorAreaSize.ExtentsColorArea = UserPrompt.PromptExtents(_ed, "Укажите первую точку зоны произвольной покраски", "Укажите вторую точку зоны произвольной покраски");
          _spots = new List<Spot>();
       }
 
@@ -316,8 +321,8 @@ namespace AlbumPanelColorTiles.RandomPainting
             _spots = new List<Spot>();
 
             List<RandomPaint> propers = ((Dictionary<string, RandomPaint>)sender).Values.ToList();
-            _xsize = Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
-            _ysize = Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
+            _xsize = _colorAreaSize.LenghtSize; //Convert.ToInt32((_extentsPrompted.MaxPoint.X - _extentsPrompted.MinPoint.X) / 300);
+            _ysize = _colorAreaSize.HeightSize; //Convert.ToInt32((_extentsPrompted.MaxPoint.Y - _extentsPrompted.MinPoint.Y) / 100);
             int totalTileCount = _xsize * _ysize;
             Log.Info("totalTileCount = {0}, xsize={1}, ysize={2}", totalTileCount, _xsize, _ysize);
             int distributedCount = 0;
@@ -388,7 +393,8 @@ namespace AlbumPanelColorTiles.RandomPainting
       // Вставка ячейки покраски (пока = одной плитке)
       private void insertSpot(Spot spot, int x, int y, Transaction t)
       {
-         Point3d position = new Point3d(_extentsPrompted.MinPoint.X + x * 300, _extentsPrompted.MinPoint.Y + y * 100, 0);
+         Point3d position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot, 
+                                       _colorAreaSize.ExtentsColorArea.MinPoint.Y + y *  _colorAreaSize.HeightSpot, 0);
          IdMapping map = new IdMapping();
          _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
          ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
@@ -418,7 +424,7 @@ namespace AlbumPanelColorTiles.RandomPainting
                cs.AppendEntity(blRefColorAreaTemplate);
                t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);
                _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;
-               setDynParamColorAreaBlock(blRefColorAreaTemplate);
+               SetDynParamColorAreaBlock(blRefColorAreaTemplate, _colorAreaSize);
                _idColCopy = new ObjectIdCollection();
                _idColCopy.Add(_idBlRefColorAreaTemplate);
 
@@ -445,15 +451,15 @@ namespace AlbumPanelColorTiles.RandomPainting
          _spots = new List<Spot>();
       }
 
-      private void setDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot)
-      {
-         foreach (DynamicBlockReferenceProperty item in blRefcolorAreaSpot.DynamicBlockReferencePropertyCollection)
-         {
-            if (string.Equals(item.PropertyName, "Длина", StringComparison.InvariantCultureIgnoreCase))
-               item.Value = 300d;
-            else if (string.Equals(item.PropertyName, "Высота", StringComparison.InvariantCultureIgnoreCase))
-               item.Value = 100d;
-         }
-      }
+      //private void setDynParamColorAreaBlock(BlockReference blRefcolorAreaSpot)
+      //{
+      //   foreach (DynamicBlockReferenceProperty item in blRefcolorAreaSpot.DynamicBlockReferencePropertyCollection)
+      //   {
+      //      if (string.Equals(item.PropertyName, "Длина", StringComparison.InvariantCultureIgnoreCase))
+      //         item.Value = 300d;
+      //      else if (string.Equals(item.PropertyName, "Высота", StringComparison.InvariantCultureIgnoreCase))
+      //         item.Value = 100d;
+      //   }
+      //}
    }
 }

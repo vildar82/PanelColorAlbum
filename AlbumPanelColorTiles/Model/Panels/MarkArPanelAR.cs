@@ -232,7 +232,7 @@ namespace AlbumPanelColorTiles.Panels
 
       private void DefMarkArTempNames(MarkSbPanelAR markSB, string blName)
       {
-         _markArTemp = "АР-" + markSB.MarksAR.Count.ToString();
+         _markArTemp = markSB.MarksAR.Count.ToString(); // "АР-" + markSB.MarksAR.Count.ToString();
       }
    }
 }

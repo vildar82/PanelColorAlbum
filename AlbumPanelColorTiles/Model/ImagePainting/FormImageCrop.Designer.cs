@@ -28,10 +28,14 @@
       /// </summary>
       private void InitializeComponent()
       {
+         this.components = new System.ComponentModel.Container();
+         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormImageCrop));
          this.pictureBoxImage = new System.Windows.Forms.PictureBox();
          this.buttonBrowse = new System.Windows.Forms.Button();
          this.buttonFire = new System.Windows.Forms.Button();
          this.buttonSelect = new System.Windows.Forms.Button();
+         this.buttonSpotSize = new System.Windows.Forms.Button();
+         this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
          ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).BeginInit();
          this.SuspendLayout();
          // 
@@ -48,22 +52,26 @@
          // 
          // buttonBrowse
          // 
+         this.buttonBrowse.BackgroundImage = global::AlbumPanelColorTiles.Properties.Resources.image;
+         this.buttonBrowse.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
          this.buttonBrowse.Location = new System.Drawing.Point(12, 12);
          this.buttonBrowse.Name = "buttonBrowse";
-         this.buttonBrowse.Size = new System.Drawing.Size(120, 23);
+         this.buttonBrowse.Size = new System.Drawing.Size(45, 40);
          this.buttonBrowse.TabIndex = 1;
-         this.buttonBrowse.Text = "Выбрать картинку";
+         this.toolTip1.SetToolTip(this.buttonBrowse, "Выбор файла картинки на компьютере");
          this.buttonBrowse.UseVisualStyleBackColor = true;
          this.buttonBrowse.Click += new System.EventHandler(this.buttonBrowse_Click);
          // 
          // buttonFire
          // 
          this.buttonFire.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-         this.buttonFire.Location = new System.Drawing.Point(887, 729);
+         this.buttonFire.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("buttonFire.BackgroundImage")));
+         this.buttonFire.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+         this.buttonFire.Location = new System.Drawing.Point(912, 702);
          this.buttonFire.Name = "buttonFire";
-         this.buttonFire.Size = new System.Drawing.Size(75, 23);
+         this.buttonFire.Size = new System.Drawing.Size(50, 50);
          this.buttonFire.TabIndex = 3;
-         this.buttonFire.Text = "Огонь";
+         this.toolTip1.SetToolTip(this.buttonFire, "Покраска области чертежа по картинке");
          this.buttonFire.UseVisualStyleBackColor = true;
          this.buttonFire.Click += new System.EventHandler(this.buttonFire_Click);
          // 
@@ -76,14 +84,28 @@
          this.buttonSelect.Name = "buttonSelect";
          this.buttonSelect.Size = new System.Drawing.Size(25, 25);
          this.buttonSelect.TabIndex = 8;
+         this.toolTip1.SetToolTip(this.buttonSelect, "Задание области покраски на чертеже");
          this.buttonSelect.UseVisualStyleBackColor = true;
          this.buttonSelect.Click += new System.EventHandler(this.buttonSelect_Click);
+         // 
+         // buttonSpotSize
+         // 
+         this.buttonSpotSize.BackgroundImage = global::AlbumPanelColorTiles.Properties.Resources.size;
+         this.buttonSpotSize.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+         this.buttonSpotSize.Location = new System.Drawing.Point(31, 739);
+         this.buttonSpotSize.Name = "buttonSpotSize";
+         this.buttonSpotSize.Size = new System.Drawing.Size(25, 25);
+         this.buttonSpotSize.TabIndex = 9;
+         this.toolTip1.SetToolTip(this.buttonSpotSize, "Задание размера для одного пикселя на чертеже ");
+         this.buttonSpotSize.UseVisualStyleBackColor = true;
+         this.buttonSpotSize.Click += new System.EventHandler(this.buttonSpotSize_Click);
          // 
          // FormImageCrop
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.ClientSize = new System.Drawing.Size(974, 764);
+         this.Controls.Add(this.buttonSpotSize);
          this.Controls.Add(this.buttonSelect);
          this.Controls.Add(this.buttonFire);
          this.Controls.Add(this.buttonBrowse);
@@ -95,7 +117,7 @@
          this.ShowIcon = false;
          this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
          this.Text = "Выбор картинки";
-         this.Activated += new System.EventHandler(this.FormImageCrop_Activated);         
+         this.Activated += new System.EventHandler(this.FormImageCrop_Activated);
          ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
          this.ResumeLayout(false);
 
@@ -107,5 +129,7 @@
       private System.Windows.Forms.Button buttonBrowse;
       private System.Windows.Forms.Button buttonFire;
       private System.Windows.Forms.Button buttonSelect;
+      private System.Windows.Forms.Button buttonSpotSize;
+      private System.Windows.Forms.ToolTip toolTip1;
    }
 }

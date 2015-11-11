@@ -7,6 +7,8 @@ namespace AlbumPanelColorTiles.RandomPainting
    // Размер ячейки зоны покраски
    public class ColorAreaSpotSize
    {
+      private const string _regKeySpotSizeLength = "SpotLenght";
+      private const string _regKeySpotSizeHeight = "SpotHeight";
       private Extents3d _extentsColorArea;
       private int _height;
       private int _heightSize;
@@ -80,8 +82,8 @@ namespace AlbumPanelColorTiles.RandomPainting
          try
          {
             var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(Album.RegAppPath + "\\" + _subkey);
-            _lenghtSpot = Convert.ToInt32(keyAKR.GetValue("Lenght", _lenghtSpot));
-            _heightSpot = Convert.ToInt32(keyAKR.GetValue("Height", _heightSpot));
+            _lenghtSpot = Convert.ToInt32(keyAKR.GetValue(_regKeySpotSizeLength, _lenghtSpot));
+            _heightSpot = Convert.ToInt32(keyAKR.GetValue(_regKeySpotSizeHeight, _heightSpot));
          }
          catch { }
       }
@@ -91,8 +93,8 @@ namespace AlbumPanelColorTiles.RandomPainting
          try
          {
             var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(Album.RegAppPath + "\\" + _subkey);
-            keyAKR.SetValue("Lenght", _lenghtSpot, Microsoft.Win32.RegistryValueKind.DWord);
-            keyAKR.SetValue("Height", _heightSpot, Microsoft.Win32.RegistryValueKind.DWord);
+            keyAKR.SetValue(_regKeySpotSizeLength, _lenghtSpot, Microsoft.Win32.RegistryValueKind.DWord);
+            keyAKR.SetValue(_regKeySpotSizeHeight, _heightSpot, Microsoft.Win32.RegistryValueKind.DWord);
          }
          catch { }
       }

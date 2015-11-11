@@ -104,8 +104,35 @@
     <Setting Name="FacadeIndentFromMountingPlanes" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">10000</Value>
     </Setting>
-    <Setting Name="FacadeEndsPanelIndent" Type="System.Int32" Scope="User">
+    <Setting Name="FacadeEndsPanelIndent" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">447</Value>
+    </Setting>
+    <Setting Name="PaintIndexUpperStorey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Ч</Value>
+    </Setting>
+    <Setting Name="PaintIndexWindow" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">-ОК</Value>
+    </Setting>
+    <Setting Name="PaintIndexEndLeftPanel" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ТЛ</Value>
+    </Setting>
+    <Setting Name="PaintIndexEndRightPanel" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ТП</Value>
+    </Setting>
+    <Setting Name="PaintIndexStorey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Э</Value>
+    </Setting>
+    <Setting Name="PaintIndexLastStorey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">П</Value>
+    </Setting>
+    <Setting Name="StoreyDefineDeviation" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">2000</Value>
+    </Setting>
+    <Setting Name="BlockColorAreaDynPropLength" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Длина</Value>
+    </Setting>
+    <Setting Name="BlockColorAreaDynPropHeight" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Высота</Value>
     </Setting>
   </Settings>
 </SettingsFile>

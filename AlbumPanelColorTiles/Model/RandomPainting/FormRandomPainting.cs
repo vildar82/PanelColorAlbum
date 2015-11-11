@@ -326,5 +326,10 @@ namespace AlbumPanelColorTiles.RandomPainting
          // Подпись процента в TextBox
          setPercentToTextBox(proper);
       }
+
+      private void buttonSpotSize_Click(object sender, EventArgs e)
+      {
+         _randomPaintingService.ColorAreaSpotSize.ChangeSize();
+      }
    }
 }
