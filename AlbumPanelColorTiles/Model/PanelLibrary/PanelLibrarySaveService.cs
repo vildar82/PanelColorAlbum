@@ -13,14 +13,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // Библиотека панелей покраски.
    // DWG файл
    public class PanelLibrarySaveService
-   {
-      //private Album _album;
-      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
-
-      public PanelLibrarySaveService()//(Album album)
-      {
-         //_album = album;
-      }
+   {      
+      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");      
 
       /// <summary>
       /// Проверка есть ли в текущем чертеже фасада новые панели, которых нет в библиотеке
@@ -31,7 +25,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var ed = doc.Editor;
 
          // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
-         var panelsAkrInFacade = GetPanels();
+         var panelsAkrInFacade = GetPanelsAkrCurrentDb();
          // список панелей в бибилиотеке
          List<PanelAKR> panelsAkrInLib = GetPanelsInLib();
          // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
@@ -55,7 +49,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      public static Dictionary<ObjectId, string> GetPanels()
+      public static Dictionary<ObjectId, string> GetPanelsAkrCurrentDb()
       {
          Dictionary<ObjectId, string> panels = new Dictionary<ObjectId, string>();
          Database db = HostApplicationServices.WorkingDatabase;
@@ -91,8 +85,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // копирование в temp
          string fileLibPanelsTemp = Path.GetTempFileName();
          File.Copy(PanelLibrarySaveService.LibPanelsFilePath, fileLibPanelsTemp, true);
-
-         Database dbFacade = HostApplicationServices.WorkingDatabase;
+                  
          using (Database dbLib = new Database(false, true))
          {
             dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");
@@ -121,7 +114,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
 
          // сбор блоков для сохранения
-         var panelsBtr = GetPanels();
+         var panelsBtr = GetPanelsAkrCurrentDb();
 
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var libDwg = new Database(false, true))

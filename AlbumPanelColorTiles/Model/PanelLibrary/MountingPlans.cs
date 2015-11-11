@@ -14,12 +14,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private Database _db;
       private Document _doc;
       private Editor _ed;
+      private string _section;
 
       public MountingPlans()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
          _db = _doc.Database;
+         _section = string.Empty; 
       }
 
       // создание блоков монтажных планов из выбранных планов монтажек пользователем
@@ -123,7 +125,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // запрос номера этажа
          numberFloor = getNumberFloor(numberFloor);
          // проверка наличия блока монтажки с этим номером
-         string floorBlockName = string.Format("{0}{1}", Settings.Default.BlockMountingPlanePrefixName, numberFloor);
+         string floorBlockName;
+         if (string.IsNullOrEmpty(_section))
+         {
+            floorBlockName = string.Format("{0}эт-{1}", Settings.Default.BlockMountingPlanePrefixName, numberFloor);
+         }
+         else
+         {
+            floorBlockName = string.Format("{0}С{1}_эт-{2}", Settings.Default.BlockMountingPlanePrefixName, _section, numberFloor);
+         }
          if (!checkBlock(floorBlockName))
          {
             // запрос объектов плана этажа
@@ -137,17 +147,36 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Запрос номера этажа
       private int getNumberFloor(int defaultNumber)
       {
-         var prOpt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
-         prOpt.DefaultValue = defaultNumber;
-         var res = _ed.GetInteger(prOpt);
+         var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
+         opt.DefaultValue = defaultNumber;
+         opt.Keywords.Add("Секция" + _section);
+         var res = _ed.GetInteger(opt);
          if (res.Status == PromptStatus.OK)
-         {
+         {            
             return res.Value;
+         }
+         else if(res.Status == PromptStatus.Keyword)
+         {
+            _section = getSection();
+            return getNumberFloor(defaultNumber);
          }
          else
          {
             throw new Exception("\nОтменено пользователем");
          }
+      }
+
+      private string getSection()
+      {
+         string resSection = string.Empty;
+         var opt = new PromptStringOptions("Номер секции");
+         opt.DefaultValue = string.IsNullOrEmpty(_section) ? "1" : _section;
+         var res = _ed.GetString(opt);
+         if (res.Status == PromptStatus.OK)
+         {
+            resSection = res.StringResult;
+         }
+         return resSection;
       }
 
       private Point3d getPoint(string msg)

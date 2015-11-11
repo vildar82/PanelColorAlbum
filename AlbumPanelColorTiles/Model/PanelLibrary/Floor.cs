@@ -142,7 +142,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       private string getFloorName(BlockReference blRefMounting)
       {
-         return blRefMounting.Name.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
+         string name = string.Empty;
+         var indexFloor = blRefMounting.Name.IndexOf("эт-");
+         if (indexFloor == -1)
+         {
+            name = blRefMounting.Name.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
+         }
+         else
+         {
+            name = blRefMounting.Name.Substring(indexFloor + "эт-".Length);
+         }
+         return name;
       }
 
       private double getXMaxFloor()
