@@ -90,13 +90,15 @@
          // 
          // buttonSpotSize
          // 
+         this.buttonSpotSize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
          this.buttonSpotSize.BackgroundImage = global::AlbumPanelColorTiles.Properties.Resources.size;
          this.buttonSpotSize.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
          this.buttonSpotSize.Location = new System.Drawing.Point(31, 739);
          this.buttonSpotSize.Name = "buttonSpotSize";
          this.buttonSpotSize.Size = new System.Drawing.Size(25, 25);
          this.buttonSpotSize.TabIndex = 9;
-         this.toolTip1.SetToolTip(this.buttonSpotSize, "Задание размера для одного пикселя на чертеже ");
+         this.toolTip1.SetToolTip(this.buttonSpotSize, "Задание размера блока зоны покраски для одного пикселя на чертеже. Рекомендуется " +
+        "квадратное соотношение размеров зоны.");
          this.buttonSpotSize.UseVisualStyleBackColor = true;
          this.buttonSpotSize.Click += new System.EventHandler(this.buttonSpotSize_Click);
          // 

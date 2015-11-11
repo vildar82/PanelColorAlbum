@@ -11,8 +11,7 @@ namespace AlbumPanelColorTiles.Panels
    {
       private static StoreyNumberComparer _comparer = new StoreyNumberComparer();
       private HashSet<MarkArPanelAR> _marksAr;
-      private string _number;
-      private string _numberAsNumber;
+      private string _number;      
       private double _y;
 
       /// <summary>
@@ -32,12 +31,9 @@ namespace AlbumPanelColorTiles.Panels
          get { return _number; }
          set
          {
-            _number = value;
-            _numberAsNumber = value;
+            _number = value;            
          }
-      }
-
-      public string NumberAsNumber { get { return _numberAsNumber; } }
+      }     
 
       public double Y { get { return _y; } }
 
@@ -83,7 +79,9 @@ namespace AlbumPanelColorTiles.Panels
          int i = numberFirstFloor;
          var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
          storeysOrders.ForEach((s) => s.Number = i++.ToString());
-         storeysOrders.Last().Number = Settings.Default.PaintIndexLastStorey;// "П"
+         // Пока уберем индекс Последнего этажа - сейчас он определяется только для последнего этажа среди всех окрашевыемых фасадов. 
+         // А нужно определять последний этаж на каждом фасаде.
+         //storeysOrders.Last().Number = Settings.Default.PaintIndexLastStorey;// "П"
          // В итоге у всех панелей (Panel) проставлены этажи (Storey).
          return storeys;
       }

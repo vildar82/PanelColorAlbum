@@ -178,12 +178,14 @@ namespace AlbumPanelColorTiles.ImagePainting
          else
          {
             _userRect.rect = userRect;
-         }
+         }         
       }
 
       private void buttonSpotSize_Click(object sender, EventArgs e)
       {
-         _imagePaintingService.ColorAreaSize.ChangeSize();         
+         _imagePaintingService.ColorAreaSize.ChangeSize();
+         setUserRect();
+         this.Refresh();
       }
    }
 }

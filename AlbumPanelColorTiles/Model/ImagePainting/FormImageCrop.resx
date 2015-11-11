@@ -124,7 +124,7 @@
   <data name="buttonFire.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQffCwsHMSaeciaA
+        YQUAAAAJcEhZcwAACxEAAAsRAX9kX5EAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQffCwsHMSaeciaA
         AAAGIElEQVR4Xu2bW2gcVRjH11q8FNSCSkUfije8X7Be41xMqlLapjOzTUSoJjOTEMzMbIMo9MFKsA/6
         oIigiFKk4IvQ4ouIUmwVqVa0KdmZbasGS21BTWY2iWitpSldv7N+m8zOfpO9zCTZbvYPP8jOnDn5/7/s
         nDnn7CbRVFMLq1wicYGj88/hy8UnWxNedzT+O3y5uOQZcr+jCzkowjd4aPEom5KfdC3pLCuAowpf4+HF
@@ -154,4 +154,7 @@
         L0w21VRTTVWvROI/Tz26Nf/AHR8AAAAASUVORK5CYII=
 </value>
   </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
 </root>
