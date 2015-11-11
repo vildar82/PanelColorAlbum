@@ -4,6 +4,7 @@ using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
+using System.Linq;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -16,6 +17,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private ObjectId _idBtrAkrPanelInFacade;
       private ObjectId _idBtrAkrPanelInLib;
       private bool _isElectricCopy;
+      private string _reportStatus;
 
       // расстояние от точки вставки панели до центра (по плитке) по X
       private bool _isEndLeftPanel;
@@ -27,6 +29,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // блок панели АКР в файле фасада
       private PanelSB _panelSb;
 
+      private List<EntityInfo> _entInfos; // Список объектов в блоке для сравнения панелей с блоками в фасаде
+
       public PanelAKR(ObjectId idBtrAkrPanelInLib, string blName)
       {
          _idBtrAkrPanelInLib = idBtrAkrPanelInLib;
@@ -34,9 +38,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _markAkrWithoutWhite = MarkSbPanelAR.GetMarkSbCleanName(MarkSbPanelAR.GetMarkSbName(blName)).Replace(' ', '-');
          // определение - торцов панели
          defineEndsPanel(blName);
+         // Список объектов в блоке
+         _entInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanelInLib);
       }
 
       public string BlNameInLib { get { return _blNameInLib; } }
+      public string ReportStatus { get { return _reportStatus; } set { _reportStatus = value; } }
 
       public double DistToCenterFromBase
       {
@@ -66,6 +73,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
       public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
+      public List<EntityInfo> EntInfos { get { return _entInfos; } }
       public PanelSB PanelSb { get { return _panelSb; } set { _panelSb = value; } }
 
       /// <summary>
@@ -140,6 +148,31 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
          }
+      }
+
+      public static List<PanelAKR> GetChangedAndNewPanels(List<PanelAKR> panelsAkrInFacade, List<PanelAKR> panelsAkrInLib)
+      {
+         List<PanelAKR> panelsChangedAndNew = new List<PanelAKR>();
+         foreach (var panelAkrInFacade in panelsAkrInFacade)
+         {
+            var panelAkrInLib = panelsAkrInLib.Find(p => string.Equals(p.BlNameInLib, panelAkrInFacade.BlNameInLib, StringComparison.OrdinalIgnoreCase));
+            if (panelAkrInLib == null)
+            {
+               // panelAkrInFacade - новая панель, которой нет в библмиотеке
+               panelAkrInFacade.ReportStatus = "Новая";
+               panelsChangedAndNew.Add(panelAkrInFacade);
+            }
+            else
+            {
+               // сравнить панели (по списку объектов в блоке)
+               if (!panelAkrInFacade.EntInfos.SequenceEqual(panelAkrInLib.EntInfos))
+               {
+                  panelAkrInFacade.ReportStatus = "Изменившаяся";
+                  panelsChangedAndNew.Add(panelAkrInFacade);
+               }
+            }
+         }
+         return panelsChangedAndNew;
       }
 
       private double getDistToCenter(ObjectId idBtrPanelAkr)

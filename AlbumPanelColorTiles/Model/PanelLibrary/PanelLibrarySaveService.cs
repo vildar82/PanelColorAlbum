@@ -32,9 +32,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          List<string> panelsNotInLib = new List<string>();
          foreach (var panelInFacade in panelsAkrInFacade)
          {
-            if (!panelsAkrInLib.Exists(p => string.Equals(p.BlNameInLib, panelInFacade.Value, StringComparison.CurrentCultureIgnoreCase)))
+            if (!panelsAkrInLib.Exists(p => string.Equals(p.BlNameInLib, panelInFacade.BlNameInLib, StringComparison.CurrentCultureIgnoreCase)))
             {
-               panelsNotInLib.Add(panelInFacade.Value);
+               panelsNotInLib.Add(panelInFacade.BlNameInLib);
             }
          }
          if (panelsNotInLib.Count > 0)
@@ -49,14 +49,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      public static Dictionary<ObjectId, string> GetPanelsAkrCurrentDb()
+      public static List<PanelAKR> GetPanelsAkrCurrentDb()
       {
-         Dictionary<ObjectId, string> panels = new Dictionary<ObjectId, string>();
+         List<PanelAKR> panels = new List<PanelAKR>();
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
@@ -64,7 +63,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   if (MarkSbPanelAR.IsBlockNamePanel(btr.Name) && !MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
                   {
-                     panels.Add(btr.Id, btr.Name);
+                     panels.Add(new PanelAKR (idBtr, btr.Name));
                   }
                }
             }
@@ -114,20 +113,26 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
 
          // сбор блоков для сохранения
-         var panelsBtr = GetPanelsAkrCurrentDb();
+         List<PanelAKR> panelsAkrInFacade = GetPanelsAkrCurrentDb();
 
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var libDwg = new Database(false, true))
          {
             libDwg.ReadDwgFile(LibPanelsFilePath, FileShare.ReadWrite, true, "");
+            // список панелей в библиотеке
+            List<PanelAKR> panelsAkrInLib = GetPanelsInLib();
+            // Список изменившихся панелей и новых для записи в базу.
+            List<PanelAKR> panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
             // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
             copyLibPanelFile(LibPanelsFilePath);
             // Копирование новых панелей
-            copyNewPanels(libDwg, panelsBtr);
+            copyNewPanels(libDwg, panelsAkrToSave);
+            // Запись изменений в файл библиотеки
+            TextChangesToLibDwg();
             // Сохранение файла библиотеки панелей
             libDwg.SaveAs(LibPanelsFilePath, DwgVersion.Current);
             // отправка отчета
-            sendReport(panelsBtr);
+            sendReport(panelsAkrToSave);
             // лог
             Log.Info("Обновлена библиотека панелей.");
          }
@@ -143,9 +148,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // Копирование новых панелей
-      private void copyNewPanels(Database dbLib, Dictionary<ObjectId, string> panels)
+      private void copyNewPanels(Database dbLib, List<PanelAKR> panelsAkrToCopy)
       {
-         var ids = new ObjectIdCollection(panels.Keys.ToArray());
+         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p=>p.IdBtrAkrPanelInLib).ToArray());
          using (var t = dbLib.TransactionManager.StartTransaction())
          {
             IdMapping iMap = new IdMapping();
@@ -154,13 +159,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      private void sendReport(Dictionary<ObjectId, string> panels)
+      private void sendReport(List<PanelAKR> panels)
       {
          StringBuilder msg = new StringBuilder();
          msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
-         foreach (var panel in panels.Values)
+         foreach (var panel in panels)
          {
-            msg.AppendLine(panel);
+            msg.AppendLine(string.Format("{0} - {1}", panel.BlNameInLib, panel.ReportStatus));
          }
          using (var mail = new MailMessage())
          {

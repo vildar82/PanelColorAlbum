@@ -82,6 +82,7 @@
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
+    <Compile Include="Model\PanelLibrary\EntityInfo.cs" />
     <Compile Include="Model\PanelLibrary\Facade.cs" />
     <Compile Include="Model\PanelLibrary\FacadeFrontBlock.cs" />
     <Compile Include="Model\PanelLibrary\Floor.cs" />
