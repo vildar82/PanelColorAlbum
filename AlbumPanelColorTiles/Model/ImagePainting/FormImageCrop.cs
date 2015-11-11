@@ -159,7 +159,7 @@ namespace AlbumPanelColorTiles.ImagePainting
       private void setUserRect()
       {
          Rectangle userRect = new Rectangle();
-         if (_imagePaintingService.ColorAreaSize.Lenght / (double)pictureBoxImage.Width > _imagePaintingService.ColorAreaSize.Height / (double)pictureBoxImage.Height)
+         if (_imagePaintingService.ColorAreaSize.LenghtSize / (double)pictureBoxImage.Width > _imagePaintingService.ColorAreaSize.HeightSize / (double)pictureBoxImage.Height)
          {
             // Длина больше высоты. Задаемся макимальной длиной равной длине pictureBox
             userRect.Width = pictureBoxImage.Width;
