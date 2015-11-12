@@ -128,7 +128,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // Копирование новых панелей
             copyNewPanels(libDwg, panelsAkrToSave);
             // Запись изменений в файл библиотеки
-            TextChangesToLibDwg();
+            //TextChangesToLibDwg();
             // Сохранение файла библиотеки панелей
             libDwg.SaveAs(LibPanelsFilePath, DwgVersion.Current);
             // отправка отчета
