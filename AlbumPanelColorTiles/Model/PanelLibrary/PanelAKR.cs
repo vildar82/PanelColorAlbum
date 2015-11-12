@@ -199,11 +199,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          double shiftEnd = 0;
          if (blName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
-            shiftEnd = -Settings.Default.FacadeEndsPanelIndent;// 447;// Торец слева - сдвинуть влево FacadeEndsPanelIndent
+            shiftEnd = -Settings.Default.FacadeEndsPanelIndent*0.5;// 445;// Торец слева - сдвинуть влево FacadeEndsPanelIndent
          }
          else if (blName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
-            shiftEnd = -Settings.Default.FacadeEndsPanelIndent;// 447;// Торец спрва - сдвинуть вправо
+            shiftEnd = -Settings.Default.FacadeEndsPanelIndent*0.5;// 445;// Торец спрва - сдвинуть вправо
          }
          return (extTiles.MaxPoint.X - extTiles.MinPoint.X) * 0.5 + shiftEnd;
       }

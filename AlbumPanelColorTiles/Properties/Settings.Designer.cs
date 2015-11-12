@@ -331,7 +331,7 @@ namespace AlbumPanelColorTiles.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("447")]
+        [global::System.Configuration.DefaultSettingValueAttribute("890")]
         public int FacadeEndsPanelIndent {
             get {
                 return ((int)(this["FacadeEndsPanelIndent"]));
