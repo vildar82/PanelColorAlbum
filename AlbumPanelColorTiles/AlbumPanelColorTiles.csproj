@@ -113,7 +113,7 @@
     <Compile Include="Model\Lib\Block.cs" />
     <Compile Include="Model\Panels\MarkArPanelAR.cs" />
     <Compile Include="Model\Panels\MarkSbPanelAR.cs" />
-    <Compile Include="Model\Options.cs" />
+    <Compile Include="Model\Settings.cs" />
     <Compile Include="Model\Panels\Paint.cs" />
     <Compile Include="Model\Panels\PanelAR.cs" />
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />
@@ -144,12 +144,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Settings.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">
@@ -206,10 +200,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <None Include="Resources\delete.png" />
   </ItemGroup>
   <ItemGroup>
