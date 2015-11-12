@@ -4,13 +4,12 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Plot;
-using AlbumPanelColorTiles.Properties;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -269,7 +268,7 @@ namespace AlbumPanelColorTiles
                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)
-            {               
+            {
                doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using AlbumPanelColorTiles.Properties;
-using AlbumPanelColorTiles.RandomPainting;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.EditorInput;
 
 namespace AlbumPanelColorTiles.ImagePainting
@@ -67,6 +66,13 @@ namespace AlbumPanelColorTiles.ImagePainting
             }
             catch { }
          }
+      }
+
+      private void buttonSpotSize_Click(object sender, EventArgs e)
+      {
+         _imagePaintingService.ColorAreaSize.ChangeSize();
+         setUserRect();
+         this.Refresh();
       }
 
       private void FormImageCrop_Activated(object sender, EventArgs e)
@@ -178,14 +184,7 @@ namespace AlbumPanelColorTiles.ImagePainting
          else
          {
             _userRect.rect = userRect;
-         }         
-      }
-
-      private void buttonSpotSize_Click(object sender, EventArgs e)
-      {
-         _imagePaintingService.ColorAreaSize.ChangeSize();
-         setUserRect();
-         this.Refresh();
+         }
       }
    }
 }

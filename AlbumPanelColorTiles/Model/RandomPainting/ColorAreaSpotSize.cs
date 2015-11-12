@@ -7,8 +7,8 @@ namespace AlbumPanelColorTiles.RandomPainting
    // Размер ячейки зоны покраски
    public class ColorAreaSpotSize
    {
-      private const string _regKeySpotSizeLength = "SpotLenght";
       private const string _regKeySpotSizeHeight = "SpotHeight";
+      private const string _regKeySpotSizeLength = "SpotLenght";
       private Extents3d _extentsColorArea;
       private int _height;
       private int _heightSize;

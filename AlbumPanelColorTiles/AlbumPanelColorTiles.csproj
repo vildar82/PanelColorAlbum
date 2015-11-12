@@ -81,6 +81,7 @@
     </Compile>
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
+    <Compile Include="Model\Options\SerializerXml.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
     <Compile Include="Model\PanelLibrary\EntityInfo.cs" />
     <Compile Include="Model\PanelLibrary\Facade.cs" />
@@ -113,7 +114,7 @@
     <Compile Include="Model\Lib\Block.cs" />
     <Compile Include="Model\Panels\MarkArPanelAR.cs" />
     <Compile Include="Model\Panels\MarkSbPanelAR.cs" />
-    <Compile Include="Model\Settings.cs" />
+    <Compile Include="Model\Options\Settings.cs" />
     <Compile Include="Model\Panels\Paint.cs" />
     <Compile Include="Model\Panels\PanelAR.cs" />
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />

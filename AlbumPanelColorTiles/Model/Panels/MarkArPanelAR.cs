@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
@@ -118,7 +117,7 @@ namespace AlbumPanelColorTiles.Panels
                   if (!hasTileWithoutPaint)
                   {
                      //Ошибка. Не удалось определить покраску плитки.???
-                     Inspector.AddError (string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean), blRefPanel);
+                     Inspector.AddError(string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean), blRefPanel);
                      hasTileWithoutPaint = true;
                   }
                }

@@ -1,5 +1,5 @@
 ﻿using System;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;

@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Checks;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
-using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 

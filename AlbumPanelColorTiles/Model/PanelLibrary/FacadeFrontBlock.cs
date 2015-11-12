@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 
@@ -36,7 +37,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   using (var blRef = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
                   {
                      // Если это блок обозначения стороны фасада - по имени блока
-                     if (string.Equals(blRef.GetEffectiveName(), Properties.Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
+                     if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         FacadeFrontBlock front = new FacadeFrontBlock(blRef);
                         facadeFrontBlocks.Add(front);

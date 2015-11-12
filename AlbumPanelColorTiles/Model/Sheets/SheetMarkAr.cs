@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
-using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -313,8 +313,8 @@ namespace AlbumPanelColorTiles.Sheets
 
          //ObjectContextManager ocm = dbMarkSB.ObjectContextManager;
          //ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
-         //vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");         
-         vp.CustomScale = 1d / Settings.Default.SheetScale; // 0.04; // SheetScale         
+         //vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
+         vp.CustomScale = 1d / Settings.Default.SheetScale; // 0.04; // SheetScale
       }
 
       // Направление видового экрана на блок Марки АР
@@ -344,20 +344,20 @@ namespace AlbumPanelColorTiles.Sheets
          Point2d ptCenterMarkAR;
          if (isFacadeView)
          {
-            if (_markAR.MarkSB.IsEndLeftPanel && !_markAR.MarkSB.IsEndRightPanel)               
+            if (_markAR.MarkSB.IsEndLeftPanel && !_markAR.MarkSB.IsEndRightPanel)
                ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X + Settings.Default.SheetPanelEndShift,
                                             blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
             else if (_markAR.MarkSB.IsEndRightPanel && !_markAR.MarkSB.IsEndLeftPanel)
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - Settings.Default.SheetPanelEndShift, 
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - Settings.Default.SheetPanelEndShift,
                                             blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
             else
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X, 
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X,
                                              blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
          }
          else
          {
             // Диман гоаорит не нужно сдвигать торцевые панели в форме.
-            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X, 
+            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X,
                                     blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
          }
          ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);

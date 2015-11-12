@@ -13,7 +13,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // Библиотека панелей покраски.
    // DWG файл
    public class PanelLibrarySaveService
-   {      
+   {
       public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
       private Database _dbCur;
       private Document _doc;
@@ -60,7 +60,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public static List<PanelAKR> GetPanelsAkrInDb(Database db)
       {
-         List<PanelAKR> panels = new List<PanelAKR>();         
+         List<PanelAKR> panels = new List<PanelAKR>();
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -71,7 +71,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   if (MarkSbPanelAR.IsBlockNamePanel(btr.Name) && !MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
                   {
-                     panels.Add(new PanelAKR (idBtr, btr.Name));
+                     panels.Add(new PanelAKR(idBtr, btr.Name));
                   }
                }
             }
@@ -92,7 +92,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // копирование в temp
          string fileLibPanelsTemp = Path.GetTempFileName();
          File.Copy(PanelLibrarySaveService.LibPanelsFilePath, fileLibPanelsTemp, true);
-                  
+
          using (Database dbLib = new Database(false, true))
          {
             dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");
@@ -104,7 +104,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          return panelsInLib;
-      }      
+      }
 
       public void SavePanelsToLibrary()
       {
@@ -133,7 +133,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // список панелей в библиотеке
             List<PanelAKR> panelsAkrInLib = GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
             // Список изменившихся панелей и новых для записи в базу.
-            List<PanelAKR> panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);            
+            List<PanelAKR> panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
             if (panelsAkrToSave.Count > 0)
             {
                // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
@@ -143,13 +143,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
                // Сохранение файла библиотеки панелей
                dbLib.SaveAs(LibPanelsFilePath, DwgVersion.Current);
                // строка отчета
-               msgReport= getReport(panelsAkrToSave);
+               msgReport = getReport(panelsAkrToSave);
                Log.Info("Обновлена библиотека панелей.");
             }
             else
             {
                _doc.Editor.WriteMessage("\nНет панелей для сохранения в библиотеку (в текущем чертеже нет новых и изменившихся панелей).");
-            }                   
+            }
          }
          _doc.Editor.WriteMessage(string.Format("\n{0}", msgReport));
          sendReport(msgReport);
@@ -167,7 +167,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Копирование новых панелей
       private void copyNewPanels(Database dbLib, List<PanelAKR> panelsAkrToCopy)
       {
-         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p=>p.IdBtrAkrPanelInLib).ToArray());
+         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p => p.IdBtrAkrPanelInLib).ToArray());
          using (var t = dbLib.TransactionManager.StartTransaction())
          {
             IdMapping iMap = new IdMapping();
@@ -177,11 +177,45 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
+      private string getReport(List<PanelAKR> panels)
+      {
+         StringBuilder msg = new StringBuilder();
+         msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
+         foreach (var panel in panels)
+         {
+            msg.AppendLine(string.Format("{0} - {1}", panel.BlNameInLib, panel.ReportStatus));
+         }
+         return msg.ToString();
+      }
+
+      private void sendReport(string msg)
+      {
+         try
+         {
+            using (var mail = new MailMessage())
+            {
+               mail.To.Add("vildar82@gmail.com");
+               mail.To.Add("KhisyametdinovVT@pik.ru");
+               mail.From = new MailAddress("KhisyametdinovVT@pik.ru");
+               mail.Subject = string.Format("AKR - Изменение библиотеки панелей {0}", Environment.UserName);
+               mail.Body = msg.ToString();
+
+               SmtpClient client = new SmtpClient();
+               client.Host = "ex20pik.picompany.ru";
+               client.Send(mail);
+            }
+         }
+         catch (Exception ex)
+         {
+            Log.Error(ex, "sendReport MailMessage");
+         }
+      }
+
       private void textChangesToLibDwg(List<PanelAKR> panelsAkrToCopy, Database db, Transaction t)
       {
          // Запись изменений в текстовый объект
          var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-         var ms = t.GetObject(bt[BlockTableRecord.ModelSpace],OpenMode.ForWrite) as BlockTableRecord;
+         var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
          foreach (ObjectId idEnt in ms)
          {
             if (idEnt.ObjectClass.Name == "AcDbMText")
@@ -220,40 +254,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
          text.Contents = sbChanges.ToString();
          ms.AppendEntity(text);
          t.AddNewlyCreatedDBObject(text, true);
-      }
-
-      private string getReport(List<PanelAKR> panels)
-      {
-         StringBuilder msg = new StringBuilder();
-         msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
-         foreach (var panel in panels)
-         {
-            msg.AppendLine(string.Format("{0} - {1}", panel.BlNameInLib, panel.ReportStatus));
-         }
-         return msg.ToString();
-      }
-
-      private void sendReport(string msg)
-      {         
-         try
-         {
-            using (var mail = new MailMessage())
-            {
-               mail.To.Add("vildar82@gmail.com");
-               mail.To.Add("KhisyametdinovVT@pik.ru");
-               mail.From = new MailAddress("KhisyametdinovVT@pik.ru");
-               mail.Subject = string.Format("AKR - Изменение библиотеки панелей {0}", Environment.UserName);
-               mail.Body = msg.ToString();
-
-               SmtpClient client = new SmtpClient();
-               client.Host = "ex20pik.picompany.ru";
-               client.Send(mail);
-            }
-         }
-         catch (Exception ex)
-         {
-            Log.Error(ex, "sendReport MailMessage");
-         }
       }
    }
 }

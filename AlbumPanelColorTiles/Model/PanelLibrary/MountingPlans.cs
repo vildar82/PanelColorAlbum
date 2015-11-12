@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -21,7 +21,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
          _db = _doc.Database;
-         _section = string.Empty; 
+         _section = string.Empty;
       }
 
       // создание блоков монтажных планов из выбранных планов монтажек пользователем
@@ -152,13 +152,26 @@ namespace AlbumPanelColorTiles.PanelLibrary
          opt.Keywords.Add("Секция" + _section);
          var res = _ed.GetInteger(opt);
          if (res.Status == PromptStatus.OK)
-         {            
+         {
             return res.Value;
          }
-         else if(res.Status == PromptStatus.Keyword)
+         else if (res.Status == PromptStatus.Keyword)
          {
             _section = getSection();
             return getNumberFloor(defaultNumber);
+         }
+         else
+         {
+            throw new Exception("\nОтменено пользователем");
+         }
+      }
+
+      private Point3d getPoint(string msg)
+      {
+         var res = _ed.GetPoint(msg);
+         if (res.Status == PromptStatus.OK)
+         {
+            return res.Value;
          }
          else
          {
@@ -177,19 +190,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
             resSection = res.StringResult;
          }
          return resSection;
-      }
-
-      private Point3d getPoint(string msg)
-      {
-         var res = _ed.GetPoint(msg);
-         if (res.Status == PromptStatus.OK)
-         {
-            return res.Value;
-         }
-         else
-         {
-            throw new Exception("\nОтменено пользователем");
-         }
       }
 
       // запрос выбора объектов этажа

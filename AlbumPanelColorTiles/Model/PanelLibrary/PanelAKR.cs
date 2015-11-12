@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
-using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
-using System.Linq;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -13,11 +13,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
    {
       private string _blNameInLib;
       private double _distToCenterFromBase;
+      private List<EntityInfo> _entInfos;
       private ObjectId _idBlRef;
       private ObjectId _idBtrAkrPanelInFacade;
       private ObjectId _idBtrAkrPanelInLib;
       private bool _isElectricCopy;
-      private string _reportStatus;
 
       // расстояние от точки вставки панели до центра (по плитке) по X
       private bool _isEndLeftPanel;
@@ -29,7 +29,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // блок панели АКР в файле фасада
       private PanelSB _panelSb;
 
-      private List<EntityInfo> _entInfos; // Список объектов в блоке для сравнения панелей с блоками в фасаде
+      private string _reportStatus;
+      // Список объектов в блоке для сравнения панелей с блоками в фасаде
 
       public PanelAKR(ObjectId idBtrAkrPanelInLib, string blName)
       {
@@ -43,7 +44,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       public string BlNameInLib { get { return _blNameInLib; } }
-      public string ReportStatus { get { return _reportStatus; } set { _reportStatus = value; } }
 
       public double DistToCenterFromBase
       {
@@ -56,6 +56,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
             return _distToCenterFromBase;
          }
       }
+
+      public List<EntityInfo> EntInfos { get { return _entInfos; } }
 
       /// <summary>
       /// Вхождение блока в файле фасада
@@ -73,8 +75,33 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
       public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
-      public List<EntityInfo> EntInfos { get { return _entInfos; } }
       public PanelSB PanelSb { get { return _panelSb; } set { _panelSb = value; } }
+      public string ReportStatus { get { return _reportStatus; } set { _reportStatus = value; } }
+
+      public static List<PanelAKR> GetChangedAndNewPanels(List<PanelAKR> panelsAkrInFacade, List<PanelAKR> panelsAkrInLib)
+      {
+         List<PanelAKR> panelsChangedAndNew = new List<PanelAKR>();
+         foreach (var panelAkrInFacade in panelsAkrInFacade)
+         {
+            var panelAkrInLib = panelsAkrInLib.Find(p => string.Equals(p.BlNameInLib, panelAkrInFacade.BlNameInLib, StringComparison.OrdinalIgnoreCase));
+            if (panelAkrInLib == null)
+            {
+               // panelAkrInFacade - новая панель, которой нет в библмиотеке
+               panelAkrInFacade.ReportStatus = "Новая";
+               panelsChangedAndNew.Add(panelAkrInFacade);
+            }
+            else
+            {
+               // сравнить панели (по списку объектов в блоке)
+               if (!panelAkrInFacade.EntInfos.SequenceEqual(panelAkrInLib.EntInfos))
+               {
+                  panelAkrInFacade.ReportStatus = "Изменившаяся";
+                  panelsChangedAndNew.Add(panelAkrInFacade);
+               }
+            }
+         }
+         return panelsChangedAndNew;
+      }
 
       /// <summary>
       /// Простая расстановка АКР-панелей в точуи вставки панелей СБ
@@ -150,31 +177,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      public static List<PanelAKR> GetChangedAndNewPanels(List<PanelAKR> panelsAkrInFacade, List<PanelAKR> panelsAkrInLib)
-      {
-         List<PanelAKR> panelsChangedAndNew = new List<PanelAKR>();
-         foreach (var panelAkrInFacade in panelsAkrInFacade)
-         {
-            var panelAkrInLib = panelsAkrInLib.Find(p => string.Equals(p.BlNameInLib, panelAkrInFacade.BlNameInLib, StringComparison.OrdinalIgnoreCase));
-            if (panelAkrInLib == null)
-            {
-               // panelAkrInFacade - новая панель, которой нет в библмиотеке
-               panelAkrInFacade.ReportStatus = "Новая";
-               panelsChangedAndNew.Add(panelAkrInFacade);
-            }
-            else
-            {
-               // сравнить панели (по списку объектов в блоке)
-               if (!panelAkrInFacade.EntInfos.SequenceEqual(panelAkrInLib.EntInfos))
-               {
-                  panelAkrInFacade.ReportStatus = "Изменившаяся";
-                  panelsChangedAndNew.Add(panelAkrInFacade);
-               }
-            }
-         }
-         return panelsChangedAndNew;
-      }
-
       private double getDistToCenter(ObjectId idBtrPanelAkr)
       {
          var extTiles = new Extents3d();
@@ -199,11 +201,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          double shiftEnd = 0;
          if (blName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
-            shiftEnd = -Settings.Default.FacadeEndsPanelIndent*0.5;// 445;// Торец слева - сдвинуть влево FacadeEndsPanelIndent
+            shiftEnd = -Settings.Default.FacadeEndsPanelIndent * 0.5;// 445;// Торец слева - сдвинуть влево FacadeEndsPanelIndent
          }
          else if (blName.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
-            shiftEnd = -Settings.Default.FacadeEndsPanelIndent*0.5;// 445;// Торец спрва - сдвинуть вправо
+            shiftEnd = -Settings.Default.FacadeEndsPanelIndent * 0.5;// 445;// Торец спрва - сдвинуть вправо
          }
          return (extTiles.MaxPoint.X - extTiles.MinPoint.X) * 0.5 + shiftEnd;
       }

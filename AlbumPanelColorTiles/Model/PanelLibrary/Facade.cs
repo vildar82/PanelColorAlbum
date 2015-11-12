@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -74,23 +73,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      private static void testGeom(PanelSB panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
-      {
-         // Точка центра панели СБ
-         DBPoint ptPanelSbInModel = new DBPoint(panelSb.PtCenterPanelSbInModel);
-         ms.AppendEntity(ptPanelSbInModel);
-         t.AddNewlyCreatedDBObject(ptPanelSbInModel, true);
-         // Точка вставки панели АКР
-         DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0));
-         ms.AppendEntity(ptPanelArkInModel);
-         t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);
-         // Расстояние до центра панели АКР
-         Line lineToCenterPanelAkr = new Line(ptPanelArkInModel.Position,
-            new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAKR.DistToCenterFromBase, ptPanelArkInModel.Position.Y, 0));
-         ms.AppendEntity(lineToCenterPanelAkr);
-         t.AddNewlyCreatedDBObject(lineToCenterPanelAkr, true);
-      }
-
       /// <summary>
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
       /// </summary>
@@ -136,7 +118,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          textFloor.Annotative = AnnotativeStates.False;
          textFloor.Height = Settings.Default.FacadeCaptionFloorTextHeight;// 250;// FacadeCaptionFloorTextHeight
          textFloor.TextString = name;
-         textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (Settings.Default.FacadeFloorHeight*0.5), 0);
+         textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (Settings.Default.FacadeFloorHeight * 0.5), 0);
          ms.AppendEntity(textFloor);
          t.AddNewlyCreatedDBObject(textFloor, true);
       }
@@ -146,6 +128,23 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.AllPanelsSbInFloor).Max(p => p.PtCenterPanelSbInModel.Y);
          return maxYblRefPanelInModel + Settings.Default.FacadeIndentFromMountingPlanes;// 10000; // FacadeIndentFromMountingPlanes
+      }
+
+      private static void testGeom(PanelSB panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
+      {
+         // Точка центра панели СБ
+         DBPoint ptPanelSbInModel = new DBPoint(panelSb.PtCenterPanelSbInModel);
+         ms.AppendEntity(ptPanelSbInModel);
+         t.AddNewlyCreatedDBObject(ptPanelSbInModel, true);
+         // Точка вставки панели АКР
+         DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0));
+         ms.AppendEntity(ptPanelArkInModel);
+         t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);
+         // Расстояние до центра панели АКР
+         Line lineToCenterPanelAkr = new Line(ptPanelArkInModel.Position,
+            new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAKR.DistToCenterFromBase, ptPanelArkInModel.Position.Y, 0));
+         ms.AppendEntity(lineToCenterPanelAkr);
+         t.AddNewlyCreatedDBObject(lineToCenterPanelAkr, true);
       }
    }
 }

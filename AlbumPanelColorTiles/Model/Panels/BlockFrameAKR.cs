@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;

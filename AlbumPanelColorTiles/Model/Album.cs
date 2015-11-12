@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AcadLib.Comparers;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
-using AlbumPanelColorTiles.Properties;
 using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
@@ -22,14 +21,19 @@ namespace AlbumPanelColorTiles
    {
       private const string _regAppPath = @"Software\Vildar\AKR";
       private const string _regKeyAbbreviate = "Abbreviate";
+      private string _abbreviateProject;
+      private string _albumDir;
+      private List<ColorArea> _colorAreas;
       private List<Paint> _colors; // Набор цветов используемых в альбоме.
-      private string _abbreviateProject;// Сокращенное имя проеккта
-      private int _numberFirstFloor;
-      private string _albumDir;      
-      private List<ColorArea> _colorAreas;      
       private Database _db;
+
       private Document _doc;
-      private List<MarkSbPanelAR> _marksSB;      
+
+      private List<MarkSbPanelAR> _marksSB;
+
+      // Сокращенное имя проеккта
+      private int _numberFirstFloor;
+
       private SheetsSet _sheetsSet;
       private List<Storey> _storeys;
 
@@ -37,7 +41,7 @@ namespace AlbumPanelColorTiles
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
-      }      
+      }
 
       public static string RegAppPath { get { return _regAppPath; } }
       public static Tolerance Tolerance { get { return Tolerance.Global; } }
@@ -47,29 +51,7 @@ namespace AlbumPanelColorTiles
       public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSbPanelAR> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
-      public List<Storey> Storeys { get { return _storeys; } }      
-
-      // Поиск цвета в списке цветов альбома
-      public Paint GetPaint(string layerName)
-      {
-         Paint paint = _colors.Find(c => c.LayerName == layerName);
-         if (paint == null)
-         {
-            // Определение цвета слоя
-            Database db = HostApplicationServices.WorkingDatabase;
-            Color color = null;
-            using (var lt = db.LayerTableId.GetObject(OpenMode.ForRead) as LayerTable)
-            {
-               using (var ltr = lt[layerName].GetObject(OpenMode.ForRead) as LayerTableRecord)
-               {
-                  color = ltr.Color;
-               }
-            }
-            paint = new Paint(layerName, color);
-            _colors.Add(paint);
-         }
-         return paint;
-      }
+      public List<Storey> Storeys { get { return _storeys; } }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
       public static void ResetBlocks()
@@ -105,7 +87,7 @@ namespace AlbumPanelColorTiles
                            // Такое возможно, если после покраски панелей, сделать очистку чертежа (блоки марки СБ удалятся).
                            MarkSbPanelAR.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);
                            string errMsg = "\nНет определения блока для панели Марки СБ " + markSbBlName +
-                                          ". Оно создано из панели Марки АР " + blRef.Name + 
+                                          ". Оно создано из панели Марки АР " + blRef.Name +
                                           ". Если внутри блока Марки СБ были зоны покраски, то в блоке Марки АР они были удалены." +
                                           "Необходимо проверить блоки и заново запустить программу.";
                            ed.WriteMessage("\n" + errMsg);
@@ -227,6 +209,28 @@ namespace AlbumPanelColorTiles
          _sheetsSet.CreateAlbum();
       }
 
+      // Поиск цвета в списке цветов альбома
+      public Paint GetPaint(string layerName)
+      {
+         Paint paint = _colors.Find(c => c.LayerName == layerName);
+         if (paint == null)
+         {
+            // Определение цвета слоя
+            Database db = HostApplicationServices.WorkingDatabase;
+            Color color = null;
+            using (var lt = db.LayerTableId.GetObject(OpenMode.ForRead) as LayerTable)
+            {
+               using (var ltr = lt[layerName].GetObject(OpenMode.ForRead) as LayerTableRecord)
+               {
+                  color = ltr.Color;
+               }
+            }
+            paint = new Paint(layerName, color);
+            _colors.Add(paint);
+         }
+         return paint;
+      }
+
       // Покраска панелей в модели (по блокам зон покраски)
       public void PaintPanels()
       {
@@ -257,7 +261,7 @@ namespace AlbumPanelColorTiles
          // Проверка чертежа
          Inspector.Clear();
          CheckDrawing checkDrawing = new CheckDrawing();
-         checkDrawing.CheckForPaint();                  
+         checkDrawing.CheckForPaint();
          if (Inspector.HasErrors)
          {
             throw new System.Exception("\nПокраска панелей не выполнена, в чертеже найдены ошибки в блоках панелей, см. выше.");
@@ -299,7 +303,7 @@ namespace AlbumPanelColorTiles
          ObjectId _idLayerMarks = ObjectId.Null;
          _marksSB = null;
          _sheetsSet = null;
-      }      
+      }
 
       private string abbreviateNameProject()
       {
@@ -349,8 +353,6 @@ namespace AlbumPanelColorTiles
          }
          progressMeter.Stop();
       }
-
-      
 
       private string loadAbbreviateName()
       {

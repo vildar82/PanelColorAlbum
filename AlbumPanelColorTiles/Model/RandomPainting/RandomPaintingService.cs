@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using AlbumPanelColorTiles.Lib;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -14,15 +14,17 @@ namespace AlbumPanelColorTiles.RandomPainting
    // Произвольная покраска участа с % распределением цветов
    public class RandomPaintService
    {
+      private ColorAreaSpotSize _colorAreaSize;
       private int _countInsertBlocksSpot;
       private Database _db;
       private Document _doc;
       private Editor _ed;
+
       //private Extents3d _extentsPrompted;
       private ObjectId _idBlRefColorAreaTemplate;
+
       private ObjectIdCollection _idColCopy;
       private ObjectId _idMS;
-      private ColorAreaSpotSize _colorAreaSize;
 
       // зона произвольной покраски
       private Random _rnd;
@@ -44,9 +46,8 @@ namespace AlbumPanelColorTiles.RandomPainting
                                     Settings.Default.TileHeight + Settings.Default.TileSeam, "RandomPaint");
       }
 
-      public Editor Ed { get { return _ed; } }
-
       public ColorAreaSpotSize ColorAreaSpotSize { get { return _colorAreaSize; } }
+      public Editor Ed { get { return _ed; } }
 
       public static void CheckBlockColorAre(Database db)
       {
@@ -349,13 +350,13 @@ namespace AlbumPanelColorTiles.RandomPainting
                _spots.AddRange(Spot.GetSpots(proper));
             }
 
-            // Распределение зон покраски            
-            List<Spot> distributedSpots = distributeSpots(_spots, totalTileCount);            
+            // Распределение зон покраски
+            List<Spot> distributedSpots = distributeSpots(_spots, totalTileCount);
 
-            // Вставка блоков зон            
-            placementSpots(distributedSpots);            
-            
-            _ed.Regen();            
+            // Вставка блоков зон
+            placementSpots(distributedSpots);
+
+            _ed.Regen();
          }
          catch (System.Exception ex)
          {
@@ -384,8 +385,8 @@ namespace AlbumPanelColorTiles.RandomPainting
       // Вставка ячейки покраски (пока = одной плитке)
       private void insertSpot(Spot spot, int x, int y, Transaction t)
       {
-         Point3d position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot, 
-                                       _colorAreaSize.ExtentsColorArea.MinPoint.Y + y *  _colorAreaSize.HeightSpot, 0);
+         Point3d position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot,
+                                       _colorAreaSize.ExtentsColorArea.MinPoint.Y + y * _colorAreaSize.HeightSpot, 0);
          IdMapping map = new IdMapping();
          _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
          ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;

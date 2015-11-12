@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -479,7 +478,7 @@ namespace AlbumPanelColorTiles.Panels
             _extentsTiles.AddPoint(tile.CenterTile);
          }
          return new Point2d((_extentsTiles.MinPoint.X + _extentsTiles.MaxPoint.X) * 0.5, (_extentsTiles.MinPoint.Y + _extentsTiles.MaxPoint.Y) * 0.5);
-      }      
+      }
 
       // Получение списка плиток в определении блока
       private void GetTiles()

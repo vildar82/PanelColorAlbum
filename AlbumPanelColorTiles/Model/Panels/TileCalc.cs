@@ -1,5 +1,5 @@
 ﻿using System;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.Colors;
 
 namespace AlbumPanelColorTiles.Panels

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
@@ -68,7 +68,7 @@ namespace AlbumPanelColorTiles.Panels
          if (rtreeColorAreas.Count > 0)
          {
             Point p = new Point(centerTile.X, centerTile.Y, 0);
-            var colorAreas = rtreeColorAreas.Nearest(p, Settings.Default.TileLenght); 
+            var colorAreas = rtreeColorAreas.Nearest(p, Settings.Default.TileLenght);
             colorAreas.Sort();
             foreach (ColorArea colorArea in colorAreas)
             {

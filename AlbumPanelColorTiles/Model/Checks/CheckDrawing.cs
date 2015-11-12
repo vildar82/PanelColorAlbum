@@ -17,7 +17,19 @@ namespace AlbumPanelColorTiles.Checks
       {
          Clear();
       }
-      
+
+      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
+      //private static List<Error> _notPaintedTilesInMarkAR;
+      public static void Clear()
+      {
+         _doc = Application.DocumentManager.MdiActiveDocument;
+         _db = _doc.Database;
+         _ed = _doc.Editor;
+         //_errors = new List<Error>();
+         //_notPaintedTilesInMarkAR = new List<ErrorObject>();
+         //_markArBtrNames = new List<string>();
+      }
+
       // Проверка чертежа
       public void CheckForPaint()
       {
@@ -34,18 +46,6 @@ namespace AlbumPanelColorTiles.Checks
          }
       }
 
-      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
-      //private static List<Error> _notPaintedTilesInMarkAR;
-      public static void Clear()
-      {
-         _doc = Application.DocumentManager.MdiActiveDocument;
-         _db = _doc.Database;
-         _ed = _doc.Editor;
-         //_errors = new List<Error>();
-         //_notPaintedTilesInMarkAR = new List<ErrorObject>();
-         //_markArBtrNames = new List<string>();
-      }
-
       // Проверка, все ли плитки покрашены
       //public static bool CheckAllTileArePainted(List<MarkSbPanel> marksSb)
       //{
@@ -57,7 +57,7 @@ namespace AlbumPanelColorTiles.Checks
       //      {
       //         // Такого не должно быть. Марка СБ есть, а марок АР нет.
       //         Error err = new Error(string.Format("\nЕсть Марка СБ {0}, а Марки АР не определены. Ошибка в программе(.", markSb.MarkSb));
-      //      }      
+      //      }
 
       //      foreach (var markAr in markSb.MarksAR)
       //      {

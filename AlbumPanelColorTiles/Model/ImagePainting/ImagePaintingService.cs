@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.RandomPainting;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.ImagePainting
             ext = _doc.Editor.PromptExtents("\nУкажите первый угол зоны покраски", "\nУкажите второй угол зоны покраски");
             len = ext.MaxPoint - ext.MinPoint;
             errMsg = "\nНужно выбрать область больше.";
-         } while (len.Length < (Settings.Default.ImagePaintSpotLength+ Settings.Default.ImagePaintSpotHeight));
+         } while (len.Length < (Settings.Default.ImagePaintSpotLength + Settings.Default.ImagePaintSpotHeight));
          _colorAreaSize.ExtentsColorArea = ext;
          _idsInsertBlRefColorArea = new List<ObjectId>();
       }

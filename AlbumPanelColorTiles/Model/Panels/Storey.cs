@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -11,7 +11,7 @@ namespace AlbumPanelColorTiles.Panels
    {
       private static StoreyNumberComparer _comparer = new StoreyNumberComparer();
       private HashSet<MarkArPanelAR> _marksAr;
-      private string _number;      
+      private string _number;
       private double _y;
 
       /// <summary>
@@ -31,27 +31,11 @@ namespace AlbumPanelColorTiles.Panels
          get { return _number; }
          set
          {
-            _number = value;            
+            _number = value;
          }
-      }     
+      }
 
       public double Y { get { return _y; } }
-
-      public void AddMarkAr(MarkArPanelAR markAr)
-      {
-         _marksAr.Add(markAr);
-      }
-
-      public int CompareTo(Storey other)
-      {
-         return _comparer.Compare(_number, other._number);
-      }
-
-      public bool Equals(Storey other)
-      {
-         return _number.Equals(other._number) &&
-            _y.Equals(other._y);
-      }
 
       // определение этажей панелей
       public static List<Storey> IdentificationStoreys(List<MarkSbPanelAR> marksSB, int numberFirstFloor)
@@ -79,11 +63,27 @@ namespace AlbumPanelColorTiles.Panels
          int i = numberFirstFloor;
          var storeysOrders = storeys.OrderBy(s => s.Y).ToList();
          storeysOrders.ForEach((s) => s.Number = i++.ToString());
-         // Пока уберем индекс Последнего этажа - сейчас он определяется только для последнего этажа среди всех окрашевыемых фасадов. 
+         // Пока уберем индекс Последнего этажа - сейчас он определяется только для последнего этажа среди всех окрашевыемых фасадов.
          // А нужно определять последний этаж на каждом фасаде.
          //storeysOrders.Last().Number = Settings.Default.PaintIndexLastStorey;// "П"
          // В итоге у всех панелей (Panel) проставлены этажи (Storey).
          return storeys;
+      }
+
+      public void AddMarkAr(MarkArPanelAR markAr)
+      {
+         _marksAr.Add(markAr);
+      }
+
+      public int CompareTo(Storey other)
+      {
+         return _comparer.Compare(_number, other._number);
+      }
+
+      public bool Equals(Storey other)
+      {
+         return _number.Equals(other._number) &&
+            _y.Equals(other._y);
       }
    }
 }

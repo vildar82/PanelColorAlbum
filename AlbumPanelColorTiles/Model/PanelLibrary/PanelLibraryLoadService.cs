@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.PanelLibrary

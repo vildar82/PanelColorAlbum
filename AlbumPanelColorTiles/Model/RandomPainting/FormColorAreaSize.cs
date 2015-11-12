@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using AlbumPanelColorTiles.Properties;
+using AlbumPanelColorTiles.Options;
 
 namespace AlbumPanelColorTiles.RandomPainting
 {
@@ -66,7 +66,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          int len;
          int.TryParse(slen, out len);
          int div = len / tileValue;
-         string res = (tileValue * div).ToString();         
+         string res = (tileValue * div).ToString();
          if (!string.Equals(slen, res, StringComparison.CurrentCultureIgnoreCase))
          {
             errorProviderError.SetError(textBox, string.Format("Введенное значение {0} откорректированно для кратности плитке", slen));
@@ -88,6 +88,6 @@ namespace AlbumPanelColorTiles.RandomPainting
       {
          errorProviderError.SetError(buttonOk, string.Empty);
          textBoxLenght.Text = correctionValue(textBoxLenght, Settings.Default.TileLenght + Settings.Default.TileSeam);
-      }     
+      }
    }
 }

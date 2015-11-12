@@ -173,6 +173,11 @@ namespace AlbumPanelColorTiles.RandomPainting
          }
       }
 
+      private void buttonSpotSize_Click(object sender, EventArgs e)
+      {
+         _randomPaintingService.ColorAreaSpotSize.ChangeSize();
+      }
+
       private void comboBoxColor_DrawItem(object sender, DrawItemEventArgs e)
       {
          e.DrawBackground();
@@ -326,11 +331,6 @@ namespace AlbumPanelColorTiles.RandomPainting
          trackBar.Value = value;
          // Подпись процента в TextBox
          setPercentToTextBox(proper);
-      }
-
-      private void buttonSpotSize_Click(object sender, EventArgs e)
-      {
-         _randomPaintingService.ColorAreaSpotSize.ChangeSize();
       }
    }
 }
