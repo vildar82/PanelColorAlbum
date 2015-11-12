@@ -148,6 +148,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          using (Database dbLib = new Database(false, true))
          {
             dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");
+            dbLib.CloseInput(true);
             using (var t = dbLib.TransactionManager.StartTransaction())
             {
                // список блоков АКР-Панелей в библиотеке (полные имена блоков).

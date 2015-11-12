@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Properties;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -12,16 +14,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
    {
       private Extents3d _extents;
       private Guid _classId;
-      private Color _color;
+      private System.Drawing.Color _color;
       private string _layer;
       private string _linetype;
       private LineWeight _lineweight;
 
       public EntityInfo(Entity ent)
       {
-         _extents = ent.GeometricExtents;
+         _extents = ent.GeometricExtents;         
          _classId = ent.ClassID;
-         _color = ent.Color;
+         _color = ent.Color.ColorValue;
          _layer = ent.Layer;
          _linetype = ent.Linetype;
          _lineweight = ent.LineWeight;
@@ -31,7 +33,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          if (Object.ReferenceEquals(other, null)) return false;
          if (Object.ReferenceEquals(this, other)) return true;
-         return _extents.Equals(other._extents) &&
+         return _extents.Equals(other._extents) &&            
             _classId.Equals(other._classId) &&
             _color.Equals(other._color) &&
             _layer.Equals(other._layer) &&
@@ -65,7 +67,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
             entsInfo.Add(new EntityInfo(ent));
             if (ent is BlockReference)
             {
-               entsInfo.AddRange(GetEntInfoBtr(((BlockReference)ent).BlockTableRecord));
+               if (!string.Equals(((BlockReference)ent).Name, Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+               {
+                  entsInfo.AddRange(GetEntInfoBtr(((BlockReference)ent).BlockTableRecord));
+               }
             }
          }
          return entsInfo;

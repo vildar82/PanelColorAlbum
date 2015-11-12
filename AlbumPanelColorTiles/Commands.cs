@@ -159,17 +159,20 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         try
+         using (var DocLock = doc.LockDocument())
          {
-            MountingPlans mountingPlans = new MountingPlans();
-            mountingPlans.CreateMountingPlans();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            try
             {
-               Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
+               MountingPlans mountingPlans = new MountingPlans();
+               mountingPlans.CreateMountingPlans();
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage(string.Format("\n{0}", ex.ToString()));
+               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               {
+                  Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
+               }
             }
          }
       }
@@ -189,20 +192,23 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-ImagePainting");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         try
+         using (var DocLock = doc.LockDocument())
          {
-            if (_imagePainting == null)
+            try
             {
-               _imagePainting = new ImagePaintingService(doc);
+               if (_imagePainting == null)
+               {
+                  _imagePainting = new ImagePaintingService(doc);
+               }
+               _imagePainting.Go();
             }
-            _imagePainting.Go();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage("\n{0}", ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            catch (System.Exception ex)
             {
-               Log.Error(ex, "Command: AKR-ImagePainting");
+               doc.Editor.WriteMessage("\n{0}", ex.ToString());
+               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               {
+                  Log.Error(ex, "Command: AKR-ImagePainting");
+               }
             }
          }
       }
@@ -217,17 +223,20 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-LoadPanelsFromLibrary");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         try
+         using (var DocLock = doc.LockDocument())
          {
-            PanelLibraryLoadService loadPanelsService = new PanelLibraryLoadService();
-            loadPanelsService.LoadPanels();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            try
             {
-               Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary");
+               PanelLibraryLoadService loadPanelsService = new PanelLibraryLoadService();
+               loadPanelsService.LoadPanels();
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage(string.Format("\n{0}", ex.ToString()));
+               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               {
+                  Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary");
+               }
             }
          }
       }
@@ -349,21 +358,24 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-RandomPainting");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         try
+         using (var DocLock = doc.LockDocument())
          {
-            // Произвольная покраска участка, с % распределением цветов зон покраски.
-            if (_randomPainting == null)
+            try
             {
-               _randomPainting = new RandomPaintService();
+               // Произвольная покраска участка, с % распределением цветов зон покраски.
+               if (_randomPainting == null)
+               {
+                  _randomPainting = new RandomPaintService();
+               }
+               _randomPainting.Start();
             }
-            _randomPainting.Start();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage("\n{0}", ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            catch (System.Exception ex)
             {
-               Log.Error(ex, "Command: AKR-RandomPainting");
+               doc.Editor.WriteMessage("\n{0}", ex.ToString());
+               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               {
+                  Log.Error(ex, "Command: AKR-RandomPainting");
+               }
             }
          }
       }
@@ -404,17 +416,20 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-SavePanelsToLibrary");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         try
+         using (var DocLock = doc.LockDocument())
          {
-            PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
-            panelLib.SavePanelsToLibrary();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            try
             {
-               Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
+               PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
+               panelLib.SavePanelsToLibrary();
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage(ex.ToString());
+               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               {
+                  Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
+               }
             }
          }
       }

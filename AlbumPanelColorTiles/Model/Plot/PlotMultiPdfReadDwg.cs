@@ -25,6 +25,7 @@ namespace AlbumPanelColorTiles.Plot
             using (var db = new Database(false, true))
             {
                db.ReadDwgFile(fileDwg.FullName, FileShare.ReadWrite, false, "");
+               db.CloseInput(true);
                HostApplicationServices.WorkingDatabase = db;
                db.CloseInput(true);
                multiSheetPlot(db);
