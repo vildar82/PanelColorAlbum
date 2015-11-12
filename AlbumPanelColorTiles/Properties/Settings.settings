@@ -134,5 +134,14 @@
     <Setting Name="BlockColorAreaDynPropHeight" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Высота</Value>
     </Setting>
+    <Setting Name="SheetPanelEndUp" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1400</Value>
+    </Setting>
+    <Setting Name="SheetPanelEndShift" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">700</Value>
+    </Setting>
+    <Setting Name="SheetScale" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

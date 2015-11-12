@@ -418,5 +418,32 @@ namespace AlbumPanelColorTiles.Properties {
                 return ((string)(this["BlockColorAreaDynPropHeight"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1400")]
+        public int SheetPanelEndUp {
+            get {
+                return ((int)(this["SheetPanelEndUp"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("700")]
+        public float SheetPanelEndShift {
+            get {
+                return ((float)(this["SheetPanelEndShift"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("25")]
+        public int SheetScale {
+            get {
+                return ((int)(this["SheetScale"]));
+            }
+        }
     }
 }
