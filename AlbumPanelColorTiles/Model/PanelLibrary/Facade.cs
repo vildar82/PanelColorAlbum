@@ -56,7 +56,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         if (panelSb.PanelAKR != null)
                         {
                            Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
-                           testGeom(panelSb, facade, floor, yFloor, t, ms);
+                           //testGeom(panelSb, facade, floor, yFloor, t, ms);
                            var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
                            panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);

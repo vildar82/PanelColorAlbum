@@ -37,7 +37,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public PanelSB(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark)
       {
          _markSb = mark;
-         _extBlRefPanel = blRefPanelSB.GeometricExtents;
+         _extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
          _extTransToModel = new Extents3d();
          _extTransToModel.AddPoint(_extBlRefPanel.MinPoint.TransformBy(trans));
          _extTransToModel.AddPoint(_extBlRefPanel.MaxPoint.TransformBy(trans));
