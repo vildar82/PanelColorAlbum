@@ -14,7 +14,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // DWG файл
    public class PanelLibrarySaveService
    {
-      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
+      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels_Test.dwg");
+      public static readonly string LibPanelsExcelFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.xlsx");
       private Database _dbCur;
       private Document _doc;
 
@@ -124,6 +125,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          List<PanelAKR> panelsAkrInFacade = GetPanelsAkrInDb(_dbCur);
 
          string msgReport = string.Empty;
+         List<PanelAKR> panelsAkrToSave;
 
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var dbLib = new Database(false, true))
@@ -133,7 +135,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // список панелей в библиотеке
             List<PanelAKR> panelsAkrInLib = GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
             // Список изменившихся панелей и новых для записи в базу.
-            List<PanelAKR> panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
+            panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
             if (panelsAkrToSave.Count > 0)
             {
                // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
@@ -153,6 +155,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                _doc.Editor.WriteMessage("\nНет панелей для сохранения в библиотеку (в текущем чертеже нет новых и изменившихся панелей).");
             }
          }
+         SaveChangesToExel.Save(panelsAkrToSave);
          _doc.Editor.WriteMessage(string.Format("\n{0}", msgReport));
          sendReport(msgReport);
       }
