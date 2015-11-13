@@ -81,10 +81,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // Поиск всех панелей СБ в определении блока
-      public static List<PanelSB> GetPanels(ObjectId idBtr, Point3d ptBase, Matrix3d trans)
+      public static List<PanelSB> GetPanels(BlockReference blRefMounting, Point3d ptBase, Matrix3d trans)
       {
          List<PanelSB> panelsSB = new List<PanelSB>();
-         using (var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         using (var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord)
          {
             foreach (ObjectId idEnt in btr)
             {
@@ -124,6 +124,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   }
                }
             }
+         }
+         if (panelsSB.Count == 0)
+         {
+            // Ошибка - в блоке монтажного плана, не найдена ни одна панель
+            Inspector.AddError(string.Format("В блоке монтажного плана {0} не найдена ни одна панель.", blRefMounting.Name), blRefMounting);
          }
          return panelsSB;
       }

@@ -46,7 +46,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _ptBlMounting = blRefMounting.Position;
          _name = getFloorName(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting.BlockTableRecord, blRefMounting.Position, blRefMounting.BlockTransform);
+         _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform);
          _xmin = getXMinFloor();
          _xmax = getXMaxFloor();
          //// добавление блоков паненлей в общий список панелей СБ
@@ -131,6 +131,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // определение торцов панелей
       public void DefineEndsPanelSb()
       {
+         if (_panelsSbInFront.Count == 0) return;
          // панель с самым меньшим X это торцевая панель слева
          var min = _panelsSbInFront.Aggregate((p1, p2) => p1.PtCenterPanelSbInModel.X < p2.PtCenterPanelSbInModel.X ? p1 : p2);
          min.IsEndLeftPanel = true;
@@ -156,11 +157,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       private double getXMaxFloor()
       {
+         if (_allPanelsSbInFloor.Count == 0) return 0;
          return _allPanelsSbInFloor.Max(p => p.ExtTransToModel.MaxPoint.X);
       }
 
       private double getXMinFloor()
       {
+         if (_allPanelsSbInFloor.Count == 0) return 0;
          return _allPanelsSbInFloor.Min(p => p.ExtTransToModel.MinPoint.X);
       }
 
@@ -178,6 +181,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                panelSb.IsInFloor = true;
                _panelsSbInFront.Add(panelSb);
             }
+         }
+         if(_panelsSbInFront.Count ==0)
+         {
+            Inspector.AddError(string.Format("В блоке обозначения стороны фасада {0} не найдена ни одна панель.", facadeFrontBlock.BlName),
+               facadeFrontBlock.Extents, facadeFrontBlock.IdBlRef);
          }
       }
    }

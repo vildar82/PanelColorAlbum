@@ -105,17 +105,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
          Inspector.Clear();
          // Попытка определить фасады по монтажкам
          List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
-         // загрузка АКР-панелей из библиотеки
-         PanelSB.LoadBtrPanels(facades);
+         if (Inspector.HasErrors)
+         {            
+            Inspector.Show();
+            return;
+         }         
          if (facades.Count > 0)
          {
+            // загрузка АКР-панелей из библиотеки
+            PanelSB.LoadBtrPanels(facades);
             // расстановка АКР-Панелей по фасадам
             Facade.CreateFacades(facades);
          }
          else
-         {
-            // простая расстановки имеющихся в бибилтоеке АКР-Панелей
-            //PanelAKR.SimpleInsert(_allPanelsSB);
+         {            
             Inspector.AddError("Не удалось определить фасады по монтажным планам.");
          }
          if (Inspector.HasErrors)
