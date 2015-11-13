@@ -128,8 +128,7 @@ namespace AlbumPanelColorTiles
                         Inspector.Show();
                      }
 
-                     doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
-                     doc.Editor.Regen();
+                     doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);                     
                      Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
                   }
                   else
@@ -415,20 +414,17 @@ namespace AlbumPanelColorTiles
          Log.Info("Start Command: AKR-SavePanelsToLibrary");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         using (var DocLock = doc.LockDocument())
+         try
          {
-            try
+            PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
+            panelLib.SavePanelsToLibrary();
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage(ex.ToString());
+            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
             {
-               PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
-               panelLib.SavePanelsToLibrary();
-            }
-            catch (System.Exception ex)
-            {
-               doc.Editor.WriteMessage(ex.ToString());
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
-               {
-                  Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
-               }
+               Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
             }
          }
       }

@@ -128,7 +128,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var dbLib = new Database(false, true))
          {
-            dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.ReadWrite, false, "");
+            dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.Read, false, "");
             dbLib.CloseInput(true);
             // список панелей в библиотеке
             List<PanelAKR> panelsAkrInLib = GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
@@ -139,9 +139,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
                copyLibPanelFile(LibPanelsFilePath);
                // Копирование новых панелей
-               //copyNewPanels(dbLib, panelsAkrToSave);
+               copyNewPanels(dbLib, panelsAkrToSave);
+               // Текст изменений.
+               //textChangesToLibDwg(panelsAkrToCopy, dbLib, t);
                // Сохранение файла библиотеки панелей
-               dbLib.SaveAs(LibPanelsFilePath, DwgVersion.Current);
+               dbLib.SaveAs(dbLib.Filename, DwgVersion.Current);
                // строка отчета
                msgReport = getReport(panelsAkrToSave);
                Log.Info("Обновлена библиотека панелей.");
@@ -168,13 +170,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private void copyNewPanels(Database dbLib, List<PanelAKR> panelsAkrToCopy)
       {
          var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p => p.IdBtrAkrPanelInLib).ToArray());
-         using (var t = dbLib.TransactionManager.StartTransaction())
-         {
-            IdMapping iMap = new IdMapping();
-            dbLib.WblockCloneObjects(ids, dbLib.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
-            textChangesToLibDwg(panelsAkrToCopy, dbLib, t);
-            t.Commit();
-         }
+         IdMapping iMap = new IdMapping();
+         dbLib.WblockCloneObjects(ids, dbLib.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);         
       }
 
       private string getReport(List<PanelAKR> panels)
