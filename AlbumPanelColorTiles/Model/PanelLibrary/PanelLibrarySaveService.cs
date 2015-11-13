@@ -48,12 +48,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          if (panelsNotInLib.Count > 0)
          {
-            ed.WriteMessage("\nБлоки панелей которых нет в библиотеке:");
+            ed.WriteMessage("\n!!!Важно!!! В чертеже есть новые блоки АКР-Панелей которых нет в библиотеке:");
             foreach (var panel in panelsNotInLib)
             {
                ed.WriteMessage("\n{0}", panel);
             }
-            ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку. Спасибо!");
+            ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку.");
             Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
          }
       }

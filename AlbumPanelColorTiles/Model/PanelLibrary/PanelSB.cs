@@ -179,7 +179,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   IdMapping iMap = new IdMapping();
                   dbFacade.WblockCloneObjects(new ObjectIdCollection(idsPanelsAkrInLibAndFacade.Keys.ToArray()),
-                                             dbFacade.BlockTableId, iMap, DuplicateRecordCloning.Ignore, false);
+                                             dbFacade.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
                   // запись соответствия панелей
                   foreach (var item in idsPanelsAkrInLibAndFacade)
                   {
