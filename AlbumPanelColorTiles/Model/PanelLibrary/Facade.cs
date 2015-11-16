@@ -53,12 +53,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      captionFloor(facade.XMin, yFloor, floor.Name, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
                      {
-                        if (panelSb.PanelAKR != null)
+                        if (panelSb.PanelAkrLib != null)
                         {
-                           Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0);
+                           Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAkrLib).X, yFloor, 0);
                            //testGeom(panelSb, facade, floor, yFloor, t, ms);
-                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAKR.IdBtrAkrPanelInFacade);
-                           panelSb.PanelAKR.IdBlRefWhenCreateFacade = ms.AppendEntity(blRefPanelAkr);
+                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkrLib.IdBtrPanelAkrInFacade);
+                           ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
                            blRefPanelAkr.Draw();
                         }
@@ -137,12 +137,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          ms.AppendEntity(ptPanelSbInModel);
          t.AddNewlyCreatedDBObject(ptPanelSbInModel, true);
          // Точка вставки панели АКР
-         DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAKR).X, yFloor, 0));
+         DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAkrLib).X, yFloor, 0));
          ms.AppendEntity(ptPanelArkInModel);
          t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);
          // Расстояние до центра панели АКР
          Line lineToCenterPanelAkr = new Line(ptPanelArkInModel.Position,
-            new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAKR.DistToCenterFromBase, ptPanelArkInModel.Position.Y, 0));
+            new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAkrLib.GetDistToCenter(panelSb.PanelAkrLib.IdBtrPanelAkrInFacade),
+                        ptPanelArkInModel.Position.Y, 0));
          ms.AppendEntity(lineToCenterPanelAkr);
          t.AddNewlyCreatedDBObject(lineToCenterPanelAkr, true);
       }

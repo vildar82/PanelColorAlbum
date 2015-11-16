@@ -13,18 +13,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    public partial class FormPanelAkrList : Form
    {
-      private List<PanelAKR> _selectedPanels;
+      private List<PanelAkrFacade> _selectedPanels;
 
-      public FormPanelAkrList(List<PanelAKR> panels)
+      public FormPanelAkrList(List<PanelAkrFacade> panels)
       {
-         _selectedPanels = new List<PanelAKR>();
-
+         _selectedPanels = new List<PanelAkrFacade>();
          InitializeComponent();
-
          listBoxPanels.DataSource = panels;
       }
 
-      public List<PanelAKR> SelectedPanels { get { return _selectedPanels; } }
+      public List<PanelAkrFacade> SelectedPanels { get { return _selectedPanels; } }
 
       private void buttonAdd_Click(object sender, EventArgs e)
       {
@@ -34,8 +32,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             DialogResult = DialogResult.None;
             return;
          }
-
-         _selectedPanels = listBoxPanels.SelectedItems.Cast<PanelAKR>().ToList();
+         _selectedPanels = listBoxPanels.SelectedItems.Cast<PanelAkrFacade>().ToList();
       }
    }
 }

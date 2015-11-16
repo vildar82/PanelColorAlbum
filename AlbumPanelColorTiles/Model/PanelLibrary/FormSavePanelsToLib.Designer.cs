@@ -33,7 +33,9 @@
          this.tabControl = new System.Windows.Forms.TabControl();
          this.tabPageNew = new System.Windows.Forms.TabPage();
          this.tabPageChanged = new System.Windows.Forms.TabPage();
+         this.listBoxChanged = new System.Windows.Forms.ListBox();
          this.tabPageForce = new System.Windows.Forms.TabPage();
+         this.listBoxForce = new System.Windows.Forms.ListBox();
          this.buttonDel = new System.Windows.Forms.Button();
          this.buttonAdd = new System.Windows.Forms.Button();
          this.buttonShow = new System.Windows.Forms.Button();
@@ -41,8 +43,7 @@
          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
          this.buttonCancel = new System.Windows.Forms.Button();
          this.buttonSave = new System.Windows.Forms.Button();
-         this.listBoxChanged = new System.Windows.Forms.ListBox();
-         this.listBoxForce = new System.Windows.Forms.ListBox();
+         this.buttonDesc = new System.Windows.Forms.Button();
          this.tabControl.SuspendLayout();
          this.tabPageNew.SuspendLayout();
          this.tabPageChanged.SuspendLayout();
@@ -92,6 +93,15 @@
          this.tabPageChanged.Text = "Измененные";
          this.tabPageChanged.UseVisualStyleBackColor = true;
          // 
+         // listBoxChanged
+         // 
+         this.listBoxChanged.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.listBoxChanged.FormattingEnabled = true;
+         this.listBoxChanged.Location = new System.Drawing.Point(3, 3);
+         this.listBoxChanged.Name = "listBoxChanged";
+         this.listBoxChanged.Size = new System.Drawing.Size(376, 295);
+         this.listBoxChanged.TabIndex = 1;
+         // 
          // tabPageForce
          // 
          this.tabPageForce.Controls.Add(this.listBoxForce);
@@ -102,6 +112,15 @@
          this.tabPageForce.TabIndex = 2;
          this.tabPageForce.Text = "Принудительно";
          this.tabPageForce.UseVisualStyleBackColor = true;
+         // 
+         // listBoxForce
+         // 
+         this.listBoxForce.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.listBoxForce.FormattingEnabled = true;
+         this.listBoxForce.Location = new System.Drawing.Point(3, 3);
+         this.listBoxForce.Name = "listBoxForce";
+         this.listBoxForce.Size = new System.Drawing.Size(376, 295);
+         this.listBoxForce.TabIndex = 1;
          // 
          // buttonDel
          // 
@@ -146,6 +165,7 @@
          this.buttonShowInLib.Text = "Показать в библиотеке";
          this.toolTip1.SetToolTip(this.buttonShowInLib, "Показать панель в библиотеке");
          this.buttonShowInLib.UseVisualStyleBackColor = true;
+         this.buttonShowInLib.Visible = false;
          this.buttonShowInLib.Click += new System.EventHandler(this.buttonShowInLib_Click);
          // 
          // buttonCancel
@@ -169,24 +189,18 @@
          this.buttonSave.Text = "Сохранить";
          this.toolTip1.SetToolTip(this.buttonSave, "Сохранение блоков панелей в файл библиотеки");
          this.buttonSave.UseVisualStyleBackColor = true;
+         this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
          // 
-         // listBoxChanged
+         // buttonDesc
          // 
-         this.listBoxChanged.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.listBoxChanged.FormattingEnabled = true;
-         this.listBoxChanged.Location = new System.Drawing.Point(3, 3);
-         this.listBoxChanged.Name = "listBoxChanged";
-         this.listBoxChanged.Size = new System.Drawing.Size(376, 295);
-         this.listBoxChanged.TabIndex = 1;
-         // 
-         // listBoxForce
-         // 
-         this.listBoxForce.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.listBoxForce.FormattingEnabled = true;
-         this.listBoxForce.Location = new System.Drawing.Point(3, 3);
-         this.listBoxForce.Name = "listBoxForce";
-         this.listBoxForce.Size = new System.Drawing.Size(376, 295);
-         this.listBoxForce.TabIndex = 1;
+         this.buttonDesc.Location = new System.Drawing.Point(12, 397);
+         this.buttonDesc.Name = "buttonDesc";
+         this.buttonDesc.Size = new System.Drawing.Size(82, 23);
+         this.buttonDesc.TabIndex = 4;
+         this.buttonDesc.Text = "Примечание";
+         this.toolTip1.SetToolTip(this.buttonDesc, "Примечание к панели. Примечание сохраниться при сохранении панелей в библиотеку.");
+         this.buttonDesc.UseVisualStyleBackColor = true;
+         this.buttonDesc.Click += new System.EventHandler(this.buttonDesc_Click);
          // 
          // FormSavePanelsToLib
          // 
@@ -195,6 +209,7 @@
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.CancelButton = this.buttonCancel;
          this.ClientSize = new System.Drawing.Size(420, 432);
+         this.Controls.Add(this.buttonDesc);
          this.Controls.Add(this.buttonAdd);
          this.Controls.Add(this.buttonShowInLib);
          this.Controls.Add(this.buttonShow);
@@ -229,5 +244,6 @@
       private System.Windows.Forms.Button buttonSave;
       private System.Windows.Forms.ListBox listBoxChanged;
       private System.Windows.Forms.ListBox listBoxForce;
+      private System.Windows.Forms.Button buttonDesc;
    }
 }

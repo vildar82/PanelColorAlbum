@@ -96,6 +96,12 @@
     <Compile Include="Model\PanelLibrary\FormPanelAkrList.Designer.cs">
       <DependentUpon>FormPanelAkrList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\PanelLibrary\FormPanelDesc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\PanelLibrary\FormPanelDesc.Designer.cs">
+      <DependentUpon>FormPanelDesc.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\PanelLibrary\MountingPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelAKR.cs" />
     <Compile Include="Model\PanelLibrary\PanelAkrFacade.cs" />
@@ -200,6 +206,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Model\PanelLibrary\FormPanelAkrList.resx">
       <DependentUpon>FormPanelAkrList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Model\PanelLibrary\FormPanelDesc.resx">
+      <DependentUpon>FormPanelDesc.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Model\PanelLibrary\FormSavePanelsToLib.resx">
       <DependentUpon>FormSavePanelsToLib.cs</DependentUpon>
