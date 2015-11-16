@@ -14,8 +14,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // DWG файл
    public class PanelLibrarySaveService
    {
-      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
-      public static readonly string LibPanelsExcelFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.xlsx");
+      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels_Test.dwg");
+      public static readonly string LibPanelsExcelFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels_Test.xlsx");
       private Database _dbCur;
       private Document _doc;
 
@@ -114,8 +114,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Если такой блок уже есть в бибилиотеке? - старому блоку изменить имя с приставкой сегодняшней даты - [АКР_Панель_МаркаСБ]_25.10.2015-14:15
          // Если файл занят другим процессом? - подождать 3 секунды и повторить.
 
-         // Файл библиотеки блоков панелей.
-         //string libPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
+         // Файл библиотеки блоков панелей.         
          if (!File.Exists(LibPanelsFilePath))
          {
             Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
@@ -123,6 +122,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          // сбор блоков для сохранения
          List<PanelAKR> panelsAkrInFacade = GetPanelsAkrInDb(_dbCur);
+         if (panelsAkrInFacade.Count == 0)
+         {
+            _doc.Editor.WriteMessage("\nНет блоков АКР-Панелей для сохранения в библиотеку.");
+            return;
+         }
 
          string msgReport = string.Empty;
          List<PanelAKR> panelsAkrToSave;
@@ -130,12 +134,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var dbLib = new Database(false, true))
          {
-            dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.Read, false, "");
+            dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.None, false, "");
             dbLib.CloseInput(true);
             // список панелей в библиотеке
             List<PanelAKR> panelsAkrInLib = GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
             // Список изменившихся панелей и новых для записи в базу.
             panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
+
+            // Форма для просмотра и управления списков сохранения панелей            
+            FormSavePanelsToLib formSave = new FormSavePanelsToLib(
+               panelsAkrToSave.Where(p => p.ReportStatus == EnumReportStatus.New).ToList(),
+               panelsAkrToSave.Where(p => p.ReportStatus == EnumReportStatus.Changed).ToList(),
+               panelsAkrInFacade.Where(p => p.ReportStatus == EnumReportStatus.Other).ToList());
+            Application.ShowModelessDialog(formSave);
+
             if (panelsAkrToSave.Count > 0)
             {
                // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
@@ -232,7 +244,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Заголовок Изменений
          sbChanges.AppendLine(string.Format("Последнее изменение от {0}. Дата {1}. Чертеж {2}", Environment.UserName, DateTime.Now, _dbCur.Filename));
          // Список новых панелей
-         var newPanels = panelsAkrToCopy.Where(p => p.ReportStatus == "Новая");
+         var newPanels = panelsAkrToCopy.Where(p => p.ReportStatus ==   EnumReportStatus.New);
          if (newPanels.Count() > 0)
          {
             sbChanges.AppendLine("Список новых панелей:");
@@ -241,7 +253,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                sbChanges.AppendLine(item.BlNameInLib);
             }
          }
-         var changedPanels = panelsAkrToCopy.Where(p => p.ReportStatus == "Изменившаяся");
+         var changedPanels = panelsAkrToCopy.Where(p => p.ReportStatus ==  EnumReportStatus.Changed);
          if (changedPanels.Count() > 0)
          {
             sbChanges.AppendLine("Список изменившихся панелей:");

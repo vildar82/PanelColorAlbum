@@ -408,23 +408,26 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("PIK", "AKR-SavePanelsToLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor)]
+      [CommandMethod("PIK", "AKR-SavePanelsToLibrary", CommandFlags.Session | CommandFlags.Modal | CommandFlags.NoBlockEditor)]
       public void SavePanelsToLibraryCommand()
       {
          Log.Info("Start Command: AKR-SavePanelsToLibrary");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
-         try
+         using (var lockDoc = doc.LockDocument())
          {
-            PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
-            panelLib.SavePanelsToLibrary();
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage(ex.ToString());
-            if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+            try
             {
-               Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
+               PanelLibrarySaveService panelLib = new PanelLibrarySaveService();
+               panelLib.SavePanelsToLibrary();
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage(ex.ToString());
+               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               {
+                  Log.Error(ex, "Command: AKR-SavePanelsToLibrary");
+               }
             }
          }
       }
