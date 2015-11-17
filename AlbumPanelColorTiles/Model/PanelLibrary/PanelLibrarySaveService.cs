@@ -131,7 +131,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var dbLib = new Database(false, true))
          {
-            dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.None, false, "");
+            dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.Read, false, "");
             dbLib.CloseInput(true);
             // список панелей в библиотеке
             List<PanelAkrLib> panelsAkrInLib = PanelAkrLib.GetAkrPanelLib(dbLib); //GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
