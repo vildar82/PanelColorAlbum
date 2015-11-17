@@ -139,11 +139,12 @@ namespace AlbumPanelColorTiles.ImagePainting
                      Point3d position = ptStart.Add(new Vector3d(x * _colorAreaSize.LenghtSpot, -(y + 1) * _colorAreaSize.HeightSpot, 0));
                      insertSpot(position, getLayerId(bitmap.GetPixel(x, y), _layersColorArea));
                   }
+                  progressMeter.Stop();
                   blRefColorAreaTemplate.Erase(true);
                   t.Commit();
-
-                  progressMeter.Stop();
+                  
                   _doc.Editor.Regen();
+                  _doc.Editor.WriteMessage("\nГотово");
                }
             }
          }

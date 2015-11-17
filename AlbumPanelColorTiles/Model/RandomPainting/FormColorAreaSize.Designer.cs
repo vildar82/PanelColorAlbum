@@ -78,7 +78,7 @@
          this.textBoxLenght.Name = "textBoxLenght";
          this.textBoxLenght.Size = new System.Drawing.Size(100, 20);
          this.textBoxLenght.TabIndex = 2;
-         this.toolTip1.SetToolTip(this.textBoxLenght, "Длина зоны покраски. Должна быть кратна длине плитки со швом");         
+         this.toolTip1.SetToolTip(this.textBoxLenght, "Длина зоны покраски. Должна быть кратна длине плитки со швом");
          this.textBoxLenght.Leave += new System.EventHandler(this.textBoxLenght_Leave);
          // 
          // label2
@@ -120,6 +120,7 @@
          this.MinimizeBox = false;
          this.Name = "FormColorAreaSize";
          this.ShowIcon = false;
+         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
          this.Text = "Размер зоны покраски";
          ((System.ComponentModel.ISupportInitialize)(this.errorProviderError)).EndInit();
          this.ResumeLayout(false);
