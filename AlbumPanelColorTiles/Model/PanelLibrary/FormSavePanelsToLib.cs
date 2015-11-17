@@ -87,6 +87,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          PanelAkrFacade panel = (PanelAkrFacade)_curListBox.SelectedItem;
          List<PanelAkrFacade> panelsList = (List<PanelAkrFacade>)_curListBox.DataSource;
          panelsList.Remove(panel);
+         _panelsOtherInFacade.Add(panel);
+         refreshDataSource();
       }
 
       private void activateDoc()
