@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -203,6 +204,28 @@ namespace AlbumPanelColorTiles.Panels
             t.Commit();
          }
          return Settings.Default.LayerMarks;
+      }
+
+      public static List<ObjectId> GetPanelsBlRefInModel(Database db)
+      {         
+         List<ObjectId> ids = new List<ObjectId>();
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                  if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
+                  {
+                     ids.Add(idEnt);
+                  }
+               }
+            }
+            t.Commit();
+         }
+         return ids;
       }
    }
 }
