@@ -162,7 +162,10 @@ namespace AlbumPanelColorTiles.RandomPainting
 
       private void buttonDraw_Click(object sender, EventArgs e)
       {
-         Fire(_trackPropers, e);
+         this.Hide();
+         Fire(_trackPropers, e);         
+         this.Show();
+         MessageBox.Show("Готово");
       }
 
       private void buttonSelect_Click(object sender, EventArgs e)

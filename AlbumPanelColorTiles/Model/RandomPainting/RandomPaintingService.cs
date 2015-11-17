@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.RandomPainting
 {
@@ -356,7 +357,7 @@ namespace AlbumPanelColorTiles.RandomPainting
             // Вставка блоков зон
             placementSpots(distributedSpots);
 
-            _ed.Regen();
+            _ed.Regen();                        
          }
          catch (System.Exception ex)
          {
@@ -420,9 +421,14 @@ namespace AlbumPanelColorTiles.RandomPainting
                _idColCopy = new ObjectIdCollection();
                _idColCopy.Add(_idBlRefColorAreaTemplate);
 
+               ProgressMeter progressMeter = new ProgressMeter();
+               progressMeter.SetLimit(spots.Count);
+               progressMeter.Start("Вставка блоков зон покраски...");
+
                _countInsertBlocksSpot = 0;
                foreach (var spot in spots)
                {
+                  progressMeter.MeterProgress();
                   if (HostApplicationServices.Current.UserBreak())
                      break;
                   if (spot != null)
@@ -430,6 +436,7 @@ namespace AlbumPanelColorTiles.RandomPainting
                      insertSpot(spot, spot.Index / _ysize, spot.Index % _ysize, t);
                   }
                }
+               progressMeter.Stop();
                Log.Debug("Вставлено блоков {0}", _countInsertBlocksSpot);
 
                blRefColorAreaTemplate.Erase(true);

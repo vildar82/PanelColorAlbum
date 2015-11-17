@@ -27,16 +27,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public static List<EntityInfo> GetEntInfoBtr(ObjectId idBtrTest)
       {
          List<EntityInfo> entsInfo = new List<EntityInfo>();
-         var btr = idBtrTest.GetObject(OpenMode.ForRead) as BlockTableRecord;
-         foreach (ObjectId idEnt in btr)
+         using (var btr = idBtrTest.Open(OpenMode.ForRead) as BlockTableRecord)
          {
-            var ent = idEnt.GetObject(OpenMode.ForRead) as Entity;
-            entsInfo.Add(new EntityInfo(ent));
-            if (ent is BlockReference)
+            foreach (ObjectId idEnt in btr)
             {
-               if (!string.Equals(((BlockReference)ent).Name, Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+               using (var ent = idEnt.Open(OpenMode.ForRead) as Entity)
                {
-                  entsInfo.AddRange(GetEntInfoBtr(((BlockReference)ent).BlockTableRecord));
+                  entsInfo.Add(new EntityInfo(ent));
+                  if (ent is BlockReference)
+                  {
+                     if (!string.Equals(((BlockReference)ent).Name, Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        entsInfo.AddRange(GetEntInfoBtr(((BlockReference)ent).BlockTableRecord));
+                     }
+                  }
                }
             }
          }

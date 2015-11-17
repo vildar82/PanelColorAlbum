@@ -46,7 +46,10 @@ namespace AlbumPanelColorTiles.ImagePainting
             }
             else
             {
+               this.Hide();
                Fire(_cropBitmap, e);
+               this.Show();
+               MessageBox.Show("Готово");
             }
          }
          catch (Exception ex)

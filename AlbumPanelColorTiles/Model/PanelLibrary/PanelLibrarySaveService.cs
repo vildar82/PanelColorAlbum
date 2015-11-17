@@ -35,16 +35,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var ed = doc.Editor;
 
          // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
-         var panelsAkrInFacade = GetPanelsAkrInDb(dbCur);
+         List<PanelAkrFacade> panelsAkrFacade = GetPanelsAkrInDb(dbCur);
          // список панелей в бибилиотеке
-         List<PanelAKR> panelsAkrInLib = GetPanelsInLib();
+         List<PanelAkrLib> panelsAkrLib = GetPanelsInLib();
          // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
          List<string> panelsNotInLib = new List<string>();
-         foreach (var panelInFacade in panelsAkrInFacade)
+         foreach (var panelInFacade in panelsAkrFacade)
          {
-            if (!panelsAkrInLib.Exists(p => string.Equals(p.BlNameInLib, panelInFacade.BlNameInLib, StringComparison.CurrentCultureIgnoreCase)))
+            if (!panelsAkrLib.Exists(p => string.Equals(p.BlName, panelInFacade.BlName, StringComparison.CurrentCultureIgnoreCase)))
             {
-               panelsNotInLib.Add(panelInFacade.BlNameInLib);
+               panelsNotInLib.Add(panelInFacade.BlName);
             }
          }
          if (panelsNotInLib.Count > 0)
@@ -59,9 +59,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      public static List<PanelAKR> GetPanelsAkrInDb(Database db)
+      public static List<PanelAkrFacade> GetPanelsAkrInDb(Database db)
       {
-         List<PanelAKR> panels = new List<PanelAKR>();
+         List<PanelAkrFacade> panels = new List<PanelAkrFacade>();
          using (var t = db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   if (MarkSbPanelAR.IsBlockNamePanel(btr.Name) && !MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
                   {
-                     panels.Add(new PanelAKR(idBtr, btr.Name));
+                     panels.Add(new PanelAkrFacade(idBtr, btr.Name));
                   }
                }
             }
@@ -81,9 +81,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return panels;
       }
 
-      public static List<PanelAKR> GetPanelsInLib()
+      public static List<PanelAkrLib> GetPanelsInLib()
       {
-         List<PanelAKR> panelsInLib = new List<PanelAKR>();
+         List<PanelAkrLib> panelsInLib = new List<PanelAkrLib>();
          // Получение списка панелей в библиотеке
          // файл библиотеки
          if (!File.Exists(PanelLibrarySaveService.LibPanelsFilePath))
@@ -91,18 +91,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
             throw new Exception("Не найден файл библиотеки АКР-Панелей - " + PanelLibrarySaveService.LibPanelsFilePath);
          }
          // копирование в temp
-         string fileLibPanelsTemp = Path.GetTempFileName();
-         File.Copy(PanelLibrarySaveService.LibPanelsFilePath, fileLibPanelsTemp, true);
+         //string fileLibPanelsTemp = Path.GetTempFileName();
+         //File.Copy(PanelLibrarySaveService.LibPanelsFilePath, fileLibPanelsTemp, true);
 
          using (Database dbLib = new Database(false, true))
          {
-            dbLib.ReadDwgFile(fileLibPanelsTemp, FileShare.ReadWrite, true, "");
+            dbLib.ReadDwgFile(PanelLibrarySaveService.LibPanelsFilePath, FileShare.ReadWrite, true, "");
             dbLib.CloseInput(true);
-            using (var t = dbLib.TransactionManager.StartTransaction())
-            {
-               // список блоков АКР-Панелей в библиотеке (полные имена блоков).
-               panelsInLib = PanelSB.GetAkrPanelNames(dbLib);
-            }
+            // список блоков АКР-Панелей в библиотеке (полные имена блоков).
+            panelsInLib = PanelAkrLib.GetAkrPanelLib(dbLib);
          }
          return panelsInLib;
       }
@@ -114,18 +111,22 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Если такой блок уже есть в бибилиотеке? - старому блоку изменить имя с приставкой сегодняшней даты - [АКР_Панель_МаркаСБ]_25.10.2015-14:15
          // Если файл занят другим процессом? - подождать 3 секунды и повторить.
 
-         // Файл библиотеки блоков панелей.
-         //string libPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
+         // Файл библиотеки блоков панелей.         
          if (!File.Exists(LibPanelsFilePath))
          {
             Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
             return;
          }
          // сбор блоков для сохранения
-         List<PanelAKR> panelsAkrInFacade = GetPanelsAkrInDb(_dbCur);
+         List<PanelAkrFacade> panelsAkrInFacade = GetPanelsAkrInDb(_dbCur);
+         if (panelsAkrInFacade.Count == 0)
+         {
+            _doc.Editor.WriteMessage("\nНет блоков АКР-Панелей для сохранения в библиотеку.");
+            return;
+         }
 
          string msgReport = string.Empty;
-         List<PanelAKR> panelsAkrToSave;
+         List<PanelAkrFacade> panelsAkrToSave;
 
          // Открываем и блокируем от изменений файл библиотеки блоков
          using (var dbLib = new Database(false, true))
@@ -133,29 +134,40 @@ namespace AlbumPanelColorTiles.PanelLibrary
             dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.Read, false, "");
             dbLib.CloseInput(true);
             // список панелей в библиотеке
-            List<PanelAKR> panelsAkrInLib = GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
+            List<PanelAkrLib> panelsAkrInLib = PanelAkrLib.GetAkrPanelLib(dbLib); //GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
             // Список изменившихся панелей и новых для записи в базу.
-            panelsAkrToSave = PanelAKR.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
-            if (panelsAkrToSave.Count > 0)
+            panelsAkrToSave = PanelAkrFacade.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
+
+            // Форма для просмотра и управления списков сохранения панелей            
+            FormSavePanelsToLib formSave = new FormSavePanelsToLib(
+               panelsAkrToSave.Where(p => p.ReportStatus == EnumReportStatus.New).ToList(),
+               panelsAkrToSave.Where(p => p.ReportStatus == EnumReportStatus.Changed).ToList(),
+               panelsAkrInFacade.Where(p => p.ReportStatus == EnumReportStatus.Other).ToList());
+            if (Application.ShowModalDialog(formSave) != System.Windows.Forms.DialogResult.OK)
+            {
+               return;
+            }
+
+            if (formSave.PanelsToSave.Count > 0)
             {
                // копия текущего файла библиотеки панелей с приставкой сегодняшней даты
                copyLibPanelFile(LibPanelsFilePath);
                // Копирование новых панелей
-               copyNewPanels(dbLib, panelsAkrToSave);
+               copyNewPanels(dbLib, formSave.PanelsToSave);
                // Текст изменений.
                //textChangesToLibDwg(panelsAkrToCopy, dbLib, t);
                // Сохранение файла библиотеки панелей
                dbLib.SaveAs(dbLib.Filename, DwgVersion.Current);
                // строка отчета
-               msgReport = getReport(panelsAkrToSave);
+               msgReport = getReport(formSave.PanelsToSave);
                Log.Info("Обновлена библиотека панелей.");
+               SaveChangesToExel.Save(formSave.PanelsToSave);
             }
             else
             {
                _doc.Editor.WriteMessage("\nНет панелей для сохранения в библиотеку (в текущем чертеже нет новых и изменившихся панелей).");
             }
-         }
-         SaveChangesToExel.Save(panelsAkrToSave);
+         }         
          _doc.Editor.WriteMessage(string.Format("\n{0}", msgReport));
          sendReport(msgReport);
       }
@@ -170,20 +182,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // Копирование новых панелей
-      private void copyNewPanels(Database dbLib, List<PanelAKR> panelsAkrToCopy)
+      private void copyNewPanels(Database dbLib, List<PanelAkrFacade> panelsAkrToCopy)
       {
-         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p => p.IdBtrAkrPanelInLib).ToArray());
+         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p => p.IdBtrAkrPanel).ToArray());
          IdMapping iMap = new IdMapping();
          dbLib.WblockCloneObjects(ids, dbLib.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);         
       }
 
-      private string getReport(List<PanelAKR> panels)
+      private string getReport(List<PanelAkrFacade> panels)
       {
          StringBuilder msg = new StringBuilder();
          msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
          foreach (var panel in panels)
          {
-            msg.AppendLine(string.Format("{0} - {1}", panel.BlNameInLib, panel.ReportStatus));
+            msg.AppendLine(string.Format("{0} - {1}", panel.BlName, panel.ReportStatusString()));
          }
          return msg.ToString();
       }
@@ -211,49 +223,49 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      private void textChangesToLibDwg(List<PanelAKR> panelsAkrToCopy, Database db, Transaction t)
-      {
-         // Запись изменений в текстовый объект
-         var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-         var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-         foreach (ObjectId idEnt in ms)
-         {
-            if (idEnt.ObjectClass.Name == "AcDbMText")
-            {
-               var textOld = idEnt.GetObject(OpenMode.ForWrite) as MText;
-               textOld.Erase();
-               break;
-            }
-         }
-         MText text = new MText();
-         text.SetDatabaseDefaults(db);
+      //private void textChangesToLibDwg(List<PanelAKR> panelsAkrToCopy, Database db, Transaction t)
+      //{
+      //   // Запись изменений в текстовый объект
+      //   var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+      //   var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+      //   foreach (ObjectId idEnt in ms)
+      //   {
+      //      if (idEnt.ObjectClass.Name == "AcDbMText")
+      //      {
+      //         var textOld = idEnt.GetObject(OpenMode.ForWrite) as MText;
+      //         textOld.Erase();
+      //         break;
+      //      }
+      //   }
+      //   MText text = new MText();
+      //   text.SetDatabaseDefaults(db);
 
-         StringBuilder sbChanges = new StringBuilder();
-         // Заголовок Изменений
-         sbChanges.AppendLine(string.Format("Последнее изменение от {0}. Дата {1}. Чертеж {2}", Environment.UserName, DateTime.Now, _dbCur.Filename));
-         // Список новых панелей
-         var newPanels = panelsAkrToCopy.Where(p => p.ReportStatus == "Новая");
-         if (newPanels.Count() > 0)
-         {
-            sbChanges.AppendLine("Список новых панелей:");
-            foreach (var item in newPanels)
-            {
-               sbChanges.AppendLine(item.BlNameInLib);
-            }
-         }
-         var changedPanels = panelsAkrToCopy.Where(p => p.ReportStatus == "Изменившаяся");
-         if (changedPanels.Count() > 0)
-         {
-            sbChanges.AppendLine("Список изменившихся панелей:");
-            foreach (var item in changedPanels)
-            {
-               sbChanges.AppendLine(item.BlNameInLib);
-            }
-         }
+      //   StringBuilder sbChanges = new StringBuilder();
+      //   // Заголовок Изменений
+      //   sbChanges.AppendLine(string.Format("Последнее изменение от {0}. Дата {1}. Чертеж {2}", Environment.UserName, DateTime.Now, _dbCur.Filename));
+      //   // Список новых панелей
+      //   var newPanels = panelsAkrToCopy.Where(p => p.ReportStatus ==   EnumReportStatus.New);
+      //   if (newPanels.Count() > 0)
+      //   {
+      //      sbChanges.AppendLine("Список новых панелей:");
+      //      foreach (var item in newPanels)
+      //      {
+      //         sbChanges.AppendLine(item.BlName);
+      //      }
+      //   }
+      //   var changedPanels = panelsAkrToCopy.Where(p => p.ReportStatus ==  EnumReportStatus.Changed);
+      //   if (changedPanels.Count() > 0)
+      //   {
+      //      sbChanges.AppendLine("Список изменившихся панелей:");
+      //      foreach (var item in changedPanels)
+      //      {
+      //         sbChanges.AppendLine(item.BlName);
+      //      }
+      //   }
 
-         text.Contents = sbChanges.ToString();
-         ms.AppendEntity(text);
-         t.AddNewlyCreatedDBObject(text, true);
-      }
+      //   text.Contents = sbChanges.ToString();
+      //   ms.AppendEntity(text);
+      //   t.AddNewlyCreatedDBObject(text, true);
+      //}
    }
 }

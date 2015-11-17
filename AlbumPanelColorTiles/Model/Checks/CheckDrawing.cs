@@ -13,14 +13,14 @@ namespace AlbumPanelColorTiles.Checks
       private static Document _doc;
       private static Editor _ed;
 
-      static CheckDrawing()
+      public CheckDrawing()
       {
          Clear();
       }
 
       // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
       //private static List<Error> _notPaintedTilesInMarkAR;
-      public static void Clear()
+      public void Clear()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;

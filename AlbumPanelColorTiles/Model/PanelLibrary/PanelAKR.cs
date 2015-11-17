@@ -3,167 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
-   // Панель АКР - под покраску - блок из библиотеки панелей АКР.
-   public class PanelAKR
+   public enum EnumReportStatus
    {
-      private string _blNameInLib;
-      private double _distToCenterFromBase;
-      private List<EntityInfo> _entInfos;
-      private ObjectId _idBlRef;
-      private ObjectId _idBtrAkrPanelInFacade;
-      private ObjectId _idBtrAkrPanelInLib;
-      private bool _isElectricCopy;
+      Other, // 0 - default
+      New,
+      Changed,
+      Force
+   }
 
-      // расстояние от точки вставки панели до центра (по плитке) по X
-      private bool _isEndLeftPanel;
+   // Панель АКР - под покраску - блок из библиотеки панелей АКР.
+   public abstract class PanelAKR
+   {
+      protected string _blName;
+      protected List<EntityInfo> _entInfos;// Список объектов в блоке для сравнения блоков панелей фасада и библмиотеки
+      protected ObjectId _idBtrAkrPanel;      
+      protected bool _isEndLeftPanel;
+      protected bool _isEndRightPanel;
+      protected string _markAkrWithoutWhite;
+      protected double _distToCenterFromBase;
+      protected string _description;      
 
-      private bool _isEndRightPanel;
-      private string _markAkrWithoutWhite;
-
-      // блок панели АКР в файле библиотеки панелей
-      // блок панели АКР в файле фасада
-      private PanelSB _panelSb;
-
-      private string _reportStatus;
-      // Список объектов в блоке для сравнения панелей с блоками в фасаде
-
-      public PanelAKR(ObjectId idBtrAkrPanelInLib, string blName)
+      public PanelAKR(ObjectId idBtrAkrPanel, string blName)
       {
-         _idBtrAkrPanelInLib = idBtrAkrPanelInLib;
-         _blNameInLib = blName;
+         _idBtrAkrPanel = idBtrAkrPanel;
+         _blName = blName;
+         _description = "";
          _markAkrWithoutWhite = MarkSbPanelAR.GetMarkSbCleanName(MarkSbPanelAR.GetMarkSbName(blName)).Replace(' ', '-');
          // определение - торцов панели
          defineEndsPanel(blName);
          // Список объектов в блоке
-         _entInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanelInLib);
-      }
+         _entInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);
+      }      
 
-      public string BlNameInLib { get { return _blNameInLib; } }
-
-      public double DistToCenterFromBase
-      {
-         get
-         {
-            if (_distToCenterFromBase == 0)
-            {
-               _distToCenterFromBase = getDistToCenter(_idBtrAkrPanelInFacade);
-            }
-            return _distToCenterFromBase;
-         }
-      }
-
-      public List<EntityInfo> EntInfos { get { return _entInfos; } }
-
-      /// <summary>
-      /// Вхождение блока в файле фасада
-      /// </summary>
-      public ObjectId IdBlRef { get { return _idBlRef; } set { _idBlRef = value; } }
-
-      public ObjectId IdBtrAkrPanelInFacade
-      {
-         get { return _idBtrAkrPanelInFacade; }
-         set { _idBtrAkrPanelInFacade = value; }
-      }
-
-      public ObjectId IdBtrAkrPanelInLib { get { return _idBtrAkrPanelInLib; } }
-      public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
+      public string BlName { get { return _blName; } }     
+      public List<EntityInfo> EntInfos { get { return _entInfos; } }      
+      public ObjectId IdBtrAkrPanel { get { return _idBtrAkrPanel; } }
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
       public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
-      public PanelSB PanelSb { get { return _panelSb; } set { _panelSb = value; } }
-      public string ReportStatus { get { return _reportStatus; } set { _reportStatus = value; } }
-
-      public static List<PanelAKR> GetChangedAndNewPanels(List<PanelAKR> panelsAkrInFacade, List<PanelAKR> panelsAkrInLib)
-      {
-         List<PanelAKR> panelsChangedAndNew = new List<PanelAKR>();
-         foreach (var panelAkrInFacade in panelsAkrInFacade)
-         {
-            var panelAkrInLib = panelsAkrInLib.Find(p => string.Equals(p.BlNameInLib, panelAkrInFacade.BlNameInLib, StringComparison.OrdinalIgnoreCase));
-            if (panelAkrInLib == null)
-            {
-               // panelAkrInFacade - новая панель, которой нет в библмиотеке
-               panelAkrInFacade.ReportStatus = "Новая";
-               panelsChangedAndNew.Add(panelAkrInFacade);
-            }
-            else
-            {
-               // сравнить панели (по списку объектов в блоке)
-               if (!panelAkrInFacade.EntInfos.SequenceEqual(panelAkrInLib.EntInfos))
-               {
-                  panelAkrInFacade.ReportStatus = "Изменившаяся";
-                  panelsChangedAndNew.Add(panelAkrInFacade);
-               }
-            }
-         }
-         return panelsChangedAndNew;
-      }
-
-      /// <summary>
-      /// Простая расстановка АКР-панелей в точуи вставки панелей СБ
-      /// </summary>
-      /// <param name="_allPanelsSB"></param>
-      public static void SimpleInsert(List<PanelSB> _allPanelsSB)
-      {
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            using (ProgressMeter progress = new ProgressMeter())
-            {
-               progress.SetLimit(_allPanelsSB.Count);
-               progress.Start("Простая расстановка панелей");
-
-               var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-               foreach (var panelSb in _allPanelsSB)
-               {
-                  int countNull = 0;
-                  if (panelSb.PanelAKR != null)
-                  {
-                     var blRefPanelAkr = new BlockReference((panelSb.GetPtInModel(panelSb.PanelAKR)), panelSb.PanelAKR.IdBtrAkrPanelInFacade);
-                     panelSb.PanelAKR.IdBlRef = ms.AppendEntity(blRefPanelAkr);
-                     t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
-                  }
-                  else
-                  {
-                     countNull++;
-                  }
-                  progress.MeterProgress();
-               }
-               t.Commit();
-               progress.Stop();
-            }
-         }
-      }
-
-      public PanelAKR CopyLibBlockElectricInTempFile(PanelSB panelSb)
-      {
-         PanelAKR panelAkr = null;
-         try
-         {
-            string markAkr = panelSb.MarkSb;
-            if (panelSb.IsEndLeftPanel)
-            {
-               markAkr += Settings.Default.EndLeftPanelSuffix;
-            }
-            else if (panelSb.IsEndRightPanel)
-            {
-               markAkr += Settings.Default.EndRightPanelSuffix;
-            }
-            SymbolUtilityServices.ValidateSymbolName(markAkr, false);
-            // копирование блока с новым именем с электрикой
-            ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanelInLib, markAkr);
-            panelAkr = new PanelAKR(idBtrAkeElectricInTempLib, markAkr);
-            panelAkr.IsElectricCopy = true;
-         }
-         catch
-         {
-         }
-         return panelAkr;
-      }
+      public string Description { get { return _description; } set { _description = value; } }
 
       private void defineEndsPanel(string markAkrWithoutWhite)
       {
@@ -175,20 +60,29 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
          }
+      }      
+
+      public override string ToString()
+      {
+         return string.Format("{0}{1}{2}",  _blName, string.IsNullOrEmpty(_description) ? "" : " - " , _description);
       }
 
-      private double getDistToCenter(ObjectId idBtrPanelAkr)
+      public double GetDistToCenter(ObjectId idBtrPanelAkr)
       {
+         if (_distToCenterFromBase != 0)
+         {
+            return _distToCenterFromBase;
+         }
          var extTiles = new Extents3d();
          string blName;
-         using (var btrAkr = idBtrPanelAkr.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         using (var btrAkr = idBtrPanelAkr.Open(OpenMode.ForRead) as BlockTableRecord)
          {
             blName = btrAkr.Name;
             foreach (ObjectId idEnt in btrAkr)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  using (var blRefTile = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
+                  using (var blRefTile = idEnt.Open(OpenMode.ForRead) as BlockReference)
                   {
                      if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {
@@ -207,7 +101,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             shiftEnd = -Settings.Default.FacadeEndsPanelIndent * 0.5;// 445;// Торец спрва - сдвинуть вправо
          }
-         return (extTiles.MaxPoint.X - extTiles.MinPoint.X) * 0.5 + shiftEnd;
+         _distToCenterFromBase = (extTiles.MaxPoint.X - extTiles.MinPoint.X) * 0.5 + shiftEnd;
+         return _distToCenterFromBase;
       }
    }
 }
