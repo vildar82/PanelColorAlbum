@@ -127,7 +127,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
 
          string msgReport;
-         // Открываем и блокируем от изменений файл библиотеки блоков
+         // Сохранение панелей в библиотеку
          savePanelsAkrToLibDb(panelsAkrInFacade, out msgReport);
 
          if (!string.IsNullOrEmpty(msgReport))
