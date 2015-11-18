@@ -138,7 +138,7 @@ namespace AlbumPanelColorTiles
                }
                catch (System.Exception ex)
                {
-                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. " + ex.Message);
+                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. {0}", ex.Message);
                   if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                   {
                      Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
@@ -166,7 +166,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage(string.Format("\n{0}", ex.ToString()));
+               doc.Editor.WriteMessage("\n{0}", ex.ToString());
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {
                   Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks");
@@ -230,7 +230,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage(string.Format("\n{0}", ex.ToString()));
+               doc.Editor.WriteMessage("\n{0}", ex.ToString());
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {
                   Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary");
@@ -268,7 +268,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. " + ex.Message);
+               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {
                   Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
@@ -338,7 +338,7 @@ namespace AlbumPanelColorTiles
                      }
                      catch (System.Exception ex)
                      {
-                        ed.WriteMessage("\n" + ex.Message);
+                        ed.WriteMessage("\n{0}", ex.Message);
                         if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                         {
                            Log.Error(ex, "plotter.PlotDir({0});", dialog.SelectedPath);
@@ -399,7 +399,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. " + ex.Message);
+               doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. {0}", ex.Message);
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {
                   Log.Error(ex, "Не удалось выполнить сброс панелей. ");
@@ -423,7 +423,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage(ex.ToString());
+               doc.Editor.WriteMessage("\nНе удалось выполнить сохранение панелей. {0}", ex.Message);               
                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
                {
                   Log.Error(ex, "Command: AKR-SavePanelsToLibrary");

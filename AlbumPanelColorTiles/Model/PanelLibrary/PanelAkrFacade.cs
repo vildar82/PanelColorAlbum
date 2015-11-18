@@ -24,8 +24,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private ObjectId _idBlRefWhenCreateFacade;
       private ObjectId _idBlRefForShow;
       // блок панели АКР в файле фасада
-      private PanelSB _panelSb;
-      private PanelAkrLib _panelAkrLib;
+      private PanelSB _panelSb;      
       protected EnumReportStatus _reportStatus;
 
       public PanelAkrFacade(ObjectId idBtr, string blName) : base(idBtr, blName)
