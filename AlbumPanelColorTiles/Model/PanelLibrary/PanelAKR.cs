@@ -10,14 +10,6 @@ using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
-   public enum EnumReportStatus
-   {
-      Other, // 0 - default
-      New,
-      Changed,
-      Force
-   }
-
    // Панель АКР - под покраску - блок из библиотеки панелей АКР.
    public abstract class PanelAKR
    {

@@ -53,18 +53,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   switch (res.StringResult)
                   {
                      case "Выход":
-                        throw new Exception("\nОтменено пользователем");
+                        throw new Exception("\nОтменено пользователем.");
                      case "Пропустить":
                         skipOrRedefine = true;
                         break;
 
                      default:
-                        throw new Exception("\nОтменено пользователем");
+                        throw new Exception("\nОтменено пользователем.");
                   }
                }
                else
                {
-                  throw new Exception("\nОтменено пользователем");
+                  throw new Exception("\nОтменено пользователем.");
                }
             }
          }
@@ -162,7 +162,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем");
+            throw new Exception("\nОтменено пользователем.");
          }
       }
 
@@ -175,7 +175,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем");
+            throw new Exception("\nОтменено пользователем.");
          }
       }
 
@@ -204,7 +204,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем");
+            throw new Exception("\nОтменено пользователем.");
          }
       }
    }

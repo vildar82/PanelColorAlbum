@@ -11,6 +11,14 @@ using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
+   public enum EnumReportStatus
+   {
+      Other, // 0 - default
+      New,
+      Changed,
+      Force
+   }
+
    public class PanelAkrFacade : PanelAKR
    {
       private ObjectId _idBlRefWhenCreateFacade;
