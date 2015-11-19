@@ -127,7 +127,7 @@ namespace AlbumPanelColorTiles
                      {
                         Inspector.Show();
                      }
-
+                     doc.Editor.Regen();
                      doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);                     
                      Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
                   }
