@@ -120,7 +120,7 @@ namespace AlbumPanelColorTiles.Sheets
       private void CheckTableExtents(Extents3d extentsViewPort, ObjectId idTable)
       {
          // Таблица выходит за границы видового экрана. (Видовой экран, как ориентир)
-         using (var table = idTable.GetObject(OpenMode.ForRead) as Table)
+         using (var table = idTable.GetObject(OpenMode.ForRead, false, true) as Table)
          {
             var extTable = table.GeometricExtents;
             if (!extentsViewPort.IsPointInBounds(extTable.MinPoint))
@@ -155,7 +155,7 @@ namespace AlbumPanelColorTiles.Sheets
          foreach (ObjectId idAtrRef in atrs)
          {
             if (idAtrRef.IsErased) continue;
-            var atrRef = idAtrRef.GetObject(OpenMode.ForRead) as AttributeReference;
+            var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference;
             string text = string.Empty;
             if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
             {
@@ -270,7 +270,7 @@ namespace AlbumPanelColorTiles.Sheets
          foreach (ObjectId idEnt in btrLayout)
          {
             if (idEnt.ObjectClass.Name != "AcDbViewport") continue;
-            var vp = t.GetObject(idEnt, OpenMode.ForRead) as Viewport;
+            var vp = t.GetObject(idEnt, OpenMode.ForRead, false, true) as Viewport;
             if (vp.Layer != "АР_Видовые экраны") continue;
             idVp = idEnt;
             break;
@@ -324,7 +324,7 @@ namespace AlbumPanelColorTiles.Sheets
          ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
          var idVP = GetViewport(idLayoutMarkAR, t);
-         var vp = t.GetObject(idVP, OpenMode.ForWrite) as Viewport;
+         var vp = t.GetObject(idVP, OpenMode.ForWrite, false, true) as Viewport;
 
          extentsViewPort = vp.GeometricExtents;
 

@@ -97,14 +97,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
             var moveMatrix = Matrix3d.Displacement(Point3d.Origin - location);
             foreach (ObjectId idEnt in btr)
             {
-               var ent = t.GetObject(idEnt, OpenMode.ForWrite) as Entity;
+               var ent = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Entity;
                ent.TransformBy(moveMatrix);
             }
 
             // удаление выбранных объектов
             foreach (ObjectId idEnt in ids)
             {
-               var ent = t.GetObject(idEnt, OpenMode.ForWrite) as Entity;
+               var ent = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Entity;
                ent.Erase();
             }
 

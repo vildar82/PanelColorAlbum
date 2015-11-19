@@ -37,7 +37,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  using (var blRef = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
+                  using (var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
                   {
                      // Если это блок обозначения стороны фасада - по имени блока
                      if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))

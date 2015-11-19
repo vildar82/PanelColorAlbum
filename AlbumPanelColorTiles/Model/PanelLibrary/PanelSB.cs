@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead) as BlockReference)
+                  using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
                   {
                      // как определить что это блок панели СБ?
                      // По набору атрибутов: Покраска, МАРКА
@@ -82,7 +82,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
                         foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
                         {
-                           var atrRef = idAtrRef.GetObject(OpenMode.ForRead) as AttributeReference;
+                           var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference;
                            // Покраска
                            if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                            {

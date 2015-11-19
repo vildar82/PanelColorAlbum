@@ -95,7 +95,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          Extents3d extents;
-         using (var blRef = _idBlRefForShow.Open(OpenMode.ForRead) as BlockReference)
+         using (var blRef = _idBlRefForShow.Open(OpenMode.ForRead, false, true) as BlockReference)
          {
             extents = blRef.GeometricExtents;
          }

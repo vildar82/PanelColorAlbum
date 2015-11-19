@@ -202,7 +202,7 @@ namespace AlbumPanelColorTiles.ImagePainting
          ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
          if (idBlRefCopy.IsValid && !idBlRefCopy.IsNull)
          {
-            using (var blRefSpot = idBlRefCopy.GetObject(OpenMode.ForWrite) as BlockReference)
+            using (var blRefSpot = idBlRefCopy.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
             {
                blRefSpot.Position = position;
                blRefSpot.LayerId = idLayer;

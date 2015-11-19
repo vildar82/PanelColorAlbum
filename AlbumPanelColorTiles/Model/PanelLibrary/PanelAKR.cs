@@ -74,7 +74,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  using (var blRefTile = idEnt.Open(OpenMode.ForRead) as BlockReference)
+                  using (var blRefTile = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                   {
                      if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {

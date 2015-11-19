@@ -145,7 +145,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          foreach (var idBlRefPanelAkr in idsBlRefPanelAkr)
          {
-            using (var blRefPanelAkr = idBlRefPanelAkr.Open(OpenMode.ForRead) as BlockReference)
+            using (var blRefPanelAkr = idBlRefPanelAkr.Open(OpenMode.ForRead, false, true) as BlockReference)
             {
                var extentsAkr = blRefPanelAkr.GeometricExtents;
                var ptCenterPanelAkr = extentsAkr.Center();

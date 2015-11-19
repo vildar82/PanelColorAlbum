@@ -454,7 +454,7 @@ namespace AlbumPanelColorTiles
                {
                   if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                   {
-                     var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                     var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                      if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
                      {
                         if (MarkSbPanelAR.IsBlockNamePanelMarkAr(blRef.Name))

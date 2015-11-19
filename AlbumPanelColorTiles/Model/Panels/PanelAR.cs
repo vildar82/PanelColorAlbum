@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (idEnt.ObjectClass.Name == "AcDbText")
             {
-               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
+               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false, true) as DBText;
                if (textMark.Layer == Settings.Default.LayerMarks)
                {
                   textMark.UpgradeOpen();
@@ -144,7 +144,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             return _extents;
          }
-         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead) as BlockReference)
+         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead, false, true) as BlockReference)
          {
             var matrix = blRef.BlockTransform;
             extTilesBtr.TransformBy(matrix);
@@ -216,7 +216,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
                   {
                      ids.Add(idEnt);
