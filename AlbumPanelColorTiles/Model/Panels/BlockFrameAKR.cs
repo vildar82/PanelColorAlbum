@@ -95,7 +95,7 @@ namespace AlbumPanelColorTiles.Panels
                   {
                      if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                      {
-                        var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                        var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                         if (blRef.GetEffectiveName().Equals(blName))
                         {
                            updateBlRefFrame(blRef, btrFrame, t);
@@ -116,7 +116,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               var blRef = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+               var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                if (blRef.GetEffectiveName().Equals(_blFrameName, StringComparison.OrdinalIgnoreCase))
                {
                   // считывание атрибутов
@@ -124,7 +124,7 @@ namespace AlbumPanelColorTiles.Panels
                   _attrs = new Dictionary<string, string>();
                   foreach (ObjectId idAtrRef in atrCol)
                   {
-                     var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
+                     var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead, false, true) as AttributeReference;
                      string key = atrRef.Tag.ToUpper();
                      if (!_attrs.ContainsKey(key))
                      {
@@ -148,7 +148,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
                {
-                  var atrDef = t.GetObject(idEnt, OpenMode.ForRead) as AttributeDefinition;
+                  var atrDef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as AttributeDefinition;
                   switch (atrDef.Tag.ToUpper())
                   {
                      case "ВИД":
@@ -185,7 +185,7 @@ namespace AlbumPanelColorTiles.Panels
          // Удаление атрибутов
          foreach (ObjectId idAtrRef in blRef.AttributeCollection)
          {
-            var atrRef = t.GetObject(idAtrRef, OpenMode.ForWrite) as AttributeReference;
+            var atrRef = t.GetObject(idAtrRef, OpenMode.ForWrite, false, true) as AttributeReference;
             atrRef.Erase(true);
          }
 
@@ -194,7 +194,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
             {
-               var atrDef = t.GetObject(idEnt, OpenMode.ForRead) as AttributeDefinition;
+               var atrDef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as AttributeDefinition;
                if (!atrDef.Constant)
                {
                   using (var atrRef = new AttributeReference())

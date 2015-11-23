@@ -142,6 +142,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
             foreach (var panelAdded in formPanels.SelectedPanels)
             {
                _panelsOtherInFacade.Remove(panelAdded);
+               if (panelAdded.ReportStatus == EnumReportStatus.Other)
+               {
+                  panelAdded.ReportStatus = EnumReportStatus.Force;
+               }
             }
             refreshDataSource();
          }

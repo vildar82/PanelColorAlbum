@@ -179,7 +179,7 @@ namespace AlbumPanelColorTiles.Sheets
          foreach (ObjectId idAtrRef in atrs)
          {
             if (idAtrRef.IsErased) continue;
-            var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead) as AttributeReference;
+            var atrRef = t.GetObject(idAtrRef, OpenMode.ForRead, false, true) as AttributeReference;
             string text = string.Empty;
             if (atrRef.Tag.Equals("ВИД", StringComparison.OrdinalIgnoreCase))
             {
@@ -227,7 +227,7 @@ namespace AlbumPanelColorTiles.Sheets
          {
             if (idEnt.ObjectClass.Name == "AcDbTable")
             {
-               return t.GetObject(idEnt, OpenMode.ForWrite) as Table;
+               return t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Table;
             }
          }
          throw new System.Exception("Не найдена заготовка таблицы в шаблоне содержания.");

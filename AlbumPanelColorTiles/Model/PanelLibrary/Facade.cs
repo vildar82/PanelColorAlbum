@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
 using AlbumPanelColorTiles.Options;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -128,6 +130,36 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.AllPanelsSbInFloor).Max(p => p.PtCenterPanelSbInModel.Y);
          return maxYblRefPanelInModel + Settings.Default.FacadeIndentFromMountingPlanes;// 10000; // FacadeIndentFromMountingPlanes
+      }
+
+      public static void DeleteOldAkrPanels(List<Facade> facades)
+      {
+         // удаление старых АКР-Панелей фасадов
+         Database db = HostApplicationServices.WorkingDatabase;
+         // список всех акр панелей в модели
+         List<ObjectId> idsBlRefPanelAkr = PanelAR.GetPanelsBlRefInModel(db);
+
+         ProgressMeter progressMeter = new ProgressMeter();
+         progressMeter.SetLimit(idsBlRefPanelAkr.Count);
+         progressMeter.Start("Удаление старых фасадов");
+
+         foreach (var idBlRefPanelAkr in idsBlRefPanelAkr)
+         {
+            using (var blRefPanelAkr = idBlRefPanelAkr.Open(OpenMode.ForRead, false, true) as BlockReference)
+            {
+               var extentsAkr = blRefPanelAkr.GeometricExtents;
+               var ptCenterPanelAkr = extentsAkr.Center();
+               // если панель входит в границы любого фасада, то удаляем ее
+               Facade facade = facades.Find(f => f.XMin < ptCenterPanelAkr.X && f.XMax > ptCenterPanelAkr.X);
+               if (facade != null)
+               {
+                  blRefPanelAkr.UpgradeOpen();
+                  blRefPanelAkr.Erase();
+               }
+               progressMeter.MeterProgress();
+            }
+         }
+         progressMeter.Stop();
       }
 
       private static void testGeom(PanelSB panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)

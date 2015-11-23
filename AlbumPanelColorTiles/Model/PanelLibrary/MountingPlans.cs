@@ -53,18 +53,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   switch (res.StringResult)
                   {
                      case "Выход":
-                        throw new Exception("\nОтменено пользователем");
+                        throw new Exception("\nОтменено пользователем.");
                      case "Пропустить":
                         skipOrRedefine = true;
                         break;
 
                      default:
-                        throw new Exception("\nОтменено пользователем");
+                        throw new Exception("\nОтменено пользователем.");
                   }
                }
                else
                {
-                  throw new Exception("\nОтменено пользователем");
+                  throw new Exception("\nОтменено пользователем.");
                }
             }
          }
@@ -97,14 +97,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
             var moveMatrix = Matrix3d.Displacement(Point3d.Origin - location);
             foreach (ObjectId idEnt in btr)
             {
-               var ent = t.GetObject(idEnt, OpenMode.ForWrite) as Entity;
+               var ent = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Entity;
                ent.TransformBy(moveMatrix);
             }
 
             // удаление выбранных объектов
             foreach (ObjectId idEnt in ids)
             {
-               var ent = t.GetObject(idEnt, OpenMode.ForWrite) as Entity;
+               var ent = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Entity;
                ent.Erase();
             }
 
@@ -162,7 +162,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем");
+            throw new Exception("\nОтменено пользователем.");
          }
       }
 
@@ -175,7 +175,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем");
+            throw new Exception("\nОтменено пользователем.");
          }
       }
 
@@ -204,7 +204,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем");
+            throw new Exception("\nОтменено пользователем.");
          }
       }
    }

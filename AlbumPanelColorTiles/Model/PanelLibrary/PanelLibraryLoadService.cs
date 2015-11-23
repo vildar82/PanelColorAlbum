@@ -114,6 +114,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             // загрузка АКР-панелей из библиотеки
             PanelSB.LoadBtrPanels(facades);
+            // удаление АКР-Панелей старых фасадов
+            Facade.DeleteOldAkrPanels(facades);
             // расстановка АКР-Панелей по фасадам
             Facade.CreateFacades(facades);
          }

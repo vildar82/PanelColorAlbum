@@ -10,14 +10,6 @@ using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
-   public enum EnumReportStatus
-   {
-      Other, // 0 - default
-      New,
-      Changed,
-      Force
-   }
-
    // Панель АКР - под покраску - блок из библиотеки панелей АКР.
    public abstract class PanelAKR
    {
@@ -82,7 +74,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  using (var blRefTile = idEnt.Open(OpenMode.ForRead) as BlockReference)
+                  using (var blRefTile = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                   {
                      if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {

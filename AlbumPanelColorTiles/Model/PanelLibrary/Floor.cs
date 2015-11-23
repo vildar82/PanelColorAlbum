@@ -92,7 +92,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead) as BlockReference;
+                  var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
                   if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {

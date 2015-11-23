@@ -393,7 +393,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
          if (idBlRefCopy.IsValid && !idBlRefCopy.IsNull)
          {
-            using (var blRefSpot = t.GetObject(idBlRefCopy, OpenMode.ForWrite) as BlockReference)
+            using (var blRefSpot = t.GetObject(idBlRefCopy, OpenMode.ForWrite, false, true) as BlockReference)
             {
                blRefSpot.Position = position;
                blRefSpot.LayerId = spot.Proper.IdLayer;

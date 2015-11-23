@@ -11,13 +11,20 @@ using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
+   public enum EnumReportStatus
+   {
+      Other, // 0 - default
+      New,
+      Changed,
+      Force
+   }
+
    public class PanelAkrFacade : PanelAKR
    {
       private ObjectId _idBlRefWhenCreateFacade;
       private ObjectId _idBlRefForShow;
       // блок панели АКР в файле фасада
-      private PanelSB _panelSb;
-      private PanelAkrLib _panelAkrLib;
+      private PanelSB _panelSb;      
       protected EnumReportStatus _reportStatus;
 
       public PanelAkrFacade(ObjectId idBtr, string blName) : base(idBtr, blName)
@@ -88,7 +95,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          Extents3d extents;
-         using (var blRef = _idBlRefForShow.Open(OpenMode.ForRead) as BlockReference)
+         using (var blRef = _idBlRefForShow.Open(OpenMode.ForRead, false, true) as BlockReference)
          {
             extents = blRef.GeometricExtents;
          }

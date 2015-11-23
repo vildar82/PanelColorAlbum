@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -71,7 +72,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             if (idEnt.ObjectClass.Name == "AcDbText")
             {
-               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false) as DBText;
+               var textMark = t.GetObject(idEnt, OpenMode.ForRead, false, true) as DBText;
                if (textMark.Layer == Settings.Default.LayerMarks)
                {
                   textMark.UpgradeOpen();
@@ -143,7 +144,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             return _extents;
          }
-         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead) as BlockReference)
+         using (var blRef = _idBlRefAr.Open(OpenMode.ForRead, false, true) as BlockReference)
          {
             var matrix = blRef.BlockTransform;
             extTilesBtr.TransformBy(matrix);
@@ -203,6 +204,28 @@ namespace AlbumPanelColorTiles.Panels
             t.Commit();
          }
          return Settings.Default.LayerMarks;
+      }
+
+      public static List<ObjectId> GetPanelsBlRefInModel(Database db)
+      {         
+         List<ObjectId> ids = new List<ObjectId>();
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
+                  {
+                     ids.Add(idEnt);
+                  }
+               }
+            }
+            t.Commit();
+         }
+         return ids;
       }
    }
 }
