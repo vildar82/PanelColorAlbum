@@ -102,6 +102,7 @@
     <Compile Include="Model\PanelLibrary\FormPanelDesc.Designer.cs">
       <DependentUpon>FormPanelDesc.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\PanelLibrary\LibEditor\LibraryEditor.cs" />
     <Compile Include="Model\PanelLibrary\MountingPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelAKR.cs" />
     <Compile Include="Model\PanelLibrary\PanelAkrFacade.cs" />
@@ -254,6 +255,7 @@
   <ItemGroup>
     <None Include="Resources\Fire.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets" Condition="Exists('..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
