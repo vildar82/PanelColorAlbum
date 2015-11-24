@@ -28,6 +28,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       // Имя/номер этажа
       private string _name;
+      private Storey _storey; // этаж.
 
       private List<PanelSB> _panelsSbInFront;
 
@@ -59,6 +60,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }
 
       public string Name { get { return _name; } }
+      public Storey Storey { get { return _storey; } set { _storey = value; } }
 
       public List<PanelSB> PanelsSbInFront { get { return _panelsSbInFront; } }
 

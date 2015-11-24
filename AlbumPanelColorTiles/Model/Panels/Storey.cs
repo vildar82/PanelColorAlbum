@@ -24,6 +24,11 @@ namespace AlbumPanelColorTiles.Panels
          _marksAr = new HashSet<MarkArPanelAR>();
       }
 
+      public Storey(string name)
+      {
+         _number = name;
+      }
+
       public List<MarkArPanelAR> MarksAr { get { return _marksAr.ToList(); } }
 
       public string Number
@@ -84,6 +89,16 @@ namespace AlbumPanelColorTiles.Panels
       {
          return _number.Equals(other._number) &&
             _y.Equals(other._y);
+      }
+
+      public void DefineYFloor(int minNum)
+      {
+         // определение уровня этажа относиельно 0 уровня минимального этажа minNum
+         int numCur;
+         if( int.TryParse(_number, out numCur))
+         {
+            _y = (numCur - minNum) * Settings.Default.FacadeFloorHeight;
+         }
       }
    }
 }

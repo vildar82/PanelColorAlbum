@@ -39,7 +39,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          using (var t = db.TransactionManager.StartTransaction())
          {
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
+            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов            
 
             using (ProgressMeter progress = new ProgressMeter())
             {
@@ -51,6 +51,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   double yFloor = yFirstFloor;
                   foreach (var floor in facade.Floors)
                   {
+                     yFloor = floor.Storey.Y + yFirstFloor;
                      // Подпись номера этажа
                      captionFloor(facade.XMin, yFloor, floor.Name, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
@@ -65,7 +66,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            blRefPanelAkr.Draw();
                         }
                      }
-                     yFloor += Settings.Default.FacadeFloorHeight;// 2800;// высота этажа
+                     //yFloor += Settings.Default.FacadeFloorHeight;// 2800;// высота этажа
                      progress.MeterProgress();
                   }
                }
@@ -73,7 +74,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                progress.Stop();
             }
          }
-      }
+      }      
 
       /// <summary>
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
@@ -102,14 +103,36 @@ namespace AlbumPanelColorTiles.PanelLibrary
                facades.Add(facade);
             }
             facade._floors.Add(floor);
-         }
+         }         
+         // определение уровней этажей Storey
+         defineFloorStoreys(facades);
+         return facades;
+      }
+
+      private static void defineFloorStoreys(List<Facade> facades)
+      {
+         // определение уровней этажей Storey
          // сортировка этажей в фасадах
          facades.ForEach(f =>
          {
             f.Floors.Sort();
             f._xmax = f.Floors.Max(l => l.XMax);
          });
-         return facades;
+         // создание куоллекции уровней Storey - для каждого имени этажа - соотв уровень.
+         List<Storey> storeys = new List<Storey>();
+         var floorNames = facades.SelectMany(f => f.Floors).GroupBy(f => f.Name);
+         foreach (var nameFloor in floorNames)
+         {
+            string name = nameFloor.Key;
+            Storey storey = new Storey(name);
+            storeys.Add(storey);
+            foreach (var floor in nameFloor) floor.Storey = storey;                        
+         }
+         // сортировка этажей
+         storeys.Sort();
+         int minNum = 0;
+         int.TryParse(storeys.First().Number, out minNum);
+         storeys.ForEach(s => s.DefineYFloor(minNum));
       }
 
       // Подпись номера этажа
