@@ -12,9 +12,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // Этаж - блоки АКР-панелей этажа и связаннный с ним блок монтажки с блоком обозначения стороны фасада
    public class Floor : IComparable<Floor>
    {
-      // для сортировки этажей (строка имени этажа = номеру этажа)
-      private static StoreyNumberComparer _comparer = new StoreyNumberComparer();
-
       // Панели СБ - все что есть внутри блока монтажки
       private List<PanelSB> _allPanelsSbInFloor;
 
@@ -24,11 +21,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private FacadeFrontBlock _facadeFrontBlock;
 
       // Блок монтажного плана
-      private ObjectId _idBlRefMounting;
+      private ObjectId _idBlRefMounting;      
 
       // Имя/номер этажа
-      private string _name;
-      private Storey _storey; // этаж.
+      private string _blRefName;      
+      private Storey _storey; // этаж  
+      private double _height; // высота этажа    
 
       private List<PanelSB> _panelsSbInFront;
 
@@ -45,7 +43,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _idBlRefMounting = blRefMounting.Id;
          _extBlMounting = blRefMounting.GeometricExtents;
          _ptBlMounting = blRefMounting.Position;
-         _name = getFloorName(blRefMounting);
+         _blRefName = blRefMounting.Name;
+         //defFloorNameAndNumber(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
          _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform);
          _xmin = getXMinFloor();
@@ -55,12 +54,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       //public Point3d PtBlMounting { get { return _ptBlMounting; } }
-      public List<PanelSB> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }
+      public List<PanelSB> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }      
 
-      public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }
-
-      public string Name { get { return _name; } }
+      public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }            
+      
       public Storey Storey { get { return _storey; } set { _storey = value; } }
+      public double Height { get { return _height; } set { _height = value; } }
 
       public List<PanelSB> PanelsSbInFront { get { return _panelsSbInFront; } }
 
@@ -73,7 +72,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// </summary>
       public static List<Floor> GetMountingBlocks(PanelLibraryLoadService libLoadServ)
       {
-         List<Floor> floors = new List<Floor>();
+         List<Floor> floors = new List<Floor>();         
 
          var db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
@@ -124,37 +123,44 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return floors;
       }
 
+      public void DefineStorey(List<Storey> storeysNumbersTypeInAllFacades)
+      {         
+         var indexFloor = _blRefName.IndexOf("эт-");
+         string nameStorey = string.Empty; 
+         if (indexFloor == -1)         
+            nameStorey = _blRefName.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);         
+         else         
+            nameStorey = _blRefName.Substring(indexFloor + "эт-".Length);         
+         try
+         {
+            var storey = new Storey(nameStorey);
+            if (storey.Type == EnumStorey.Number)
+            {
+               // поиск в общем списке этажей. Номерные этажи всех фасадов должны быть на одном уровне
+               var storeyAllFacades = storeysNumbersTypeInAllFacades.Find(s => s.Number == storey.Number);
+               if (storeyAllFacades == null)
+               {
+                  storeysNumbersTypeInAllFacades.Add(storey);                  
+               }
+               else
+               {
+                  storey = storeyAllFacades;
+               }
+               _height = Settings.Default.FacadeFloorHeight;
+            }
+            _storey = storey;            
+         }
+         catch(Exception ex)
+         {
+            // ошибка определения номера этажа монтажки - это не чердак (Ч), не парапет (П), и не просто число            
+            Inspector.AddError(ex.Message + _blRefName, _extBlMounting, _idBlRefMounting);
+            Log.Error(ex, "Floor - DefineStorey()");
+         }                  
+      }
+
       public int CompareTo(Floor other)
-      {
-         // Сортировка этажей по именам
-         return _comparer.Compare(_name, other._name);
-      }
-
-      // определение торцов панелей
-      public void DefineEndsPanelSb()
-      {
-         if (_panelsSbInFront.Count == 0) return;
-         // панель с самым меньшим X это торцевая панель слева
-         var min = _panelsSbInFront.Aggregate((p1, p2) => p1.PtCenterPanelSbInModel.X < p2.PtCenterPanelSbInModel.X ? p1 : p2);
-         min.IsEndLeftPanel = true;
-         // панель с самым большим X это торцевая панель справа
-         var max = _panelsSbInFront.Aggregate((p1, p2) => p1.PtCenterPanelSbInModel.X > p2.PtCenterPanelSbInModel.X ? p1 : p2);
-         max.IsEndRightPanel = true;
-      }
-
-      private string getFloorName(BlockReference blRefMounting)
-      {
-         string name = string.Empty;
-         var indexFloor = blRefMounting.Name.IndexOf("эт-");
-         if (indexFloor == -1)
-         {
-            name = blRefMounting.Name.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
-         }
-         else
-         {
-            name = blRefMounting.Name.Substring(indexFloor + "эт-".Length);
-         }
-         return name;
+      {         
+         return _storey.CompareTo(other._storey);
       }
 
       private double getXMaxFloor()

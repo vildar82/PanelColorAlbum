@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Comparers;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -36,10 +37,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          if (facades.Count == 0) return;
          Database db = HostApplicationServices.WorkingDatabase;
+         checkLayers(db);
          using (var t = db.TransactionManager.StartTransaction())
          {
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
-            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов            
+            double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов                        
 
             using (ProgressMeter progress = new ProgressMeter())
             {
@@ -50,10 +52,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   double yFloor = yFirstFloor;
                   foreach (var floor in facade.Floors)
-                  {
+                  {                     
                      yFloor = floor.Storey.Y + yFirstFloor;
                      // Подпись номера этажа
-                     captionFloor(facade.XMin, yFloor, floor.Name, ms, t);
+                     captionFloor(facade.XMin, yFloor, floor, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
                      {
                         if (panelSb.PanelAkrLib != null)
@@ -61,12 +63,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            Point3d ptPanelAkr = new Point3d(panelSb.GetPtInModel(panelSb.PanelAkrLib).X, yFloor, 0);
                            //testGeom(panelSb, facade, floor, yFloor, t, ms);
                            var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkrLib.IdBtrPanelAkrInFacade);
+                           blRefPanelAkr.Layer = floor.Storey.Layer;
                            ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
                            blRefPanelAkr.Draw();
                         }
-                     }
-                     //yFloor += Settings.Default.FacadeFloorHeight;// 2800;// высота этажа
+                     }                     
                      progress.MeterProgress();
                   }
                }
@@ -74,7 +76,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
                progress.Stop();
             }
          }
-      }      
+      }
+
+      private static void checkLayers(Database db)
+      {
+         // проверкаслоев - если рабочие слои - заблокированны, то разблокировать
+         List<string> layersCheck = new List<string>();
+         layersCheck.Add(SymbolUtilityServices.LayerZeroName);
+         layersCheck.Add(Settings.Default.LayerParapetPanels);
+         layersCheck.Add(Settings.Default.LayerUpperStoreyPanels);
+         AcadLib.Layers.LayerExt.CheckLayerState(layersCheck.ToArray());         
+      }
 
       /// <summary>
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
@@ -85,10 +97,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          List<Facade> facades = new List<Facade>();
 
          // Поиск всех блоков монтажных планов в Модели чертежа с соотв обозначением стороны фасада
-         List<Floor> floors = Floor.GetMountingBlocks(libLoadServ);
-
-         // определение торцов панелей
-         floors.ForEach(f => f.DefineEndsPanelSb());
+         List<Floor> floors = Floor.GetMountingBlocks(libLoadServ);         
 
          // Упорядочивание блоков этажей в фасады (блоки монтажек по вертикали образуют фасад)
          // сортировка блоков монтажек по X, потом по Y (все монтажки в одну вертикаль снизу вверх)
@@ -112,38 +121,76 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private static void defineFloorStoreys(List<Facade> facades)
       {
          // определение уровней этажей Storey
-         // сортировка этажей в фасадах
+         // этажи с одинаковыми номерами, должны быть на одном уровне во всех фасадах.
+         // этажи Ч и П - должны быть последними в этажах одного фасада
+         // Определение Storey в фасадах
+         List<Storey> storeysAllFacades = new List<Storey>(); // общий список этажей         
          facades.ForEach(f =>
          {
-            f.Floors.Sort();
+            f.DefineFloorStoreys(storeysAllFacades);            
             f._xmax = f.Floors.Max(l => l.XMax);
          });
-         // создание куоллекции уровней Storey - для каждого имени этажа - соотв уровень.
-         List<Storey> storeys = new List<Storey>();
-         var floorNames = facades.SelectMany(f => f.Floors).GroupBy(f => f.Name);
-         foreach (var nameFloor in floorNames)
+         // назначение Y для нумеррованных этажей
+         storeysAllFacades.Sort();
+         double y = 0;
+         storeysAllFacades.Where(s => s.Type == EnumStorey.Number).ToList().ForEach(s =>
          {
-            string name = nameFloor.Key;
-            Storey storey = new Storey(name);
-            storeys.Add(storey);
-            foreach (var floor in nameFloor) floor.Storey = storey;                        
+            s.Y = y;
+            y += Settings.Default.FacadeFloorHeight;
+         });
+         // определение отметки для этажей Ч и П - по самой высокой панели АКР в этаже ??? определится при построении
+      }
+
+      private void DefineFloorStoreys(List<Storey> storeysNumbersTypeInAllFacades)
+      {
+         // Определение этажей в этажах фасада.
+         List<Storey> storeysFacade = new List<Storey>();
+         _floors.ForEach(f => f.DefineStorey(storeysNumbersTypeInAllFacades));
+         _floors.Sort();
+         // проверка этажей в фасаде.
+         checkStoreysFacade();      
+      }
+
+      private void checkStoreysFacade()
+      {
+         // проверка этажей в фасаде.
+         // не должно быть одинаковых номеров этажей
+         var storeysFacade = _floors.Select(f => f.Storey);
+         var storeyNumbersType = storeysFacade.Where(s => s.Type == EnumStorey.Number).ToList();         
+         var dublicateNumbers = storeyNumbersType.GroupBy(s => s.Number).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+         if (dublicateNumbers.Count>0)
+         {
+            string nums = string.Join(",", dublicateNumbers);
+            Inspector.AddError(string.Format(
+               "Повторяющиеся номера этажей в фасаде. Координата фасада X = {0}. Повторяющиеся номера этажей определенные по блокам монтажных планов этого фасада {1}",
+               _xmin, nums));
          }
-         // сортировка этажей
-         storeys.Sort();
-         int minNum = 0;
-         int.TryParse(storeys.First().Number, out minNum);
-         storeys.ForEach(s => s.DefineYFloor(minNum));
+         // Ч и П могут быть только по одной штуке
+         var storeyUpperType = storeysFacade.Where(s => s.Type == EnumStorey.Upper);
+         if (storeyUpperType.Count()>1)
+         {
+            Inspector.AddError(string.Format(
+               "Не должно быть больше одного этажа Чердака в одном фасаде. Для фасада найдено {0} блоков монтажных планов определенных как чердак. Координата фасада X = {1}.",
+               storeyUpperType.Count(), _xmin));
+         }
+         var storeyParapetType = storeysFacade.Where(s => s.Type == EnumStorey.Parapet);
+         if (storeyParapetType.Count() > 1)
+         {
+            Inspector.AddError(string.Format(
+               "Не должно быть больше одного этажа Парапета в одном фасаде. Для фасада найдено {0} блоков монтажных планов определенных как парапет. Координата фасада X = {1}.",
+               storeyParapetType.Count(), _xmin));
+         }
       }
 
       // Подпись номера этажа
-      private static void captionFloor(double x, double yFloor, string name, BlockTableRecord ms, Transaction t)
+      private static void captionFloor(double x, double yFloor, Floor floor, BlockTableRecord ms, Transaction t)
       {
          DBText textFloor = new DBText();
          textFloor.SetDatabaseDefaults(ms.Database);
          textFloor.Annotative = AnnotativeStates.False;
          textFloor.Height = Settings.Default.FacadeCaptionFloorTextHeight;// 250;// FacadeCaptionFloorTextHeight
-         textFloor.TextString = name;
-         textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (Settings.Default.FacadeFloorHeight * 0.5), 0);
+         textFloor.TextString = floor.Storey.ToString();
+         textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (floor.Height * 0.5), 0);
          ms.AppendEntity(textFloor);
          t.AddNewlyCreatedDBObject(textFloor, true);
       }
@@ -185,22 +232,57 @@ namespace AlbumPanelColorTiles.PanelLibrary
          progressMeter.Stop();
       }
 
-      private static void testGeom(PanelSB panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
+      public void DefYForUpperAndParapetStorey()
       {
-         // Точка центра панели СБ
-         DBPoint ptPanelSbInModel = new DBPoint(panelSb.PtCenterPanelSbInModel);
-         ms.AppendEntity(ptPanelSbInModel);
-         t.AddNewlyCreatedDBObject(ptPanelSbInModel, true);
-         // Точка вставки панели АКР
-         DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAkrLib).X, yFloor, 0));
-         ms.AppendEntity(ptPanelArkInModel);
-         t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);
-         // Расстояние до центра панели АКР
-         Line lineToCenterPanelAkr = new Line(ptPanelArkInModel.Position,
-            new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAkrLib.GetDistToCenter(panelSb.PanelAkrLib.IdBtrPanelAkrInFacade),
-                        ptPanelArkInModel.Position.Y, 0));
-         ms.AppendEntity(lineToCenterPanelAkr);
-         t.AddNewlyCreatedDBObject(lineToCenterPanelAkr, true);
+         // определение уровней для Ч и П этажей в этом фасаде
+         // уровеь последнего этажа в фасаде
+         var floorsNumberType = _floors.Where(f => f.Storey.Type == EnumStorey.Number);
+         double yLastNumberFloor = 0;
+         if (floorsNumberType.Count()>0)
+         {
+            yLastNumberFloor = floorsNumberType.Max(f => f.Storey.Y);
+         }         
+         // чердак 
+         double yParapet = 0;
+         var floorUpper = _floors.Where(f => f.Storey.Type == EnumStorey.Upper).FirstOrDefault();
+         if (floorUpper != null)
+         {
+            var maxHeightPanel = floorUpper.PanelsSbInFront.Where(p=>p.PanelAkrLib!=null)?.Max(p => p.PanelAkrLib?.HeightPanelByTile);
+            if (maxHeightPanel.HasValue)
+            {
+               floorUpper.Storey.Y = yLastNumberFloor + Settings.Default.FacadeFloorHeight;
+               yParapet = floorUpper.Storey.Y + maxHeightPanel.Value;
+               floorUpper.Height = maxHeightPanel.Value;
+            }
+         }
+         var floorParapet = _floors.Where(f => f.Storey.Type == EnumStorey.Parapet).FirstOrDefault();
+         if (floorParapet != null)
+         {
+            yParapet = yParapet != 0 ? yParapet : yLastNumberFloor + Settings.Default.FacadeFloorHeight;
+            floorParapet.Storey.Y = yParapet;
+            var maxHeightPanel = floorParapet.PanelsSbInFront.Where(p => p.PanelAkrLib != null)?.Max(p => p.PanelAkrLib?.HeightPanelByTile);
+            if (maxHeightPanel.HasValue)
+            {
+               floorParapet.Height = maxHeightPanel.Value;
+            }
+         }
       }
+      //private static void testGeom(PanelSB panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
+      //{
+      //   // Точка центра панели СБ
+      //   DBPoint ptPanelSbInModel = new DBPoint(panelSb.PtCenterPanelSbInModel);
+      //   ms.AppendEntity(ptPanelSbInModel);
+      //   t.AddNewlyCreatedDBObject(ptPanelSbInModel, true);
+      //   // Точка вставки панели АКР
+      //   DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAkrLib).X, yFloor, 0));
+      //   ms.AppendEntity(ptPanelArkInModel);
+      //   t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);
+      //   // Расстояние до центра панели АКР
+      //   Line lineToCenterPanelAkr = new Line(ptPanelArkInModel.Position,
+      //      new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAkrLib.GetDistToCenter(panelSb.PanelAkrLib.IdBtrPanelAkrInFacade),
+      //                  ptPanelArkInModel.Position.Y, 0));
+      //   ms.AppendEntity(lineToCenterPanelAkr);
+      //   t.AddNewlyCreatedDBObject(lineToCenterPanelAkr, true);
+      //}
    }
 }

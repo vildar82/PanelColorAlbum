@@ -15,6 +15,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private Document _doc;
       private Editor _ed;
       private string _section;
+      private int _numberFloor;
+      private string _nameFloor;      
 
       public MountingPlans()
       {
@@ -27,10 +29,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // создание блоков монтажных планов из выбранных планов монтажек пользователем
       public void CreateMountingPlans()
       {
-         int numberFloor = 2;
+         _numberFloor = 2;
          _ed.WriteMessage("\nКоманда создания блоков монтажных планов вида АКР_Монтажка_2.");
-
-         createFloor(numberFloor);
+         createFloor();
       }
 
       // проверка наличия блока монтажки этого этажа
@@ -53,18 +54,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   switch (res.StringResult)
                   {
                      case "Выход":
-                        throw new Exception("\nОтменено пользователем.");
+                        throw new Exception("Отменено пользователем.");
                      case "Пропустить":
                         skipOrRedefine = true;
                         break;
 
                      default:
-                        throw new Exception("\nОтменено пользователем.");
+                        throw new Exception("Отменено пользователем.");
                   }
                }
                else
                {
-                  throw new Exception("\nОтменено пользователем.");
+                  throw new Exception("Отменено пользователем.");
                }
             }
          }
@@ -120,49 +121,78 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      private void createFloor(int numberFloor)
-      {
+      private void createFloor()
+      {         
          // запрос номера этажа
-         numberFloor = getNumberFloor(numberFloor);
+         getNumberFloor();         
          // проверка наличия блока монтажки с этим номером
-         string floorBlockName;
-         if (string.IsNullOrEmpty(_section))
+         string indexFloor;
+         if (string.IsNullOrEmpty(_nameFloor))
          {
-            floorBlockName = string.Format("{0}эт-{1}", Settings.Default.BlockMountingPlanePrefixName, numberFloor);
+            indexFloor =  _numberFloor.ToString();
+            _numberFloor++;
          }
          else
          {
-            floorBlockName = string.Format("{0}С{1}_эт-{2}", Settings.Default.BlockMountingPlanePrefixName, _section, numberFloor);
+            indexFloor = _nameFloor;
+         }       
+         string floorBlockName;
+         if (string.IsNullOrEmpty(_section))
+         {
+            floorBlockName = string.Format("{0}эт-{1}", Settings.Default.BlockMountingPlanePrefixName, indexFloor);
+         }
+         else
+         {
+            floorBlockName = string.Format("{0}С{1}_эт-{2}", Settings.Default.BlockMountingPlanePrefixName, _section, indexFloor);
          }
          if (!checkBlock(floorBlockName))
          {
             // запрос объектов плана этажа
-            var idsFloor = selectFloor(numberFloor);
+            var idsFloor = selectFloor(indexFloor);
             createBlock(idsFloor, floorBlockName);
          }
          // создание следующего этажа
-         createFloor(++numberFloor);
+         createFloor();
       }
 
       // Запрос номера этажа
-      private int getNumberFloor(int defaultNumber)
-      {
-         var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
-         opt.DefaultValue = defaultNumber;
-         opt.Keywords.Add("Секция" + _section);
+      private void getNumberFloor()
+      {         
+         var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");         
+         opt.DefaultValue = _numberFloor;
+         string keySection = "Секция" + _section;
+         opt.Keywords.Add(keySection);
+         opt.Keywords.Add("Чердак");
+         opt.Keywords.Add("Парапет");
          var res = _ed.GetInteger(opt);
          if (res.Status == PromptStatus.OK)
          {
-            return res.Value;
+            _numberFloor = res.Value;
+            _nameFloor = null;
          }
          else if (res.Status == PromptStatus.Keyword)
          {
-            _section = getSection();
-            return getNumberFloor(defaultNumber);
+            if (res.StringResult == keySection)
+            {
+               _section = getSection();
+               getNumberFloor();
+            }
+            else if (res.StringResult == "Чердак")
+            {
+               _nameFloor = Settings.Default.PaintIndexUpperStorey;
+            }
+            else if (res.StringResult == "Парапет")
+            {
+               _nameFloor = Settings.Default.PaintIndexParapet;
+            }
+            else
+            {               
+               throw new Exception("Отменено пользователем.");
+            }
          }
          else
-         {
-            throw new Exception("\nОтменено пользователем.");
+         {            
+            throw new Exception("Отменено пользователем.");
          }
       }
 
@@ -175,7 +205,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем.");
+            throw new Exception("Отменено пользователем.");
          }
       }
 
@@ -193,10 +223,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // запрос выбора объектов этажа
-      private List<ObjectId> selectFloor(int numberFloor)
+      private List<ObjectId> selectFloor(string indexFloor)
       {
-         var selOpt = new PromptSelectionOptions();
-         selOpt.MessageForAdding = string.Format("\nВыбор объектов монтажного плана {0} этажа", numberFloor);
+         var selOpt = new PromptSelectionOptions();         
+         selOpt.MessageForAdding = string.Format("\nВыбор объектов монтажного плана {0} этажа", indexFloor);
          var selRes = _ed.GetSelection(selOpt);
          if (selRes.Status == PromptStatus.OK)
          {
@@ -204,7 +234,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            throw new Exception("\nОтменено пользователем.");
+            throw new Exception("Отменено пользователем.");
          }
       }
    }

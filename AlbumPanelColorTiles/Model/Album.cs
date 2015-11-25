@@ -327,7 +327,7 @@ namespace AlbumPanelColorTiles
          }
          else
          {
-            throw new System.Exception("Прервано пользователем.");
+            throw new System.Exception("Отменено пользователем.");
          }
          return abbrName;
       }
@@ -417,7 +417,7 @@ namespace AlbumPanelColorTiles
             }
             else
             {
-               throw new System.Exception("Прервано пользователем.");
+               throw new System.Exception("Отменено пользователем.");
             }
          } while (numberFirstFloor == 0);
          return numberFirstFloor;

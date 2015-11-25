@@ -168,7 +168,7 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.ToString());
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем."))
                {
                   Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks. {0}", doc.Name);
                }

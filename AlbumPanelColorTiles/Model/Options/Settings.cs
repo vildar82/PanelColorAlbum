@@ -61,6 +61,7 @@
       private string _layerMarks;
 
       private string _layerUpperStoreyPanels;
+      private string _layerParapetPanels;
       private string _layerWindows;
       private string _paintIndexEndLeftPanel;
       private string _paintIndexEndRightPanel;
@@ -71,7 +72,7 @@
       // Индексы покраски
       //
       private string _paintIndexUpperStorey;
-
+      private string _paintIndexParapet;
       private string _paintIndexWindow;
       private int _sheetPanelEndShift;
 
@@ -142,12 +143,14 @@
       public string LayerDimensionForm { get { return _layerDimensionForm; } }
       public string LayerMarks { get { return _layerMarks; } }
       public string LayerUpperStoreyPanels { get { return _layerUpperStoreyPanels; } }
+      public string LayerParapetPanels { get { return _layerParapetPanels; } }
       public string LayerWindows { get { return _layerWindows; } }
       public string PaintIndexEndLeftPanel { get { return _paintIndexEndLeftPanel; } }
       public string PaintIndexEndRightPanel { get { return _paintIndexEndRightPanel; } }
       public string PaintIndexLastStorey { get { return _paintIndexLastStorey; } }
       public string PaintIndexStorey { get { return _paintIndexStorey; } }
       public string PaintIndexUpperStorey { get { return _paintIndexUpperStorey; } }
+      public string PaintIndexParapet { get { return _paintIndexParapet; } }      
       public string PaintIndexWindow { get { return _paintIndexWindow; } }
       public int SheetPanelEndShift { get { return _sheetPanelEndShift; } }
       public int SheetPanelEndUp { get { return _sheetPanelEndUp; } }
@@ -189,6 +192,7 @@
          _windowPanelSuffix = "_ок";
          _layerMarks = "АР_Марки";
          _layerUpperStoreyPanels = "АР_Панели_Чердак";
+         _layerParapetPanels = "АР_Панели_Парапет";
          _layerWindows = "АР_Окна";
          _layerDimensionFacade = "АР_Размеры на фасаде";
          _layerDimensionForm = "АР_Размеры в форме";
@@ -212,6 +216,7 @@
          _facadeIndentFromMountingPlanes = 10000;
          _facadeEndsPanelIndent = 890;
          _paintIndexUpperStorey = "Ч";
+         _paintIndexParapet = "П";
          _paintIndexWindow = "-ОК";
          _paintIndexEndLeftPanel = "ТЛ";
          _paintIndexEndRightPanel = "ТП";
