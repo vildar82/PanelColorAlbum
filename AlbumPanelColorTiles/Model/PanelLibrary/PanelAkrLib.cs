@@ -20,22 +20,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
-      public ObjectId IdBtrPanelAkrInFacade { get { return _idBtrPanelAkrInFacade; } set { _idBtrPanelAkrInFacade = value; } }
+      public ObjectId IdBtrPanelAkrInFacade
+      {
+         get { return _idBtrPanelAkrInFacade; }
+         set { _idBtrPanelAkrInFacade = value; }
+      }
 
       public PanelAkrLib CopyLibBlockElectricInTempFile(PanelSB panelSb)
       {
          PanelAkrLib panelAkrLib = null;
          try
          {
-            string markAkr = panelSb.MarkSb;
-            if (panelSb.IsEndLeftPanel)
-            {
-               markAkr += Settings.Default.EndLeftPanelSuffix;
-            }
-            else if (panelSb.IsEndRightPanel)
-            {
-               markAkr += Settings.Default.EndRightPanelSuffix;
-            }
+            string markAkr = panelSb.MarkSb;            
             SymbolUtilityServices.ValidateSymbolName(markAkr, false);
             // копирование блока с новым именем с электрикой
             ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanel, markAkr);
@@ -67,6 +63,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          return panelsAkrLIb;
-      }
+      }      
    }
 }

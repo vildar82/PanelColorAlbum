@@ -118,7 +118,7 @@
       <DependentUpon>FormSavePanelsToLib.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\Panels\ColorArea.cs" />
-    <Compile Include="Model\Panels\StoreyNumberComparer.cs" />
+    <Compile Include="Model\Panels\EnumStorey.cs" />
     <Compile Include="Model\RandomPainting\ColorAreaSpotSize.cs" />
     <Compile Include="Model\RandomPainting\FormColorAreaSize.cs">
       <SubType>Form</SubType>

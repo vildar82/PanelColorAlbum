@@ -14,12 +14,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public abstract class PanelAKR
    {
       protected string _blName;
+      protected Extents3d _extentsTiles; // границы блока по плиткам
       protected List<EntityInfo> _entInfos;// Список объектов в блоке для сравнения блоков панелей фасада и библмиотеки
       protected ObjectId _idBtrAkrPanel;      
       protected bool _isEndLeftPanel;
       protected bool _isEndRightPanel;
       protected string _markAkrWithoutWhite;
       protected double _distToCenterFromBase;
+      protected double _heightPanelByTile;
       protected string _description;      
 
       public PanelAKR(ObjectId idBtrAkrPanel, string blName)
@@ -42,6 +44,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
       public string Description { get { return _description; } set { _description = value; } }
 
+      public double HeightPanelByTile { get { return _heightPanelByTile; } }
+      public double DistToCenterFromBase { get { return _distToCenterFromBase; } }
+
       private void defineEndsPanel(string markAkrWithoutWhite)
       {
          if (markAkrWithoutWhite.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
@@ -59,13 +64,22 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return string.Format("{0}{1}{2}",  _blName, string.IsNullOrEmpty(_description) ? "" : " - " , _description);
       }
 
-      public double GetDistToCenter(ObjectId idBtrPanelAkr)
+      //public double GetDistToCenter(ObjectId idBtrPanelAkr)
+      //{
+      //   if (_distToCenterFromBase != 0)
+      //   {
+      //      return _distToCenterFromBase;
+      //   }
+      //   else
+      //   {
+      //      DefineGeom(idBtrPanelAkr);
+      //      return _distToCenterFromBase;
+      //   }
+      //}
+
+      public void DefineGeom(ObjectId idBtrPanelAkr)
       {
-         if (_distToCenterFromBase != 0)
-         {
-            return _distToCenterFromBase;
-         }
-         var extTiles = new Extents3d();
+         _extentsTiles = new Extents3d();
          string blName;
          using (var btrAkr = idBtrPanelAkr.Open(OpenMode.ForRead) as BlockTableRecord)
          {
@@ -78,12 +92,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {
-                        extTiles.AddExtents(blRefTile.GeometricExtents);
+                        _extentsTiles.AddExtents(blRefTile.GeometricExtents);
                      }
                   }
                }
             }
          }
+         _heightPanelByTile = _extentsTiles.MaxPoint.Y - _extentsTiles.MinPoint.Y + Settings.Default.TileSeam;
          double shiftEnd = 0;
          if (blName.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
          {
@@ -93,8 +108,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             shiftEnd = -Settings.Default.FacadeEndsPanelIndent * 0.5;// 445;// Торец спрва - сдвинуть вправо
          }
-         _distToCenterFromBase = (extTiles.MaxPoint.X - extTiles.MinPoint.X) * 0.5 + shiftEnd;
-         return _distToCenterFromBase;
+         _distToCenterFromBase = (_extentsTiles.MaxPoint.X - _extentsTiles.MinPoint.X) * 0.5 + shiftEnd;         
       }
    }
 }

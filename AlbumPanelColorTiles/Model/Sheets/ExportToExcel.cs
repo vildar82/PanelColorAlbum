@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Excel;
+using System.Linq;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -62,15 +63,17 @@ namespace AlbumPanelColorTiles.Sheets
          int row = 1;
          sheetFloor.Cells[row, 1].Value = "Этаж";
          sheetFloor.Cells[row, 2].Value = "Панели";
-
-         album.Storeys.Sort();
-         foreach (var storey in album.Storeys)
-         {
-            foreach (var markAr in storey.MarksAr)
+         row++;
+         // TODO: Список панелей по этажам.
+         var panelsGroupByStoreys = album.MarksSB.SelectMany(sb => sb.MarksAR).SelectMany(ar=>ar.Panels).GroupBy(p=>p.Storey);
+         foreach (var panelGroupStorey in panelsGroupByStoreys)
+         {            
+            foreach (var panelsOnStorey in panelGroupStorey)
             {
-               sheetFloor.Cells[++row, 1].Value = storey.Number;
-               sheetFloor.Cells[row, 2].Value = markAr.MarkARPanelFullName;
-            }
+               sheetFloor.Cells[row, 1].Value = panelGroupStorey.Key.ToString(); //"Этаж";
+               sheetFloor.Cells[row, 2].Value = panelsOnStorey.MarkAr.MarkARPanelFullName; //"Панели";
+               row++;
+            }            
          }
       }
    }

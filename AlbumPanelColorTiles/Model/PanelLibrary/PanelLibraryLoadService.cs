@@ -60,7 +60,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   if (facade != null)
                   {
                      // поиск нужного этажа
-                     var floor = facade.Floors.Find(f => string.Equals(f.Name, panelAr.Storey.Number, StringComparison.OrdinalIgnoreCase));
+                     var floor = facade.Floors.Find(f => f.Storey.Equals(panelAr.Storey));
                      if (floor != null)
                      {
                         // Поск монтажки по линии от центра панели АКР
