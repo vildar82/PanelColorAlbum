@@ -40,7 +40,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          if (facades.Count == 0)
          {
-            Log.Info("Не найдены фасады по монтажным планам для заполнения марок покраски в монтажках");
+            string errMsg = "Не найдены фасады по монтажным планам для заполнения марок покраски в монтажках.";
+            Log.Info(errMsg);
+            album.Doc.Editor.WriteMessage("\n{0}", errMsg);
             return;
          }
 

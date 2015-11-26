@@ -112,7 +112,15 @@ namespace AlbumPanelColorTiles.Sheets
                tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
-               int curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
+               int curSheetArNum;
+               if (_album.NumberFirstSheet ==0)
+               {
+                  curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
+               }
+               else
+               {
+                  curSheetArNum = _album.NumberFirstSheet;
+               }
 
                ProgressMeter progressMeter = new ProgressMeter();
                progressMeter.SetLimit(_sheetsMarkSB.Count);
