@@ -80,7 +80,9 @@ namespace AlbumPanelColorTiles.Sheets
          }
          catch (Exception ex)
          {
-            Log.Error(ex, "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);");
+            string errMsg = "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);";
+            _album.Doc.Editor.WriteMessage("\n{0} - {1}", errMsg, ex.ToString());
+            Log.Error(ex, errMsg);
          }
 
          // Проверка новых панелей, которых нет в библиотеке

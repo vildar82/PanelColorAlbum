@@ -8,7 +8,7 @@ namespace AlbumPanelColorTiles.Lib
    {
       private const string _dicName = "AlbumPanelColorTiles";
       private const string _recNameAbbr = "Abbr";
-      private const string _recNameNumberFirstFloor = "NumberFirstFloor";
+      //private const string _recNameNumberFirstFloor = "NumberFirstFloor";
       private const string _recNameRenameMarkAR = "MarkArRename";
 
       public static string LoadAbbr()
@@ -33,10 +33,10 @@ namespace AlbumPanelColorTiles.Lib
          return res;
       }
 
-      public static int LoadNumberFirstFloor()
+      public static int LoadNumber(string keyName)
       {
          int res = 0;
-         ObjectId idRec = getRec(_recNameNumberFirstFloor);
+         ObjectId idRec = getRec(keyName);
          if (idRec.IsNull)
             return res;
 
@@ -100,9 +100,9 @@ namespace AlbumPanelColorTiles.Lib
          }
       }
 
-      public static void SaveNumberFirstFloor(int numberFirstFloor)
+      public static void SaveNumber(int number, string keyName)
       {
-         ObjectId idRec = getRec(_recNameNumberFirstFloor);
+         ObjectId idRec = getRec(keyName);
          if (idRec.IsNull)
             return;
 
@@ -110,7 +110,7 @@ namespace AlbumPanelColorTiles.Lib
          {
             using (ResultBuffer rb = new ResultBuffer())
             {
-               rb.Add(new TypedValue((int)DxfCode.Int32, numberFirstFloor));
+               rb.Add(new TypedValue((int)DxfCode.Int32, number));
                xRec.Data = rb;
             }
          }

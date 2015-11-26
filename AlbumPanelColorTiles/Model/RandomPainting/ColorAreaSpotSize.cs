@@ -81,7 +81,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       {
          try
          {
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(Album.RegAppPath + "\\" + _subkey);
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(Album.REGAPPPATH + "\\" + _subkey);
             _lenghtSpot = Convert.ToInt32(keyAKR.GetValue(_regKeySpotSizeLength, _lenghtSpot));
             _heightSpot = Convert.ToInt32(keyAKR.GetValue(_regKeySpotSizeHeight, _heightSpot));
          }
@@ -92,7 +92,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       {
          try
          {
-            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(Album.RegAppPath + "\\" + _subkey);
+            var keyAKR = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(Album.REGAPPPATH + "\\" + _subkey);
             keyAKR.SetValue(_regKeySpotSizeLength, _lenghtSpot, Microsoft.Win32.RegistryValueKind.DWord);
             keyAKR.SetValue(_regKeySpotSizeHeight, _heightSpot, Microsoft.Win32.RegistryValueKind.DWord);
          }
