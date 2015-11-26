@@ -17,7 +17,7 @@ namespace AlbumPanelColorTiles.Panels
       private string _markARPanelFullName;
       private string _markARPanelFullNameCalculated;
       private string _markArTemp;
-      private string _markPainting;
+      private string _markPainting;      
       private string _markPaintingCalulated; // вычесленная программой марка покраски, в методе DefineArchitectMarks класса MarkSbPanel
       private MarkSbPanelAR _markSB;
       private List<Paint> _paints;
@@ -63,20 +63,39 @@ namespace AlbumPanelColorTiles.Panels
          set
          {
             _markPainting = value;
-            _markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
+            //_markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
+            _markARPanelFullName = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
             // Переименование подписей марок панелей (текстовый объект внутри блока панелели)
             PanelAR.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
          }
       }
+
+      public string MarkPaintingFull
+      {
+         get
+         {
+            string paint = _markPainting ?? _markPaintingCalulated;
+            if (string.IsNullOrEmpty(_markSB.Abbr) )
+            {
+               return string.Format("({0})", paint);
+            }
+            else
+            {
+               return string.Format("({0}_{1})", paint, _markSB.Abbr);
+            }
+            
+         }
+      }
+
 
       public string MarkPaintingCalulated
       {
          get { return _markPaintingCalulated; }
          set
          {
-            _markPaintingCalulated = value;
-            _markArBlockName = string.Format("{0}({1}_{2})", _markSB.MarkSbBlockName, AcadLib.Blocks.Block.GetValidNameForBlock(_markPaintingCalulated), _markSB.Abbr);
-            _markARPanelFullNameCalculated = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPaintingCalulated, _markSB.Abbr);
+            _markPaintingCalulated = value.GetValidDbSymbolName();            
+            _markArBlockName = string.Format("{0}{1}", _markSB.MarkSbBlockName, MarkPaintingFull);
+            _markARPanelFullNameCalculated = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
          }
       }
 

@@ -82,7 +82,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                               {
                                  using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
                                  {
-                                    atrRef.TextString = string.Format("{0}_{1}", markAr.MarkPainting, markSbAkr.Abbr);
+                                    atrRef.TextString = markAr.MarkPaintingFull;
                                     isFound = true;
                                  }
                               }
