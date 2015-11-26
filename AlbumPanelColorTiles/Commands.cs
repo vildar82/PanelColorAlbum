@@ -70,7 +70,8 @@ namespace AlbumPanelColorTiles
                       "\nБлок плитки (разложенная в блоке панели) - " + Settings.Default.BlockTileName +
                       "\nБлок обозначения стороны фасада на монтажном плане - " + Settings.Default.BlockFacadeName +
                       "\nБлок рамки со штампом - " + Settings.Default.BlockFrameName +
-                      "\nПанели чердака на слое - " + Settings.Default.LayerUpperStoreyPanels +
+                      "\nПанели Чердака на слое - " + Settings.Default.LayerUpperStoreyPanels +
+                      "\nПанели Парапета на слое - " + Settings.Default.LayerParapetPanels +
                       "\nПанели торцевые с суффиксом _тп или _тл после марки СБ в конце имени блока панели." +
                       "\nПанели с разными окнами - с суффиксом _ок (русскими буквами) и номером в конце имени блока панели. Например _ОК1" +
                       "\nСлой для окон в панелях (замораживается на листе формы панели марки АР) - " + Settings.Default.LayerWindows +
