@@ -313,24 +313,20 @@ namespace AlbumPanelColorTiles
             _numberFirstSheet = loadNumberFromDict(KEYNAMENUMBERFIRSTSHEET, 0);            
          }
 
-         string keyAbbrLocal = "Проект " + _abbreviateProject;
-         string keyAbbrGlobal = "Project" + _abbreviateProject;
-         string keyNumberFirstFloorLocal = "Номер первого этажа " + _numberFirstFloor;
-         string keyNumberFirstFloorGlobal = "NumFirstFloor" + _numberFirstFloor;
-         string keyNumberFirstSheetLocal = "Номер первого листа ";
-         string keyNumberFirstSheetGlobal = "NumFirstSheet";
+         string keyAbbrLocal = "Проект" + _abbreviateProject;         
+         string keyNumberFirstFloorLocal = "НомерПервогоЭтажа" + _numberFirstFloor;         
+         string keyNumberFirstSheetLocal = "НомерПервогоЛиста";         
          if (_numberFirstSheet != 0)
          {
-            keyNumberFirstSheetLocal += _numberFirstSheet;
-            keyNumberFirstSheetGlobal += _numberFirstSheet;
+            keyNumberFirstSheetLocal += _numberFirstSheet;            
          }         
 
-         var opt = new PromptKeywordOptions("Начальные значения:");
+         var opt = new PromptKeywordOptions("Начальные значения (ентер или пробел для продолжения):");
          opt.AllowArbitraryInput = false;
          opt.AllowNone = true;         
-         opt.Keywords.Add(keyAbbrGlobal, keyAbbrLocal);         
-         opt.Keywords.Add(keyNumberFirstFloorGlobal, keyNumberFirstFloorLocal);
-         opt.Keywords.Add(keyNumberFirstSheetGlobal, keyNumberFirstSheetLocal);
+         opt.Keywords.Add(keyAbbrLocal);         
+         opt.Keywords.Add(keyNumberFirstFloorLocal);
+         opt.Keywords.Add(keyNumberFirstSheetLocal);
          var res = _doc.Editor.GetKeywords(opt);
          switch (res.Status)
          {
@@ -343,16 +339,16 @@ namespace AlbumPanelColorTiles
                throw new System.Exception("Отменено пользователем.");
             case PromptStatus.OK:
             case PromptStatus.Keyword:
-               if (res.StringResult == keyAbbrGlobal)
+               if (res.StringResult == keyAbbrLocal)
                {
                   abbreviateNameProject();
                }
-               else if (res.StringResult == keyNumberFirstFloorGlobal)
+               else if (res.StringResult == keyNumberFirstFloorLocal)
                {
                   _numberFirstFloor = promptNumber("Введите номер для первого этажа панелей:", _numberFirstFloor);                  
                   saveNumberToDict(_numberFirstFloor, KEYNAMENUMBERFIRSTFLOOR);
                }
-               else if (res.StringResult == keyNumberFirstSheetGlobal)
+               else if (res.StringResult == keyNumberFirstSheetLocal)
                {
                   _numberFirstSheet = promptNumber("Введите номер для первого листа панелей:", _numberFirstSheet);
                   saveNumberToDict(_numberFirstSheet, KEYNAMENUMBERFIRSTSHEET);
