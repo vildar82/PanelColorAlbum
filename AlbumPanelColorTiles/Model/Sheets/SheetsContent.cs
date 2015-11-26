@@ -131,14 +131,14 @@ namespace AlbumPanelColorTiles.Sheets
                   progressMeter.MeterProgress();
                   foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
                   {
-                     tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки на фасаде";
+                     tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки на фасаде";
                      sheetMarkAR.SheetNumber = ++curSheetArNum;
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
                      CheckEndOfTable(t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
 
-                     tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ".Раскладка плитки в форме";
+                     tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки в форме";
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
                      sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;

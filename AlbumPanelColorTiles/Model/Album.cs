@@ -298,7 +298,7 @@ namespace AlbumPanelColorTiles
       private void promptStartOptions()
       {
          // Дефолтное значение аббревиатуры проекта
-         if (string.IsNullOrEmpty(_abbreviateProject))
+         if (_abbreviateProject == null)
          {
             _abbreviateProject = loadAbbreviateName();// "Н47Г";
          }
@@ -380,19 +380,39 @@ namespace AlbumPanelColorTiles
       }
 
       private void abbreviateNameProject()
-      {         
-         var opt = new PromptStringOptions("\nВведите сокращенное имя проекта:");
-         opt.DefaultValue = _abbreviateProject;
-         var res = _doc.Editor.GetString(opt);
+      {
+         var opt = new PromptKeywordOptions(string.Format(
+            "Введите сокращенное имя проекта (пробел или ентер для продолжения с текущим значением {0}):", _abbreviateProject));
+         opt.AllowArbitraryInput = true;
+         opt.AllowNone = true;         
+         opt.AppendKeywordsToMessage = true;
+         opt.Keywords.Add("Пустое");
+         opt.Keywords.Add(_abbreviateProject);         
+         var res = _doc.Editor.GetKeywords(opt);
          if (res.Status == PromptStatus.OK)
-         {            
-            _abbreviateProject = res.StringResult;
-            saveAbbreviateName(_abbreviateProject);
-         }
-         //else
-         //{
-         //   throw new System.Exception("Отменено пользователем.");
-         //}         
+         {
+            if (res.StringResult == "Пустое")
+            {
+               _abbreviateProject = string.Empty;               
+            }
+            else if (res.StringResult == _abbreviateProject)
+            {
+               // не изменилось
+            }
+            else                       
+            {
+               if (res.StringResult.IsValidDbSymbolName())
+               {
+                  _abbreviateProject = res.StringResult;
+                  saveAbbreviateName(_abbreviateProject);
+               }
+               else
+               {
+                  _doc.Editor.WriteMessage("\nНедопустимое имя проекта - т.к. оно используется в именах блоков, то недопускаются символы недопустимые в именах блоков.");
+                  abbreviateNameProject();
+               }
+            }                        
+         }                        
       }
 
       // Создание определений блоков панелей марки АР

@@ -61,7 +61,14 @@ namespace AlbumPanelColorTiles.RenamePanels
 
       public string GetMarkArPreview(string markPainting)
       {
-         return string.Format("{0}({1}_{2})", _markSB, markPainting, _abbr);
+         if (string.IsNullOrEmpty(_abbr) )
+         {
+            return string.Format("{0}({1})", _markSB, markPainting);
+         }
+         else
+         {
+            return string.Format("{0}({1}_{2})", _markSB, markPainting, _abbr);
+         }
       }
 
       // Переименование марки покрааски
