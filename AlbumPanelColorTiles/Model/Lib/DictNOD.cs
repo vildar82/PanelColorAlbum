@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.DatabaseServices;
 
@@ -186,6 +187,21 @@ namespace AlbumPanelColorTiles.Lib
       private static string getValueRenameMark(MarkArRename renameMark)
       {
          return string.Format("{0};{1}", renameMark.MarkAR.MarkARPanelFullNameCalculated, renameMark.MarkPainting);
+      }
+
+      public static void CopyDict(Database dbDest)
+      {
+         // Копирование словаря АКР в базу
+         var idDict = getDict();
+         if (idDict.IsNull)
+         {
+            Inspector.AddError("Словарь АКР в текущем чертеже не найден.");
+            return;
+         }
+         var ids = new ObjectIdCollection();
+         ids.Add(idDict);
+         var map = new IdMapping();
+         dbDest.WblockCloneObjects(ids, dbDest.NamedObjectsDictionaryId, map, DuplicateRecordCloning.Replace, false);
       }
    }
 }

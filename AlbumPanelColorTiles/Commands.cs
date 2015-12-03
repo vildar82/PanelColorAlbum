@@ -510,5 +510,54 @@ namespace AlbumPanelColorTiles
             }            
          }
       }
+
+      /// <summary>
+      /// Копирование словаря АКР из этого чертежа в другой
+      /// </summary>
+      [CommandMethod("PIK", "AKR-CopyDictionary", CommandFlags.Modal | CommandFlags.Session)]
+      public void CopyDictionary()
+      {         
+         Log.Info("Start Command: AKR-CopyDictionary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         using (var DocLock = doc.LockDocument())
+         {            
+            try
+            {
+               Inspector.Clear();
+               // Запрос имени открытого чертежа в который нужно скопировать словарь
+               var res = doc.Editor.GetString("Имя чертежа в который копировать словарь АКР");
+               if (res.Status == PromptStatus.OK)
+               {
+                  // Поиск чертежа среди открытых документов
+                  foreach (Document itemDoc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
+                  {
+                     if (string.Equals(Path.GetFileName(itemDoc.Name), res.StringResult, System.StringComparison.OrdinalIgnoreCase))
+                     {
+                        using (var lockItemDoc = itemDoc.LockDocument())
+                        {
+                           DictNOD.CopyDict(itemDoc.Database);
+                        }
+                     }
+                  }
+               }
+               else
+               {
+                  return;
+               }               
+               if (Inspector.HasErrors)
+               {
+                  Inspector.Show();
+               }
+            }
+            catch (System.Exception ex)
+            {
+               Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
+               doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex);
+            }
+         }
+      }
    }
 }
