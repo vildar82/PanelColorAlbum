@@ -163,6 +163,30 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      public void CaptionPanelsUseMarksAr()
+      {
+         // Подпись в виде текста на слое АР_Марки
+         using (var t = _db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            foreach (var markSb in _marksSB)
+            {
+               if (HostApplicationServices.Current.UserBreak())
+                  throw new System.Exception("Отменено пользователем.");
+
+               var btrSb = t.GetObject(markSb.IdBtr, OpenMode.ForRead) as BlockTableRecord;               
+               PanelAR.AddMarkToPanelBtr(markSb.MarkSbClean, t, btrSb);
+
+               foreach (var markAr in markSb.MarksAR)
+               {
+                  var btrAr = t.GetObject(markAr.IdBtrAr, OpenMode.ForRead) as BlockTableRecord;
+                  PanelAR.AddMarkToPanelBtr(markAr.MarkARPanelFullName, t, btrAr);
+               }
+            }
+            t.Commit();
+         }
+      }
+
       // Проверка панелей на чертеже и панелей в памяти (this)
       public void CheckPanelsInDrawingAndMemory()
       {
@@ -292,7 +316,7 @@ namespace AlbumPanelColorTiles
          ReplaceBlocksMarkSbOnMarkAr();
 
          // Добавление подписей к панелям
-         CaptionPanels();
+         CaptionPanelsUseMarksAr();
       }
 
       private void promptStartOptions()

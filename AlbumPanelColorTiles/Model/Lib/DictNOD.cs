@@ -2,6 +2,7 @@
 using AcadLib.Errors;
 using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.DatabaseServices;
+using System.Linq;
 
 namespace AlbumPanelColorTiles.Lib
 {
@@ -73,12 +74,26 @@ namespace AlbumPanelColorTiles.Lib
                foreach (var typedValue in data)
                {
                   string value = typedValue.Value.ToString();
-                  var names = value.Split(';');
-                  string markArName = names[0];
+                  var names = value.Split(';'); //renameMark.MarkAR.MarkARPanelFullNameCalculated;renameMark.MarkPainting
+                  string markArDict = names[0];
                   MarkArRename markArRename;
-                  if (beforeRenameMarkARList.TryGetValue(markArName, out markArRename))
+                  if (beforeRenameMarkARList.TryGetValue(markArDict, out markArRename))
                   {
                      markArRename.RenameMark(names[1], beforeRenameMarkARList);
+                  }
+                  else
+                  {
+                     // Замена запятых на точки
+                     markArDict = markArDict.Replace(',', '.');
+                     List<MarkArRename> marksArRename = beforeRenameMarkARList.Values.ToList();
+                     foreach (var item in marksArRename)
+                     {
+                        var markArDot = item.MarkArCurFull.Replace(',', '.');
+                        if (string.Equals(markArDict, markArDot, System.StringComparison.OrdinalIgnoreCase))
+                        {
+                           item.RenameMark(names[1], beforeRenameMarkARList);
+                        }
+                     }
                   }
                }
             }

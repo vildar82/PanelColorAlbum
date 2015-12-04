@@ -13,6 +13,7 @@ namespace AlbumPanelColorTiles.Panels
    public class MarkArPanelAR : IEquatable<MarkArPanelAR>
    {
       private ObjectId _idBtrAr;
+      private string _abbrIndex;
       private string _markArBlockName;
       private string _markARPanelFullName;
       private string _markARPanelFullNameCalculated;
@@ -25,8 +26,9 @@ namespace AlbumPanelColorTiles.Panels
       private List<TileCalc> _tilesCalc;
 
       public MarkArPanelAR(List<Paint> paintAR, MarkSbPanelAR markSb, BlockReference blRefMarkAr)
-      {
+      {         
          _markSB = markSb;
+         _abbrIndex = string.IsNullOrEmpty(_markSB.Abbr) ? "" : "_" + _markSB.Abbr;
          _paints = paintAR;
          DefMarkArTempNames(markSb, blRefMarkAr.Name);
          _panels = new List<PanelAR>();
@@ -70,31 +72,25 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
+      /// <summary>
+      /// Марка покраски со скобками - (Э2_Н47Г)
+      /// </summary>
       public string MarkPaintingFull
       {
          get
          {
             string paint = _markPainting ?? _markPaintingCalulated;
-            if (string.IsNullOrEmpty(_markSB.Abbr) )
-            {
-               return string.Format("({0})", paint);
-            }
-            else
-            {
-               return string.Format("({0}_{1})", paint, _markSB.Abbr);
-            }
-            
+            return string.Format("({0}{1})", paint, _abbrIndex);
          }
       }
-
 
       public string MarkPaintingCalulated
       {
          get { return _markPaintingCalulated; }
          set
          {
-            _markPaintingCalulated = value.GetValidDbSymbolName();            
-            _markArBlockName = string.Format("{0}{1}", _markSB.MarkSbBlockName, MarkPaintingFull);
+            _markPaintingCalulated = value;           
+            _markArBlockName = string.Format("{0}{1}", _markSB.MarkSbBlockName, MarkPaintingFull.GetValidDbSymbolName());
             _markARPanelFullNameCalculated = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
          }
       }
