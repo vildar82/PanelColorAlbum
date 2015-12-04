@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -27,6 +28,8 @@ namespace AlbumPanelColorTiles
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands
    {
+      private static DateTime _lastStartCommandDateTime;
+      private static string _lastStartCommandName = string.Empty;
       private static string _curDllDir;
       private Album _album;
       private ImagePaintingService _imagePainting;
@@ -86,12 +89,24 @@ namespace AlbumPanelColorTiles
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.Session | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void AlbumPanelsCommand()
-      {
-         Log.Info("Start Command: AKR-AlbumPanels");
+      {         
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
+
+         string commandName = "AlbumPanels";         
+         if (string.Equals(_lastStartCommandName, commandName))
+         {
+            if ((DateTime.Now - _lastStartCommandDateTime).Seconds < 5)
+            {
+               doc.Editor.WriteMessage("Между запусками команды прошло меньше 5 секунд. Отмена.");
+               return;
+            }
+         }
+
          if (!File.Exists(doc.Name))
-            throw new System.Exception("Нужно сохранить файл.");
+            throw new System.Exception("Нужно сохранить файл.");         
+
+         Log.Info("Start Command: AKR-AlbumPanels");
 
          using (var DocLock = doc.LockDocument())
          {
@@ -148,6 +163,8 @@ namespace AlbumPanelColorTiles
                }
             }
          }
+         _lastStartCommandName = commandName;
+         _lastStartCommandDateTime = DateTime.Now;
       }
 
       /// <summary>
@@ -243,10 +260,22 @@ namespace AlbumPanelColorTiles
 
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
-      {
-         Log.Info("Start Command: AKR-PaintPanels");
+      {         
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
+
+         string commandName = "PaintPanels";
+         if (string.Equals(_lastStartCommandName, commandName))
+         {            
+            if ((DateTime.Now - _lastStartCommandDateTime).Seconds < 5)
+            {
+               doc.Editor.WriteMessage("Между запусками команды прошло меньше 5 секунд. Отмена.");
+               return;
+            }            
+         }
+
+         Log.Info("Start Command: AKR-PaintPanels");
+
          using (var DocLock = doc.LockDocument())
          {
             try
@@ -281,6 +310,8 @@ namespace AlbumPanelColorTiles
                Inspector.Show();
             }
          }
+         _lastStartCommandName = commandName;
+         _lastStartCommandDateTime = DateTime.Now;
       }
 
       [CommandMethod("PIK", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]

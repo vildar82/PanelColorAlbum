@@ -61,20 +61,28 @@ namespace AlbumPanelColorTiles.Sheets
          Worksheet sheetFloor = workBook.Sheets.Add();
          sheetFloor.Name = "Floors";
          int row = 1;
+         int totalCountPanels = 0;
          sheetFloor.Cells[row, 1].Value = "Этаж";
          sheetFloor.Cells[row, 2].Value = "Панели";
+         sheetFloor.Cells[row, 3].Value = "Кол";
          row++;
          // TODO: Список панелей по этажам.
-         var panelsGroupByStoreys = album.MarksSB.SelectMany(sb => sb.MarksAR).SelectMany(ar=>ar.Panels).GroupBy(p=>p.Storey);
+         var panelsGroupByStoreys = album.MarksSB.SelectMany(sb => 
+                  sb.MarksAR).SelectMany(ar=>ar.Panels).OrderBy(s=>s.Storey).GroupBy(p=>p.Storey);
          foreach (var panelGroupStorey in panelsGroupByStoreys)
-         {            
-            foreach (var panelsOnStorey in panelGroupStorey)
+         {
+            totalCountPanels += panelGroupStorey.Count();
+            var panelsArOnStorey = panelGroupStorey.OrderBy(p=>p.MarkAr.MarkARPanelFullName).GroupBy(p => p.MarkAr);
+            foreach (var panelOnStorey in panelsArOnStorey)
             {
-               sheetFloor.Cells[row, 1].Value = panelGroupStorey.Key.ToString(); //"Этаж";
-               sheetFloor.Cells[row, 2].Value = panelsOnStorey.MarkAr.MarkARPanelFullName; //"Панели";
+               sheetFloor.Cells[row, 1].Value = panelGroupStorey.Key.ToString(); //"Этаж";               
+               sheetFloor.Cells[row, 2].Value = panelOnStorey.Key.MarkARPanelFullName; //"Панели";
+               sheetFloor.Cells[row, 3].Value = panelOnStorey.Count();// Кол
                row++;
             }            
          }
+         sheetFloor.Cells[row, 2].Value ="Итого";
+         sheetFloor.Cells[row, 3].Value = totalCountPanels;
       }
    }
 }
