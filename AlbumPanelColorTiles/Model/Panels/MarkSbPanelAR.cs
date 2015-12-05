@@ -22,6 +22,7 @@ namespace AlbumPanelColorTiles.Panels
 
       // Границы блока по плитке
       private Extents3d _extentsTiles;
+      private double _heightPanelByTile; // Высота панели по плитке
 
       private ObjectId _idBtr;
       private bool _isEndLeftPanel;
@@ -80,6 +81,7 @@ namespace AlbumPanelColorTiles.Panels
 
       public Point2d CenterPanel { get { return _centerPanel; } }
       public Extents3d ExtentsTiles { get { return _extentsTiles; } }
+      public double HeightPanelByTile { get { return _heightPanelByTile; } }
 
       public ObjectId IdBtr { get { return _idBtr; } }
 
@@ -499,6 +501,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             _extentsTiles.AddPoint(tile.CenterTile);
          }
+         _heightPanelByTile = _extentsTiles.MaxPoint.Y - _extentsTiles.MinPoint.Y + Settings.Default.TileSeam;
          return new Point2d((_extentsTiles.MinPoint.X + _extentsTiles.MaxPoint.X) * 0.5, (_extentsTiles.MinPoint.Y + _extentsTiles.MaxPoint.Y) * 0.5);
       }
 

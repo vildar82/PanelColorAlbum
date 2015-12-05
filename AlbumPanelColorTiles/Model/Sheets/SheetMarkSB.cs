@@ -119,14 +119,17 @@ namespace AlbumPanelColorTiles.Sheets
          using (var t = dbMarkSB.TransactionManager.StartTransaction())
          {
             var lt = t.GetObject(dbMarkSB.LayerTableId, OpenMode.ForRead) as LayerTable;
+            // Слой размеров на фасаде
             if (lt.Has(Settings.Default.LayerDimensionFacade))
             {
                layersToFreezeOnFormSheet.Add(lt[Settings.Default.LayerDimensionFacade]);
             }
+            // Слой окон
             if (lt.Has(Settings.Default.LayerWindows))
             {
                layersToFreezeOnFormSheet.Add(lt[Settings.Default.LayerWindows]);
             }
+            // Слой размеров в форме
             if (lt.Has(Settings.Default.LayerDimensionForm))
             {
                layersToFreezeOnFacadeSheet.Add(lt[Settings.Default.LayerDimensionForm]);
@@ -153,7 +156,6 @@ namespace AlbumPanelColorTiles.Sheets
                   layMarks.IsPlottable = false;
                }
             }
-
             t.Commit();
          }
       }

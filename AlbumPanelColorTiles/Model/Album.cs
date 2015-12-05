@@ -4,6 +4,7 @@ using System.Linq;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Sheets;
@@ -108,6 +109,7 @@ namespace AlbumPanelColorTiles
                   }
                }
             }
+            Caption captionPanels = new Caption(t, db);
             // Удаление определений блоков Марок АР.
             foreach (ObjectId idBtr in bt)
             {
@@ -132,60 +134,13 @@ namespace AlbumPanelColorTiles
                   {
                      // Подпись марки блока
                      string panelMark = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
-                     PanelAR.AddMarkToPanelBtr(panelMark, t, btr);
+                     captionPanels.AddMarkToPanelBtr(panelMark,idBtr, null);
                   }
                }
             }
             t.Commit();
          }
-      }
-
-      // Добавление подписи имени марки панели в блоки панелей в чертеже
-      public void CaptionPanels()
-      {
-         // Подпись в виде текста на слое АР_Марки
-         using (var t = _db.TransactionManager.StartTransaction())
-         {
-            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            foreach (ObjectId idBtr in bt)
-            {
-               if (HostApplicationServices.Current.UserBreak())
-                  throw new System.Exception("Отменено пользователем.");
-
-               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (MarkSbPanelAR.IsBlockNamePanel(btr.Name))
-               {
-                  string panelMark = MarkSbPanelAR.GetPanelMarkFromBlockName(btr.Name, _marksSB);
-                  PanelAR.AddMarkToPanelBtr(panelMark, t, btr);
-               }
-            }
-            t.Commit();
-         }
-      }
-
-      public void CaptionPanelsUseMarksAr()
-      {
-         // Подпись в виде текста на слое АР_Марки
-         using (var t = _db.TransactionManager.StartTransaction())
-         {
-            var bt = t.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            foreach (var markSb in _marksSB)
-            {
-               if (HostApplicationServices.Current.UserBreak())
-                  throw new System.Exception("Отменено пользователем.");
-
-               var btrSb = t.GetObject(markSb.IdBtr, OpenMode.ForRead) as BlockTableRecord;               
-               PanelAR.AddMarkToPanelBtr(markSb.MarkSbClean, t, btrSb);
-
-               foreach (var markAr in markSb.MarksAR)
-               {
-                  var btrAr = t.GetObject(markAr.IdBtrAr, OpenMode.ForRead) as BlockTableRecord;
-                  PanelAR.AddMarkToPanelBtr(markAr.MarkARPanelFullName, t, btrAr);
-               }
-            }
-            t.Commit();
-         }
-      }
+      }      
 
       // Проверка панелей на чертеже и панелей в памяти (this)
       public void CheckPanelsInDrawingAndMemory()
@@ -316,7 +271,8 @@ namespace AlbumPanelColorTiles
          ReplaceBlocksMarkSbOnMarkAr();
 
          // Добавление подписей к панелям
-         CaptionPanelsUseMarksAr();
+         Caption caption = new Caption(_marksSB);
+         caption.CaptionPanels();
       }
 
       private void promptStartOptions()

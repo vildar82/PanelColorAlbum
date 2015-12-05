@@ -117,6 +117,7 @@
     <Compile Include="Model\PanelLibrary\FormSavePanelsToLib.Designer.cs">
       <DependentUpon>FormSavePanelsToLib.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\Panels\Caption.cs" />
     <Compile Include="Model\Panels\ColorArea.cs" />
     <Compile Include="Model\Panels\EnumStorey.cs" />
     <Compile Include="Model\RandomPainting\ColorAreaSpotSize.cs" />

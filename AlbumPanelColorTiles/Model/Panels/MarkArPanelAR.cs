@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -68,7 +69,7 @@ namespace AlbumPanelColorTiles.Panels
             //_markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
             _markARPanelFullName = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
             // Переименование подписей марок панелей (текстовый объект внутри блока панелели)
-            PanelAR.AddMarkToPanelBtr(_markARPanelFullName, _idBtrAr);
+            Caption.AddMarkToPanelBtr(this, _idBtrAr);
          }
       }
 
