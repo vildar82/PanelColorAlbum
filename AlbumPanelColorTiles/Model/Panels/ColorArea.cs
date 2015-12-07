@@ -15,11 +15,12 @@ namespace AlbumPanelColorTiles.Panels
       private Paint _paint;
       private double _size;
 
-      public ColorArea(BlockReference blRef, Album album)
+      public ColorArea(BlockReference blRef, Album album, Matrix3d trans)
       {
          _idblRef = blRef.ObjectId;
-         // Определение габаритов
+         // Определение габаритов         
          _bounds = blRef.GeometricExtents;
+         _bounds.TransformBy(trans);
          _paint = album.GetPaint(blRef.Layer);
          _size = (_bounds.MaxPoint.X - _bounds.MinPoint.X) * (_bounds.MaxPoint.Y - _bounds.MinPoint.Y);
       }
@@ -40,26 +41,65 @@ namespace AlbumPanelColorTiles.Panels
          List<ColorArea> colorAreas = new List<ColorArea>();
          using (var t = idBtr.Database.TransactionManager.StartTransaction())
          {
-            var btrMarkSb = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-            foreach (ObjectId idEnt in btrMarkSb)
-            {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-               {
-                  var blRefColorArea = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (string.Equals(blRefColorArea.GetEffectiveName(),
-                     Settings.Default.BlockColorAreaName,
-                     System.StringComparison.InvariantCultureIgnoreCase))
-                  {
-                     ColorArea colorArea = new ColorArea(blRefColorArea, album);
-                     colorAreas.Add(colorArea);
-                  }
-               }
-            }
+            IterateColorAreasInBtr(idBtr, album, colorAreas, Matrix3d.Identity, string.Empty);
             t.Commit();
          }
          // Сортировка зон покраски по размеру
          colorAreas.Sort();
          return colorAreas;
+      }
+
+      private static void IterateColorAreasInBtr(ObjectId idBtr, Album album,
+            List<ColorArea> colorAreas, Matrix3d matrix, string xrefName)
+      {
+         var btr = idBtr.GetObject( OpenMode.ForRead) as BlockTableRecord;
+         foreach (ObjectId idEnt in btr)
+         {
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            {
+               var blRefColorArea = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
+
+               var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
+               if (string.Equals(blName,
+                  Settings.Default.BlockColorAreaName,
+                  System.StringComparison.InvariantCultureIgnoreCase))
+               {
+                  ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
+                  colorAreas.Add(colorArea);
+               }
+               else
+               {
+                  // Если это не блок Панели, то ищем вложенные в блоки зоны покраски
+                  if (!MarkSbPanelAR.IsBlockNamePanel(blName))
+                  {
+                     var btrInner = blRefColorArea.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
+                     // Обработка вложенных зон покраски в блок
+                     if (btrInner.IsFromExternalReference)
+                     {
+                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas, 
+                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), btrInner.Name);
+                     }
+                     else
+                     {
+                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas, 
+                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), xrefName);
+                     }                     
+                  }
+               }
+            }
+         }
+      }
+
+      private static string getBlNameWithoutXrefPrefix(string blName, string xrefName)
+      {
+         if (!string.IsNullOrEmpty(xrefName))
+         {
+            if (blName.IndexOf(xrefName, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+               return blName.Substring(xrefName.Length + 1);
+            }
+         }         
+         return blName;
       }
 
       // Определение покраски. Попадание точки в зону окраски
