@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Model.ExportFacade;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.PanelLibrary.LibEditor;
@@ -105,7 +106,10 @@ namespace AlbumPanelColorTiles
          }
 
          if (!File.Exists(doc.Name))
-            throw new System.Exception("Нужно сохранить файл.");         
+         {
+            doc.Editor.WriteMessage("\nНужно сохранить текущий чертеж.");
+            return;
+         }
 
          Log.Info("Start Command: AKR-AlbumPanels");
 
@@ -157,10 +161,10 @@ namespace AlbumPanelColorTiles
                catch (System.Exception ex)
                {
                   doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. {0}", ex.Message);
-                  if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+                  if (!ex.Message.Contains("Отменено пользователем"))
                   {
                      Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
-                  }
+                  }                  
                }
             }
          }
@@ -187,10 +191,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.ToString());
-               if (!ex.Message.Contains("Отменено пользователем."))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks. {0}", doc.Name);
-               }
+               }               
             }
          }
       }
@@ -223,10 +227,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.ToString());
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-ImagePainting. {0}", doc.Name);
-               }
+               }               
             }
          }
       }
@@ -251,10 +255,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.ToString());
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary. {0}", doc.Name);
-               }
+               }               
             }
          }
       }
@@ -301,10 +305,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
-               }
+               }               
             }
             if (Inspector.HasErrors)
             {
@@ -316,7 +320,7 @@ namespace AlbumPanelColorTiles
       }
 
       [CommandMethod("PIK", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
-      public void PlotPdf()
+      public void PlotPdfCommand()
       {
          Log.Info("Start Command AKR-PlotPdf");
          // Печать в PDF. Текущий чертеж или чертежи в указанной папке
@@ -373,10 +377,10 @@ namespace AlbumPanelColorTiles
                      catch (System.Exception ex)
                      {
                         ed.WriteMessage("\n{0}", ex.Message);
-                        if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+                        if (!ex.Message.Contains("Отменено пользователем"))
                         {
                            Log.Error(ex, "plotter.PlotDir({0}); {1}", dialog.SelectedPath, doc.Name);
-                        }
+                        }                        
                      }
                   }
                }
@@ -404,10 +408,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.ToString());
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-RandomPainting. {0}", doc.Name);
-               }
+               }               
             }
          }
       }
@@ -434,10 +438,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. {0}", ex.Message);
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Не удалось выполнить сброс панелей. {0}", doc.Name);
-               }
+               }               
             }
          }
       }
@@ -458,10 +462,10 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\nНе удалось выполнить сохранение панелей. {0}", ex.Message);
-               if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+               if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-SavePanelsToLibrary. {0}", doc.Name);
-               }
+               }               
             }
          }
       }
@@ -538,7 +542,11 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
+               }
+               ed.WriteMessage(ex.ToString());
             }            
          }
       }
@@ -547,7 +555,7 @@ namespace AlbumPanelColorTiles
       /// Копирование словаря АКР из этого чертежа в другой
       /// </summary>
       [CommandMethod("PIK", "AKR-CopyDictionary", CommandFlags.Modal | CommandFlags.Session)]
-      public void CopyDictionary()
+      public void CopyDictionaryCommand()
       {         
          Log.Info("Start Command: AKR-CopyDictionary");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -586,8 +594,47 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
+               }               
                doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex);
+            }
+         }
+      }
+
+      /// <summary>
+      /// Экспорт фасадов (для Архитекторов - создающих листы фасадов)
+      /// </summary>
+      [CommandMethod("PIK", "AKR-ExportFacade", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void ExportFacadeCommand()
+      {
+         Log.Info("Start Command: AKR-ExportFacade");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         using (var DocLock = doc.LockDocument())
+         {
+            try
+            {
+               Inspector.Clear();
+
+               ExportFacadeService export = new ExportFacadeService();
+               export.Export();
+               
+               if (Inspector.HasErrors)
+               {
+                  Inspector.Show();
+               }
+            }
+            catch (System.Exception ex)
+            {
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-ExportFacade. {0}", doc.Name);
+               }               
+               doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex);
             }
          }
       }

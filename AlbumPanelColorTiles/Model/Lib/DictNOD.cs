@@ -116,6 +116,44 @@ namespace AlbumPanelColorTiles.Lib
          }
       }
 
+      public static void SaveString(string text, string key)
+      {
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return;
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Text, text));
+               xRec.Data = rb;
+            }
+         }
+      }
+
+      public static string LoadString(string key)
+      {
+         string res = string.Empty;
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return res;
+
+         using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
+         {
+            using (var data = xRec.Data)
+            {
+               if (data == null)
+                  return res;
+               foreach (var typedValue in data)
+               {
+                  return typedValue.Value.ToString();
+               }
+            }
+         }
+         return res;
+      }
+
       public static void SaveNumber(int number, string keyName)
       {
          ObjectId idRec = getRec(keyName);
