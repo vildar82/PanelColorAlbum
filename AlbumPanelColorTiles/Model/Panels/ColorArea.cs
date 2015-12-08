@@ -60,9 +60,7 @@ namespace AlbumPanelColorTiles.Panels
                var blRefColorArea = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
 
                var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
-               if (string.Equals(blName,
-                  Settings.Default.BlockColorAreaName,
-                  System.StringComparison.InvariantCultureIgnoreCase))
+               if (string.Equals(blName, Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
                {
                   ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
                   colorAreas.Add(colorArea);

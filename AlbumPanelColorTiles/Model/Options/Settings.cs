@@ -10,16 +10,13 @@
       // Атибуты блоков
       //
       private string _attributePanelSbPaint;
-
       private string _blockColorAreaDynPropHeight;
-
       private string _blockColorAreaDynPropLength;
 
       //
       // Имена блоков
       //
       private string _blockColorAreaName;
-
       private string _blockFacadeName;
       private string _blockFrameName;
       private string _blockMountingPlanePrefixName;
@@ -36,7 +33,6 @@
       // Суффиксы (приставки к именам блоков панелей)
       //
       private string _endLeftPanelSuffix;
-
       private string _endRightPanelSuffix;
       private int _facadeCaptionFloorIndent;
       private int _facadeCaptionFloorTextHeight;
@@ -51,7 +47,6 @@
       // Покраска по картинке
       //
       private int _imagePaintSpotLength;
-
       private string _layerDimensionFacade;
       private string _layerDimensionForm;
 
@@ -59,7 +54,6 @@
       // Слои
       //
       private string _layerMarks;
-
       private string _layerUpperStoreyPanels;
       private string _layerParapetPanels;
       private string _layerWindows;
@@ -80,10 +74,8 @@
       // Листы Альбома АКР
       //
       private int _sheetPanelEndUp;
-
       //_settings.Add("PaintIndexLastStorey", "П");
       private int _sheetScale;
-
       private string _sheetTemplateLayoutNameForContent;
       private string _sheetTemplateLayoutNameForMarkAR;
       private int _storeyDefineDeviation;
@@ -92,7 +84,7 @@
       // Шаблоны
       //
       private string _templateBlocksAKRFileName;
-
+      private string _templateBlocksAKRExportFacadeFileName;
       private string _templateSheetContentFileName;
       private string _templateSheetMarkSBFileName;
 
@@ -100,7 +92,6 @@
       // Плитка
       //
       private int _tileHeight;
-
       private int _tileLenght;
       private int _tileSeam;
       private string _windowPanelSuffix;
@@ -159,6 +150,7 @@
       public string SheetTemplateLayoutNameForMarkAR { get { return _sheetTemplateLayoutNameForMarkAR; } }
       public int StoreyDefineDeviation { get { return _storeyDefineDeviation; } }
       public string TemplateBlocksAKRFileName { get { return _templateBlocksAKRFileName; } }
+      public string TemplateBlocksAKRExportFacadeFileName { get { return _templateBlocksAKRExportFacadeFileName; } }
       public string TemplateSheetContentFileName { get { return _templateSheetContentFileName; } }
       public string TemplateSheetMarkSBFileName { get { return _templateSheetMarkSBFileName; } }
       public int TileHeight { get { return _tileHeight; } }
@@ -197,6 +189,7 @@
          _layerDimensionFacade = "АР_Размеры на фасаде";
          _layerDimensionForm = "АР_Размеры в форме";
          _templateBlocksAKRFileName = "АКР_Блоки.dwg";
+         _templateBlocksAKRExportFacadeFileName = "АКР_Блоки-ЭкспортФасада.dwg";
          _sheetTemplateLayoutNameForContent = "Содержание";
          _templateSheetContentFileName = "АКР_Шаблон_Содержание.dwg";
          _templateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";

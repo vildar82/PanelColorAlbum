@@ -19,7 +19,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       private const string _keyDict = "FileExportFacade";
       private Document _docAkr = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
 
-      public string FileNameExport { get; private set; }
+      public FileInfo FileExportFacade { get; private set; }
       public FileInfo FileAkrFacade { get; private set; }
       public bool IsExistsFileExport { get; private set; }
 
@@ -32,23 +32,42 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             throw new Exception("Нужно сохранить текущий чертеж.");
          }
 
-         FileNameExport = DictNOD.LoadString(_keyDict);
-         if (string.IsNullOrEmpty(FileNameExport))
+         var fileExportFullName = DictNOD.LoadString(_keyDict);         
+         if (string.IsNullOrEmpty(fileExportFullName))
          {
             // Если в имени файла есть АКР, то убираем его и предлагаем пользователю согласиться с этим именем или изменить
-            if (FileAkrFacade.Name.Contains("АКР"))
+            string fileExportName;
+            var fileAkrName = Path.GetFileNameWithoutExtension(FileAkrFacade.Name);
+            if (fileAkrName.Contains("АКР"))
             {
-               FileNameExport = FileAkrFacade.Name.Replace("АКР", "");
+               fileExportName = fileAkrName.Replace("АКР", "");
             }
             else
             {
-               FileNameExport = FileAkrFacade.Name + "_Экспорт";
+               fileExportName = fileAkrName + "_Экспорт";
             }
-         }
-         
+            fileExportFullName = Path.Combine(FileAkrFacade.DirectoryName, fileExportName + ".dwg");
+         }         
+         FileExportFacade = new FileInfo(fileExportFullName);
+
          promptUserExportFile();
          // сохранение имени экспортируемого файла фасада в словыарь
-         DictNOD.SaveString(FileNameExport, _keyDict);
+         DictNOD.SaveString(FileExportFacade.FullName, _keyDict);
+      }
+
+      public void Backup()
+      {
+         var backupFile = Path.Combine(FileExportFacade.DirectoryName,
+                                       Path.GetFileNameWithoutExtension(FileExportFacade.Name) +
+                                       "_Backup_" + DateTime.Now.ToString("dd.MM.yyyy-HH.mm") + ".bak");
+         try
+         {
+            FileExportFacade.CopyTo(backupFile, true);
+         }
+         catch
+         {
+            throw;
+         }         
       }
 
       private void promptUserExportFile()
@@ -56,35 +75,49 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          // Запрос имени экспортированного файла у пользователя
          Editor ed = _docAkr.Editor;
          var prOpt = new PromptSaveFileOptions("Имя экспортируемого файла");
-         prOpt.InitialFileName = FileNameExport;
-         prOpt.InitialDirectory = FileAkrFacade.DirectoryName;
-         prOpt.DialogCaption = "DialogCaption";
-         prOpt.DialogName = "DialogName";
-         prOpt.Message = "Message";         
+         prOpt.InitialFileName = FileExportFacade.Name;
+         prOpt.InitialDirectory = FileExportFacade.DirectoryName;
+         //prOpt.DialogCaption = "";
+         prOpt.DialogName = "Экспорт";
+         prOpt.Message = "Новый файл или существующий - в существующем файле заменятся блоки панелей.";
+         prOpt.Filter = "Чертеж |*.dwg";         
          var res = ed.GetFileNameForSave(prOpt);
          if (res.Status != PromptStatus.OK)
          {
             throw new Exception("Отменено пользователем.");
          }
-         FileNameExport = res.StringResult;
-         // Если файл существует, то спросить подтверждение экспорта фасадов в существующий файл.
-         FileInfo fiRes = new FileInfo(FileNameExport);
-         IsExistsFileExport = fiRes.Exists;
-         if (IsExistsFileExport)
+         FileExportFacade = new FileInfo( getDwgFileName(res.StringResult));         
+         IsExistsFileExport = FileExportFacade.Exists;
+         // Если файл существует, то спросить подтверждение экспорта фасадов в существующий файл.         
+         // Не нужно, т.к. в диалоге уже выдается такой вопрос.
+         //if (IsExistsFileExport)
+         //{
+         //   var messageRes = MessageBox.Show("Такой файл уже существует. Выполнить повторный экспорт фасада в этот файл? \n" +
+         //      "Старые панели в файле будут заменены на новые.", "Повторный экспорт",
+         //      MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+         //   if (messageRes == MessageBoxResult.No)
+         //   {
+         //      // Повтор запроса имени файла
+         //      promptUserExportFile();
+         //   }
+         //   else if (messageRes == MessageBoxResult.Cancel)
+         //   {
+         //      throw new Exception("Отменено пользователем.");
+         //   }            
+         //}         
+      }
+
+      private string getDwgFileName(string fileName)
+      {
+         // Подстановка расширения в имя файла, если его нет
+         if (fileName.EndsWith(".dwg", StringComparison.OrdinalIgnoreCase))
          {
-            var messageRes = MessageBox.Show("Такой файл уже существует. Выполнить повторный экспорт фасада в этот файл? \n" +
-               "Старые панели в файле будут заменены на новые.", "Повторный экспорт",
-               MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
-            if (messageRes == MessageBoxResult.No)
-            {
-               // Повтор запроса имени файла
-               promptUserExportFile();
-            }
-            else if (messageRes == MessageBoxResult.Cancel)
-            {
-               throw new Exception("Отменено пользователем.");
-            }            
-         }         
+            return fileName;
+         }
+         else
+         {
+            return fileName + ".dwg";
+         }
       }
    }
 }

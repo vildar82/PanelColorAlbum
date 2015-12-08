@@ -145,7 +145,8 @@ namespace AlbumPanelColorTiles.Lib
             {
                if (data == null)
                   return res;
-               foreach (var typedValue in data)
+               var values = data.AsArray();
+               foreach (var typedValue in values)
                {
                   return typedValue.Value.ToString();
                }
