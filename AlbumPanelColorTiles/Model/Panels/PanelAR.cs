@@ -21,12 +21,12 @@ namespace AlbumPanelColorTiles.Panels
       // Точка вставки блока исходного (Марки СБ)
       private Point3d _insPt;
 
-      private MarkArPanelAR _markAr;
+      private MarkAr _markAr;
 
       // Этаж панели
       private Storey _storey;
 
-      public PanelAR(BlockReference blRefPanel, MarkArPanelAR markAr)
+      public PanelAR(BlockReference blRefPanel, MarkAr markAr)
       {
          _idBlRefSb = blRefPanel.ObjectId;
          _insPt = blRefPanel.Position;
@@ -47,7 +47,7 @@ namespace AlbumPanelColorTiles.Panels
       /// </summary>
       public Point3d InsPt { get { return _insPt; } }
 
-      public MarkArPanelAR MarkAr { get { return _markAr; } }
+      public MarkAr MarkAr { get { return _markAr; } }
 
       public Storey Storey
       {
@@ -65,7 +65,7 @@ namespace AlbumPanelColorTiles.Panels
       /// </summary>
       /// <param name="markSB"></param>
       /// <returns></returns>
-      public Extents3d GetExtentsTiles(MarkSbPanelAR markSB)
+      public Extents3d GetExtentsTiles(MarkSb markSB)
       {
          // границы в определении блока
          var extTilesBtr = markSB.ExtentsTiles;
@@ -84,7 +84,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Замена вхождения блока СБ на АР
-      public void ReplaceBlockSbToAr(MarkArPanelAR markAr, Transaction t, BlockTableRecord ms)
+      public void ReplaceBlockSbToAr(MarkAr markAr, Transaction t, BlockTableRecord ms)
       {
          var blRefMarkSb = t.GetObject(_idBlRefSb, OpenMode.ForWrite, false, true) as BlockReference;
          var blRefPanelAr = new BlockReference(blRefMarkSb.Position, markAr.IdBtrAr);
@@ -124,7 +124,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
+                  if (MarkSb.IsBlockNamePanel(blRef.Name))
                   {
                      ids.Add(idEnt);
                   }

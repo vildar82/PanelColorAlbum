@@ -132,7 +132,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
-      private List<SheetMarkSB> ProcessingSheets(List<MarkSbPanelAR> marksSB)
+      private List<SheetMarkSB> ProcessingSheets(List<MarkSb> marksSB)
       {
          List<SheetMarkSB> sheetsMarkSb = new List<SheetMarkSB>();
          foreach (var markSB in marksSB)

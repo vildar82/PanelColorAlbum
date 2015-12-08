@@ -29,7 +29,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _idBtrAkrPanel = idBtrAkrPanel;
          _blName = blName;
          _description = "";
-         _markAkrWithoutWhite = MarkSbPanelAR.GetMarkSbCleanName(MarkSbPanelAR.GetMarkSbName(blName)).Replace(' ', '-');
+         _markAkrWithoutWhite = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName)).Replace(' ', '-');
          // определение - торцов панели
          defineEndsPanel(blName);
          // Список объектов в блоке

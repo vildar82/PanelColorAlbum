@@ -25,7 +25,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // границы панели трансформированные в координаты модели
       private bool _isInFloor;
 
-      private string _markSb;
+      private string _markSb;      
       private string _markSbWithoutWhite;
       private string _markSbWithoutWhiteAndElectric;
       private PanelAkrLib _panelAkrLib;
@@ -54,6 +54,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       //public bool IsEndRightPanel { get { return _isEndRightPanel; } set { _isEndRightPanel = value; } }
       public bool IsInFloor { get { return _isInFloor; } set { _isInFloor = value; } }
       public string MarkSb { get { return _markSb; } }
+      public string MarkSbBlockName { get { return Panels.MarkSb.GetMarkSbBlockName(_markSb); } }
       public string MarkSbWithoutWhite { get { return _markSbWithoutWhite; } }
       public string MarkSbWithoutWhiteAndElectric { get { return _markSbWithoutWhiteAndElectric; } }
       public PanelAkrLib PanelAkrLib { get { return _panelAkrLib; } set { _panelAkrLib = value; } }

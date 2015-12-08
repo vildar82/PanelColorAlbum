@@ -71,7 +71,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
                if (!btr.IsLayout)
                {
-                  if (MarkSbPanelAR.IsBlockNamePanel(btr.Name) && !MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
+                  if (MarkSb.IsBlockNamePanel(btr.Name) && !MarkSb.IsBlockNamePanelMarkAr(btr.Name))
                   {
                      panels.Add(new PanelAkrFacade(idBtr, btr.Name));
                   }

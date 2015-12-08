@@ -56,9 +56,9 @@ namespace AlbumPanelColorTiles.Model.Select
                {
                   using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                   {
-                     if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
+                     if (MarkSb.IsBlockNamePanel(blRef.Name))
                      {
-                        if (MarkSbPanelAR.IsBlockNamePanelMarkAr(blRef.Name))
+                        if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
                         {
                            IdsBlRefPanelAr.Add(idEnt);
                         }
@@ -88,9 +88,9 @@ namespace AlbumPanelColorTiles.Model.Select
                {
                   using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
                   {
-                     if (MarkSbPanelAR.IsBlockNamePanel(btr.Name))
+                     if (MarkSb.IsBlockNamePanel(btr.Name))
                      {
-                        if (MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
+                        if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
                         {
                            IdsBtrPanelAr.Add(idEnt);
                         }

@@ -142,8 +142,8 @@
     <Compile Include="Model\Lib\BlockInsert.cs" />
     <Compile Include="Model\Checks\CheckDrawing.cs" />
     <Compile Include="Model\Lib\Block.cs" />
-    <Compile Include="Model\Panels\MarkArPanelAR.cs" />
-    <Compile Include="Model\Panels\MarkSbPanelAR.cs" />
+    <Compile Include="Model\Panels\MarkAr.cs" />
+    <Compile Include="Model\Panels\MarkSb.cs" />
     <Compile Include="Model\Options\Settings.cs" />
     <Compile Include="Model\Panels\Paint.cs" />
     <Compile Include="Model\Panels\PanelAR.cs" />

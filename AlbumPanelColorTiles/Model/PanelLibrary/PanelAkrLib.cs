@@ -31,7 +31,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          PanelAkrLib panelAkrLib = null;
          try
          {
-            string markAkr = panelSb.MarkSb;            
+            string markAkr = panelSb.MarkSbBlockName;            
             SymbolUtilityServices.ValidateSymbolName(markAkr, false);
             // копирование блока с новым именем с электрикой
             ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanel, markAkr);
@@ -54,7 +54,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
                {
-                  if (MarkSbPanelAR.IsBlockNamePanel(btr.Name))
+                  if (MarkSb.IsBlockNamePanel(btr.Name))
                   {
                      PanelAkrLib panelAkr = new PanelAkrLib(idBtr, btr.Name);
                      panelsAkrLIb.Add(panelAkr);

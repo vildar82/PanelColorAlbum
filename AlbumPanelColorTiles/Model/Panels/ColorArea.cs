@@ -68,7 +68,7 @@ namespace AlbumPanelColorTiles.Panels
                else
                {
                   // Если это не блок Панели, то ищем вложенные в блоки зоны покраски
-                  if (!MarkSbPanelAR.IsBlockNamePanel(blName))
+                  if (!MarkSb.IsBlockNamePanel(blName))
                   {
                      var btrInner = blRefColorArea.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
                      // Обработка вложенных зон покраски в блок

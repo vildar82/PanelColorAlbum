@@ -62,7 +62,7 @@ namespace AlbumPanelColorTiles.Panels
       public string Layer { get { return _layer; } }
 
       // определение этажей панелей
-      public static List<Storey> IdentificationStoreys(List<MarkSbPanelAR> marksSB, int numberFirstFloor)
+      public static List<Storey> IdentificationStoreys(List<MarkSb> marksSB, int numberFirstFloor)
       {
          List<Storey> storeys = new List<Storey>();
          // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.         
@@ -76,7 +76,7 @@ namespace AlbumPanelColorTiles.Panels
          return storeys;
       }
 
-      private static List<Storey> defStoreyUpperAndParapetType(List<MarkSbPanelAR> marksSB)
+      private static List<Storey> defStoreyUpperAndParapetType(List<MarkSb> marksSB)
       {
          // Этажи Ч и П 
          var storeysUpperAndParapetType = new List<Storey>();
@@ -96,7 +96,7 @@ namespace AlbumPanelColorTiles.Panels
          return storeysUpperAndParapetType;
       }
 
-      private static List<Storey> defStoreyNumberType(List<MarkSbPanelAR> marksSB, int numberFirstFloor)
+      private static List<Storey> defStoreyNumberType(List<MarkSb> marksSB, int numberFirstFloor)
       {
          var storeysNumberType = new List<Storey>();
          var comparerStorey = new DoubleEqualityComparer(Settings.Default.StoreyDefineDeviation); // 2000        

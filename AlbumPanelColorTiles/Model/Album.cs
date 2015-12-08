@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles
 
       private Document _doc;
 
-      private List<MarkSbPanelAR> _marksSB;
+      private List<MarkSb> _marksSB;
 
       // Сокращенное имя проеккта
       private int _numberFirstFloor;
@@ -55,7 +55,7 @@ namespace AlbumPanelColorTiles
       public List<Paint> Colors { get { return _colors; } }
       public string DwgFacade { get { return _doc.Name; } }
       public Document Doc { get { return _doc; } }
-      public List<MarkSbPanelAR> MarksSB { get { return _marksSB; } }
+      public List<MarkSb> MarksSB { get { return _marksSB; } }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
       public List<Storey> Storeys { get { return _storeys; } }
 
@@ -80,18 +80,18 @@ namespace AlbumPanelColorTiles
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (MarkSbPanelAR.IsBlockNamePanel(blRef.Name))
+                  if (MarkSb.IsBlockNamePanel(blRef.Name))
                   {
                      // Если это панель марки АР, то заменяем на панель марки СБ.
-                     if (MarkSbPanelAR.IsBlockNamePanelMarkAr(blRef.Name))
+                     if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
                      {
-                        string markSb = MarkSbPanelAR.GetMarkSbName(blRef.Name);// может быть с суффиксом торца _тп или _тл
-                        string markSbBlName = MarkSbPanelAR.GetMarkSbBlockName(markSb);// может быть с суффиксом торца _тп или _тл
+                        string markSb = MarkSb.GetMarkSbName(blRef.Name);// может быть с суффиксом торца _тп или _тл
+                        string markSbBlName = MarkSb.GetMarkSbBlockName(markSb);// может быть с суффиксом торца _тп или _тл
                         if (!bt.Has(markSbBlName))
                         {
                            // Нет определения блока марки СБ.
                            // Такое возможно, если после покраски панелей, сделать очистку чертежа (блоки марки СБ удалятся).
-                           MarkSbPanelAR.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);
+                           MarkSb.CreateBlockMarkSbFromAr(blRef.BlockTableRecord, markSbBlName);
                            string errMsg = "\nНет определения блока для панели Марки СБ " + markSbBlName +
                                           ". Оно создано из панели Марки АР " + blRef.Name +
                                           ". Если внутри блока Марки СБ были зоны покраски, то в блоке Марки АР они были удалены." +
@@ -114,10 +114,10 @@ namespace AlbumPanelColorTiles
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (MarkSbPanelAR.IsBlockNamePanel(btr.Name))
+               if (MarkSb.IsBlockNamePanel(btr.Name))
                {
                   // Если это блок панели Марки АР
-                  if (MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
+                  if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
                   {
                      // Удаление всех вхожденний бллока
                      var idsBlRef = btr.GetBlockReferenceIds(true, true);
@@ -156,7 +156,7 @@ namespace AlbumPanelColorTiles
          // Проверка панелей
          // Определение покраски панелей.
          var rtreeColorAreas = ColorArea.GetRTree(colorAreasCheck);
-         var marksSbCheck = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, this, "Проверка панелей...");
+         var marksSbCheck = MarkSb.GetMarksSB(rtreeColorAreas, this, "Проверка панелей...");
          //RenamePanelsToArchitectIndex(marksSbCheck);
          if (!marksSbCheck.SequenceEqual(_marksSB))
          {
@@ -249,7 +249,7 @@ namespace AlbumPanelColorTiles
          }
 
          // Определение покраски панелей.
-         _marksSB = MarkSbPanelAR.GetMarksSB(rtreeColorAreas, this, "Покраска панелей...");
+         _marksSB = MarkSb.GetMarksSB(rtreeColorAreas, this, "Покраска панелей...");
          if (_marksSB?.Count == 0)
          {
             throw new System.Exception("Не найдены блоки панелей в чертеже. Выполните команду AKR-Help для просмотра справки к программе.");
@@ -468,7 +468,7 @@ namespace AlbumPanelColorTiles
       }
 
       // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
-      private void RenamePanelsToArchitectIndex(List<MarkSbPanelAR> marksSB)
+      private void RenamePanelsToArchitectIndex(List<MarkSb> marksSB)
       {
          // Определение этажа панели.
          _storeys = Storey.IdentificationStoreys(marksSB, _numberFirstFloor);

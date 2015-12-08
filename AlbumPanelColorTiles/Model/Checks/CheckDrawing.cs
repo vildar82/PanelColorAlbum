@@ -91,7 +91,7 @@ namespace AlbumPanelColorTiles.Checks
             {
                using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
                {
-                  if (MarkSbPanelAR.IsBlockNamePanelMarkAr(btr.Name))
+                  if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
                   {
                      markArBtrNames.Add(btr.Name);
                   }

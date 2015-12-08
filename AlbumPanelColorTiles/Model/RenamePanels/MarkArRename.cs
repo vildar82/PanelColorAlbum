@@ -8,12 +8,12 @@ namespace AlbumPanelColorTiles.RenamePanels
    {
       private static string _abbr;
       private bool _isRenamed;
-      private MarkArPanelAR _markAR;
+      private MarkAr _markAR;
       private string _markArCurFull;
       private string _markPainting;
       private string _markSB;
 
-      public MarkArRename(MarkArPanelAR markAR)
+      public MarkArRename(MarkAr markAR)
       {
          _markAR = markAR;
          _markPainting = _markAR.MarkPaintingCalulated;
@@ -29,7 +29,7 @@ namespace AlbumPanelColorTiles.RenamePanels
       }
 
       public bool IsRenamed { get { return _isRenamed; } }
-      public MarkArPanelAR MarkAR { get { return _markAR; } }
+      public MarkAr MarkAR { get { return _markAR; } }
       public string MarkArCurFull { get { return _markArCurFull; } }
       public string MarkPainting { get { return _markPainting; } }
 
@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.RenamePanels
       {
          Dictionary<string, MarkArRename> markArRenames = new Dictionary<string, MarkArRename>();
          // Все панели марки АР.
-         List<MarkArPanelAR> marksAR = new List<MarkArPanelAR>();
+         List<MarkAr> marksAR = new List<MarkAr>();
          album.MarksSB.ForEach(m => marksAR.AddRange(m.MarksAR));
          foreach (var markAr in marksAR)
          {

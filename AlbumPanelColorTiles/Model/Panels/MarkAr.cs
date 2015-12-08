@@ -11,7 +11,7 @@ using RTreeLib;
 namespace AlbumPanelColorTiles.Panels
 {
    // Марка АР покраски панели
-   public class MarkArPanelAR : IEquatable<MarkArPanelAR>
+   public class MarkAr : IEquatable<MarkAr>
    {
       private ObjectId _idBtrAr;
       private string _abbrIndex;
@@ -21,12 +21,12 @@ namespace AlbumPanelColorTiles.Panels
       private string _markArTemp;
       private string _markPainting;      
       private string _markPaintingCalulated; // вычесленная программой марка покраски, в методе DefineArchitectMarks класса MarkSbPanel
-      private MarkSbPanelAR _markSB;
+      private MarkSb _markSB;
       private List<Paint> _paints;
       private List<PanelAR> _panels;
       private List<TileCalc> _tilesCalc;
 
-      public MarkArPanelAR(List<Paint> paintAR, MarkSbPanelAR markSb, BlockReference blRefMarkAr)
+      public MarkAr(List<Paint> paintAR, MarkSb markSb, BlockReference blRefMarkAr)
       {         
          _markSB = markSb;
          _abbrIndex = string.IsNullOrEmpty(_markSB.Abbr) ? "" : "_" + _markSB.Abbr;
@@ -96,7 +96,7 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
-      public MarkSbPanelAR MarkSB { get { return _markSB; } }
+      public MarkSb MarkSB { get { return _markSB; } }
       public List<Paint> Paints { get { return _paints; } }
       public List<PanelAR> Panels { get { return _panels; } }
 
@@ -113,7 +113,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски панели (список цветов по порядку списка плитов в блоке СБ)
-      public static List<Paint> GetPanelMarkAR(MarkSbPanelAR markSb, BlockReference blRefPanel, RTree<ColorArea> rtreeColorAreas)
+      public static List<Paint> GetPanelMarkAR(MarkSb markSb, BlockReference blRefPanel, RTree<ColorArea> rtreeColorAreas)
       {
          List<Paint> paintsAR = new List<Paint>();
 
@@ -210,7 +210,7 @@ namespace AlbumPanelColorTiles.Panels
          return paintAR.SequenceEqual(_paints);
       }
 
-      public bool Equals(MarkArPanelAR other)
+      public bool Equals(MarkAr other)
       {
          return _markArTemp.Equals(other._markArTemp) &&
             _paints.SequenceEqual(other._paints) &&
@@ -245,7 +245,7 @@ namespace AlbumPanelColorTiles.Panels
          return tilesCalc;
       }
 
-      private void DefMarkArTempNames(MarkSbPanelAR markSB, string blName)
+      private void DefMarkArTempNames(MarkSb markSB, string blName)
       {
          _markArTemp = markSB.MarksAR.Count.ToString(); // "АР-" + markSB.MarksAR.Count.ToString();
       }
