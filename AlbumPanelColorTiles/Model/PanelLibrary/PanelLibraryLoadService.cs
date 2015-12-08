@@ -115,7 +115,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          if (facades.Count > 0)
          {
             // загрузка АКР-панелей из библиотеки
-            PanelSB.LoadBtrPanels(facades);
+            MountingPanel.LoadBtrPanels(facades);
             // удаление АКР-Панелей старых фасадов
             Facade.DeleteOldAkrPanels(facades);
             // расстановка АКР-Панелей по фасадам

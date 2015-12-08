@@ -24,7 +24,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private ObjectId _idBlRefWhenCreateFacade;
       private ObjectId _idBlRefForShow;
       // блок панели АКР в файле фасада
-      private PanelSB _panelSb;      
+      private MountingPanel _panelSb;      
       protected EnumReportStatus _reportStatus;
 
       public PanelAkrFacade(ObjectId idBtr, string blName) : base(idBtr, blName)
@@ -36,7 +36,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// Вхождение блока в файле фасада
       /// </summary>
       public ObjectId IdBlRefWhenCreateFacade { get { return _idBlRefWhenCreateFacade; } set { _idBlRefWhenCreateFacade = value; } }
-      public PanelSB PanelSb { get { return _panelSb; } set { _panelSb = value; } }
+      public MountingPanel PanelSb { get { return _panelSb; } set { _panelSb = value; } }
       public EnumReportStatus ReportStatus { get { return _reportStatus; } set { _reportStatus = value; } }
 
       

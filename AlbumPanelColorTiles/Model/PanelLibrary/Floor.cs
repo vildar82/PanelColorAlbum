@@ -13,7 +13,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public class Floor : IComparable<Floor>
    {
       // Панели СБ - все что есть внутри блока монтажки
-      private List<PanelSB> _allPanelsSbInFloor;
+      private List<MountingPanel> _allPanelsSbInFloor;
 
       private Extents3d _extBlMounting;
 
@@ -28,7 +28,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private Storey _storey; // этаж  
       private double _height; // высота этажа    
 
-      private List<PanelSB> _panelsSbInFront;
+      private List<MountingPanel> _panelsSbInFront;
 
       // Точка вставки блока монтажки
       private Point3d _ptBlMounting;
@@ -46,7 +46,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _blRefName = blRefMounting.Name;
          //defFloorNameAndNumber(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _allPanelsSbInFloor = PanelSB.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform);
+         _allPanelsSbInFloor = MountingPanel.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform);
          _xmin = getXMinFloor();
          _xmax = getXMaxFloor();
          //// добавление блоков паненлей в общий список панелей СБ
@@ -54,14 +54,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       //public Point3d PtBlMounting { get { return _ptBlMounting; } }
-      public List<PanelSB> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }      
+      public List<MountingPanel> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }      
 
       public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }            
       
       public Storey Storey { get { return _storey; } set { _storey = value; } }
       public double Height { get { return _height; } set { _height = value; } }
 
-      public List<PanelSB> PanelsSbInFront { get { return _panelsSbInFront; } }
+      public List<MountingPanel> PanelsSbInFront { get { return _panelsSbInFront; } }
 
       public double XMax { get { return _xmax; } }
 
@@ -179,7 +179,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private void SetFacadeFrontBlock(FacadeFrontBlock facadeFrontBlock)
       {
          _facadeFrontBlock = facadeFrontBlock;
-         _panelsSbInFront = new List<PanelSB>();
+         _panelsSbInFront = new List<MountingPanel>();
          // найти блоки панелей-СБ входящих внутрь границ блока стороны фасада
          foreach (var panelSb in _allPanelsSbInFloor)
          {

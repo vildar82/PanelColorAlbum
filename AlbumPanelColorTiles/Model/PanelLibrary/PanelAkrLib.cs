@@ -26,7 +26,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          set { _idBtrPanelAkrInFacade = value; }
       }
 
-      public PanelAkrLib CopyLibBlockElectricInTempFile(PanelSB panelSb)
+      public PanelAkrLib CopyLibBlockElectricInTempFile(MountingPanel panelSb)
       {
          PanelAkrLib panelAkrLib = null;
          try
