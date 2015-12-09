@@ -26,7 +26,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       public void Convert ()
       {
          // обработка блоков панелей         
-         ConvertPanel convertPanel = new ConvertPanel(_idsBtrPanelArExport);
+         ConvertPanelService convertPanel = new ConvertPanelService(_idsBtrPanelArExport);
          convertPanel.Convert();
 
          // Очистка чертежа

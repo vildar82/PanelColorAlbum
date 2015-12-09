@@ -79,7 +79,8 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\ExportFacade\ConversionExportFacade.cs" />
-    <Compile Include="Model\ExportFacade\ConvertPanel.cs" />
+    <Compile Include="Model\ExportFacade\ConvertPanelBtr.cs" />
+    <Compile Include="Model\ExportFacade\ConvertPanelService.cs" />
     <Compile Include="Model\ExportFacade\ExportFacadeService.cs" />
     <Compile Include="Model\ExportFacade\FileExport.cs" />
     <Compile Include="Model\ImagePainting\FormImageCrop.cs">
