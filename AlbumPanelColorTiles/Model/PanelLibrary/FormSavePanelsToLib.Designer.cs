@@ -58,6 +58,7 @@
          this.listBoxNew.Name = "listBoxNew";
          this.listBoxNew.Size = new System.Drawing.Size(376, 295);
          this.listBoxNew.TabIndex = 0;
+         this.toolTip1.SetToolTip(this.listBoxNew, "Панели которых нет в библиотеке");
          // 
          // tabControl
          // 
@@ -101,6 +102,7 @@
          this.listBoxChanged.Name = "listBoxChanged";
          this.listBoxChanged.Size = new System.Drawing.Size(376, 295);
          this.listBoxChanged.TabIndex = 1;
+         this.toolTip1.SetToolTip(this.listBoxChanged, "Панели отличаются от библиотечных");
          // 
          // tabPageForce
          // 
@@ -121,6 +123,8 @@
          this.listBoxForce.Name = "listBoxForce";
          this.listBoxForce.Size = new System.Drawing.Size(376, 295);
          this.listBoxForce.TabIndex = 1;
+         this.toolTip1.SetToolTip(this.listBoxForce, "Если нужно сохранить панель, но она не попала в список Новых или Измененных панел" +
+        "ей, можно принудительно сохранить добавив в этот список.");
          // 
          // buttonDel
          // 
