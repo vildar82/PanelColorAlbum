@@ -30,8 +30,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          foreach (var idBtr in _idsBtrPanelArExport)
          {
             ConvertPanelBtr convBtr = new ConvertPanelBtr(idBtr);
-            convBtr.Convert();
-            _convertedBtr.Add(convBtr);
+            try
+            {
+               convBtr.Convert();
+               _convertedBtr.Add(convBtr);
+            }
+            catch (Exception ex)
+            {
+               Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
+            }            
          }         
       } 
    }
