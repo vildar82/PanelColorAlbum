@@ -190,7 +190,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\n{0}", ex.ToString());
+               doc.Editor.WriteMessage("\n{0}", ex.Message);
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks. {0}", doc.Name);
@@ -226,7 +226,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\n{0}", ex.ToString());
+               doc.Editor.WriteMessage("\n{0}", ex.Message);
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-ImagePainting. {0}", doc.Name);
@@ -254,7 +254,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\n{0}", ex.ToString());
+               doc.Editor.WriteMessage("\n{0}", ex.Message);
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary. {0}", doc.Name);
@@ -407,7 +407,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-               doc.Editor.WriteMessage("\n{0}", ex.ToString());
+               doc.Editor.WriteMessage("\n{0}", ex.Message);
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-RandomPainting. {0}", doc.Name);
@@ -546,7 +546,7 @@ namespace AlbumPanelColorTiles
                {
                   Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
                }
-               ed.WriteMessage(ex.ToString());
+               ed.WriteMessage(ex.Message);
             }            
          }
       }
@@ -598,7 +598,7 @@ namespace AlbumPanelColorTiles
                {
                   Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
                }               
-               doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex);
+               doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex.Message);
             }
          }
       }
@@ -634,7 +634,7 @@ namespace AlbumPanelColorTiles
                {
                   Log.Error(ex, "Command: AKR-ExportFacade. {0}", doc.Name);
                }               
-               doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex);
+               doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex.Message);
             }
          }
       }

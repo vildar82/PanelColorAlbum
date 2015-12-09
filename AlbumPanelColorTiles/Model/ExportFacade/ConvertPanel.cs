@@ -33,13 +33,14 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       {
          using (var btr = idBtr.Open(OpenMode.ForWrite) as BlockTableRecord)
          {
-            // Удаление лишнего из блока панели
-            deleteWaste(btr);
-
             // Переопределение блока плитки из файла шаблона блоков для Экспорта фасадов.
             redefineBlockTile();
 
+            // Удаление лишнего из блока панели
+            deleteWaste(btr);            
+
             // Повортот подписи марки (Марки СБ и Марки Покраски) и добавление фоновой штриховки
+            convertCaption();
          }
       }      
 
@@ -49,8 +50,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             using (var ent = idEnt.Open(  OpenMode.ForRead) as Entity)
             {
-               if (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade) &&
-                  string.Equals(ent.Layer, Settings.Default.LayerDimensionForm))
+               if (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade, StringComparison.CurrentCultureIgnoreCase) ||
+                  string.Equals(ent.Layer, Settings.Default.LayerDimensionForm, StringComparison.CurrentCultureIgnoreCase))
                {
                   ent.UpgradeOpen();
                   ent.Erase();
@@ -66,14 +67,20 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          if (File.Exists(fileBlocksTemplate))
          {
             try
-            {            
-            AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(Settings.Default.BlockTileName, fileBlocksTemplate,
-                           _idsBtrPanelArExport[0].Database, DuplicateRecordCloning.Replace);
+            {
+               AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(Settings.Default.BlockTileName, fileBlocksTemplate,
+                              _idsBtrPanelArExport[0].Database, DuplicateRecordCloning.Replace);
             }
             catch
-            {               
+            {
             }
          }         
+      }
+
+      // Повортот подписи марки (Марки СБ и Марки Покраски) и добавление фоновой штриховки
+      private void convertCaption()
+      {
+         // Найти тексты на слое АР_Марки - нижний текст это Марка СБ, верхний - Покраска
       }
    }
 }
