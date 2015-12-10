@@ -80,6 +80,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            // Покраска
                            if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                            {
+                              atrRef.UpgradeOpen();
+                              atrRef.TextString = string.Empty;
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
                            }
