@@ -195,6 +195,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             Inspector.AddError(string.Format("В блоке обозначения стороны фасада {0} не найдена ни одна панель.", facadeFrontBlock.BlName),
                facadeFrontBlock.Extents, facadeFrontBlock.IdBlRef);
          }
+         else
+         {
+            _xmax = _panelsSbInFront.Max(p => p.ExtTransToModel.MaxPoint.X);
+            _xmin = _panelsSbInFront.Min(p => p.ExtTransToModel.MinPoint.X);
+         }
       }
    }
 }

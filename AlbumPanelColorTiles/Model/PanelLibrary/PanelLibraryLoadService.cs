@@ -36,6 +36,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          // Определение фасадов по монтажным планам
          List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
+
+         //testPtFacades(facades);
+
          Inspector.Clear();
 
          if (facades.Count == 0)
@@ -58,46 +61,77 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   var extPanelAkr = panelAr.GetExtentsTiles(markSbAkr);
                   double xCenterPanelAkr = extPanelAkr.MinPoint.X + (extPanelAkr.MaxPoint.X - extPanelAkr.MinPoint.X) * 0.5;
                   // поиск фасада - X центра панели АКР попадает в границы фасада Xmin и Xmax
-                  var facade = facades.Find(f => f.XMin < xCenterPanelAkr && f.XMax > xCenterPanelAkr);
-                  if (facade != null)
+                  var facadesFound = facades.FindAll(f => f.XMin < xCenterPanelAkr && f.XMax > xCenterPanelAkr);
+                  if (facadesFound != null)
                   {
-                     // поиск нужного этажа
-                     var floor = facade.Floors.Find(f => f.Storey.Equals(panelAr.Storey));
-                     if (floor != null)
+                     foreach (var facade in facadesFound)
                      {
-                        // Поск монтажки по линии от центра панели АКР
-                        var mountingPanelSb = floor.PanelsSbInFront.Find(
-                           p => p.ExtTransToModel.MinPoint.X < xCenterPanelAkr && p.ExtTransToModel.MaxPoint.X > xCenterPanelAkr);
-                        // Проверка имени панели
-                        if (mountingPanelSb != null)
+                        // поиск нужного этажа
+                        var floor = facade.Floors.Find(f => f.Storey.Equals(panelAr.Storey));
+                        if (floor != null)
                         {
-                           string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
-                           string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
-                           if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
+                           // Поск монтажки по линии от центра панели АКР
+                           var mountingPanelSb = floor.PanelsSbInFront.Find(
+                              p => p.ExtTransToModel.MinPoint.X < xCenterPanelAkr && p.ExtTransToModel.MaxPoint.X > xCenterPanelAkr);
+                           // Проверка имени панели
+                           if (mountingPanelSb != null)
                            {
-                              // Заполнение атрибута покраски
-                              var atrInfo = mountingPanelSb.AttrDet.Find
-                                 (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
-                              if (atrInfo != null)
+                              string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
+                              string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
+                              if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                               {
-                                 using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                                 // Заполнение атрибута покраски
+                                 var atrInfo = mountingPanelSb.AttrDet.Find
+                                    (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
+                                 if (atrInfo != null)
                                  {
-                                    atrRef.TextString = markAr.MarkPaintingFull;
-                                    isFound = true;
+                                    using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                                    {
+                                       atrRef.TextString = markAr.MarkPaintingFull;
+                                       isFound = true;
+                                    }
                                  }
                               }
                            }
                         }
                      }
-                  }
-                  if (!isFound)
-                  {
-                     Inspector.AddError(
-                        string.Format("{0} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.", markAr.MarkARPanelFullName),
-                        extPanelAkr, panelAr.IdBlRefAr);
+                     if (!isFound)
+                     {
+                        Inspector.AddError(
+                           string.Format("{0} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.", markAr.MarkARPanelFullName),
+                           extPanelAkr, panelAr.IdBlRefAr);
+                     }
                   }
                }
             }
+         }
+      }
+
+      private void testPtFacades(List<Facade> facades)
+      {
+         Database db = HostApplicationServices.WorkingDatabase;
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db),OpenMode.ForWrite) as BlockTableRecord;
+            foreach (var facade in facades)
+            {
+               DBPoint ptFacadeMin = new DBPoint(new Autodesk.AutoCAD.Geometry.Point3d(facade.XMin, 0, 0));
+               ptFacadeMin.Layer = "Fmin";
+               ms.AppendEntity(ptFacadeMin);
+               t.AddNewlyCreatedDBObject(ptFacadeMin, true);
+
+               DBPoint ptFacadeMax = new DBPoint(new Autodesk.AutoCAD.Geometry.Point3d(facade.XMax, 0, 0));
+               ptFacadeMax.Layer = "Fmax";
+               ms.AppendEntity(ptFacadeMax);
+               t.AddNewlyCreatedDBObject(ptFacadeMax, true);
+
+               DBText textFloors = new DBText();
+               textFloors.TextString = "Кол этажей = " + facade.Floors.Count;
+               textFloors.Height = 300;
+               ms.AppendEntity(textFloors);
+               t.AddNewlyCreatedDBObject(textFloors, true);
+            }            
+            t.Commit();
          }
       }
 

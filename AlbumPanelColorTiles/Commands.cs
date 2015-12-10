@@ -267,7 +267,9 @@ namespace AlbumPanelColorTiles
       public void PaintPanelsCommand()
       {         
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
+         if (doc == null) return;         
+         
+         // Принудительное сохранение файла         
 
          string commandName = "PaintPanels";
          if (string.Equals(_lastStartCommandName, commandName))

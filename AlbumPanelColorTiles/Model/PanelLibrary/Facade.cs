@@ -101,7 +101,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          // Упорядочивание блоков этажей в фасады (блоки монтажек по вертикали образуют фасад)
          // сортировка блоков монтажек по X, потом по Y (все монтажки в одну вертикаль снизу вверх)
-         var comparerFloors = new DoubleEqualityComparer(1000); // FacadeVerticalDeviation
+         var comparerFloors = new DoubleEqualityComparer(100); // FacadeVerticalDeviation
          foreach (var floor in floors)
          {
             Facade facade = facades.Find(f => comparerFloors.Equals(f.XMin, floor.XMin));
