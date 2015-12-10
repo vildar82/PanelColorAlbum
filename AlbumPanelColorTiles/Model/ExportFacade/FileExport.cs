@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
 
          var fileExportFullName = DictNOD.LoadString(_keyDict);         
-         if (string.IsNullOrEmpty(fileExportFullName))
+         if (string.IsNullOrEmpty(fileExportFullName) || !File.Exists(fileExportFullName))
          {
             // Если в имени файла есть АКР, то убираем его и предлагаем пользователю согласиться с этим именем или изменить
             string fileExportName;
