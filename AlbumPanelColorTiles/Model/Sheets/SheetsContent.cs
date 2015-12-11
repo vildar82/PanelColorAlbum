@@ -74,7 +74,7 @@ namespace AlbumPanelColorTiles.Sheets
       private void Contents()
       {
          // Создание файла содержания и титульных листов
-         string fileContent = Path.Combine(_album.AlbumDir, "00_Содержание" + _album.AbbreviateProject + ".dwg");
+         string fileContent = Path.Combine(_album.AlbumDir, "00_Содержание" + _album.StartOptions.Abbr + ".dwg");
          File.Copy(_sheetsSet.SheetTemplateFileContent, fileContent);
 
          // Кол листов содержания = Суммарное кол лисчтов панелей / на кол строк в таблице на одном листе
@@ -113,13 +113,13 @@ namespace AlbumPanelColorTiles.Sheets
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
                int curSheetArNum;
-               if (_album.NumberFirstSheet ==0)
+               if (_album.StartOptions.NumberFirstSheet ==0)
                {
                   curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
                }
                else
                {
-                  curSheetArNum = _album.NumberFirstSheet;
+                  curSheetArNum = _album.StartOptions.NumberFirstSheet;
                }
 
                ProgressMeter progressMeter = new ProgressMeter();

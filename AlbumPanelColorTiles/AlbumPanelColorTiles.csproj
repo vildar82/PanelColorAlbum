@@ -83,6 +83,12 @@
     <Compile Include="Model\ExportFacade\ConvertPanelService.cs" />
     <Compile Include="Model\ExportFacade\ExportFacadeService.cs" />
     <Compile Include="Model\ExportFacade\FileExport.cs" />
+    <Compile Include="Model\FormStartOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\FormStartOptions.Designer.cs">
+      <DependentUpon>FormStartOptions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\ImagePainting\FormImageCrop.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -173,6 +179,7 @@
     <Compile Include="Model\Panels\Tile.cs" />
     <Compile Include="Model\Panels\TileCalc.cs" />
     <Compile Include="Model\Sheets\TotalTileTable.cs" />
+    <Compile Include="Model\StartOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -210,6 +217,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Model\FormStartOptions.resx">
+      <DependentUpon>FormStartOptions.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Model\ImagePainting\FormImageCrop.resx">
       <DependentUpon>FormImageCrop.cs</DependentUpon>
       <SubType>Designer</SubType>

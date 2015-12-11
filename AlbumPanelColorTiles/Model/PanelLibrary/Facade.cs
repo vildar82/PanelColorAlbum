@@ -267,7 +267,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
       }
-      //private static void testGeom(PanelSB panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
+      //private static void testGeom(MountingPanel panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
       //{
       //   // Точка центра панели СБ
       //   DBPoint ptPanelSbInModel = new DBPoint(panelSb.PtCenterPanelSbInModel);

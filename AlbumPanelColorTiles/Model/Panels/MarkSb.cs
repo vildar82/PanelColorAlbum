@@ -49,7 +49,7 @@ namespace AlbumPanelColorTiles.Panels
       // Конструктор. Скрытый.
       private MarkSb(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, Album album)
       {
-         _abbr = album.AbbreviateProject;
+         _abbr = album.StartOptions.Abbr;
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;

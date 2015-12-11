@@ -105,35 +105,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                }
             }
          }
-      }
-
-      private void testPtFacades(List<Facade> facades)
-      {
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db),OpenMode.ForWrite) as BlockTableRecord;
-            foreach (var facade in facades)
-            {
-               DBPoint ptFacadeMin = new DBPoint(new Autodesk.AutoCAD.Geometry.Point3d(facade.XMin, 0, 0));
-               ptFacadeMin.Layer = "Fmin";
-               ms.AppendEntity(ptFacadeMin);
-               t.AddNewlyCreatedDBObject(ptFacadeMin, true);
-
-               DBPoint ptFacadeMax = new DBPoint(new Autodesk.AutoCAD.Geometry.Point3d(facade.XMax, 0, 0));
-               ptFacadeMax.Layer = "Fmax";
-               ms.AppendEntity(ptFacadeMax);
-               t.AddNewlyCreatedDBObject(ptFacadeMax, true);
-
-               DBText textFloors = new DBText();
-               textFloors.TextString = "Кол этажей = " + facade.Floors.Count;
-               textFloors.Height = 300;
-               ms.AppendEntity(textFloors);
-               t.AddNewlyCreatedDBObject(textFloors, true);
-            }            
-            t.Commit();
-         }
-      }
+      }      
 
       // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
       public void LoadPanels()

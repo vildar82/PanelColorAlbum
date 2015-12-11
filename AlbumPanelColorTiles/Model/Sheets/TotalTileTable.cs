@@ -61,7 +61,7 @@ namespace AlbumPanelColorTiles.Sheets
 
          table.Rows[1].Height = 15;
 
-         table.Cells[0, 0].TextString = "Расход плитки на альбом " + _album.AbbreviateProject;
+         table.Cells[0, 0].TextString = "Расход плитки на альбом " + _album.StartOptions.Abbr;
          table.Cells[1, 0].TextString = "Поз.";
          table.Cells[1, 1].TextString = "Цвет";
          table.Cells[1, 2].TextString = "Образец";
