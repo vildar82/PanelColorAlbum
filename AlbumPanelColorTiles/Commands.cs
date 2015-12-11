@@ -277,7 +277,15 @@ namespace AlbumPanelColorTiles
             if (Convert.ToInt16(obj) != 0)
             {
                var db = doc.Database;
-               db.SaveAs(db.Filename, true, DwgVersion.Current, db.SecurityParameters);
+               try
+               {
+                  db.SaveAs(db.Filename, true, DwgVersion.Current, db.SecurityParameters);
+               }
+               catch (System.Exception ex)
+               {
+                  doc.Editor.WriteMessage(ex.Message);
+                  Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
+               }               
             }            
          }
 
