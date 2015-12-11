@@ -21,6 +21,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private List<PanelAkrFacade> _panelsNew;
       private List<PanelAkrFacade> _panelsChanged;
       private List<PanelAkrFacade> _panelsForce;
+      // оставшиеся панели на фасаде
       private List<PanelAkrFacade> _panelsOtherInFacade;
       private List<PanelAkrFacade> _panelsToSave;
       private ListBox _curListBox;
@@ -79,15 +80,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       private void buttonDel_Click(object sender, EventArgs e)
       {
-         if (_curListBox.SelectedIndex == -1)
+         if (_curListBox.SelectedItems== null)
          {
-            MessageBox.Show("Не выбрана панель");
+            MessageBox.Show("Не выбраны панели");
             return;
-         }
-         PanelAkrFacade panel = (PanelAkrFacade)_curListBox.SelectedItem;
+         }         
+         var panels = _curListBox.SelectedItems.Cast<PanelAkrFacade>().ToList();
          List<PanelAkrFacade> panelsList = (List<PanelAkrFacade>)_curListBox.DataSource;
-         panelsList.Remove(panel);
-         _panelsOtherInFacade.Add(panel);
+         foreach (var item in panels)
+         {
+            panelsList.Remove(item);
+            _panelsOtherInFacade.Add(item);
+         }         
          refreshDataSource();
       }
 

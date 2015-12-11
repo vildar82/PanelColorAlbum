@@ -37,6 +37,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
          List<PanelAkrFacade> panelsAkrFacade = GetPanelsAkrInDb(dbCur);
+         // исключение панелей с индексом электрики
+         removeElectricPanels(panelsAkrFacade);
          // список панелей в бибилиотеке
          List<PanelAkrLib> panelsAkrLib = GetPanelsInLib();
          // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
@@ -58,6 +60,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
             ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку.");
             Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
          }
+      }
+
+      private static void removeElectricPanels(List<PanelAkrFacade> panelsAkrFacade)
+      {
+         List<PanelAkrFacade> removes = new List<PanelAkrFacade>();
+         foreach (var panel in panelsAkrFacade)
+         {
+            var markWithoutElectric = MountingPanel.GetMarkWithoutElectric(panel.BlName);
+            if (panel.BlName.Length != markWithoutElectric.Length)
+            {
+               removes.Add(panel);
+            }
+         }
+         removes.ForEach(r => panelsAkrFacade.Remove(r));
       }
 
       public static List<PanelAkrFacade> GetPanelsAkrInDb(Database db)
@@ -120,6 +136,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          // сбор блоков для сохранения
          List<PanelAkrFacade> panelsAkrInFacade = GetPanelsAkrInDb(_dbCur);
+         removeElectricPanels(panelsAkrInFacade);
          if (panelsAkrInFacade.Count == 0)
          {
             _doc.Editor.WriteMessage("\nНет блоков АКР-Панелей для сохранения в библиотеку.");

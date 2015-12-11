@@ -56,6 +56,7 @@
          this.listBoxNew.FormattingEnabled = true;
          this.listBoxNew.Location = new System.Drawing.Point(3, 3);
          this.listBoxNew.Name = "listBoxNew";
+         this.listBoxNew.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
          this.listBoxNew.Size = new System.Drawing.Size(376, 295);
          this.listBoxNew.TabIndex = 0;
          this.toolTip1.SetToolTip(this.listBoxNew, "Панели которых нет в библиотеке");
@@ -100,6 +101,7 @@
          this.listBoxChanged.FormattingEnabled = true;
          this.listBoxChanged.Location = new System.Drawing.Point(3, 3);
          this.listBoxChanged.Name = "listBoxChanged";
+         this.listBoxChanged.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
          this.listBoxChanged.Size = new System.Drawing.Size(376, 295);
          this.listBoxChanged.TabIndex = 1;
          this.toolTip1.SetToolTip(this.listBoxChanged, "Панели отличаются от библиотечных");
@@ -121,6 +123,7 @@
          this.listBoxForce.FormattingEnabled = true;
          this.listBoxForce.Location = new System.Drawing.Point(3, 3);
          this.listBoxForce.Name = "listBoxForce";
+         this.listBoxForce.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
          this.listBoxForce.Size = new System.Drawing.Size(376, 295);
          this.listBoxForce.TabIndex = 1;
          this.toolTip1.SetToolTip(this.listBoxForce, "Если нужно сохранить панель, но она не попала в список Новых или Измененных панел" +

@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark)
       {
-         _markSb = getMarkWithoutElectric(mark).Replace(' ', '-');
+         _markSb = GetMarkWithoutElectric(mark).Replace(' ', '-');
          _extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
          _extTransToModel = new Extents3d();
          _extTransToModel.AddPoint(_extBlRefPanel.MinPoint.TransformBy(trans));
@@ -219,7 +219,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return panelAkrLib;
       }
 
-      private static string getMarkWithoutElectric(string markSB)
+      public static string GetMarkWithoutElectric(string markSB)
       {
          string res = markSB;
          var matchs = Regex.Matches(markSB, @"-\d{0,2}[э,Э]$");

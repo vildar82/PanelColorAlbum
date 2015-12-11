@@ -116,7 +116,7 @@
     <Compile Include="Model\PanelLibrary\PanelAkrLib.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibraryLoadService.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibrarySaveService.cs" />
-    <Compile Include="Model\PanelLibrary\PanelSB.cs" />
+    <Compile Include="Model\PanelLibrary\MountingPanel.cs" />
     <Compile Include="Model\PanelLibrary\SaveChangesToExel.cs" />
     <Compile Include="Model\PanelLibrary\FormSavePanelsToLib.cs">
       <SubType>Form</SubType>
