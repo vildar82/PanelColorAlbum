@@ -12,7 +12,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       private Extents3d _extentsColorArea;
       private int _height;
       private int _heightSize;
-      private int _heightSpot;
+      private int _heightSpot;      
 
       // кол участков покраски в высоте
       private int _lenght;
@@ -48,6 +48,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          }
       }
 
+      public bool PatternChess { get; set; }
       public int Height { get { return _height; } }
       public int HeightSize { get { return _heightSize; } }
       public int HeightSpot { get { return _heightSpot; } }
@@ -58,11 +59,12 @@ namespace AlbumPanelColorTiles.RandomPainting
 
       public void ChangeSize()
       {
-         FormColorAreaSize formSize = new FormColorAreaSize(_lenghtSpot, _heightSpot);
+         FormColorAreaSize formSize = new FormColorAreaSize(_lenghtSpot, _heightSpot, PatternChess);
          if (Application.ShowModalDialog(formSize) == System.Windows.Forms.DialogResult.OK)
          {
             _lenghtSpot = formSize.LenghtSpot;
             _heightSpot = formSize.HeightSpot;
+            PatternChess = formSize.ChessPattern;
             calcSizes();
             saveSize();
          }

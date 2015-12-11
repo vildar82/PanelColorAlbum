@@ -93,7 +93,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          Dictionary<string, RandomPaint> allProperPaint = getAllProperPaints();
          // Форма для распределения цветов
          FormRandomPainting formProper = new FormRandomPainting(allProperPaint, this, _trackRandoms);
-         formProper.Fire += FormProper_Fire;
+         formProper.Fire += Fire;
          Application.ShowModalDialog(formProper);
          _trackRandoms = formProper.TrackPropers;
       }
@@ -311,7 +311,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       }
 
       // Огонь
-      private void FormProper_Fire(object sender, EventArgs e)
+      private void Fire(object sender, EventArgs e)
       {
          try
          {
@@ -386,8 +386,23 @@ namespace AlbumPanelColorTiles.RandomPainting
       // Вставка ячейки покраски (пока = одной плитке)
       private void insertSpot(Spot spot, int x, int y, Transaction t)
       {
-         Point3d position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot,
-                                       _colorAreaSize.ExtentsColorArea.MinPoint.Y + y * _colorAreaSize.HeightSpot, 0);
+         Point3d position;
+         if (_colorAreaSize.PatternChess)
+         {
+            double offset = 0;
+            if (y%2 == 0)
+            {
+               offset = _colorAreaSize.LenghtSpot * 0.5;
+            }
+            position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot + offset,
+                                   _colorAreaSize.ExtentsColorArea.MinPoint.Y + y * _colorAreaSize.HeightSpot, 0);
+         }
+         else
+         {
+            position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot,
+                                   _colorAreaSize.ExtentsColorArea.MinPoint.Y + y * _colorAreaSize.HeightSpot, 0);
+         }
+         
          IdMapping map = new IdMapping();
          _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
          ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;

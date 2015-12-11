@@ -37,6 +37,7 @@
          this.textBoxHeight = new System.Windows.Forms.TextBox();
          this.errorProviderError = new System.Windows.Forms.ErrorProvider(this.components);
          this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+         this.checkBoxChess = new System.Windows.Forms.CheckBox();
          ((System.ComponentModel.ISupportInitialize)(this.errorProviderError)).BeginInit();
          this.SuspendLayout();
          // 
@@ -44,7 +45,7 @@
          // 
          this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
          this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-         this.buttonCancel.Location = new System.Drawing.Point(187, 105);
+         this.buttonCancel.Location = new System.Drawing.Point(201, 121);
          this.buttonCancel.Name = "buttonCancel";
          this.buttonCancel.Size = new System.Drawing.Size(75, 23);
          this.buttonCancel.TabIndex = 0;
@@ -55,7 +56,7 @@
          // 
          this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
          this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-         this.buttonOk.Location = new System.Drawing.Point(106, 105);
+         this.buttonOk.Location = new System.Drawing.Point(120, 121);
          this.buttonOk.Name = "buttonOk";
          this.buttonOk.Size = new System.Drawing.Size(75, 23);
          this.buttonOk.TabIndex = 0;
@@ -103,13 +104,25 @@
          // 
          this.errorProviderError.ContainerControl = this;
          // 
+         // checkBoxChess
+         // 
+         this.checkBoxChess.AutoSize = true;
+         this.checkBoxChess.Location = new System.Drawing.Point(15, 89);
+         this.checkBoxChess.Name = "checkBoxChess";
+         this.checkBoxChess.Size = new System.Drawing.Size(139, 17);
+         this.checkBoxChess.TabIndex = 3;
+         this.checkBoxChess.Text = "В шахматном порядке";
+         this.toolTip1.SetToolTip(this.checkBoxChess, "Расстановка блоков зон-покраски в шахматном порядке");
+         this.checkBoxChess.UseVisualStyleBackColor = true;
+         // 
          // FormColorAreaSize
          // 
          this.AcceptButton = this.buttonOk;
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.CancelButton = this.buttonCancel;
-         this.ClientSize = new System.Drawing.Size(274, 140);
+         this.ClientSize = new System.Drawing.Size(288, 156);
+         this.Controls.Add(this.checkBoxChess);
          this.Controls.Add(this.textBoxHeight);
          this.Controls.Add(this.textBoxLenght);
          this.Controls.Add(this.label2);
@@ -138,5 +151,6 @@
       private System.Windows.Forms.TextBox textBoxHeight;
       private System.Windows.Forms.ErrorProvider errorProviderError;
       private System.Windows.Forms.ToolTip toolTip1;
+      private System.Windows.Forms.CheckBox checkBoxChess;
    }
 }

@@ -6,16 +6,18 @@ namespace AlbumPanelColorTiles.RandomPainting
 {
    public partial class FormColorAreaSize : Form
    {
-      public FormColorAreaSize(int lenghtSpot, int heightSpot)
+      public FormColorAreaSize(int lenghtSpot, int heightSpot, bool chess)
       {
          InitializeComponent();
          errorProviderError.Icon = Properties.Resources.errorProviderError;
          textBoxHeight.Text = heightSpot.ToString();
          textBoxLenght.Text = lenghtSpot.ToString();
+         checkBoxChess.Checked = chess;
       }
 
       public int HeightSpot { get { return int.Parse(textBoxHeight.Text); } }
       public int LenghtSpot { get { return int.Parse(textBoxLenght.Text); } }
+      public bool ChessPattern { get { return checkBoxChess.Checked; } }
 
       private void buttonOk_Click(object sender, EventArgs e)
       {
