@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using AcadLib.Errors;
+using AcadLib;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Model.ExportFacade;
@@ -18,6 +19,7 @@ using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -656,6 +658,72 @@ namespace AlbumPanelColorTiles
                }               
                doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex.Message);
             }
+         }
+      }
+
+      [CommandMethod("PIK", "TestInsertAKRPanels", CommandFlags.Modal)]
+      public void TestInsertAKRPanels()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         Editor ed = doc.Editor;
+         Database db = doc.Database;
+
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+            Point3d pt = Point3d.Origin;
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               {
+                  var blRef = new BlockReference(pt, idBtr);
+                  ms.AppendEntity(blRef);
+                  t.AddNewlyCreatedDBObject(blRef, true);
+                  pt = new Point3d(pt.X, pt.Y + 5000, 0);
+               }
+            }
+            t.Commit();
+         }
+      }
+
+      [CommandMethod("PIK", "TestClearXdataAKRPanels", CommandFlags.Modal)]
+      public void TestClearXdataAKRPanels()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         Editor ed = doc.Editor;
+         Database db = doc.Database;
+
+         int countRemovedDict = 0;
+         int countRemovedXData = 0;
+
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+            Point3d pt = Point3d.Origin;
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               {
+                  if (!btr.ExtensionDictionary.IsNull)
+                  {
+                     btr.RemoveAllExtensionDictionary();
+                     ed.WriteMessage("{0} удален словарь.", btr.Name);
+                     countRemovedDict++;
+                  }
+                  if (btr.XData != null)
+                  {
+                     btr.RemoveAllXData();
+                     ed.WriteMessage("{0} удалы расш данные.", btr.Name);
+                     countRemovedXData++;
+                  }
+               }
+            }
+            ed.WriteMessage("Удалено словарей {0}, удалено расшданных {1}", countRemovedDict, countRemovedXData);
+            t.Commit();
          }
       }
    }

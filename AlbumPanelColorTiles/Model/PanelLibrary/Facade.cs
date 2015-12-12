@@ -267,6 +267,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
       }
+
       //private static void testGeom(MountingPanel panelSb, Facade facade, Floor floor, double yFloor, Transaction t, BlockTableRecord ms)
       //{
       //   // Точка центра панели СБ
@@ -276,13 +277,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       //   // Точка вставки панели АКР
       //   DBPoint ptPanelArkInModel = new DBPoint(new Point3d(panelSb.GetPtInModel(panelSb.PanelAkrLib).X, yFloor, 0));
       //   ms.AppendEntity(ptPanelArkInModel);
-      //   t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);
-      //   // Расстояние до центра панели АКР
-      //   Line lineToCenterPanelAkr = new Line(ptPanelArkInModel.Position,
-      //      new Point3d(ptPanelArkInModel.Position.X + panelSb.PanelAkrLib.GetDistToCenter(panelSb.PanelAkrLib.IdBtrPanelAkrInFacade),
-      //                  ptPanelArkInModel.Position.Y, 0));
-      //   ms.AppendEntity(lineToCenterPanelAkr);
-      //   t.AddNewlyCreatedDBObject(lineToCenterPanelAkr, true);
+      //   t.AddNewlyCreatedDBObject(ptPanelArkInModel, true);                  
       //}
    }
 }

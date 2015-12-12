@@ -48,6 +48,12 @@ namespace AlbumPanelColorTiles.Sheets
          worksheet.Cells[row, 2].Value = "Итого";
          worksheet.Cells[row, 3].Value = totalCountPanels.ToString();
 
+         worksheet.Columns.AutoFit();
+         var col1 = worksheet.Columns[1];
+         col1.ColumnWidth = 5;
+         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
+         worksheet.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+
          // Список панелей по этажам
          listPanelsOnFloors(workBook, album, sheetsSet);
 
@@ -83,6 +89,12 @@ namespace AlbumPanelColorTiles.Sheets
          }
          sheetFloor.Cells[row, 2].Value ="Итого";
          sheetFloor.Cells[row, 3].Value = totalCountPanels;
+
+         sheetFloor.Columns.AutoFit();
+         var col1 = sheetFloor.Columns[1];
+         col1.ColumnWidth = 5;
+         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
+         sheetFloor.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
    }
 }

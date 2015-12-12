@@ -108,6 +108,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             shiftEnd = -Settings.Default.FacadeEndsPanelIndent * 0.5;// 445;// Торец спрва - сдвинуть вправо
          }
+         var test = _extentsTiles.MaxPoint.X - _extentsTiles.MinPoint.X;
          _distToCenterFromBase = (_extentsTiles.MaxPoint.X - _extentsTiles.MinPoint.X) * 0.5 + shiftEnd;         
       }
    }
