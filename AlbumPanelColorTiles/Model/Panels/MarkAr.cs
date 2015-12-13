@@ -23,7 +23,7 @@ namespace AlbumPanelColorTiles.Panels
       private string _markPaintingCalulated; // вычесленная программой марка покраски, в методе DefineArchitectMarks класса MarkSbPanel
       private MarkSb _markSB;
       private List<Paint> _paints;
-      private List<PanelAR> _panels;
+      private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
 
       public MarkAr(List<Paint> paintAR, MarkSb markSb, BlockReference blRefMarkAr)
@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.Panels
          _abbrIndex = string.IsNullOrEmpty(_markSB.Abbr) ? "" : "_" + _markSB.Abbr;
          _paints = paintAR;
          DefMarkArTempNames(markSb, blRefMarkAr.Name);
-         _panels = new List<PanelAR>();
+         _panels = new List<Panel>();
       }
 
       public ObjectId IdBtrAr { get { return _idBtrAr; } }
@@ -98,8 +98,11 @@ namespace AlbumPanelColorTiles.Panels
 
       public MarkSb MarkSB { get { return _markSB; } }
       public List<Paint> Paints { get { return _paints; } }
-      public List<PanelAR> Panels { get { return _panels; } }
+      public List<Panel> Panels { get { return _panels; } }
 
+      /// <summary>
+      /// Кол плитки в одной панели марки АР
+      /// </summary>
       public List<TileCalc> TilesCalc
       {
          get
@@ -142,16 +145,14 @@ namespace AlbumPanelColorTiles.Panels
             {
                paintAR = paintSb;
             }
-            paintsAR.Add(paintAR);
-            // ведем подсчет плиток этого цвета для итоговой таблицы плиток на альбом
-            paintAR.AddOneTileCount();
+            paintsAR.Add(paintAR);            
          }
          return paintsAR;
       }
 
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
-         PanelAR panel = new PanelAR(blRefPanel, this);
+         Panel panel = new Panel(blRefPanel, this);
          _panels.Add(panel);
       }
 
@@ -232,7 +233,7 @@ namespace AlbumPanelColorTiles.Panels
          return new Point3d(positionBlRef.X + centerTileInBtr.X, positionBlRef.Y + centerTileInBtr.Y, 0);
       }
 
-      // Подсчет плитки
+      // Подсчет плитки в одной панели Марки АР
       private List<TileCalc> CalculateTiles()
       {
          List<TileCalc> tilesCalc = new List<TileCalc>();

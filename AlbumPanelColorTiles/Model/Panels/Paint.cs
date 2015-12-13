@@ -7,10 +7,7 @@ namespace AlbumPanelColorTiles.Panels
    public class Paint : IEquatable<Paint>
    {
       // цвет плтитки
-      private Color _color;
-
-      // кол плиток этого цвета - для итоговой таблицы плитки
-      private int _count;
+      private Color _color;      
 
       // Имя слоя. (для каждой краски свой слой с именем марки краски)
       private string _layerName;
@@ -21,17 +18,8 @@ namespace AlbumPanelColorTiles.Panels
          _color = color;
       }
 
-      public Color Color { get { return _color; } }
-      public int Count { get { return _count; } }
+      public Color Color { get { return _color; } }      
       public string LayerName { get { return _layerName; } }
-
-      /// <summary>
-      /// Добавление одной плитки с таким цветом
-      /// </summary>
-      public void AddOneTileCount()
-      {
-         _count++;
-      }
 
       public bool Equals(Paint other)
       {

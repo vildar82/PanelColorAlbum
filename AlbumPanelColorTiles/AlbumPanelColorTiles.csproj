@@ -133,6 +133,7 @@
     <Compile Include="Model\Panels\Caption.cs" />
     <Compile Include="Model\Panels\ColorArea.cs" />
     <Compile Include="Model\Panels\EnumStorey.cs" />
+    <Compile Include="Model\Panels\Section.cs" />
     <Compile Include="Model\RandomPainting\ColorAreaSpotSize.cs" />
     <Compile Include="Model\RandomPainting\FormColorAreaSize.cs">
       <SubType>Form</SubType>
@@ -155,7 +156,7 @@
     <Compile Include="Model\Panels\MarkSb.cs" />
     <Compile Include="Model\Options\Settings.cs" />
     <Compile Include="Model\Panels\Paint.cs" />
-    <Compile Include="Model\Panels\PanelAR.cs" />
+    <Compile Include="Model\Panels\Panel.cs" />
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />
     <Compile Include="Model\Plot\PlotMultiPdfReadDwg.cs" />
     <Compile Include="Model\Panels\BlockFrameAKR.cs" />
@@ -168,7 +169,7 @@
     <Compile Include="Model\RandomPainting\RandomPaint.cs" />
     <Compile Include="Model\RandomPainting\RandomPaintingService.cs" />
     <Compile Include="Model\RandomPainting\Spot.cs" />
-    <Compile Include="Model\Select\SelectionPanel.cs" />
+    <Compile Include="Model\Select\SelectionBlocks.cs" />
     <Compile Include="Model\Sheets\ExportToExcel.cs" />
     <Compile Include="Model\Plot\MultiSheetsPdfPublish.cs" />
     <Compile Include="Model\Sheets\SheetMarkAr.cs" />

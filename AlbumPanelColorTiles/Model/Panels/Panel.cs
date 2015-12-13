@@ -7,7 +7,7 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.Panels
 {
    // Панель Марки АР - вхождение блока на чертеже фасада.
-   public class PanelAR : IEquatable<PanelAR>
+   public class Panel : IEquatable<Panel>
    {
       // Границы блока
       private Extents3d _extents;
@@ -26,7 +26,7 @@ namespace AlbumPanelColorTiles.Panels
       // Этаж панели
       private Storey _storey;
 
-      public PanelAR(BlockReference blRefPanel, MarkAr markAr)
+      public Panel(BlockReference blRefPanel, MarkAr markAr)
       {
          _idBlRefSb = blRefPanel.ObjectId;
          _insPt = blRefPanel.Position;
@@ -42,6 +42,8 @@ namespace AlbumPanelColorTiles.Panels
 
       public ObjectId IdBlRefAr { get { return _idBlRefAr; } }
 
+      public Model.Panels.Section Section { get; set; }
+
       /// <summary>
       /// Точка вставки блока панели
       /// </summary>
@@ -55,7 +57,7 @@ namespace AlbumPanelColorTiles.Panels
          set { _storey = value; }
       }
 
-      public bool Equals(PanelAR other)
+      public bool Equals(Panel other)
       {
          return _insPt.Equals(other._insPt);
       }

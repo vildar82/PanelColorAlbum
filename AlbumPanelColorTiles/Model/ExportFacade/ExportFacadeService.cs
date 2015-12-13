@@ -12,7 +12,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    // Экспорт фасада
    public class ExportFacadeService
    {
-      private SelectionPanel _selectPanels;
+      private SelectionBlocks _selectPanels;
       private FileExport _fileExport;
       private List<ObjectId> _idsBtrPanelArExport;
       private List<ObjectId> _idsBlRefPanelArExport;
@@ -23,8 +23,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       public void Export()
       {
          // Список панелей для экспорта
-         _selectPanels = new SelectionPanel();
-         _selectPanels.SelectPanelsBlRefInModel();
+         _selectPanels = new SelectionBlocks();
+         _selectPanels.SelectAKRPanelsBlRefInModel();
          if (_selectPanels.IdsBlRefPanelSb.Count>0)
          {
             throw new Exception("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
@@ -93,8 +93,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       private void deletePanels(Database dbExport)
       {
-         SelectionPanel selPanels = new SelectionPanel(dbExport);
-         selPanels.SelectPanelsBlRefInModel();
+         SelectionBlocks selPanels = new SelectionBlocks(dbExport);
+         selPanels.SelectAKRPanelsBlRefInModel();
          deleteBlRefs(selPanels.IdsBlRefPanelAr);
          // Панелей СБ не должно быть, но на всякий случай удалю.
          deleteBlRefs(selPanels.IdsBlRefPanelSb);

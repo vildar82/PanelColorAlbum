@@ -69,28 +69,28 @@ namespace AlbumPanelColorTiles.Sheets
          table.Cells[1, 4].TextString = "Расход, м.кв.";
 
          int row = 2;
-         int i = 1;
-         double totalArea = 0;
+         int i = 1;         
          int totalCountTile = 0;
-         int countTile;
-         foreach (var paint in _album.Colors.OrderByDescending(p => p.Count))
+         double totalArea = 0;
+
+         foreach (var tileCalcSameColor in _album.TotalTilesCalc)
          {
             table.Cells[row, 0].TextString = i++.ToString(); //"Поз.";
-            table.Cells[row, 1].TextString = paint.LayerName;  //"Цвет";
-            table.Cells[row, 2].BackgroundColor = paint.Color;  // "Образец";
-            countTile = paint.Count / 2;
-            totalCountTile += countTile;
-            table.Cells[row, 3].TextString = countTile.ToString();// "Расход, шт.";
-            var area = countTile * TileCalc.OneTileArea;
-            totalArea += area;
-            table.Cells[row, 4].TextString = Math.Round(area, 2).ToString();  // "Расход, м.кв.";
+            table.Cells[row, 1].TextString = tileCalcSameColor.ColorMark;  //"Цвет";
+            table.Cells[row, 2].BackgroundColor = tileCalcSameColor.Pattern;  // "Образец";            
+            table.Cells[row, 3].TextString = tileCalcSameColor.Count.ToString();// "Расход, шт.";                        
+            table.Cells[row, 4].TextString = tileCalcSameColor.TotalArea.ToString();  // "Расход, м.кв.";
+
+            totalCountTile += tileCalcSameColor.Count;
+            totalArea += tileCalcSameColor.TotalArea;
+
             row++;
          }
          var mCells = CellRange.Create(table, row, 0, row, 2);
          table.MergeCells(mCells);
          table.Cells[row, 0].TextString = "Итого:";
          table.Cells[row, 3].TextString = totalCountTile.ToString();
-         table.Cells[row, 4].TextString = Math.Round(totalArea, 2).ToString();
+         table.Cells[row, 4].TextString = totalArea.ToString();
 
          table.GenerateLayout();
          return table;

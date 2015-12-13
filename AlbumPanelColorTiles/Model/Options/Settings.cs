@@ -12,6 +12,7 @@
       private string _attributePanelSbPaint;
       private string _blockColorAreaDynPropHeight;
       private string _blockColorAreaDynPropLength;
+      private string _attributeSectionName;
 
       //
       // Имена блоков
@@ -22,12 +23,13 @@
       private string _blockMountingPlanePrefixName;
       private string _blockPanelPrefixName;
       private string _blockTileName;
-      private int _captionPanelSecondTextShift;
+      private string _blockSectionName;
 
       //
       // Построение фасадов из монтажек
       //
       private int _captionPanelTextHeight;
+      private int _captionPanelSecondTextShift;
 
       //
       // Суффиксы (приставки к именам блоков панелей)
@@ -109,6 +111,8 @@
 
       public string AttributePanelSbMark { get { return _attributePanelSbMark; } }
       public string AttributePanelSbPaint { get { return _attributePanelSbPaint; } }
+      public string AttributeSectionName { get { return _attributeSectionName; } }
+            
       public string BlockColorAreaDynPropHeight { get { return _blockColorAreaDynPropHeight; } }
       public string BlockColorAreaDynPropLength { get { return _blockColorAreaDynPropLength; } }
       public string BlockColorAreaName { get { return _blockColorAreaName; } }
@@ -117,6 +121,8 @@
       public string BlockMountingPlanePrefixName { get { return _blockMountingPlanePrefixName; } }
       public string BlockPanelPrefixName { get { return _blockPanelPrefixName; } }
       public string BlockTileName { get { return _blockTileName; } }
+      public string BlockSectionName { get { return _blockSectionName; } }
+      
       public int CaptionPanelSecondTextShift { get { return _captionPanelSecondTextShift; } }
       public int CaptionPanelTextHeight { get { return _captionPanelTextHeight; } }
       public string EndLeftPanelSuffix { get { return _endLeftPanelSuffix; } }
@@ -177,8 +183,10 @@
          _blockMountingPlanePrefixName = "АКР_Монтажка_";
          _blockFacadeName = "АКР_Фасад";
          _blockTileName = "АКР_Плитка";
+         _blockSectionName = "АКР_Секция";
          _attributePanelSbPaint = "ПОКРАСКА";
          _attributePanelSbMark = "МАРКА";
+         _attributeSectionName = "СЕКЦИЯ";
          _endLeftPanelSuffix = "_тл";
          _endRightPanelSuffix = "_тп";
          _windowPanelSuffix = "_ок";

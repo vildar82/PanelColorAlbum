@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model.Select
 {
    // Выбор панелей в чертеже
-   public class SelectionPanel
+   public class SelectionBlocks
    {
       /// <summary>
       /// Вхождения блоков панелей Марки АР в Модели
@@ -29,25 +30,32 @@ namespace AlbumPanelColorTiles.Model.Select
       /// </summary>
       public List<ObjectId> IdsBtrPanelAr { get; private set; }
 
+      /// <summary>
+      /// Блоки Секций в Модели
+      /// </summary>
+      public List<ObjectId> SectionsBlRefs { get; private set; }
+
       private Database _db;
 
-      public SelectionPanel(Database db)
+      public SelectionBlocks(Database db)
       {
          _db = db;
       }
 
-      public SelectionPanel()
+      public SelectionBlocks()
       {
          _db = HostApplicationServices.WorkingDatabase;
       }
 
       /// <summary>
       /// Выбор вхождений блоков панелей Марки АР и Марки СБ в Модели
+      /// + выбор блоков Секций.
       /// </summary>
-      public void SelectPanelsBlRefInModel()
+      public void SelectAKRPanelsBlRefInModel()
       {
          IdsBlRefPanelAr = new List<ObjectId>();
          IdsBlRefPanelSb = new List<ObjectId>();
+         SectionsBlRefs = new List<ObjectId>();
          using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(_db).Open(OpenMode.ForRead) as BlockTableRecord)
          {
             foreach (ObjectId idEnt in ms)
@@ -56,6 +64,7 @@ namespace AlbumPanelColorTiles.Model.Select
                {
                   using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                   {
+                     // Блоки АКР-Панелей
                      if (MarkSb.IsBlockNamePanel(blRef.Name))
                      {
                         if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
@@ -66,7 +75,12 @@ namespace AlbumPanelColorTiles.Model.Select
                         {
                            IdsBlRefPanelSb.Add(idEnt);
                         }
-                     }                     
+                     }
+                     // Блоки Секций
+                     else if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        SectionsBlRefs.Add(idEnt);
+                     }
                   }
                }
             }
@@ -76,7 +90,7 @@ namespace AlbumPanelColorTiles.Model.Select
       /// <summary>
       /// Выбор определений блоков панелей Марки АР и Марки СБ
       /// </summary>
-      public void SelectPanelsBtr()
+      public void SelectAKRPanelsBtr()
       {
          IdsBtrPanelAr = new List<ObjectId>();
          IdsBtrPanelSb = new List<ObjectId>();
@@ -98,6 +112,27 @@ namespace AlbumPanelColorTiles.Model.Select
                         {
                            IdsBtrPanelSb.Add(idEnt);
                         }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      public void SelectSectionBlRefs()
+      {
+         SectionsBlRefs = new List<ObjectId>();
+         using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(_db).Open(OpenMode.ForRead) as BlockTableRecord)
+         {
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
+                  {
+                     if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        SectionsBlRefs.Add(idEnt);
                      }
                   }
                }

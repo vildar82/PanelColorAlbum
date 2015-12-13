@@ -330,7 +330,7 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
-               }               
+               }
             }
             if (Inspector.HasErrors)
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Model.Select;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -198,10 +199,11 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение покраски панелей текущего чертежа (в Модели)
-      public static List<MarkSb> GetMarksSB(RTree<ColorArea> rtreeColorAreas, Album album, string progressMsg)
+      public static List<MarkSb> GetMarksSB(RTree<ColorArea> rtreeColorAreas, Album album, string progressMsg, List<ObjectId> idsBlRefPanels)
       {
-         List<MarkSb> _marksSb = new List<MarkSb>();
-         Database db = HostApplicationServices.WorkingDatabase;
+         List<MarkSb> marksSb = new List<MarkSb>();
+         Database db = HostApplicationServices.WorkingDatabase;         
+
          using (var t = db.TransactionManager.StartTransaction())
          {
             // Перебор всех блоков в модели и составление списка блоков марок и панелей.
@@ -209,37 +211,35 @@ namespace AlbumPanelColorTiles.Panels
             var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
 
             ProgressMeter progressMeter = new ProgressMeter();
-            progressMeter.SetLimit(5000);
+            progressMeter.SetLimit(idsBlRefPanels.Count);
             progressMeter.Start(progressMsg);
 
-            foreach (ObjectId idEnt in ms)
+            // Перебор вхожденй блоков Марки СБ
+            foreach (ObjectId idBlRefPanelMarkSb in idsBlRefPanels)
             {
                if (HostApplicationServices.Current.UserBreak())
                {
                   throw new System.Exception("Отменено пользователем.");
                }
-
                progressMeter.MeterProgress();
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+
+               var blRefPanel = t.GetObject(idBlRefPanelMarkSb, OpenMode.ForRead, false, true) as BlockReference;
+               // Определение Марки СБ панели. Если ее еще нет, то она создается и добавляется в список _marks.
+               MarkSb markSb = GetMarkSb(blRefPanel, marksSb, bt, album);
+               if (markSb == null)
                {
-                  var blRefPanel = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  // Определение Марки СБ панели. Если ее еще нет, то она создается и добавляется в список _marks.
-                  MarkSb markSb = GetMarkSb(blRefPanel, _marksSb, bt, album);
-                  if (markSb == null)
-                  {
-                     // Значит это не блок панели. Пропускаем.
-                     continue;
-                  }
-                  //Определение покраски панели (Марки АР)
-                  List<Paint> paintAR = MarkAr.GetPanelMarkAR(markSb, blRefPanel, rtreeColorAreas);
-                  // Добавление панели АР в список панелей для Марки СБ
-                  markSb.AddPanelAR(paintAR, blRefPanel, markSb);
+                  // Значит это не блок панели. Пропускаем.
+                  continue;
                }
+               //Определение покраски панели (Марки АР)
+               List<Paint> paintAR = MarkAr.GetPanelMarkAR(markSb, blRefPanel, rtreeColorAreas);
+               // Добавление панели АР в список панелей для Марки СБ
+               markSb.AddPanelAR(paintAR, blRefPanel, markSb);
             }
             progressMeter.Stop();
             t.Commit();
-         }
-         return _marksSb;
+         }         
+         return marksSb;
       }
 
       /// <summary>
@@ -418,35 +418,32 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
-      private static MarkSb GetMarkSb(BlockReference blRefPanel, List<MarkSb> marksSb, BlockTable bt, Album album)
+      private static MarkSb GetMarkSb(BlockReference blRefPanelSb, List<MarkSb> marksSb, BlockTable bt, Album album)
       {
-         MarkSb markSb = null;
-         if (IsBlockNamePanel(blRefPanel.Name))
+         MarkSb markSb = null;         
+         string markSbName = GetMarkSbName(blRefPanelSb.Name);
+         if (markSbName != string.Empty)
          {
-            string markSbName = GetMarkSbName(blRefPanel.Name);
-            if (markSbName != string.Empty)
+            // Поиск панели Марки СБ в коллекции панелей по имени марки СБ.
+            markSb = marksSb.Find(m => m._markSb == markSbName);
+            if (markSb == null)
             {
-               // Поиск панели Марки СБ в коллекции панелей по имени марки СБ.
-               markSb = marksSb.Find(m => m._markSb == markSbName);
-               if (markSb == null)
+               // Блок Марки СБ
+               string markSbBlName = GetMarkSbBlockName(markSbName);
+               if (bt.Has(markSbBlName))
                {
-                  // Блок Марки СБ
-                  string markSbBlName = GetMarkSbBlockName(markSbName);
-                  if (bt.Has(markSbBlName))
-                  {
-                     var idMarkSbBtr = bt[markSbBlName];
-                     markSb = new MarkSb(blRefPanel, idMarkSbBtr, markSbName, markSbBlName, album);
-                     marksSb.Add(markSb);
-                  }
-                  else
-                  {
-                     //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
-                     //???
-                     Inspector.AddError(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanel.Name), blRefPanel);
-                  }
+                  var idMarkSbBtr = bt[markSbBlName];
+                  markSb = new MarkSb(blRefPanelSb, idMarkSbBtr, markSbName, markSbBlName, album);
+                  marksSb.Add(markSb);
+               }
+               else
+               {
+                  //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
+                  //???
+                  Inspector.AddError(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanelSb.Name), blRefPanelSb);
                }
             }
-         }
+         }         
          return markSb;
       }
 

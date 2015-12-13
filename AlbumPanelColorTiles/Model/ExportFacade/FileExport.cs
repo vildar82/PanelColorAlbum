@@ -60,14 +60,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          var backupFile = Path.Combine(FileExportFacade.DirectoryName,
                                        Path.GetFileNameWithoutExtension(FileExportFacade.Name) +
                                        "_Backup_" + DateTime.Now.ToString("dd.MM.yyyy-HH.mm") + ".bak");
-         try
-         {
-            FileExportFacade.CopyTo(backupFile, true);
-         }
-         catch
-         {
-            throw;
-         }         
+         FileExportFacade.CopyTo(backupFile, true);
       }
 
       private void promptUserExportFile()
