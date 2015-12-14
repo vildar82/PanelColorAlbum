@@ -58,6 +58,7 @@ namespace AlbumPanelColorTiles.Sheets
          // Создание титульных листов
          // Листы содержания
          SheetsContent content = new SheetsContent(this, blFrameSearch);
+         content.Contents();
 
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.SetLimit(_sheetsMarkSB.Count);

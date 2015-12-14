@@ -30,8 +30,7 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
          _sheetsMarkSB = sheetsSet.SheetsMarkSB;
-         _blFrameInFacade = blFrameInFacade;
-         Contents();
+         _blFrameInFacade = blFrameInFacade;         
       }
 
       // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
@@ -71,7 +70,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Содержание тома (Общие данные. Ведомость комплекта чертежей.)
-      private void Contents()
+      public void Contents()
       {
          // Создание файла содержания и титульных листов
          string fileContent = Path.Combine(_album.AlbumDir, "00_Содержание" + _album.StartOptions.Abbr + ".dwg");
@@ -119,7 +118,7 @@ namespace AlbumPanelColorTiles.Sheets
                }
                else
                {
-                  curSheetArNum = _album.StartOptions.NumberFirstSheet;
+                  curSheetArNum = _album.StartOptions.NumberFirstSheet-1;
                }
 
                ProgressMeter progressMeter = new ProgressMeter();
