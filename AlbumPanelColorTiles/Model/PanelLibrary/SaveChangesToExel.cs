@@ -13,6 +13,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Сохранение изменений в файл Excel
       public static void Save(List<PanelAkrFacade> panelsAkrFacade)
       {
+         var date = DateTime.Now;
          // файл
          string fileXls = PanelLibrarySaveService.LibPanelsExcelFilePath;
          if (!File.Exists(fileXls))
@@ -32,7 +33,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                foreach (var panel in panelsAkrFacade)
                {
                   worksheet.Cells[row, 1].Value = panel.BlName;
-                  worksheet.Cells[row, 2].Value = DateTime.Now;
+                  worksheet.Cells[row, 2].Value = date;
                   worksheet.Cells[row, 3].Value = Environment.UserName;
                   worksheet.Cells[row, 4].Value = panel.ReportStatusString();
                   worksheet.Cells[row, 5].Value = panel.IdBtrAkrPanel.Database.Filename;
