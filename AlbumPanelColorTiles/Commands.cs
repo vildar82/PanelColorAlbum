@@ -649,6 +649,10 @@ namespace AlbumPanelColorTiles
                {
                   Inspector.Show();
                }
+               else
+               {
+                  doc.Editor.WriteMessage("\nГотово.");
+               }
             }
             catch (System.Exception ex)
             {

@@ -27,10 +27,12 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       {
          // обработка блоков панелей         
          ConvertPanelService convertPanel = new ConvertPanelService(_idsBtrPanelArExport);
-         convertPanel.Convert();
-
-         // Очистка чертежа
-         purge();
+         using (AcadLib.WorkingDatabaseSwitcher switchDb = new AcadLib.WorkingDatabaseSwitcher(_dbExport))
+         {
+            convertPanel.Convert();
+            // Очистка чертежа
+            purge();
+         }
       }
 
       private void purge()

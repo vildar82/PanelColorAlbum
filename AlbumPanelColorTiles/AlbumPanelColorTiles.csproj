@@ -78,6 +78,7 @@
     <Compile Include="Commands.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
+    <Compile Include="Model\ExportFacade\ContourPanel.cs" />
     <Compile Include="Model\ExportFacade\ConversionExportFacade.cs" />
     <Compile Include="Model\ExportFacade\ConvertPanelBtr.cs" />
     <Compile Include="Model\ExportFacade\ConvertPanelService.cs" />
