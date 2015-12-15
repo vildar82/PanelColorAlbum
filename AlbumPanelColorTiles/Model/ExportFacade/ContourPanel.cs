@@ -48,9 +48,9 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
          // Первый угол панели - левый нижний         
          var pt1 = getCoordTileNoEnd(extentsByTile.MinPoint, EnumCorner.LeftLower);
-         var pt2 = getCoordTileNoEnd(extentsByTile.MinPoint, EnumCorner.LeftTop);
-         var pt3 = getCoordTileNoEnd(extentsByTile.MinPoint, EnumCorner.RightTop);
-         var pt4 = getCoordTileNoEnd(extentsByTile.MinPoint, EnumCorner.RightLower);
+         var pt2 = getCoordTileNoEnd(new Point3d (extentsByTile.MinPoint.X, extentsByTile.MaxPoint.Y, 0), EnumCorner.LeftTop);
+         var pt3 = getCoordTileNoEnd(extentsByTile.MaxPoint, EnumCorner.RightTop);
+         var pt4 = getCoordTileNoEnd(new Point3d(extentsByTile.MaxPoint.X, extentsByTile.MinPoint.Y,  0), EnumCorner.RightLower);
 
          Point3dCollection pts = new Point3dCollection();
          pts.Add(pt1);
