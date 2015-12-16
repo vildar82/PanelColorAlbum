@@ -13,6 +13,7 @@ namespace AlbumPanelColorTiles.Panels
    // Марка АР покраски панели
    public class MarkAr : IEquatable<MarkAr>
    {
+      public Album Album { get; private set; }
       private ObjectId _idBtrAr;
       private string _abbrIndex;
       private string _markArBlockName;
@@ -27,7 +28,8 @@ namespace AlbumPanelColorTiles.Panels
       private List<TileCalc> _tilesCalc;
 
       public MarkAr(List<Paint> paintAR, MarkSb markSb, BlockReference blRefMarkAr)
-      {         
+      {
+         Album = markSb.Album;
          _markSB = markSb;
          _abbrIndex = string.IsNullOrEmpty(_markSB.Abbr) ? "" : "_" + _markSB.Abbr;
          _paints = paintAR;
@@ -153,7 +155,7 @@ namespace AlbumPanelColorTiles.Panels
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
          Panel panel = new Panel(blRefPanel, this);
-         _panels.Add(panel);
+         _panels.Add(panel);         
       }
 
       // Создание определения блока Марки АР
@@ -207,7 +209,7 @@ namespace AlbumPanelColorTiles.Panels
 
       public bool EqualPaint(List<Paint> paintAR)
       {
-         // ??? сработает такое сравнение списков покраски?
+         // сравнение списков покраски
          return paintAR.SequenceEqual(_paints);
       }
 

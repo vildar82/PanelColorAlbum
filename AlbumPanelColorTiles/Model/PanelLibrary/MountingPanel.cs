@@ -115,7 +115,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// Загрузка панелей из библиотеки. И запись загруженных блоков в список панелей СБ.
       /// </summary>
       /// <param name="_allPanelsSB">Список всех панелей-СБ в чертеже</param>
-      public static void LoadBtrPanels(List<Facade> facades)
+      public static void LoadBtrPanels(List<FacadeMounting> facades)
       {
          // файл библиотеки
          if (!File.Exists(PanelLibrarySaveService.LibPanelsFilePath))

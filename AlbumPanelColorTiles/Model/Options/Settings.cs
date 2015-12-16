@@ -13,6 +13,8 @@
       private string _blockColorAreaDynPropHeight;
       private string _blockColorAreaDynPropLength;
       private string _attributeSectionName;
+      private string _attributeFacadeAxis1;
+      private string _attributeFacadeAxis2;
 
       //
       // Имена блоков
@@ -112,7 +114,9 @@
       public string AttributePanelSbMark { get { return _attributePanelSbMark; } }
       public string AttributePanelSbPaint { get { return _attributePanelSbPaint; } }
       public string AttributeSectionName { get { return _attributeSectionName; } }
-            
+      public string AttributeFacadeAxis1 { get { return _attributeFacadeAxis1; } }
+      public string AttributeFacadeAxis2 { get { return _attributeFacadeAxis2; } }
+
       public string BlockColorAreaDynPropHeight { get { return _blockColorAreaDynPropHeight; } }
       public string BlockColorAreaDynPropLength { get { return _blockColorAreaDynPropLength; } }
       public string BlockColorAreaName { get { return _blockColorAreaName; } }
@@ -187,6 +191,8 @@
          _attributePanelSbPaint = "ПОКРАСКА";
          _attributePanelSbMark = "МАРКА";
          _attributeSectionName = "СЕКЦИЯ";
+         _attributeFacadeAxis1 = "ОСЬ1";
+         _attributeFacadeAxis2 = "ОСЬ2";
          _endLeftPanelSuffix = "_тл";
          _endRightPanelSuffix = "_тп";
          _windowPanelSuffix = "_ок";

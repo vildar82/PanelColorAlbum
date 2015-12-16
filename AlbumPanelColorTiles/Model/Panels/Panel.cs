@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -50,6 +51,8 @@ namespace AlbumPanelColorTiles.Panels
       public Point3d InsPt { get { return _insPt; } }
 
       public MarkAr MarkAr { get { return _markAr; } }
+
+      public Facade Facade{ get; set; }
 
       public Storey Storey
       {
@@ -135,6 +138,6 @@ namespace AlbumPanelColorTiles.Panels
             t.Commit();
          }
          return ids;
-      }
+      }      
    }
 }

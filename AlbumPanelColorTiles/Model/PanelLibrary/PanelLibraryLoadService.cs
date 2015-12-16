@@ -35,7 +35,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public void FillMarkPainting(Album album)
       {
          // Определение фасадов по монтажным планам
-         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
+         List<FacadeMounting> facades = FacadeMounting.GetFacadesFromMountingPlans(this);
 
          //testPtFacades(facades);
 
@@ -71,24 +71,28 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         if (floor != null)
                         {
                            // Поск монтажки по линии от центра панели АКР
-                           var mountingPanelSb = floor.PanelsSbInFront.Find(
+                           var mountingsPanelSb = floor.PanelsSbInFront.FindAll(
                               p => p.ExtTransToModel.MinPoint.X < xCenterPanelAkr && p.ExtTransToModel.MaxPoint.X > xCenterPanelAkr);
                            // Проверка имени панели
-                           if (mountingPanelSb != null)
+                           if (mountingsPanelSb != null)
                            {
-                              string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
-                              string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
-                              if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
+                              foreach (var mountingPanelSb in mountingsPanelSb)
                               {
-                                 // Заполнение атрибута покраски
-                                 var atrInfo = mountingPanelSb.AttrDet.Find
-                                    (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
-                                 if (atrInfo != null)
+                                 string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
+                                 string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
+                                 if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
-                                    using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                                    // Заполнение атрибута покраски
+                                    var atrInfo = mountingPanelSb.AttrDet.Find
+                                       (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
+                                    if (atrInfo != null)
                                     {
-                                       atrRef.TextString = markAr.MarkPaintingFull;
-                                       isFound = true;
+                                       using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                                       {
+                                          atrRef.TextString = markAr.MarkPaintingFull;
+                                          isFound = true;
+                                          break;
+                                       }
                                     }
                                  }
                               }
@@ -112,7 +116,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          Inspector.Clear();
          // Попытка определить фасады по монтажкам
-         List<Facade> facades = Facade.GetFacadesFromMountingPlans(this);
+         List<FacadeMounting> facades = FacadeMounting.GetFacadesFromMountingPlans(this);
          if (Inspector.HasErrors)
          {            
             Inspector.Show();
@@ -123,9 +127,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // загрузка АКР-панелей из библиотеки
             MountingPanel.LoadBtrPanels(facades);
             // удаление АКР-Панелей старых фасадов
-            Facade.DeleteOldAkrPanels(facades);
+            FacadeMounting.DeleteOldAkrPanels(facades);
             // расстановка АКР-Панелей по фасадам
-            Facade.CreateFacades(facades);
+            FacadeMounting.CreateFacades(facades);
          }
          else
          {            

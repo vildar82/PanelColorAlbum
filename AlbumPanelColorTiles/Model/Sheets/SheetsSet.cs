@@ -86,15 +86,15 @@ namespace AlbumPanelColorTiles.Sheets
             Log.Error(ex, errMsg);
          }
 
-         // Проверка новых панелей, которых нет в библиотеке
-         try
-         {
-            PanelLibrarySaveService.CheckNewPanels();
-         }
-         catch (Exception ex)
-         {
-            Log.Error(ex, "Не удалось проверить есть ли новые панели в чертеже фасада, которых нет в библиотеке.");
-         }
+         //// Проверка новых панелей, которых нет в библиотеке
+         //try
+         //{
+         //   PanelLibrarySaveService.CheckNewPanels();
+         //}
+         //catch (Exception ex)
+         //{
+         //   Log.Error(ex, "Не удалось проверить есть ли новые панели в чертеже фасада, которых нет в библиотеке.");
+         //}
 
          // Еспорт списка панелей в ексель.
          try

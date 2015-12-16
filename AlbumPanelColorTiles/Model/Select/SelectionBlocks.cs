@@ -35,6 +35,11 @@ namespace AlbumPanelColorTiles.Model.Select
       /// </summary>
       public List<ObjectId> SectionsBlRefs { get; private set; }
 
+      /// <summary>
+      /// Блоки Фасадов в Модели
+      /// </summary>
+      public List<ObjectId> FacadeBlRefs { get; private set; }
+
       private Database _db;
 
       public SelectionBlocks(Database db)
@@ -50,12 +55,14 @@ namespace AlbumPanelColorTiles.Model.Select
       /// <summary>
       /// Выбор вхождений блоков панелей Марки АР и Марки СБ в Модели
       /// + выбор блоков Секций.
+      /// + выбор фасадов
       /// </summary>
-      public void SelectAKRPanelsBlRefInModel()
+      public void SelectBlRefsInModel()
       {
          IdsBlRefPanelAr = new List<ObjectId>();
          IdsBlRefPanelSb = new List<ObjectId>();
          SectionsBlRefs = new List<ObjectId>();
+         FacadeBlRefs = new List<ObjectId>();
          using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(_db).Open(OpenMode.ForRead) as BlockTableRecord)
          {
             foreach (ObjectId idEnt in ms)
@@ -80,6 +87,11 @@ namespace AlbumPanelColorTiles.Model.Select
                      else if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         SectionsBlRefs.Add(idEnt);
+                     }
+                     // Блоки Фасадов
+                     else if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        FacadeBlRefs.Add(idEnt);
                      }
                   }
                }

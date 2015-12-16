@@ -15,6 +15,7 @@ namespace AlbumPanelColorTiles.Panels
    public class MarkSb : IEquatable<MarkSb>
    {
       private string _abbr;
+      public Album Album { get; private set; }
 
       private Point2d _centerPanel;
 
@@ -50,6 +51,7 @@ namespace AlbumPanelColorTiles.Panels
       // Конструктор. Скрытый.
       private MarkSb(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, Album album)
       {
+         Album = album;
          _abbr = album.StartOptions.Abbr;
          _markSb = markSbName;
          _idBtr = idBtrMarkSb;

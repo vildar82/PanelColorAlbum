@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles
 
       private SheetsSet _sheetsSet;
       private List<Storey> _storeys;
-      public List<Model.Panels.Section> Sections { get; set; }
+      public List<Model.Panels.Section> Sections { get; set; }      
       /// <summary>
       /// Общий расход плитки на альбом.
       /// Список плиток по цветам
@@ -168,7 +168,7 @@ namespace AlbumPanelColorTiles
          var rtreeColorAreas = ColorArea.GetRTree(colorAreasCheck);
 
          SelectionBlocks selBlocks = new SelectionBlocks(_db);
-         selBlocks.SelectAKRPanelsBlRefInModel();
+         selBlocks.SelectBlRefsInModel();
 
          var marksSbCheck = MarkSb.GetMarksSB(rtreeColorAreas, this, "Проверка панелей...", selBlocks.IdsBlRefPanelAr);
          //RenamePanelsToArchitectIndex(marksSbCheck);
@@ -269,7 +269,7 @@ namespace AlbumPanelColorTiles
          }
 
          SelectionBlocks selBlocks = new SelectionBlocks(_db);
-         selBlocks.SelectAKRPanelsBlRefInModel();
+         selBlocks.SelectBlRefsInModel();
          // В чертеже не должно быть панелей марки АР
          if (selBlocks.IdsBlRefPanelAr.Count > 0)
          {
@@ -277,7 +277,7 @@ namespace AlbumPanelColorTiles
                   "Ошибка. При покраске в чертеже не должно быть блоков панелей марки АР. Найдено {0} блоков марки АР.",
                   selBlocks.IdsBlRefPanelAr.Count));
          }
-         Sections = Model.Panels.Section.GetSections(selBlocks.SectionsBlRefs);
+         Sections = Model.Panels.Section.GetSections(selBlocks.SectionsBlRefs);         
 
          // Определение покраски панелей.
          _marksSB = MarkSb.GetMarksSB(rtreeColorAreas, this, "Покраска панелей...", selBlocks.IdsBlRefPanelSb);
@@ -293,7 +293,7 @@ namespace AlbumPanelColorTiles
          }
 
          // Определение принадлежности блоков панелеи секциям
-         Model.Panels.Section.DefineSections(this);
+         Model.Panels.Section.DefineSections(this);         
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
          RenamePanelsToArchitectIndex(_marksSB);
@@ -303,6 +303,9 @@ namespace AlbumPanelColorTiles
 
          // Замена вхождений блоков панелей Марки СБ на блоки панелей Марки АР.
          ReplaceBlocksMarkSbOnMarkAr();
+
+         //// Определение принадлежности блоков панелеи фасадам
+         //Facade.DefineFacades(this);
 
          // Добавление подписей к панелям
          Caption caption = new Caption(_marksSB);

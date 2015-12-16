@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Model.Select;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model.ExportFacade
@@ -13,29 +15,35 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    // Экспорт фасада
    public class ExportFacadeService
    {
-      private SelectionBlocks _selectPanels;
-      private FileExport _fileExport;
-      private List<ObjectId> _idsBtrPanelArExport;
-      private List<ObjectId> _idsBlRefPanelArExport;
+      public SelectionBlocks SelectPanels { get; private set; }
+      private FileExport _fileExport;      
+      public ConvertPanelService CPS { get; private set; }
 
       /// <summary>
       /// Экспорт фасада для АР
       /// </summary>
       public void Export()
-      {
+      {         
          // Список панелей для экспорта
-         _selectPanels = new SelectionBlocks();
-         _selectPanels.SelectAKRPanelsBlRefInModel();
-         if (_selectPanels.IdsBlRefPanelSb.Count>0)
+         SelectPanels = new SelectionBlocks();
+         SelectPanels.SelectBlRefsInModel();
+         if (SelectPanels.IdsBlRefPanelSb.Count>0)
          {
             Inspector.AddError("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
             return;
          }
-         if (_selectPanels.IdsBlRefPanelAr.Count == 0            )
+         if (SelectPanels.IdsBlRefPanelAr.Count == 0            )
          {
             Inspector.AddError("Не найдены панели Марки АР в Моделе текущего чертежа.");
             return;
          }
+
+         // определение фасадов
+         var facades = Facade.GetFacades(SelectPanels.FacadeBlRefs);
+
+         // Определение экспортируемых панелей и фасадов
+         CPS = new ConvertPanelService(this);
+         CPS.DefinePanels(facades);         
 
          // Определить файл в который экспортировать фасад
          _fileExport = new FileExport();
@@ -52,27 +60,47 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                catch (Exception ex)
                {
                   // файл занят.
-                  WarningMessageBusyFileExportFacade(ex, _fileExport.FileExportFacade.FullName);
+                  warningMessageBusyFileExportFacade(ex, _fileExport.FileExportFacade.FullName);
                   throw;
                }
                // сделать копию файла
                _fileExport.Backup();
                dbExport.CloseInput(true);
                deletePanels(dbExport);
-            }           
+            }
+            CPS.DbExport = dbExport;
 
             // Копирование панелей АР в экспортный файл
-            copyPanelToExportFile(dbExport);            
+            copyPanelToExportFile(dbExport);
 
-            // Преобразования блоков
-            ConversionExportFacade conversion = new ConversionExportFacade(dbExport, _idsBtrPanelArExport);
-            conversion.Convert();            
+            // Переопределение блока плитки из файла шаблона блоков для Экспорта фасадов.
+            redefineBlockTile(dbExport);
+
+            // Преобразования блоков            
+            CPS.Convert();            
 
             dbExport.SaveAs(_fileExport.FileExportFacade.FullName, DwgVersion.Current);
          }         
       }
+            
+      private void redefineBlockTile(Database dbExport)
+      {
+         // Переопределение блока плитки из файла шаблона блоков для Экспорта фасадов.
+         string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Settings.Default.TemplateBlocksAKRExportFacadeFileName);
+         if (File.Exists(fileBlocksTemplate))
+         {
+            try
+            {
+               AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(Settings.Default.BlockTileName, fileBlocksTemplate,
+                              dbExport, DuplicateRecordCloning.Replace);
+            }
+            catch
+            {
+            }
+         }
+      }
 
-      private void WarningMessageBusyFileExportFacade(Exception ex, string file)
+      private void warningMessageBusyFileExportFacade(Exception ex, string file)
       {
          // Предупреждение, что файл занят или сообщение об исключении
          string message = string.Empty;
@@ -96,35 +124,40 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       private void deletePanels(Database dbExport)
       {
+         // Удаление блоков панелей из существующего чертежа экпорта фасадов
          SelectionBlocks selPanels = new SelectionBlocks(dbExport);
-         selPanels.SelectAKRPanelsBlRefInModel();
+         selPanels.SelectBlRefsInModel();
          deleteBlRefs(selPanels.IdsBlRefPanelAr);
          // Панелей СБ не должно быть, но на всякий случай удалю.
          deleteBlRefs(selPanels.IdsBlRefPanelSb);
       }
 
       private void copyPanelToExportFile(Database dbExport)
-      {         
-         ObjectIdCollection ids = new ObjectIdCollection(_selectPanels.IdsBlRefPanelAr.ToArray());
+      {
+         Dictionary<ObjectId, PanelBlRefExport> dictPanelsToExport = new Dictionary<ObjectId, PanelBlRefExport>();
+         CPS.PanelsBtrExport.ForEach(pBtr =>
+         {
+            pBtr.Panels.ForEach(pBlRef => dictPanelsToExport.Add(pBlRef.IdBlRefAkr, pBlRef));
+         });
+            
+         ObjectIdCollection ids = new ObjectIdCollection(dictPanelsToExport.Keys.ToArray());
+
          IdMapping map = new IdMapping();
          var msExport = SymbolUtilityServices.GetBlockModelSpaceId(dbExport);
          dbExport.WblockCloneObjects(ids, msExport, map, DuplicateRecordCloning.Replace, false);
 
-         // скопированные блоки в экспортированном чертеже
-         _idsBlRefPanelArExport = new List<ObjectId>();
+         // скопированные блоки в экспортированном чертеже         
          var idsBtrExport = new HashSet<ObjectId>();
-         foreach (var idblRefFacade in _selectPanels.IdsBlRefPanelAr)
-         {
-            var idBlRefExport = map[idblRefFacade].Value;
-            _idsBlRefPanelArExport.Add(idBlRefExport);
-            using (var blRef = idBlRefExport.Open( OpenMode.ForRead, false, true) as BlockReference)
+         foreach (var itemDict in dictPanelsToExport)
+         {            
+            itemDict.Value.IdBlRefExport = map[itemDict.Key].Value;            
+            using (var blRef = itemDict.Value.IdBlRefExport.Open( OpenMode.ForRead, false, true) as BlockReference)
             {
                idsBtrExport.Add(blRef.BlockTableRecord);
+               itemDict.Value.PanelBtrExport.IdBtrExport = blRef.BlockTableRecord;
             }            
-         }
-         _idsBtrPanelArExport = idsBtrExport.ToList();
+         }         
       }
-
 
       private void deleteBlRefs(List<ObjectId> idsBlRef)
       {

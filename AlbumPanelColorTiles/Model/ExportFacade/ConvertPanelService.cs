@@ -5,15 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model.ExportFacade
 {
    public class ConvertPanelService
    {
-      private List<ObjectId> _idsBtrPanelArExport;
-      private List<ConvertPanelBtr> _convertedBtr;
+      public ExportFacadeService Service { get; private set; }
+      public Database DbExport { get; set; }  
+      public List<PanelBtrExport> PanelsBtrExport { get; private set; }
 
       // Слой для контура панелей
       private ObjectId _idLayerContour;
@@ -32,26 +35,26 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
-      public ConvertPanelService(List<ObjectId> idsBtrPanelArExport)
+      public ConvertPanelService(ExportFacadeService service)
       {
-         _idsBtrPanelArExport = idsBtrPanelArExport;
-      }
+         Service = service;         
+      }      
 
-      // Преобразование фасадов
+      /// <summary>
+      /// преобразование панеелей
+      /// </summary>
       public void Convert()
-      {
-         if (_idsBtrPanelArExport.Count == 0)         
-            return;
-
-         // Преобразования блоков панелей
-         _convertedBtr = new List<ConvertPanelBtr>();
-         foreach (var idBtr in _idsBtrPanelArExport)
-         {
-            ConvertPanelBtr convBtr = new ConvertPanelBtr(this, idBtr);
+      {         
+         // Преобразования определений блоков панелей         
+         foreach (var panelBtr in PanelsBtrExport)
+         {            
             try
             {
-               convBtr.Convert();
-               _convertedBtr.Add(convBtr);
+               panelBtr.Convert();
+               if (!string.IsNullOrEmpty(panelBtr.ErrMsg))
+               {
+                  Inspector.AddError(panelBtr.ErrMsg);
+               }               
             }
             catch (Exception ex)
             {
@@ -59,6 +62,66 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
             }            
          }         
-      } 
+      }
+
+      private void purge()
+      {
+         // Очистка экспортированного чертежа от блоков образмеривания которые были удалены из панелей после копирования
+         ObjectIdGraph graph = new ObjectIdGraph();
+         foreach (var panelBtr in PanelsBtrExport)
+         {
+            ObjectIdGraphNode node = new ObjectIdGraphNode(panelBtr.IdBtrExport);
+            graph.AddNode(node);
+         }
+         DbExport.Purge(graph);
+      }
+
+      public void DefinePanels(List<Facade> facades)
+      {
+         // определение экспортируемых панелей - в файле АКР
+         Dictionary<ObjectId, PanelBtrExport> dictPanelsBtrExport = new Dictionary<ObjectId, PanelBtrExport>();
+
+         RTreeLib.RTree<Facade> treeFacades = new RTreeLib.RTree<Facade>();
+         facades.ForEach(f => treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f));
+
+         foreach (var idBlRefPanel in Service.SelectPanels.IdsBlRefPanelAr)
+         {
+            using (var blRef = idBlRefPanel.Open(OpenMode.ForRead, false, true) as BlockReference)
+            {
+               // панель определения блока
+               PanelBtrExport panelBtrExport;
+               if (!dictPanelsBtrExport.TryGetValue(blRef.BlockTableRecord, out panelBtrExport))
+               {
+                  panelBtrExport = new PanelBtrExport(blRef.BlockTableRecord);
+                  dictPanelsBtrExport.Add(blRef.BlockTableRecord, panelBtrExport);
+               }
+               panelBtrExport.Def();
+
+               // панель вхождения блока
+               PanelBlRefExport panelBlRefExport = new PanelBlRefExport(blRef, panelBtrExport);
+               panelBtrExport.Panels.Add(panelBlRefExport);
+
+               // определение фасада панели
+               RTreeLib.Point pt = new RTreeLib.Point(panelBlRefExport.Position.X, panelBlRefExport.Position.Y, 0);
+               var facadesFind = treeFacades.Nearest(pt, 100);
+               if (facadesFind.Count == 1)
+               {
+                  Facade facade = facadesFind.First();
+                  panelBlRefExport.Facade = facade;
+               }
+               else if (facadesFind.Count == 0)
+               {
+                  Inspector.AddError(string.Format("Не определен фасад для панели {0}", panelBtrExport.BlName),
+                                       blRef.GeometricExtents, idBlRefPanel);
+               }
+               else if (facadesFind.Count > 1)
+               {
+                  Inspector.AddError(string.Format("Найдено больше одного фасада для панели {0}", panelBtrExport.BlName),
+                                      blRef.GeometricExtents, idBlRefPanel);
+               }
+            }
+         }
+         PanelsBtrExport = dictPanelsBtrExport.Values.ToList();
+      }
    }
 }

@@ -20,34 +20,34 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          RightTop
       }
 
-      private ConvertPanelBtr convertBtr;
-      private BlockTableRecord btr;
-      private Extents3d extentsByTile;
-      private List<Extents3d> tiles;
+      private PanelBtrExport panelBtr;        
       private RTreeLib.RTree<Extents3d> treeTiles;
-      private double  endOffset = 500;
-      
+      private double endOffset = 500;      
 
-      public ContourPanel(BlockTableRecord btr, ConvertPanelBtr convertBtr)
+      public ContourPanel(PanelBtrExport panelBtr)
       {
-         this.convertBtr = convertBtr;
-         this.btr = btr;
-         this.extentsByTile = convertBtr.ExtentsByTile;
-         this.tiles = convertBtr.Tiles;
+         this.panelBtr = panelBtr;         
       }
 
-      public void CreateContour()
+      public void CreateContour(BlockTableRecord btr)
       {
          // из всех плиток отделить торцевые плитки????
          // дерево границ плиток
          treeTiles = new RTreeLib.RTree<Extents3d>();
-         tiles.ForEach(t => treeTiles.Add(ColorArea.GetRectangleRTree(t), t));
+         panelBtr.Tiles.ForEach(t => treeTiles.Add(ColorArea.GetRectangleRTree(t), t));
 
          // Первый угол панели - левый нижний         
-         var pt1 = getCoordTileNoEnd(extentsByTile.MinPoint, EnumCorner.LeftLower);
-         var pt2 = getCoordTileNoEnd(new Point3d (extentsByTile.MinPoint.X, extentsByTile.MaxPoint.Y, 0), EnumCorner.LeftTop);
-         var pt3 = getCoordTileNoEnd(extentsByTile.MaxPoint, EnumCorner.RightTop);
-         var pt4 = getCoordTileNoEnd(new Point3d(extentsByTile.MaxPoint.X, extentsByTile.MinPoint.Y,  0), EnumCorner.RightLower);
+         var pt1 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MinPoint, EnumCorner.LeftLower);
+         var pt2 = getCoordTileNoEnd(new Point3d (panelBtr.ExtentsByTile.MinPoint.X, panelBtr.ExtentsByTile.MaxPoint.Y, 0), EnumCorner.LeftTop);
+         var pt3 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MaxPoint, EnumCorner.RightTop);
+         var pt4 = getCoordTileNoEnd(new Point3d(panelBtr.ExtentsByTile.MaxPoint.X, panelBtr.ExtentsByTile.MinPoint.Y,  0), EnumCorner.RightLower);
+
+         Extents3d extNoEnd = new Extents3d();
+         extNoEnd.AddPoint(pt1);
+         extNoEnd.AddPoint(pt2);
+         extNoEnd.AddPoint(pt3);
+         extNoEnd.AddPoint(pt4);
+         panelBtr.ExtentsNoEnd = extNoEnd;
 
          Point3dCollection pts = new Point3dCollection();
          pts.Add(pt1);
@@ -56,7 +56,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          pts.Add(pt4);
          using (Polyline3d poly = new Polyline3d(Poly3dType.SimplePoly, pts, true))            
          {
-            poly.LayerId = convertBtr.Service.IdLayerContour;
+            poly.LayerId = panelBtr.CPS.IdLayerContour;
             btr.AppendEntity(poly);
          }
       }      

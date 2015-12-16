@@ -12,7 +12,7 @@ using Autodesk.AutoCAD.Runtime;
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана фасада - составляющие один фасада дома
-   public class Facade
+   public class FacadeMounting
    {
       // Этажи фасада (блоки АКР-Панелей и соотв блок Монтажки)
       private List<Floor> _floors;
@@ -22,7 +22,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // коорднината X для данного фасада
       private double _xmin;
 
-      public Facade(double x)
+      public FacadeMounting(double x)
       {
          _xmin = x;
          _floors = new List<Floor>();
@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public double XMin { get { return _xmin; } }
 
       // Создание фасадов по монтажным планам
-      public static void CreateFacades(List<Facade> facades)
+      public static void CreateFacades(List<FacadeMounting> facades)
       {
          if (facades.Count == 0) return;
          Database db = HostApplicationServices.WorkingDatabase;
@@ -92,9 +92,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
       /// </summary>
       /// <returns></returns>
-      public static List<Facade> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ)
+      public static List<FacadeMounting> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ)
       {
-         List<Facade> facades = new List<Facade>();
+         List<FacadeMounting> facades = new List<FacadeMounting>();
 
          // Поиск всех блоков монтажных планов в Модели чертежа с соотв обозначением стороны фасада
          List<Floor> floors = Floor.GetMountingBlocks(libLoadServ);         
@@ -104,11 +104,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var comparerFloors = new DoubleEqualityComparer(100); // FacadeVerticalDeviation
          foreach (var floor in floors)
          {
-            Facade facade = facades.Find(f => comparerFloors.Equals(f.XMin, floor.XMin));
+            FacadeMounting facade = facades.Find(f => comparerFloors.Equals(f.XMin, floor.XMin));
             if (facade == null)
             {
                // Новый фасад
-               facade = new Facade(floor.XMin);
+               facade = new FacadeMounting(floor.XMin);
                facades.Add(facade);
             }
             facade._floors.Add(floor);
@@ -118,7 +118,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return facades;
       }
 
-      private static void defineFloorStoreys(List<Facade> facades)
+      private static void defineFloorStoreys(List<FacadeMounting> facades)
       {
          // определение уровней этажей Storey
          // этажи с одинаковыми номерами, должны быть на одном уровне во всех фасадах.
@@ -196,13 +196,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // определение уровня по Y для первого этажа всех фасадов - отступить 10000 вверх от самого верхнего блока панели СБ.
-      private static double getFirstFloorY(List<Facade> facades)
+      private static double getFirstFloorY(List<FacadeMounting> facades)
       {
          double maxYblRefPanelInModel = facades.SelectMany(f => f.Floors).SelectMany(f => f.AllPanelsSbInFloor).Max(p => p.PtCenterPanelSbInModel.Y);
          return maxYblRefPanelInModel + Settings.Default.FacadeIndentFromMountingPlanes;// 10000; // FacadeIndentFromMountingPlanes
       }
 
-      public static void DeleteOldAkrPanels(List<Facade> facades)
+      public static void DeleteOldAkrPanels(List<FacadeMounting> facades)
       {
          // удаление старых АКР-Панелей фасадов
          Database db = HostApplicationServices.WorkingDatabase;
@@ -220,7 +220,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                var extentsAkr = blRefPanelAkr.GeometricExtents;
                var ptCenterPanelAkr = extentsAkr.Center();
                // если панель входит в границы любого фасада, то удаляем ее
-               Facade facade = facades.Find(f => f.XMin < ptCenterPanelAkr.X && f.XMax > ptCenterPanelAkr.X);
+               FacadeMounting facade = facades.Find(f => f.XMin < ptCenterPanelAkr.X && f.XMax > ptCenterPanelAkr.X);
                if (facade != null)
                {
                   blRefPanelAkr.UpgradeOpen();
