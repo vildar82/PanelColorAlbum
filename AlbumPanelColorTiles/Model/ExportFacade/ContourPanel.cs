@@ -20,27 +20,24 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          RightTop
       }
 
+      private ConvertPanelBtr convertBtr;
       private BlockTableRecord btr;
       private Extents3d extentsByTile;
       private List<Extents3d> tiles;
       private RTreeLib.RTree<Extents3d> treeTiles;
       private double  endOffset = 500;
-      private ObjectId idLayerContour;
+      
 
-      public ContourPanel(BlockTableRecord btr, List<Extents3d> tiles, Extents3d extentsByTile)
+      public ContourPanel(BlockTableRecord btr, ConvertPanelBtr convertBtr)
       {
+         this.convertBtr = convertBtr;
          this.btr = btr;
-         this.extentsByTile = extentsByTile;
-         this.tiles = tiles;
+         this.extentsByTile = convertBtr.ExtentsByTile;
+         this.tiles = convertBtr.Tiles;
       }
 
       public void CreateContour()
       {
-         // Создание контура плитки
-         var layer = new AcadLib.Layers.LayerInfo("АР_Швы");
-         layer.LineWeight = LineWeight.LineWeight030;
-         idLayerContour = AcadLib.Layers.LayerExt.GetLayerOrCreateNew(layer);
-
          // из всех плиток отделить торцевые плитки????
          // дерево границ плиток
          treeTiles = new RTreeLib.RTree<Extents3d>();
@@ -57,45 +54,45 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          pts.Add(pt2);
          pts.Add(pt3);
          pts.Add(pt4);
-         using (Polyline3d poly = new Polyline3d(Poly3dType.SimplePoly, pts, true))
+         using (Polyline3d poly = new Polyline3d(Poly3dType.SimplePoly, pts, true))            
          {
-            poly.LayerId = idLayerContour;
+            poly.LayerId = convertBtr.Service.IdLayerContour;
             btr.AppendEntity(poly);
          }
       }      
 
-      private Point3d getCoordTileNoEnd(Point3d pt1, EnumCorner corner)
+      private Point3d getCoordTileNoEnd(Point3d pt, EnumCorner corner)
       {
          double x = 0;
-         RTreeLib.Point pt1X = new RTreeLib.Point(pt1.X + getOffsetX(corner), pt1.Y, 0);
+         RTreeLib.Point pt1X = new RTreeLib.Point(pt.X + getOffsetX(corner, endOffset), pt.Y, 0);
          var resTiles = treeTiles.Nearest(pt1X, 100);
          if (resTiles.Count == 0)
          {
             // Нет плитки - торец!
             // Найти первую не торцевую плитку
-            var extTile1X = findTile(pt1.X + getOffsetX(corner), pt1.Y, true, 100);
-            x = getCoordX(extentsByTile, corner);
+            var extTileX = findTile(pt.X + getOffsetX(corner, endOffset), pt.Y,corner, true);
+            x = getCoordX(extTileX, corner);
          }
          else
          {
             // Есть плитки - не торец
-            x = pt1.X;
+            x = pt.X;
          }
 
          double y = 0;
-         RTreeLib.Point pt1Y = new RTreeLib.Point(pt1.X, pt1.Y + getOffsetY(corner), 0);
+         RTreeLib.Point pt1Y = new RTreeLib.Point(pt.X, pt.Y + getOffsetY(corner, endOffset), 0);
          resTiles = treeTiles.Nearest(pt1Y, 100);
          if (resTiles.Count == 0)
          {
             // Нет плитки - торец!
             // Найти первую не торцевую плитку
-            var extTile1X = findTile(pt1.X , pt1.Y+ getOffsetX(corner), true, 100);
-            y = getCoordY(extentsByTile, corner);
+            var extTileY = findTile(pt.X , pt.Y+ getOffsetX(corner, endOffset), corner, false);
+            y = getCoordY(extTileY, corner);
          }
          else
          {
             // Есть плитки - не торец
-            y = pt1.Y;
+            y = pt.Y;
          }
          return new Point3d(x, y, 0);
       }
@@ -130,52 +127,52 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
-      private double getOffsetX(EnumCorner corner)
+      private double getOffsetX(EnumCorner corner, double offset)
       {
          switch (corner)
          {
             case EnumCorner.LeftLower:               
             case EnumCorner.LeftTop:
-               return this.endOffset;
+               return offset;
             case EnumCorner.RightLower:               
             case EnumCorner.RightTop:
-               return -this.endOffset;
+               return -offset;
             default:
                return 0;               
          }
       }
 
-      private double getOffsetY(EnumCorner corner)
+      private double getOffsetY(EnumCorner corner, double offset)
       {
          switch (corner)
          {
             case EnumCorner.LeftTop:
             case EnumCorner.RightTop:
-               return -this.endOffset;
+               return -offset;
             case EnumCorner.LeftLower:
             case EnumCorner.RightLower:            
-               return this.endOffset;
+               return offset;
             default:
                return 0;
          }
       }
 
-      private Extents3d findTile(double x, double y, bool isX, int delta)
+      private Extents3d findTile(double x, double y, EnumCorner corner, bool isX)
       {
          RTreeLib.Point ptNext;
          if (isX)
          {
-            x += delta;
+            x += getOffsetX(corner, 100);
          }
          else
          {
-            y += delta;
+            y += getOffsetY(corner, 100);
          }
          ptNext = new RTreeLib.Point(x, y, 0);
          var resTiles = treeTiles.Nearest(ptNext, 100);
          if (resTiles.Count == 0)
          {
-            return findTile(x, y, isX, delta);
+            return findTile(x, y, corner, isX);
          }
          else
          {

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Model.Select;
 using Autodesk.AutoCAD.DatabaseServices;
 
@@ -27,11 +28,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          _selectPanels.SelectAKRPanelsBlRefInModel();
          if (_selectPanels.IdsBlRefPanelSb.Count>0)
          {
-            throw new Exception("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
+            Inspector.AddError("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
+            return;
          }
          if (_selectPanels.IdsBlRefPanelAr.Count == 0            )
          {
-            throw new Exception("Не найдены панели Марки АР в Моделе текущего чертежа.");
+            Inspector.AddError("Не найдены панели Марки АР в Моделе текущего чертежа.");
+            return;
          }
 
          // Определить файл в который экспортировать фасад

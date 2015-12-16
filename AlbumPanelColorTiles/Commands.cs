@@ -321,7 +321,7 @@ namespace AlbumPanelColorTiles
                _album.PaintPanels();
                doc.Editor.Regen();
                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-               doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+               //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)

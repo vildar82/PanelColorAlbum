@@ -17,22 +17,25 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    public class ConvertPanelBtr
    {
       private Database _db;
+      public ConvertPanelService Service { get; private set; }
 
       public ObjectId IdBtr { get; private set; }
-      public Extents3d ExtentsByTile { get; private set; }
+      public Extents3d ExtentsByTile { get { return _extentsByTile; } }
       public double HeightByTile { get; private set; }
       public string CaptionMarkSb { get; private set; }
       public string CaptionPaint { get; private set; }
       public ObjectId CaptionLayerId { get; private set; }
       private ObjectId _idCaptionMarkSb;
       private ObjectId _idCaptionPaint;
-      private List<Extents3d> _tiles;
+      public List<Extents3d> Tiles { get; private set; }
+      private Extents3d _extentsByTile;
 
-      public ConvertPanelBtr(ObjectId idBtr)
+      public ConvertPanelBtr(ConvertPanelService service, ObjectId idBtr)
       {
+         Service = service;
          IdBtr = idBtr;
          _db = idBtr.Database;
-         _tiles = new List<Extents3d>();
+         Tiles = new List<Extents3d>();
       }
 
       public void Convert()
@@ -49,7 +52,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             convertCaption(btr);
 
             // Контур панели
-            ContourPanel contourPanel = new ContourPanel(btr, _tiles, ExtentsByTile);
+            ContourPanel contourPanel = new ContourPanel(btr, this);
             contourPanel.CreateContour();
          }
       }
@@ -67,8 +70,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                if (ent is BlockReference && string.Equals(((BlockReference)ent).GetEffectiveName(),
                           Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                {
-                  ExtentsByTile.AddExtents(ent.GeometricExtents);
-                  _tiles.Add(ent.GeometricExtents);
+                  _extentsByTile.AddExtents(ent.GeometricExtents);
+                  Tiles.Add(ent.GeometricExtents);
                   continue;
                }
 
@@ -165,6 +168,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             h.Color = Color.FromRgb(250, 250, 250);
             h.Transparency = new Transparency(80);
             h.SetHatchPattern(HatchPatternType.PreDefined, "ANGLE");
+            h.PatternScale = 25.0;
             btr.AppendEntity(h);
             //_t.AddNewlyCreatedDBObject(h, true);
             h.Associative = false;
@@ -192,8 +196,6 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                btr.AppendEntity(copyText);
             }
          }
-      }
-
-      
+      }      
    }
 }
