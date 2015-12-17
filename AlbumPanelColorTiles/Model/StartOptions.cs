@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,25 @@ using Autodesk.AutoCAD.ApplicationServices;
 
 namespace AlbumPanelColorTiles.Model
 {
+   class BooleanTypeConverter : BooleanConverter
+   {
+      public override object ConvertTo(ITypeDescriptorContext context,
+        CultureInfo culture,
+        object value,
+        Type destType)
+      {
+         return (bool)value ?
+           "Да" : "Нет";
+      }
+
+      public override object ConvertFrom(ITypeDescriptorContext context,
+        CultureInfo culture,
+        object value)
+      {
+         return (string)value == "Да";
+      }
+   }
+
    public class StartOptions
    {
       [Category()]
@@ -27,7 +47,14 @@ namespace AlbumPanelColorTiles.Model
       [DisplayName("Номер первого листа")]
       [Description("Если 0, то этот параметр не учитывается.")]
       [DefaultValue(0)]
-      public int NumberFirstSheet { get; set; }      
+      public int NumberFirstSheet { get; set; }
+
+      [Category()]
+      [DisplayName("Проверка марок покраски")]
+      [Description("При создании альбома марки покраски будут сверяться со значениями в блоках монтажных панелей. Необходимо включать эту опцию после выдачи задания по маркам покраски конструкторам.")]
+      [DefaultValue(false)]
+      [TypeConverter(typeof(BooleanTypeConverter))]
+      public bool CheckMarkPainting { get; set; }
 
       public void PromptStartOptions()
       {
@@ -57,6 +84,9 @@ namespace AlbumPanelColorTiles.Model
          {
             saveAbbreviateName(Abbr);
             saveNumberToDict(NumberFirstFloor, Album.KEYNAMENUMBERFIRSTFLOOR);
+            saveNumberToDict(NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
+            DictNOD.SaveBool(CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
+
          }
          catch (Exception ex)
          {

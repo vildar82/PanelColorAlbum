@@ -9,6 +9,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // вставка панелей из библиотеки
    public class PanelLibraryLoadService
    {
+      public Album Album { get; private set; }
+
+      public PanelLibraryLoadService()
+      {
+         
+      }
+
       // все блоки панелей-СБ в чертеже
       //private List<PanelSB> _allPanelsSB = new List<PanelSB> ();
 
@@ -34,6 +41,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// </summary>
       public void FillMarkPainting(Album album)
       {
+         Album = album;
          // Определение фасадов по монтажным планам
          List<FacadeMounting> facades = FacadeMounting.GetFacadesFromMountingPlans(this);
 
@@ -45,12 +53,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             string errMsg = "Не найдены фасады по монтажным планам для заполнения марок покраски в монтажках.";
             Log.Info(errMsg);
-            album.Doc.Editor.WriteMessage("\n{0}", errMsg);
+            Album.Doc.Editor.WriteMessage("\n{0}", errMsg);
             return;
          }
 
          // список всех блоков АКР-Панелей
-         foreach (var markSbAkr in album.MarksSB)
+         foreach (var markSbAkr in Album.MarksSB)
          {
             foreach (var markAr in markSbAkr.MarksAR)
             {
@@ -82,18 +90,36 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                  string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
-                                    // Заполнение атрибута покраски
-                                    var atrInfo = mountingPanelSb.AttrDet.Find
-                                       (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
-                                    if (atrInfo != null)
+                                    //Найдена монтажная панель
+                                    // Проверка марки покраски
+                                    if (Album.StartOptions.CheckMarkPainting)
                                     {
-                                       using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
-                                       {
-                                          atrRef.TextString = markAr.MarkPaintingFull;
-                                          isFound = true;
-                                          break;
+                                       isFound = true;                                       
+                                       if (!string.Equals(mountingPanelSb.MarkPainting, markAr.MarkPaintingFull, StringComparison.CurrentCultureIgnoreCase))
+                                       { 
+                                          // Ошибка - марки покраски не совпали.
+                                          string errMsg = string.Format("Не совпала марка покраски. Панель АКР {0}, Монтажная панель {1}{2}",
+                                                markAr.MarkARPanelFullName, mountingPanelSb.MarkSb, mountingPanelSb.MarkPainting);
+                                          Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr);
+                                          Log.Error(errMsg);                                          
                                        }
+                                       break;
                                     }
+                                    // Заполнение атрибута покраски
+                                    else
+                                    {
+                                       var atrInfo = mountingPanelSb.AttrDet.Find
+                                       (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
+                                       if (atrInfo != null)
+                                       {
+                                          using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)
+                                          {
+                                             atrRef.TextString = markAr.MarkPaintingFull;
+                                             isFound = true;
+                                             break;
+                                          }
+                                       }
+                                    }                                    
                                  }
                               }
                            }

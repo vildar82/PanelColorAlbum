@@ -14,25 +14,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
    {
       // Панели СБ - все что есть внутри блока монтажки
       private List<MountingPanel> _allPanelsSbInFloor;
-
       private Extents3d _extBlMounting;
-
       // обозначение стороны фасада на монтажном плане
       private FacadeFrontBlock _facadeFrontBlock;
-
       // Блок монтажного плана
       private ObjectId _idBlRefMounting;      
-
       // Имя/номер этажа
       private string _blRefName;      
       private Storey _storey; // этаж  
       private double _height; // высота этажа    
-
       private List<MountingPanel> _panelsSbInFront;
-
       // Точка вставки блока монтажки
       private Point3d _ptBlMounting;
-
       private double _xmax;
       private double _xmin; // мин значение х среди всех границ блоков панелей внктри этажа
                             // макс значение х среди всех границ блоков панелей внктри этажа
@@ -40,19 +33,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {
+         LibLoadServ = libLoadServ;
          _idBlRefMounting = blRefMounting.Id;
          _extBlMounting = blRefMounting.GeometricExtents;
          _ptBlMounting = blRefMounting.Position;
          _blRefName = blRefMounting.Name;
          //defFloorNameAndNumber(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _allPanelsSbInFloor = MountingPanel.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform);
+         _allPanelsSbInFloor = MountingPanel.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform, LibLoadServ);
          _xmin = getXMinFloor();
          _xmax = getXMaxFloor();
          //// добавление блоков паненлей в общий список панелей СБ
          //libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
 
+      public PanelLibraryLoadService LibLoadServ { get; private set; }
       //public Point3d PtBlMounting { get { return _ptBlMounting; } }
       public List<MountingPanel> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }      
 

@@ -3,6 +3,7 @@ using AcadLib.Errors;
 using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.DatabaseServices;
 using System.Linq;
+using System;
 
 namespace AlbumPanelColorTiles.Lib
 {
@@ -130,6 +131,45 @@ namespace AlbumPanelColorTiles.Lib
                xRec.Data = rb;
             }
          }
+      }
+
+      public static void SaveBool(bool value, string key)
+      {
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return;
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Bool, value));
+               xRec.Data = rb;
+            }
+         }
+      }
+
+      public static bool LoadBool(string key)
+      {
+         bool res =  false;
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return res;
+
+         using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
+         {
+            using (var data = xRec.Data)
+            {
+               if (data == null)
+                  return res;
+               var values = data.AsArray();
+               foreach (var typedValue in values)
+               {                  
+                  return Convert.ToBoolean(typedValue.Value);
+               }
+            }
+         }
+         return res;
       }
 
       public static string LoadString(string key)

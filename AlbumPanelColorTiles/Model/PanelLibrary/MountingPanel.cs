@@ -31,9 +31,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                                // панель входит в этаж - внутри блока монтажного плана и внутри блока обозначения стороны фасада
                                                // панель торцевая - торец справа
 
-      public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark)
+      public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
          _markSb = GetMarkWithoutElectric(mark).Replace(' ', '-');
+         MarkPainting = painting;
          _extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
          _extTransToModel = new Extents3d();
          _extTransToModel.AddPoint(_extBlRefPanel.MinPoint.TransformBy(trans));
@@ -50,14 +51,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
       //public bool IsEndRightPanel { get { return _isEndRightPanel; } set { _isEndRightPanel = value; } }
       public bool IsInFloor { get { return _isInFloor; } set { _isInFloor = value; } }
       public string MarkSb { get { return _markSb; } }
+      public string MarkPainting { get; private set; }
       public string MarkSbBlockName { get { return Panels.MarkSb.GetMarkSbBlockName(_markSb); } }      
       public PanelAkrLib PanelAkrLib { get { return _panelAkrLib; } set { _panelAkrLib = value; } }
       public Point3d PtCenterPanelSbInModel { get { return _ptCenterPanelSbInModel; } }
 
-      
-
       // Поиск всех панелей СБ в определении блока
-      public static List<MountingPanel> GetPanels(BlockReference blRefMounting, Point3d ptBase, Matrix3d trans)
+      public static List<MountingPanel> GetPanels(BlockReference blRefMounting, Point3d ptBase, Matrix3d trans, PanelLibraryLoadService libLoadServ)
       {
          List<MountingPanel> panelsSB = new List<MountingPanel>();
          using (var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord)
@@ -71,6 +71,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      // как определить что это блок панели СБ?
                      // По набору атрибутов: Покраска, МАРКА
                      string mark = string.Empty;
+                     string paint = string.Empty;
                      if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
                      {
                         List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
@@ -80,22 +81,27 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            // Покраска
                            if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                            {
-                              atrRef.UpgradeOpen();
-                              atrRef.TextString = string.Empty;
+                              atrRef.UpgradeOpen();                              
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
+                              paint = atrRef.TextString;
+                              if (libLoadServ.Album!=null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
+                              {
+                                 // Удаление старой марки покраски из блока монтажной панели
+                                 atrRef.TextString = string.Empty;
+                              }                                                            
                            }
                            // МАРКА
                            else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
                            {
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
-                              mark = atrDet.Text;
+                              mark = atrRef.TextString;
                            }
                         }
                         if (attrsDet.Count == 2)
                         {
-                           MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, trans, mark);
+                           MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, trans, mark, paint);
                            panelsSB.Add(panelSb);
                         }
                      }

@@ -27,6 +27,8 @@ namespace AlbumPanelColorTiles
       public const string REGKEYABBREVIATE = "Abbreviate";
       public const string KEYNAMENUMBERFIRSTFLOOR = "NumberFirstFloor";
       public const string KEYNAMENUMBERFIRSTSHEET = "NumberFirstSheet";
+      public const string KEYNAMECHECKMARKPAINTING = "CheckMarkPainting";
+      
       //private string _abbreviateProject;      
       private List<ColorArea> _colorAreas;
       private List<Paint> _colors; // Набор цветов используемых в альбоме.
