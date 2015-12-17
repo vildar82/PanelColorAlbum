@@ -31,6 +31,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       public void CreateContour(BlockTableRecord btr)
       {
+         if (panelBtr.ExtentsByTile.Diagonal()<100)
+         {
+            return;
+         }
+
          // из всех плиток отделить торцевые плитки????
          // дерево границ плиток
          treeTiles = new RTreeLib.RTree<Extents3d>();
@@ -58,6 +63,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             poly.LayerId = panelBtr.CPS.IdLayerContour;
             btr.AppendEntity(poly);
+            btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(poly, true);
          }
       }      
 

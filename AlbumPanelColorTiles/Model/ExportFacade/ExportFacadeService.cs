@@ -38,7 +38,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             return;
          }
 
-         // определение фасадов
+         // определение фасадов (вокруг панелей АКР)
          var facades = Facade.GetFacades(SelectPanels.FacadeBlRefs);
 
          // Определение экспортируемых панелей и фасадов
@@ -55,7 +55,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                // удалить старые панели из файла экспорта
                try
                {
-                  dbExport.ReadDwgFile(_fileExport.FileExportFacade.FullName, FileShare.Read, true, "");                  
+                  dbExport.ReadDwgFile(_fileExport.FileExportFacade.FullName, FileShare.Read, true, "");
                }
                catch (Exception ex)
                {
@@ -76,8 +76,20 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             // Переопределение блока плитки из файла шаблона блоков для Экспорта фасадов.
             redefineBlockTile(dbExport);
 
-            // Преобразования блоков            
-            CPS.Convert();            
+            using (AcadLib.WorkingDatabaseSwitcher switchDb = new AcadLib.WorkingDatabaseSwitcher(dbExport))
+            {
+               using (var t = dbExport.TransactionManager.StartTransaction())
+               {
+                  // Преобразования определений блоков
+                  CPS.ConvertBtr();
+
+                  // Преобразования торцов фасадов
+                  CPS.ConvertEnds();
+
+                  t.Commit();
+               }
+            }
+            CPS.Purge();
 
             dbExport.SaveAs(_fileExport.FileExportFacade.FullName, DwgVersion.Current);
          }         
@@ -135,10 +147,10 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       private void copyPanelToExportFile(Database dbExport)
       {
          Dictionary<ObjectId, PanelBlRefExport> dictPanelsToExport = new Dictionary<ObjectId, PanelBlRefExport>();
-         CPS.PanelsBtrExport.ForEach(pBtr =>
-         {
-            pBtr.Panels.ForEach(pBlRef => dictPanelsToExport.Add(pBlRef.IdBlRefAkr, pBlRef));
-         });
+
+         foreach (var panelBtr in CPS.PanelsBtrExport)         
+            foreach (var panelBlref in panelBtr.Panels)            
+               dictPanelsToExport.Add(panelBlref.IdBlRefAkr, panelBlref);                              
             
          ObjectIdCollection ids = new ObjectIdCollection(dictPanelsToExport.Keys.ToArray());
 

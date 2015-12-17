@@ -7,21 +7,25 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    public class EntityInfo : IEquatable<EntityInfo>//, IComparable<EntityInfo>
    {
-      private Guid _classId;
-      private System.Drawing.Color _color;
-      private Extents3d _extents;
-      private string _layer;
-      private string _linetype;
-      private LineWeight _lineweight;
+      public ObjectId Id { get; set; }
+      public Guid ClassId { get; set; }
+      public string ClassName { get; set; }
+      public System.Drawing.Color Color { get; set; }
+      public Extents3d Extents { get; set; }
+      public string Layer;
+      public string Linetype;
+      public LineWeight Lineweight;
 
       public EntityInfo(Entity ent)
       {
-         _extents = ent.GeometricExtents;
-         _classId = ent.ClassID;
-         _color = ent.Color.ColorValue;
-         _layer = ent.Layer;
-         _linetype = ent.Linetype;
-         _lineweight = ent.LineWeight;
+         ClassName = ent.GetRXClass().Name;
+         Id = ent.Id;
+         Extents = ent.GeometricExtents;
+         ClassId = ent.ClassID;
+         Color = ent.Color.ColorValue;
+         Layer = ent.Layer;
+         Linetype = ent.Linetype;
+         Lineweight = ent.LineWeight;
       }
 
       public static List<EntityInfo> GetEntInfoBtr(ObjectId idBtrTest)
@@ -51,12 +55,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          if (Object.ReferenceEquals(other, null)) return false;
          if (Object.ReferenceEquals(this, other)) return true;
-         return _extents.Equals(other._extents) &&
-            _classId.Equals(other._classId) &&
-            _color.Equals(other._color) &&
-            _layer.Equals(other._layer) &&
-            _linetype.Equals(other._linetype) &&
-            _lineweight.Equals(other._lineweight);
+         return Extents.Equals(other.Extents) &&
+            ClassId.Equals(other.ClassId) &&
+            Color.Equals(other.Color) &&
+            Layer.Equals(other.Layer) &&
+            Linetype.Equals(other.Linetype) &&
+            Lineweight.Equals(other.Lineweight);
       }
 
       //public override int GetHashCode()

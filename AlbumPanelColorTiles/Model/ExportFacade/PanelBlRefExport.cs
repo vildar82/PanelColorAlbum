@@ -11,7 +11,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.ExportFacade
-{
+{  
    /// <summary>
    /// Панель экспортированная - вхождение блока панели
    /// </summary>
@@ -20,11 +20,12 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       public Point3d Position { get; private set; }
       public Facade Facade { get; set; }
       public PanelBtrExport PanelBtrExport { get; private set; }
+      public Matrix3d Transform { get; private set; }
 
       /// <summary>
       /// Блок панели в файле АКР
       /// </summary>
-      public ObjectId IdBlRefAkr { get; set; }
+      public ObjectId IdBlRefAkr { get; private set; }
       /// <summary>
       /// Блок панели в экспортиованном файле фасада
       /// </summary>
@@ -32,8 +33,10 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       public PanelBlRefExport(BlockReference blRef, PanelBtrExport panelBtrExport)
       {
+         IdBlRefAkr = blRef.Id;
          Position = blRef.Position;
          PanelBtrExport = panelBtrExport;
+         Transform = blRef.BlockTransform;
       }
    }
 }

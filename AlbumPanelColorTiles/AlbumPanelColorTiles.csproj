@@ -80,6 +80,7 @@
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\ExportFacade\ContourPanel.cs" />
     <Compile Include="Model\ExportFacade\ConvertCaption.cs" />
+    <Compile Include="Model\ExportFacade\ConvertEndsFacade.cs" />
     <Compile Include="Model\ExportFacade\ConvertPanelService.cs" />
     <Compile Include="Model\ExportFacade\ExportFacadeService.cs" />
     <Compile Include="Model\ExportFacade\FileExport.cs" />

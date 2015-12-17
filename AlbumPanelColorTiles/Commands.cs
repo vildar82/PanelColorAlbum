@@ -179,7 +179,7 @@ namespace AlbumPanelColorTiles
       /// </summary>
       [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void CreateMountingPlanBlocksCommand()
-      {
+      {         
          Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;

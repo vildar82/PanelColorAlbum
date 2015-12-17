@@ -40,7 +40,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             return resVal;
          }
-         using (var text = idDbText.Open(OpenMode.ForWrite, false, true) as DBText)
+         using (var text = idDbText.GetObject(OpenMode.ForWrite, false, true) as DBText)
          {
             text.TextStyleId = idDbText.Database.GetTextStylePIK();
             // Аннотативность???
@@ -54,6 +54,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       private void сreateHatch(Extents3d ext, BlockTableRecord btr)
       {
+         if (ext.Diagonal()<100)
+         {
+            return;
+         }
+
          using (var h = new Hatch())
          {
             h.SetDatabaseDefaults(btr.Database);
@@ -66,7 +71,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             h.SetHatchPattern(HatchPatternType.PreDefined, "ANGLE");
             h.PatternScale = 25.0;
             btr.AppendEntity(h);
-            //_t.AddNewlyCreatedDBObject(h, true);
+            btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(h, true);            
             h.Associative = false;
             h.HatchStyle = HatchStyle.Normal;
             Point2dCollection pts = new Point2dCollection();
@@ -84,7 +89,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       private ObjectId copyText(ObjectId idBdText, BlockTableRecord btr)
       {
-         using (var text = idBdText.Open(OpenMode.ForWrite, false, true) as DBText)
+         using (var text = idBdText.GetObject(OpenMode.ForWrite, false, true) as DBText)
          {
             using (var copyText = text.Clone() as DBText)
             {
