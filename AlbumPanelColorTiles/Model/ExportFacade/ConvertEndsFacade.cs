@@ -77,10 +77,10 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       {         
          string nameEnd;
          // если все панели имеют один фасад, то имя торца по имени осей фасада
-         var facades = itemLefEndsByY.Select(p=>p.Facade);
+         var facades = itemLefEndsByY.GroupBy(p=>p.Facade);
          if (facades.Count()==1 && facades.First()!=null)
-         {
-            nameEnd = facades.First().Name;
+         {            
+            nameEnd = facades.First().Key.Name;
          }
          else
          {

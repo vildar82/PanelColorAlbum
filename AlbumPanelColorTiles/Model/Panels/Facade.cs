@@ -72,10 +72,12 @@ namespace AlbumPanelColorTiles.Model.Panels
                   if (string.Equals(atrRef.Tag, Settings.Default.AttributeFacadeAxis1))
                   {
                      AttrAxis1 = new AttributeRefDetail(atrRef);
+                     Axis1 = atrRef.TextString.Trim();
                   }
                   else if (string.Equals(atrRef.Tag, Settings.Default.AttributeFacadeAxis2))
                   {
                      AttrAxis2 = new AttributeRefDetail(atrRef);
+                     Axis2 = atrRef.TextString.Trim();
                   }
                }
             }
