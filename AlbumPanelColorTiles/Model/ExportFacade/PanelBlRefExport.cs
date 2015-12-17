@@ -17,6 +17,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    /// </summary>
    public class PanelBlRefExport
    {
+      public Extents3d Extents { get; private set; }
       public Point3d Position { get; private set; }
       public Facade Facade { get; set; }
       public PanelBtrExport PanelBtrExport { get; private set; }
@@ -37,6 +38,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          Position = blRef.Position;
          PanelBtrExport = panelBtrExport;
          Transform = blRef.BlockTransform;
+         Extents = blRef.GeometricExtents;
       }
    }
 }

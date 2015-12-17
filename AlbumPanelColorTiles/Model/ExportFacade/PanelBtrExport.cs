@@ -187,9 +187,9 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          List<ObjectId> resVal = new List<ObjectId>();
          // выбор объектов блока на нужной координате (+- толщина торца = ширине одной плитки - 300)
          foreach (var entInfo in EntInfos)
-         {
-            if (Math.Abs(isX ? entInfo.Extents.MinPoint.X : entInfo.Extents.MinPoint.Y - coord) < 330 &&
-                Math.Abs(isX ? entInfo.Extents.MaxPoint.X : entInfo.Extents.MaxPoint.Y - coord) < 330)
+         {            
+            if (Math.Abs((isX ? entInfo.Extents.MinPoint.X : entInfo.Extents.MinPoint.Y) - coord) < 330 &&
+                Math.Abs((isX ? entInfo.Extents.MaxPoint.X : entInfo.Extents.MaxPoint.Y )- coord) < 330)
             {
                resVal.Add(entInfo.Id);
             }
@@ -210,6 +210,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
       private void iterateEntInBlock(BlockTableRecord btr)
       {
+         Dictionary<Extents3d, Extents3d> tilesDict = new Dictionary<Extents3d, Extents3d>();
          foreach (ObjectId idEnt in btr)
          {
             using (var ent = idEnt.GetObject(OpenMode.ForRead) as Entity)
@@ -224,7 +225,19 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                           Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                {
                   _extentsByTile.AddExtents(ent.GeometricExtents);
-                  Tiles.Add(ent.GeometricExtents);
+                  try
+                  {
+                     tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);
+                  }
+                  catch (ArgumentException argEx)
+                  {
+                     // Ошибка - плитка с такими границами уже есть
+                     ErrMsg += "Наложение плиток. ";
+                  }
+                  catch (Exception ex)
+                  {
+                     Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
+                  }                  
                   continue;
                }
 
@@ -248,6 +261,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                }               
             }
          }
+
+         Tiles = tilesDict.Values.ToList();
          // Проверка
          if (string.IsNullOrEmpty(CaptionMarkSb))
          {

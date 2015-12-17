@@ -54,7 +54,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                panelBtr.ConvertBtr();
                if (!string.IsNullOrEmpty(panelBtr.ErrMsg))
                {
-                  Inspector.AddError(panelBtr.ErrMsg);
+                  Inspector.AddError(panelBtr.ErrMsg, panelBtr.Panels.First().Extents, panelBtr.Panels.First().IdBlRefAkr);
                }               
             }
             catch (Exception ex)
@@ -112,6 +112,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       public void ConvertEnds()
       {
          // Преобразование торцов фасада
+         List<ConvertEndsFacade> convertsEnds = new List<ConvertEndsFacade>();
          DoubleEqualityComparer comparer = new DoubleEqualityComparer(500);
          // Все вхождения блоков панелей с торцами слева         
          var panelsWithLeftEndsByX = PanelsBtrExport.SelectMany(pBtr => pBtr.Panels).
@@ -121,6 +122,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             ConvertEndsFacade convertEndsFacade = new ConvertEndsFacade(itemLefEndsByY, true, this);
             convertEndsFacade.Convert();
+            convertsEnds.Add(convertEndsFacade);
          }
 
          // Все вхождения блоков панелей с торцами справа         
@@ -131,7 +133,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             ConvertEndsFacade convertEndsFacade = new ConvertEndsFacade(itemRightEndsByY, false, this);
             convertEndsFacade.Convert();
+            convertsEnds.Add(convertEndsFacade);
          }
+
+         // удаление торцов
+         convertsEnds.ForEach(c => c.DeleteEnds());
       }
 
       private Facade defFacadeForPanel(RTreeLib.RTree<Facade> treeFacades,BlockReference blRef, 

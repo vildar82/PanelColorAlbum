@@ -22,6 +22,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       public Point3d Position { get; private set; }
       public ConvertPanelService CPS;
       public ObjectId IdBtrEnd { get; set; }
+      public bool IsExistsBlockEnd { get; private set; }
 
       public ConvertEndsFacade(IGrouping<double, PanelBlRefExport> itemLefEndsByY, bool isLeftSide, ConvertPanelService cps)
       {
@@ -41,10 +42,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          Position = defPosition();
 
          // копирование объектов торца в блок торца
-         createBlock();
-
-         // удаление торцов из панелей
-         deleteEndInPanels();
+         createBlock();         
       }
 
       private void deleteEndInPanels()
@@ -107,27 +105,36 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             Dictionary<ObjectId, PanelBlRefExport> dictIdsEndEnts = new Dictionary<ObjectId, PanelBlRefExport>();
             if (isLeftSide)
             {
-               panelBlRef.PanelBtrExport.IdsEndsLeftEntity.ForEach(e => dictIdsEndEnts.Add(e,panelBlRef));
+               panelBlRef.PanelBtrExport.IdsEndsLeftEntity.ForEach(e => dictIdsEndEnts.Add(e, panelBlRef));
             }
             else
             {
-               panelBlRef.PanelBtrExport.IdsEndsRightEntity.ForEach(e => dictIdsEndEnts.Add(e,panelBlRef));
+               panelBlRef.PanelBtrExport.IdsEndsRightEntity.ForEach(e => dictIdsEndEnts.Add(e, panelBlRef));
             }
             ObjectIdCollection ids = new ObjectIdCollection(dictIdsEndEnts.Keys.ToArray());
             IdMapping mapping = new IdMapping();
             CPS.DbExport.DeepCloneObjects(ids, IdBtrEnd, mapping, false);
 
             //перемещение объектов в блоке
-            var moveMatrix = Matrix3d.Displacement(new Vector3d(0, panelBlRef.Position.Y- Position.Y, 0));
-            using (var btr = IdBtrEnd.GetObject(OpenMode.ForRead) as BlockTableRecord)
+            var moveMatrix = Matrix3d.Displacement(new Vector3d(0, panelBlRef.Position.Y - Position.Y, 0));
+            foreach (IdPair itemMap in mapping)
             {
-               foreach (IdPair itemMap in mapping)
+               using (var ent = itemMap.Value.GetObject(OpenMode.ForWrite, false, true) as Entity)
                {
-                  using (var ent = itemMap.Value.GetObject(OpenMode.ForWrite, false, true) as Entity)
-                  {
-                     ent.TransformBy(moveMatrix);
-                  }
+                  ent.TransformBy(moveMatrix);
                }
+            }
+         }
+
+         // перемещение вех объектов торца в 0
+         var btr = IdBtrEnd.GetObject(OpenMode.ForRead) as BlockTableRecord;
+         Extents3d extFull = new Extents3d();
+         extFull.AddBlockExtents(btr);
+         foreach (ObjectId idEnt in btr)
+         {
+            using (var ent = idEnt.GetObject(OpenMode.ForWrite, false, true) as Entity)
+            {
+               ent.TransformBy(Matrix3d.Displacement(new Vector3d(-extFull.MinPoint.X, 0, 0)));
             }
          }
 
@@ -148,15 +155,23 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          //}
 
          // вставка блока
-         using (var blRef = new BlockReference(Position, IdBtrEnd))
+         if (!IsExistsBlockEnd)
          {
-            blRef.SetDatabaseDefaults(CPS.DbExport);
-            using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(CPS.DbExport).GetObject(OpenMode.ForWrite) as BlockTableRecord)
+            using (var blRef = new BlockReference(Position, IdBtrEnd))
             {
-               ms.AppendEntity(blRef);
-               ms.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(blRef, true);
+               blRef.SetDatabaseDefaults(CPS.DbExport);
+               using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(CPS.DbExport).GetObject(OpenMode.ForWrite) as BlockTableRecord)
+               {
+                  ms.AppendEntity(blRef);
+                  ms.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(blRef, true);
+               }
             }
          }
+      }
+
+      public void DeleteEnds()
+      {
+         deleteEndInPanels();
       }
 
       private ObjectId getIdBtrEnd(BlockTable bt)
@@ -167,6 +182,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             // отредактировать существующий блок торца - удалтить все старые объекты
             idBtrEnd = bt[BlNameEnd];
             eraseEntInBlock(idBtrEnd);
+            IsExistsBlockEnd = true;
          }
          else
          {
