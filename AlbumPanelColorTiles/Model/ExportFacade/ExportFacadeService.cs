@@ -36,18 +36,19 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             Inspector.AddError("Не найдены панели Марки АР в Моделе текущего чертежа.");
             return;
-         }
+         }             
+
+         // Определить файл в который экспортировать фасад
+         _fileExport = new FileExport();
+         _fileExport.DefineFile();
 
          // определение фасадов (вокруг панелей АКР)
          var facades = Facade.GetFacades(SelectPanels.FacadeBlRefs);
 
          // Определение экспортируемых панелей и фасадов
          CPS = new ConvertPanelService(this);
-         CPS.DefinePanels(facades);         
+         CPS.DefinePanels(facades);
 
-         // Определить файл в который экспортировать фасад
-         _fileExport = new FileExport();
-         _fileExport.DefineFile();
          using (Database dbExport = new Database(!_fileExport.IsExistsFileExport, true))
          {
             if (_fileExport.IsExistsFileExport)

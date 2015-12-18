@@ -10,6 +10,7 @@ using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.Model.ExportFacade
 {
@@ -45,10 +46,14 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       /// преобразование панеелей
       /// </summary>
       public void ConvertBtr()
-      {         
+      {
+         ProgressMeter progress = new ProgressMeter();
+         progress.SetLimit(PanelsBtrExport.Count);
+         progress.Start("Преобразование блоков панелей в экспортированном файле");
          // Преобразования определений блоков панелей         
          foreach (var panelBtr in PanelsBtrExport)
-         {            
+         {
+            progress.MeterProgress();
             try
             {
                panelBtr.ConvertBtr();
@@ -57,12 +62,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                   Inspector.AddError(panelBtr.ErrMsg, panelBtr.Panels.First().Extents, panelBtr.Panels.First().IdBlRefAkr);
                }               
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                Inspector.AddError("Ошибка конвертации блока панели - {0}", ex.Message);
                Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
             }            
-         }         
+         }
+         progress.Stop();
       }
 
       public void Purge()
@@ -83,10 +89,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          Dictionary<ObjectId, PanelBtrExport> dictPanelsBtrExport = new Dictionary<ObjectId, PanelBtrExport>();
 
          RTreeLib.RTree<Facade> treeFacades = new RTreeLib.RTree<Facade>();
-         facades.ForEach(f => treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f));         
+         facades.ForEach(f => treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f));
+
+         ProgressMeter progress = new ProgressMeter();
+         progress.SetLimit(Service.SelectPanels.IdsBlRefPanelAr.Count);
+         progress.Start("Определение панелей в файле АКР");
 
          foreach (var idBlRefPanel in Service.SelectPanels.IdsBlRefPanelAr)
          {
+            progress.MeterProgress();
             using (var blRef = idBlRefPanel.Open(OpenMode.ForRead, false, true) as BlockReference)
             {
                // панель определения блока
@@ -107,6 +118,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             }
          }
          PanelsBtrExport = dictPanelsBtrExport.Values.ToList();
+         progress.Stop();
       }
 
       public void ConvertEnds()
