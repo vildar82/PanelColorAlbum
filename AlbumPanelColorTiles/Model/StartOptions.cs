@@ -62,6 +62,7 @@ namespace AlbumPanelColorTiles.Model
          if (Abbr == null)
          {
             Abbr = loadAbbreviateName();// "Н47Г";
+            CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);
          }
          // дефолтное значение номера первого этажа
          if (NumberFirstFloor == 0)
