@@ -211,6 +211,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       private void iterateEntInBlock(BlockTableRecord btr)
       {
          Dictionary<Extents3d, Extents3d> tilesDict = new Dictionary<Extents3d, Extents3d>();
+         bool isFirstTile = true;
          foreach (ObjectId idEnt in btr)
          {
             using (var ent = idEnt.GetObject(OpenMode.ForRead) as Entity)
@@ -224,7 +225,16 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                if (ent is BlockReference && string.Equals(((BlockReference)ent).GetEffectiveName(),
                           Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                {
-                  _extentsByTile.AddExtents(ent.GeometricExtents);
+                  if (isFirstTile)
+                  {
+                     isFirstTile = false;
+                     _extentsByTile = ent.GeometricExtents;
+                  }
+                  else
+                  {
+                     _extentsByTile.AddExtents(ent.GeometricExtents);
+                  }                  
+                  
                   try
                   {
                      tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);
@@ -259,7 +269,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                   }
                   continue;
                }               
-            }
+            }            
          }
 
          Tiles = tilesDict.Values.ToList();

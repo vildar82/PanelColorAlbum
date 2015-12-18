@@ -26,8 +26,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             Extents3d extMarkSb = convertText(panelBtr.IdCaptionMarkSb, 90, 230, 20);
             Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, 230 + 250, 20);
-            Extents3d extTexts = new Extents3d();
-            extTexts.AddExtents(extMarkSb);
+            Extents3d extTexts = extMarkSb;            
             extTexts.AddExtents(extPaint);
             сreateHatch(extTexts, btr);
          }
