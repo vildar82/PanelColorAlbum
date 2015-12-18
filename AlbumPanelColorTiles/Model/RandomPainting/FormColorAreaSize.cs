@@ -15,9 +15,9 @@ namespace AlbumPanelColorTiles.RandomPainting
          checkBoxChess.Checked = chess;
       }
 
+      public bool ChessPattern { get { return checkBoxChess.Checked; } }
       public int HeightSpot { get { return int.Parse(textBoxHeight.Text); } }
       public int LenghtSpot { get { return int.Parse(textBoxLenght.Text); } }
-      public bool ChessPattern { get { return checkBoxChess.Checked; } }
 
       private void buttonOk_Click(object sender, EventArgs e)
       {

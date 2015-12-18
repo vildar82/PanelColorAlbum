@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Model.Select;
@@ -15,28 +13,28 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    // Экспорт фасада
    public class ExportFacadeService
    {
-      public SelectionBlocks SelectPanels { get; private set; }
-      private FileExport _fileExport;      
+      private FileExport _fileExport;
       public ConvertPanelService CPS { get; private set; }
+      public SelectionBlocks SelectPanels { get; private set; }
 
       /// <summary>
       /// Экспорт фасада для АР
       /// </summary>
       public void Export()
-      {         
+      {
          // Список панелей для экспорта
          SelectPanels = new SelectionBlocks();
          SelectPanels.SelectBlRefsInModel();
-         if (SelectPanels.IdsBlRefPanelSb.Count>0)
+         if (SelectPanels.IdsBlRefPanelSb.Count > 0)
          {
             Inspector.AddError("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
             return;
          }
-         if (SelectPanels.IdsBlRefPanelAr.Count == 0            )
+         if (SelectPanels.IdsBlRefPanelAr.Count == 0)
          {
             Inspector.AddError("Не найдены панели Марки АР в Моделе текущего чертежа.");
             return;
-         }             
+         }
 
          // Определить файл в который экспортировать фасад
          _fileExport = new FileExport();
@@ -93,9 +91,57 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             CPS.Purge();
 
             dbExport.SaveAs(_fileExport.FileExportFacade.FullName, DwgVersion.Current);
-         }         
+         }
       }
-            
+
+      private void copyPanelToExportFile(Database dbExport)
+      {
+         Dictionary<ObjectId, PanelBlRefExport> dictPanelsToExport = new Dictionary<ObjectId, PanelBlRefExport>();
+
+         foreach (var panelBtr in CPS.PanelsBtrExport)
+            foreach (var panelBlref in panelBtr.Panels)
+               dictPanelsToExport.Add(panelBlref.IdBlRefAkr, panelBlref);
+
+         ObjectIdCollection ids = new ObjectIdCollection(dictPanelsToExport.Keys.ToArray());
+
+         IdMapping map = new IdMapping();
+         var msExport = SymbolUtilityServices.GetBlockModelSpaceId(dbExport);
+         dbExport.WblockCloneObjects(ids, msExport, map, DuplicateRecordCloning.Replace, false);
+
+         // скопированные блоки в экспортированном чертеже
+         var idsBtrExport = new HashSet<ObjectId>();
+         foreach (var itemDict in dictPanelsToExport)
+         {
+            itemDict.Value.IdBlRefExport = map[itemDict.Key].Value;
+            using (var blRef = itemDict.Value.IdBlRefExport.Open(OpenMode.ForRead, false, true) as BlockReference)
+            {
+               idsBtrExport.Add(blRef.BlockTableRecord);
+               itemDict.Value.PanelBtrExport.IdBtrExport = blRef.BlockTableRecord;
+            }
+         }
+      }
+
+      private void deleteBlRefs(List<ObjectId> idsBlRef)
+      {
+         foreach (ObjectId idBlRefPanel in idsBlRef)
+         {
+            using (var blRefPanel = idBlRefPanel.Open(OpenMode.ForWrite, false, true) as BlockReference)
+            {
+               blRefPanel.Erase();
+            }
+         }
+      }
+
+      private void deletePanels(Database dbExport)
+      {
+         // Удаление блоков панелей из существующего чертежа экпорта фасадов
+         SelectionBlocks selPanels = new SelectionBlocks(dbExport);
+         selPanels.SelectBlRefsInModel();
+         deleteBlRefs(selPanels.IdsBlRefPanelAr);
+         // Панелей СБ не должно быть, но на всякий случай удалю.
+         deleteBlRefs(selPanels.IdsBlRefPanelSb);
+      }
+
       private void redefineBlockTile(Database dbExport)
       {
          // Переопределение блока плитки из файла шаблона блоков для Экспорта фасадов.
@@ -132,55 +178,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                                     "{0}\n" +
                                     "Ошибка: {1}", file, ex.Message);
          }
-         System.Windows.MessageBox.Show(message, "Экспорт фасада",  System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-      }
-
-      private void deletePanels(Database dbExport)
-      {
-         // Удаление блоков панелей из существующего чертежа экпорта фасадов
-         SelectionBlocks selPanels = new SelectionBlocks(dbExport);
-         selPanels.SelectBlRefsInModel();
-         deleteBlRefs(selPanels.IdsBlRefPanelAr);
-         // Панелей СБ не должно быть, но на всякий случай удалю.
-         deleteBlRefs(selPanels.IdsBlRefPanelSb);
-      }
-
-      private void copyPanelToExportFile(Database dbExport)
-      {
-         Dictionary<ObjectId, PanelBlRefExport> dictPanelsToExport = new Dictionary<ObjectId, PanelBlRefExport>();
-
-         foreach (var panelBtr in CPS.PanelsBtrExport)         
-            foreach (var panelBlref in panelBtr.Panels)            
-               dictPanelsToExport.Add(panelBlref.IdBlRefAkr, panelBlref);                              
-            
-         ObjectIdCollection ids = new ObjectIdCollection(dictPanelsToExport.Keys.ToArray());
-
-         IdMapping map = new IdMapping();
-         var msExport = SymbolUtilityServices.GetBlockModelSpaceId(dbExport);
-         dbExport.WblockCloneObjects(ids, msExport, map, DuplicateRecordCloning.Replace, false);
-
-         // скопированные блоки в экспортированном чертеже         
-         var idsBtrExport = new HashSet<ObjectId>();
-         foreach (var itemDict in dictPanelsToExport)
-         {            
-            itemDict.Value.IdBlRefExport = map[itemDict.Key].Value;            
-            using (var blRef = itemDict.Value.IdBlRefExport.Open( OpenMode.ForRead, false, true) as BlockReference)
-            {
-               idsBtrExport.Add(blRef.BlockTableRecord);
-               itemDict.Value.PanelBtrExport.IdBtrExport = blRef.BlockTableRecord;
-            }            
-         }         
-      }
-
-      private void deleteBlRefs(List<ObjectId> idsBlRef)
-      {
-         foreach (ObjectId idBlRefPanel in idsBlRef)
-         {
-            using (var blRefPanel = idBlRefPanel.Open(OpenMode.ForWrite, false, true) as BlockReference)
-            {
-               blRefPanel.Erase();
-            }
-         }
+         System.Windows.MessageBox.Show(message, "Экспорт фасада", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
       }
    }
 }

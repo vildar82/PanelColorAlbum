@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -12,34 +9,6 @@ namespace AlbumPanelColorTiles.Model.Select
    // Выбор панелей в чертеже
    public class SelectionBlocks
    {
-      /// <summary>
-      /// Вхождения блоков панелей Марки АР в Модели
-      /// </summary>
-      public List<ObjectId> IdsBlRefPanelAr { get; private set; }
-      /// <summary>
-      /// Вхождения блоков панелей Марки СБ в Модели
-      /// </summary>
-      public List<ObjectId> IdsBlRefPanelSb { get; private set; }
-
-      /// <summary>
-      /// Определения блоков панелей Марки СБ
-      /// </summary>
-      public List<ObjectId> IdsBtrPanelSb { get; private set; }
-      /// <summary>
-      /// Определения блоков панелей Марки АР
-      /// </summary>
-      public List<ObjectId> IdsBtrPanelAr { get; private set; }
-
-      /// <summary>
-      /// Блоки Секций в Модели
-      /// </summary>
-      public List<ObjectId> SectionsBlRefs { get; private set; }
-
-      /// <summary>
-      /// Блоки Фасадов в Модели
-      /// </summary>
-      public List<ObjectId> FacadeBlRefs { get; private set; }
-
       private Database _db;
 
       public SelectionBlocks(Database db)
@@ -50,6 +19,68 @@ namespace AlbumPanelColorTiles.Model.Select
       public SelectionBlocks()
       {
          _db = HostApplicationServices.WorkingDatabase;
+      }
+
+      /// <summary>
+      /// Блоки Фасадов в Модели
+      /// </summary>
+      public List<ObjectId> FacadeBlRefs { get; private set; }
+
+      /// <summary>
+      /// Вхождения блоков панелей Марки АР в Модели
+      /// </summary>
+      public List<ObjectId> IdsBlRefPanelAr { get; private set; }
+
+      /// <summary>
+      /// Вхождения блоков панелей Марки СБ в Модели
+      /// </summary>
+      public List<ObjectId> IdsBlRefPanelSb { get; private set; }
+
+      /// <summary>
+      /// Определения блоков панелей Марки АР
+      /// </summary>
+      public List<ObjectId> IdsBtrPanelAr { get; private set; }
+
+      /// <summary>
+      /// Определения блоков панелей Марки СБ
+      /// </summary>
+      public List<ObjectId> IdsBtrPanelSb { get; private set; }
+
+      /// <summary>
+      /// Блоки Секций в Модели
+      /// </summary>
+      public List<ObjectId> SectionsBlRefs { get; private set; }
+
+      /// <summary>
+      /// Выбор определений блоков панелей Марки АР и Марки СБ
+      /// </summary>
+      public void SelectAKRPanelsBtr()
+      {
+         IdsBtrPanelAr = new List<ObjectId>();
+         IdsBtrPanelSb = new List<ObjectId>();
+         using (var bt = _db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
+         {
+            foreach (ObjectId idEnt in bt)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
+                  {
+                     if (MarkSb.IsBlockNamePanel(btr.Name))
+                     {
+                        if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
+                        {
+                           IdsBtrPanelAr.Add(idEnt);
+                        }
+                        else
+                        {
+                           IdsBtrPanelSb.Add(idEnt);
+                        }
+                     }
+                  }
+               }
+            }
+         }
       }
 
       /// <summary>
@@ -82,48 +113,18 @@ namespace AlbumPanelColorTiles.Model.Select
                         {
                            IdsBlRefPanelSb.Add(idEnt);
                         }
+                        continue;
                      }
                      // Блоки Секций
-                     else if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
+                     var blNameEff = blRef.GetEffectiveName();
+                     if (string.Equals(blNameEff, Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         SectionsBlRefs.Add(idEnt);
                      }
                      // Блоки Фасадов
-                     else if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
+                     else if (string.Equals(blNameEff, Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
                      {
                         FacadeBlRefs.Add(idEnt);
-                     }
-                  }
-               }
-            }
-         }               
-      }
-
-      /// <summary>
-      /// Выбор определений блоков панелей Марки АР и Марки СБ
-      /// </summary>
-      public void SelectAKRPanelsBtr()
-      {
-         IdsBtrPanelAr = new List<ObjectId>();
-         IdsBtrPanelSb = new List<ObjectId>();
-         using (var bt = _db.BlockTableId.Open( OpenMode.ForRead) as BlockTable)
-         {
-            foreach (ObjectId idEnt in bt)
-            {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-               {
-                  using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
-                  {
-                     if (MarkSb.IsBlockNamePanel(btr.Name))
-                     {
-                        if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
-                        {
-                           IdsBtrPanelAr.Add(idEnt);
-                        }
-                        else
-                        {
-                           IdsBtrPanelSb.Add(idEnt);
-                        }
                      }
                   }
                }

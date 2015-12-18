@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -21,25 +17,24 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
    public class PanelAkrFacade : PanelAKR
    {
-      private ObjectId _idBlRefWhenCreateFacade;
-      private ObjectId _idBlRefForShow;
-      // блок панели АКР в файле фасада
-      private MountingPanel _panelSb;      
       protected EnumReportStatus _reportStatus;
+      private ObjectId _idBlRefForShow;
+      private ObjectId _idBlRefWhenCreateFacade;
+
+      // блок панели АКР в файле фасада
+      private MountingPanel _panelSb;
 
       public PanelAkrFacade(ObjectId idBtr, string blName) : base(idBtr, blName)
       {
-
-      }      
+      }
 
       /// <summary>
       /// Вхождение блока в файле фасада
       /// </summary>
       public ObjectId IdBlRefWhenCreateFacade { get { return _idBlRefWhenCreateFacade; } set { _idBlRefWhenCreateFacade = value; } }
+
       public MountingPanel PanelSb { get { return _panelSb; } set { _panelSb = value; } }
       public EnumReportStatus ReportStatus { get { return _reportStatus; } set { _reportStatus = value; } }
-
-      
 
       ///// <summary>
       ///// Простая расстановка АКР-панелей в точуи вставки панелей СБ
@@ -77,46 +72,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
       //   }
       //}
 
-      
-
-      public void ShowPanelInFacade(Document doc)
-      {
-         if (_idBlRefForShow.IsNull || _idBlRefForShow.IsErased)
-         {
-            // поиск панели на чертеже
-            if (!getFirstBlRefInFacade(out _idBlRefForShow))
-            {
-               // вставка блока
-               _idBlRefForShow = AcadLib.Blocks.BlockInsert.Insert(_blName);
-               if (_idBlRefForShow.IsNull)
-               {
-                  return;
-               }
-            }
-         }
-         Extents3d extents;
-         using (var blRef = _idBlRefForShow.Open(OpenMode.ForRead, false, true) as BlockReference)
-         {
-            extents = blRef.GeometricExtents;
-         }
-         doc.Editor.Zoom(extents);         
-      }
-
-      private bool getFirstBlRefInFacade(out ObjectId _idBlRefForShow)
-      {
-         using (var btrPanel = IdBtrAkrPanel.Open(OpenMode.ForRead) as BlockTableRecord)
-         {
-            var idsBlRef = btrPanel.GetBlockReferenceIds(true, false);
-            if (idsBlRef.Count > 0)
-            {
-               _idBlRefForShow = idsBlRef[0];
-               return true;
-            }
-         }
-         _idBlRefForShow = ObjectId.Null;
-         return false;
-      }
-
       public static List<PanelAkrFacade> GetChangedAndNewPanels(List<PanelAkrFacade> panelsAkrInFacade, List<PanelAkrLib> panelsAkrInLib)
       {
          List<PanelAkrFacade> panelsChangedAndNew = new List<PanelAkrFacade>();
@@ -126,7 +81,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (panelAkrInLib == null)
             {
                // panelAkrInFacade - новая панель, которой нет в библмиотеке
-               panelAkrInFacade.ReportStatus = EnumReportStatus.New; // "Новая";               
+               panelAkrInFacade.ReportStatus = EnumReportStatus.New; // "Новая";
                panelsChangedAndNew.Add(panelAkrInFacade);
             }
             else
@@ -148,14 +103,55 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             case EnumReportStatus.New:
                return "Новая";
+
             case EnumReportStatus.Changed:
                return "Изменившаяся";
+
             case EnumReportStatus.Force:
                return "Принудительно";
+
             default:
                break;
          }
          return "";
+      }
+
+      public void ShowPanelInFacade(Document doc)
+      {
+         if (_idBlRefForShow.IsNull || _idBlRefForShow.IsErased)
+         {
+            // поиск панели на чертеже
+            if (!getFirstBlRefInFacade(out _idBlRefForShow))
+            {
+               // вставка блока
+               _idBlRefForShow = AcadLib.Blocks.BlockInsert.Insert(_blName);
+               if (_idBlRefForShow.IsNull)
+               {
+                  return;
+               }
+            }
+         }
+         Extents3d extents;
+         using (var blRef = _idBlRefForShow.Open(OpenMode.ForRead, false, true) as BlockReference)
+         {
+            extents = blRef.GeometricExtents;
+         }
+         doc.Editor.Zoom(extents);
+      }
+
+      private bool getFirstBlRefInFacade(out ObjectId _idBlRefForShow)
+      {
+         using (var btrPanel = IdBtrAkrPanel.Open(OpenMode.ForRead) as BlockTableRecord)
+         {
+            var idsBlRef = btrPanel.GetBlockReferenceIds(true, false);
+            if (idsBlRef.Count > 0)
+            {
+               _idBlRefForShow = idsBlRef[0];
+               return true;
+            }
+         }
+         _idBlRefForShow = ObjectId.Null;
+         return false;
       }
    }
 }

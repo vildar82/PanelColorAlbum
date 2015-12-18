@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AlbumPanelColorTiles.Options;
+﻿using System.Collections.Generic;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 
@@ -11,39 +6,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    public class PanelAkrLib : PanelAKR
    {
-      private  bool _isElectricCopy;
       protected ObjectId _idBtrPanelAkrInFacade;
+      private bool _isElectricCopy;
 
       public PanelAkrLib(ObjectId idBtr, string blName) : base(idBtr, blName)
       {
-
       }
 
-      public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
       public ObjectId IdBtrPanelAkrInFacade
       {
          get { return _idBtrPanelAkrInFacade; }
          set { _idBtrPanelAkrInFacade = value; }
       }
 
-      public PanelAkrLib CopyLibBlockElectricInTempFile(MountingPanel panelSb)
-      {
-         PanelAkrLib panelAkrLib = null;
-         try
-         {
-            string markAkr = panelSb.MarkSbBlockName;            
-            SymbolUtilityServices.ValidateSymbolName(markAkr, false);
-            // копирование блока с новым именем с электрикой
-            ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanel, markAkr);
-            panelAkrLib = new PanelAkrLib(idBtrAkeElectricInTempLib, markAkr);
-            panelAkrLib.IsElectricCopy = true;
-         }
-         catch
-         {
-            // неудалось создать копию блока
-         }
-         return panelAkrLib;
-      }
+      public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
 
       public static List<PanelAkrLib> GetAkrPanelLib(Database dbLib)
       {
@@ -63,6 +39,25 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          return panelsAkrLIb;
-      }      
+      }
+
+      public PanelAkrLib CopyLibBlockElectricInTempFile(MountingPanel panelSb)
+      {
+         PanelAkrLib panelAkrLib = null;
+         try
+         {
+            string markAkr = panelSb.MarkSbBlockName;
+            SymbolUtilityServices.ValidateSymbolName(markAkr, false);
+            // копирование блока с новым именем с электрикой
+            ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanel, markAkr);
+            panelAkrLib = new PanelAkrLib(idBtrAkeElectricInTempLib, markAkr);
+            panelAkrLib.IsElectricCopy = true;
+         }
+         catch
+         {
+            // неудалось создать копию блока
+         }
+         return panelAkrLib;
+      }
    }
 }

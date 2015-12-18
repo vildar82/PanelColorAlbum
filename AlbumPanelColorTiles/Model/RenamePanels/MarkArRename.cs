@@ -61,7 +61,7 @@ namespace AlbumPanelColorTiles.RenamePanels
 
       public string GetMarkArPreview(string markPainting)
       {
-         if (string.IsNullOrEmpty(_abbr) )
+         if (string.IsNullOrEmpty(_abbr))
          {
             return string.Format("{0}({1})", _markSB, markPainting);
          }

@@ -1,12 +1,7 @@
 ﻿using System;
 using System.IO;
-using AcadLib.Jigs;
 using AlbumPanelColorTiles.Options;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace AlbumPanelColorTiles.Lib
 {

@@ -7,7 +7,7 @@ namespace AlbumPanelColorTiles.Panels
    public class Paint : IEquatable<Paint>
    {
       // цвет плтитки
-      private Color _color;      
+      private Color _color;
 
       // Имя слоя. (для каждой краски свой слой с именем марки краски)
       private string _layerName;
@@ -18,7 +18,7 @@ namespace AlbumPanelColorTiles.Panels
          _color = color;
       }
 
-      public Color Color { get { return _color; } }      
+      public Color Color { get { return _color; } }
       public string LayerName { get { return _layerName; } }
 
       public bool Equals(Paint other)

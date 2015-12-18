@@ -18,18 +18,6 @@ namespace AlbumPanelColorTiles.Checks
          Clear();
       }
 
-      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
-      //private static List<Error> _notPaintedTilesInMarkAR;
-      public void Clear()
-      {
-         _doc = Application.DocumentManager.MdiActiveDocument;
-         _db = _doc.Database;
-         _ed = _doc.Editor;
-         //_errors = new List<Error>();
-         //_notPaintedTilesInMarkAR = new List<ErrorObject>();
-         //_markArBtrNames = new List<string>();
-      }
-
       // Проверка чертежа
       public void CheckForPaint()
       {
@@ -44,6 +32,18 @@ namespace AlbumPanelColorTiles.Checks
             //_errors.Add(new Error(msg));
             Inspector.AddError(msg);
          }
+      }
+
+      // Блоки марки АР с непокрашенной плиткой.(если есть хоть одна непокрашенная плитка).
+      //private static List<Error> _notPaintedTilesInMarkAR;
+      public void Clear()
+      {
+         _doc = Application.DocumentManager.MdiActiveDocument;
+         _db = _doc.Database;
+         _ed = _doc.Editor;
+         //_errors = new List<Error>();
+         //_notPaintedTilesInMarkAR = new List<ErrorObject>();
+         //_markArBtrNames = new List<string>();
       }
 
       // Проверка, все ли плитки покрашены

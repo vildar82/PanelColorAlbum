@@ -1,41 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 
 namespace AlbumPanelColorTiles.Model
 {
-   class BooleanTypeConverter : BooleanConverter
-   {
-      public override object ConvertTo(ITypeDescriptorContext context,
-        CultureInfo culture,
-        object value,
-        Type destType)
-      {
-         return (bool)value ?
-           "Да" : "Нет";
-      }
-
-      public override object ConvertFrom(ITypeDescriptorContext context,
-        CultureInfo culture,
-        object value)
-      {
-         return (string)value == "Да";
-      }
-   }
-
    public class StartOptions
    {
       [Category()]
       [DisplayName("Индекс проекта")]
       [Description("Добавляется к марке покраски.")]
       [DefaultValue("Н47Г")]
-      public string Abbr { get; set;     }
+      public string Abbr { get; set; }
+
+      [Category()]
+      [DisplayName("Проверка марок покраски")]
+      [Description("При создании альбома марки покраски будут сверяться со значениями в блоках монтажных панелей. Необходимо включать эту опцию после выдачи задания по маркам покраски конструкторам.")]
+      [DefaultValue(false)]
+      [TypeConverter(typeof(BooleanTypeConverter))]
+      public bool CheckMarkPainting { get; set; }
 
       [Category()]
       [DisplayName("Номер первого этажа")]
@@ -48,13 +32,6 @@ namespace AlbumPanelColorTiles.Model
       [Description("Если 0, то этот параметр не учитывается.")]
       [DefaultValue(0)]
       public int NumberFirstSheet { get; set; }
-
-      [Category()]
-      [DisplayName("Проверка марок покраски")]
-      [Description("При создании альбома марки покраски будут сверяться со значениями в блоках монтажных панелей. Необходимо включать эту опцию после выдачи задания по маркам покраски конструкторам.")]
-      [DefaultValue(false)]
-      [TypeConverter(typeof(BooleanTypeConverter))]
-      public bool CheckMarkPainting { get; set; }
 
       public void PromptStartOptions()
       {
@@ -76,7 +53,7 @@ namespace AlbumPanelColorTiles.Model
          }
 
          // Запрос начальных значений
-         FormStartOptions formStartOptions = new FormStartOptions(this);         
+         FormStartOptions formStartOptions = new FormStartOptions(this);
          if (Application.ShowModalDialog(formStartOptions) != System.Windows.Forms.DialogResult.OK)
          {
             throw new System.Exception("Отменено пользователем.");
@@ -87,13 +64,12 @@ namespace AlbumPanelColorTiles.Model
             saveNumberToDict(NumberFirstFloor, Album.KEYNAMENUMBERFIRSTFLOOR);
             saveNumberToDict(NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
             DictNOD.SaveBool(CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
-
          }
          catch (Exception ex)
          {
             Log.Error(ex, "Не удалось сохранить стартовые параметры.");
-         }         
-      }      
+         }
+      }
 
       private string loadAbbreviateName()
       {
@@ -149,6 +125,25 @@ namespace AlbumPanelColorTiles.Model
             DictNOD.SaveNumber(number, keyName);
          }
          catch { }
-      }           
+      }
+   }
+
+   internal class BooleanTypeConverter : BooleanConverter
+   {
+      public override object ConvertFrom(ITypeDescriptorContext context,
+        CultureInfo culture,
+        object value)
+      {
+         return (string)value == "Да";
+      }
+
+      public override object ConvertTo(ITypeDescriptorContext context,
+              CultureInfo culture,
+        object value,
+        Type destType)
+      {
+         return (bool)value ?
+           "Да" : "Нет";
+      }
    }
 }

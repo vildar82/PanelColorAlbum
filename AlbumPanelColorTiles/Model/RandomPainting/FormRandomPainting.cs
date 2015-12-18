@@ -163,7 +163,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       private void buttonDraw_Click(object sender, EventArgs e)
       {
          this.Hide();
-         Fire(_trackPropers, e);         
+         Fire(_trackPropers, e);
          this.Show();
          MessageBox.Show("Готово");
       }

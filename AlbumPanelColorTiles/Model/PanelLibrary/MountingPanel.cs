@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
-using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -17,7 +16,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private List<AttributeRefDetail> _attrsDet;
       private Extents3d _extBlRefPanel;
       private Extents3d _extTransToModel;
-      private ObjectId _idBlRef;      
+      private ObjectId _idBlRef;
       //// панель торцевая - торец слева
       //private bool _isEndRightPanel;
       //private bool _isEndLeftPanel;
@@ -25,7 +24,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // границы панели трансформированные в координаты модели
       private bool _isInFloor;
 
-      private string _markSb;            
+      private string _markSb;
       private PanelAkrLib _panelAkrLib;
       private Point3d _ptCenterPanelSbInModel; // точка вставки в Модели
                                                // панель входит в этаж - внутри блока монтажного плана и внутри блока обозначения стороны фасада
@@ -41,20 +40,33 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _extTransToModel.AddPoint(_extBlRefPanel.MaxPoint.TransformBy(trans));
          _idBlRef = blRefPanelSB.Id;
          _attrsDet = attrsDet;
-         _ptCenterPanelSbInModel = getCenterPanelInModel();         
+         _ptCenterPanelSbInModel = getCenterPanelInModel();
       }
 
       public List<AttributeRefDetail> AttrDet { get { return _attrsDet; } }
       public Extents3d ExtTransToModel { get { return _extTransToModel; } }
       public ObjectId IdBlRef { get { return _idBlRef; } }
+
       //public bool IsEndLeftPanel { get { return _isEndLeftPanel; } set { _isEndLeftPanel = value; } }
       //public bool IsEndRightPanel { get { return _isEndRightPanel; } set { _isEndRightPanel = value; } }
       public bool IsInFloor { get { return _isInFloor; } set { _isInFloor = value; } }
-      public string MarkSb { get { return _markSb; } }
+
       public string MarkPainting { get; private set; }
-      public string MarkSbBlockName { get { return Panels.MarkSb.GetMarkSbBlockName(_markSb); } }      
+      public string MarkSb { get { return _markSb; } }
+      public string MarkSbBlockName { get { return Panels.MarkSb.GetMarkSbBlockName(_markSb); } }
       public PanelAkrLib PanelAkrLib { get { return _panelAkrLib; } set { _panelAkrLib = value; } }
       public Point3d PtCenterPanelSbInModel { get { return _ptCenterPanelSbInModel; } }
+
+      public static string GetMarkWithoutElectric(string markSB)
+      {
+         string res = markSB;
+         var matchs = Regex.Matches(markSB, @"-\d{0,2}[э,Э]$");
+         if (matchs.Count == 1)
+         {
+            res = markSB.Substring(0, matchs[0].Index);
+         }
+         return res;
+      }
 
       // Поиск всех панелей СБ в определении блока
       public static List<MountingPanel> GetPanels(BlockReference blRefMounting, Point3d ptBase, Matrix3d trans, PanelLibraryLoadService libLoadServ)
@@ -81,15 +93,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            // Покраска
                            if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                            {
-                              atrRef.UpgradeOpen();                              
+                              atrRef.UpgradeOpen();
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
                               paint = atrRef.TextString;
-                              if (libLoadServ.Album!=null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
+                              if (libLoadServ.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
                               {
                                  // Удаление старой марки покраски из блока монтажной панели
                                  atrRef.TextString = string.Empty;
-                              }                                                            
+                              }
                            }
                            // МАРКА
                            else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
@@ -127,7 +139,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          if (!File.Exists(PanelLibrarySaveService.LibPanelsFilePath))
          {
             throw new Exception("Не найден файл библиотеки АКР-Панелей - " + PanelLibrarySaveService.LibPanelsFilePath);
-         }        
+         }
 
          Database dbFacade = HostApplicationServices.WorkingDatabase;
          using (Database dbLib = new Database(false, true))
@@ -140,7 +152,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                List<PanelAkrLib> panelsAkrInLib = PanelAkrLib.GetAkrPanelLib(dbLib);
                // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
                Dictionary<ObjectId, PanelAkrLib> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAkrLib>();
-               List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Floors.SelectMany(s => s.PanelsSbInFront)).ToList();               
+               List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Floors.SelectMany(s => s.PanelsSbInFront)).ToList();
                foreach (var panelSb in allPanelsSb)
                {
                   PanelAkrLib panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
@@ -148,7 +160,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      // Не найден блок в библиотеке
                      Inspector.AddError(string.Format("Не найдена панель в библиотеке соответствующая монтажке - {0}", panelSb.MarkSb),
-                                       panelSb.ExtTransToModel, panelSb.IdBlRef);                     
+                                       panelSb.ExtTransToModel, panelSb.IdBlRef);
                   }
                   else
                   {
@@ -159,7 +171,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      }
                      panelSb.PanelAkrLib = panelAkrLib;
                   }
-               }               
+               }
                // Копирование блоков в базу чертежа фасада
                if (idsPanelsAkrInLibAndFacade.Count > 0)
                {
@@ -223,17 +235,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
          //   }
          //}
          return panelAkrLib;
-      }
-
-      public static string GetMarkWithoutElectric(string markSB)
-      {
-         string res = markSB;
-         var matchs = Regex.Matches(markSB, @"-\d{0,2}[э,Э]$");
-         if (matchs.Count == 1)
-         {
-            res = markSB.Substring(0, matchs[0].Index);
-         }
-         return res;
       }
 
       // Определение точки центра блока панели СБ в Модели

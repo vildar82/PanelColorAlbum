@@ -12,7 +12,7 @@ namespace AlbumPanelColorTiles.RandomPainting
       private Extents3d _extentsColorArea;
       private int _height;
       private int _heightSize;
-      private int _heightSpot;      
+      private int _heightSpot;
 
       // кол участков покраски в высоте
       private int _lenght;
@@ -48,13 +48,13 @@ namespace AlbumPanelColorTiles.RandomPainting
          }
       }
 
-      public bool PatternChess { get; set; }
       public int Height { get { return _height; } }
       public int HeightSize { get { return _heightSize; } }
       public int HeightSpot { get { return _heightSpot; } }
       public int Lenght { get { return _lenght; } }
       public int LenghtSize { get { return _lenghtSize; } }
       public int LenghtSpot { get { return _lenghtSpot; } }
+      public bool PatternChess { get; set; }
       public double ProportionWidthToHeight { get { return _proportionWidthToHeight; } }
 
       public void ChangeSize()

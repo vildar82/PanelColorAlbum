@@ -1,7 +1,6 @@
-﻿using Microsoft.Office.Interop.Excel;
+﻿using System.IO;
 using System.Linq;
-using System;
-using System.IO;
+using Microsoft.Office.Interop.Excel;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -17,10 +16,10 @@ namespace AlbumPanelColorTiles.Sheets
             return;
 
          // Открываем книгу
-         Workbook workBook = excelApp.Workbooks.Add();    
+         Workbook workBook = excelApp.Workbooks.Add();
 
          // Секции
-         if (album.Sections.Count>0)
+         if (album.Sections.Count > 0)
          {
             Worksheet sheetSections = workBook.ActiveSheet as Worksheet;
             sheetSections.Name = "Секции";
@@ -44,53 +43,9 @@ namespace AlbumPanelColorTiles.Sheets
 
          // Показать ексель.
          // Лучше сохранить файл и закрыть!!!???
-         string excelFile = Path.Combine(album.AlbumDir, "АКР_" + Path.GetFileNameWithoutExtension(album.DwgFacade) + ".xlsx");         
+         string excelFile = Path.Combine(album.AlbumDir, "АКР_" + Path.GetFileNameWithoutExtension(album.DwgFacade) + ".xlsx");
          excelApp.Visible = true;
          workBook.SaveAs(excelFile);
-      }
-
-      private static void listTiles(Worksheet sheetTiles, Album album)
-      {
-         // Название
-         int row = addTitle(sheetTiles, album);
-         row++;
-         sheetTiles.Cells[row, 1].Value = "Расход плитки на альбом " + album.StartOptions.Abbr;
-         row++;
-         // Заголовки         
-         sheetTiles.Cells[row, 1].Value = "Поз.";
-         sheetTiles.Cells[row, 2].Value = "Цвет";
-         sheetTiles.Cells[row, 3].Value = "Образец";
-         sheetTiles.Cells[row, 4].Value = "Расход, шт.";
-         sheetTiles.Cells[row, 5].Value = "Расход, м.кв.";
-         row++;
-         int i = 1;
-         int totalCountTile = 0;
-         double totalArea = 0;
-
-         foreach (var tileCalcSameColor in album.TotalTilesCalc)
-         {
-            sheetTiles.Cells[row, 1].Value = i++.ToString(); //"Поз.";
-            sheetTiles.Cells[row, 2].Value = tileCalcSameColor.ColorMark;  //"Цвет";
-            sheetTiles.Cells[row, 3].Interior.Color = System.Drawing.ColorTranslator.ToOle(tileCalcSameColor.Pattern.ColorValue);// "Образец";                        
-            sheetTiles.Cells[row, 4].Value = tileCalcSameColor.Count.ToString();// "Расход, шт.";                        
-            sheetTiles.Cells[row, 5].Value = tileCalcSameColor.TotalArea.ToString();  // "Расход, м.кв.";
-
-            totalCountTile += tileCalcSameColor.Count;
-            totalArea += tileCalcSameColor.TotalArea;
-
-            row++;
-         }
-         sheetTiles.Range[sheetTiles.Cells[row, 1], sheetTiles.Cells[row, 3]].Merge();                  
-         sheetTiles.Cells[row, 1].Value = "Итого:";
-         sheetTiles.Cells[row, 4].Value = totalCountTile.ToString();
-         sheetTiles.Cells[row, 5].Value = totalArea.ToString();
-
-         sheetTiles.Columns.AutoFit();
-         var col1 = sheetTiles.Columns[1];
-         col1.ColumnWidth = 5;
-         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;         
-         sheetTiles.Columns[4].HorizontalAlignment = XlHAlign.xlHAlignCenter;
-         sheetTiles.Columns[5].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
       private static int addTitle(Worksheet sheet, Album album)
@@ -98,6 +53,42 @@ namespace AlbumPanelColorTiles.Sheets
          int row = 1;
          sheet.Cells[row, 1].Value = string.Format("{0}; {1}", album.Date, album.DwgFacade);
          return row;
+      }
+
+      private static void listFloors(Worksheet sheetFloors, Album album)
+      {
+         int row = addTitle(sheetFloors, album);
+         row++;
+         sheetFloors.Cells[row, 1].Value = "Список панелей на этажах";
+         row++;
+         int totalCountPanels = 0;
+         sheetFloors.Cells[row, 1].Value = "Этаж";
+         sheetFloors.Cells[row, 2].Value = "Панели";
+         sheetFloors.Cells[row, 3].Value = "Кол";
+         row++;
+         // TODO: Список панелей по этажам.
+         var panelsGroupByStoreys = album.MarksSB.SelectMany(sb =>
+                  sb.MarksAR).SelectMany(ar => ar.Panels).OrderBy(s => s.Storey).GroupBy(p => p.Storey);
+         foreach (var panelGroupStorey in panelsGroupByStoreys)
+         {
+            totalCountPanels += panelGroupStorey.Count();
+            var panelsArOnStorey = panelGroupStorey.OrderBy(p => p.MarkAr.MarkARPanelFullName).GroupBy(p => p.MarkAr);
+            foreach (var panelOnStorey in panelsArOnStorey)
+            {
+               sheetFloors.Cells[row, 1].Value = panelGroupStorey.Key.ToString(); //"Этаж";
+               sheetFloors.Cells[row, 2].Value = panelOnStorey.Key.MarkARPanelFullName; //"Панели";
+               sheetFloors.Cells[row, 3].Value = panelOnStorey.Count();// Кол
+               row++;
+            }
+         }
+         sheetFloors.Cells[row, 2].Value = "Итого";
+         sheetFloors.Cells[row, 3].Value = totalCountPanels;
+
+         sheetFloors.Columns.AutoFit();
+         var col1 = sheetFloors.Columns[1];
+         col1.ColumnWidth = 5;
+         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
+         sheetFloors.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
       private static void listPanels(SheetsSet sheetsSet, Album album, Worksheet sheetPanels)
@@ -137,42 +128,6 @@ namespace AlbumPanelColorTiles.Sheets
          sheetPanels.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
-      private static void listFloors(Worksheet sheetFloors, Album album)
-      {
-         int row = addTitle(sheetFloors, album);
-         row++;
-         sheetFloors.Cells[row, 1].Value = "Список панелей на этажах";
-         row++;
-         int totalCountPanels = 0;
-         sheetFloors.Cells[row, 1].Value = "Этаж";
-         sheetFloors.Cells[row, 2].Value = "Панели";
-         sheetFloors.Cells[row, 3].Value = "Кол";
-         row++;
-         // TODO: Список панелей по этажам.
-         var panelsGroupByStoreys = album.MarksSB.SelectMany(sb => 
-                  sb.MarksAR).SelectMany(ar=>ar.Panels).OrderBy(s=>s.Storey).GroupBy(p=>p.Storey);
-         foreach (var panelGroupStorey in panelsGroupByStoreys)
-         {
-            totalCountPanels += panelGroupStorey.Count();
-            var panelsArOnStorey = panelGroupStorey.OrderBy(p=>p.MarkAr.MarkARPanelFullName).GroupBy(p => p.MarkAr);
-            foreach (var panelOnStorey in panelsArOnStorey)
-            {
-               sheetFloors.Cells[row, 1].Value = panelGroupStorey.Key.ToString(); //"Этаж";               
-               sheetFloors.Cells[row, 2].Value = panelOnStorey.Key.MarkARPanelFullName; //"Панели";
-               sheetFloors.Cells[row, 3].Value = panelOnStorey.Count();// Кол
-               row++;
-            }            
-         }
-         sheetFloors.Cells[row, 2].Value ="Итого";
-         sheetFloors.Cells[row, 3].Value = totalCountPanels;
-
-         sheetFloors.Columns.AutoFit();
-         var col1 = sheetFloors.Columns[1];
-         col1.ColumnWidth = 5;
-         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
-         sheetFloors.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
-      }
-
       private static void listSections(Worksheet sheetSections, Album album)
       {
          // Список панелей по Секциям
@@ -185,10 +140,10 @@ namespace AlbumPanelColorTiles.Sheets
          sheetSections.Cells[row, 2].Value = "Панель";
          sheetSections.Cells[row, 3].Value = "Кол";
          row++;
-         
+
          foreach (var section in album.Sections)
          {
-            int pp = 1;            
+            int pp = 1;
             sheetSections.Cells[row, 2].Value = "Секция " + section.Name;
             sheetSections.Cells[row, 2].HorizontalAlignment = XlHAlign.xlHAlignCenter;
             row++;
@@ -207,6 +162,50 @@ namespace AlbumPanelColorTiles.Sheets
          col1.ColumnWidth = 5;
          col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
          sheetSections.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+      }
+
+      private static void listTiles(Worksheet sheetTiles, Album album)
+      {
+         // Название
+         int row = addTitle(sheetTiles, album);
+         row++;
+         sheetTiles.Cells[row, 1].Value = "Расход плитки на альбом " + album.StartOptions.Abbr;
+         row++;
+         // Заголовки
+         sheetTiles.Cells[row, 1].Value = "Поз.";
+         sheetTiles.Cells[row, 2].Value = "Цвет";
+         sheetTiles.Cells[row, 3].Value = "Образец";
+         sheetTiles.Cells[row, 4].Value = "Расход, шт.";
+         sheetTiles.Cells[row, 5].Value = "Расход, м.кв.";
+         row++;
+         int i = 1;
+         int totalCountTile = 0;
+         double totalArea = 0;
+
+         foreach (var tileCalcSameColor in album.TotalTilesCalc)
+         {
+            sheetTiles.Cells[row, 1].Value = i++.ToString(); //"Поз.";
+            sheetTiles.Cells[row, 2].Value = tileCalcSameColor.ColorMark;  //"Цвет";
+            sheetTiles.Cells[row, 3].Interior.Color = System.Drawing.ColorTranslator.ToOle(tileCalcSameColor.Pattern.ColorValue);// "Образец";
+            sheetTiles.Cells[row, 4].Value = tileCalcSameColor.Count.ToString();// "Расход, шт.";
+            sheetTiles.Cells[row, 5].Value = tileCalcSameColor.TotalArea.ToString();  // "Расход, м.кв.";
+
+            totalCountTile += tileCalcSameColor.Count;
+            totalArea += tileCalcSameColor.TotalArea;
+
+            row++;
+         }
+         sheetTiles.Range[sheetTiles.Cells[row, 1], sheetTiles.Cells[row, 3]].Merge();
+         sheetTiles.Cells[row, 1].Value = "Итого:";
+         sheetTiles.Cells[row, 4].Value = totalCountTile.ToString();
+         sheetTiles.Cells[row, 5].Value = totalArea.ToString();
+
+         sheetTiles.Columns.AutoFit();
+         var col1 = sheetTiles.Columns[1];
+         col1.ColumnWidth = 5;
+         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
+         sheetTiles.Columns[4].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+         sheetTiles.Columns[5].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
    }
 }

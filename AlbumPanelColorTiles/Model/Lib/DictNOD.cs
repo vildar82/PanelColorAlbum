@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.DatabaseServices;
-using System.Linq;
-using System;
 
 namespace AlbumPanelColorTiles.Lib
 {
@@ -11,8 +11,24 @@ namespace AlbumPanelColorTiles.Lib
    {
       private const string _dicName = "AlbumPanelColorTiles";
       private const string _recNameAbbr = "Abbr";
+
       //private const string _recNameNumberFirstFloor = "NumberFirstFloor";
       private const string _recNameRenameMarkAR = "MarkArRename";
+
+      public static void CopyDict(Database dbDest)
+      {
+         // Копирование словаря АКР в базу
+         var idDict = getDict();
+         if (idDict.IsNull)
+         {
+            Inspector.AddError("Словарь АКР в текущем чертеже не найден.");
+            return;
+         }
+         var ids = new ObjectIdCollection();
+         ids.Add(idDict);
+         var map = new IdMapping();
+         dbDest.WblockCloneObjects(ids, dbDest.NamedObjectsDictionaryId, map, DuplicateRecordCloning.Replace, false);
+      }
 
       public static string LoadAbbr()
       {
@@ -30,6 +46,29 @@ namespace AlbumPanelColorTiles.Lib
                foreach (var typedValue in data)
                {
                   return typedValue.Value.ToString();
+               }
+            }
+         }
+         return res;
+      }
+
+      public static bool LoadBool(string key)
+      {
+         bool res = false;
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return res;
+
+         using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
+         {
+            using (var data = xRec.Data)
+            {
+               if (data == null)
+                  return res;
+               var values = data.AsArray();
+               foreach (var typedValue in values)
+               {
+                  return Convert.ToBoolean(typedValue.Value);
                }
             }
          }
@@ -101,77 +140,6 @@ namespace AlbumPanelColorTiles.Lib
          }
       }
 
-      public static void SaveAbbr(string abbr)
-      {
-         ObjectId idRec = getRec(_recNameAbbr);
-         if (idRec.IsNull)
-            return;
-
-         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
-         {
-            using (ResultBuffer rb = new ResultBuffer())
-            {
-               rb.Add(new TypedValue((int)DxfCode.Text, abbr));
-               xRec.Data = rb;
-            }
-         }
-      }
-
-      public static void SaveString(string text, string key)
-      {
-         ObjectId idRec = getRec(key);
-         if (idRec.IsNull)
-            return;
-
-         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
-         {
-            using (ResultBuffer rb = new ResultBuffer())
-            {
-               rb.Add(new TypedValue((int)DxfCode.Text, text));
-               xRec.Data = rb;
-            }
-         }
-      }
-
-      public static void SaveBool(bool value, string key)
-      {
-         ObjectId idRec = getRec(key);
-         if (idRec.IsNull)
-            return;
-
-         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
-         {
-            using (ResultBuffer rb = new ResultBuffer())
-            {
-               rb.Add(new TypedValue((int)DxfCode.Bool, value));
-               xRec.Data = rb;
-            }
-         }
-      }
-
-      public static bool LoadBool(string key)
-      {
-         bool res =  false;
-         ObjectId idRec = getRec(key);
-         if (idRec.IsNull)
-            return res;
-
-         using (var xRec = idRec.Open(OpenMode.ForRead) as Xrecord)
-         {
-            using (var data = xRec.Data)
-            {
-               if (data == null)
-                  return res;
-               var values = data.AsArray();
-               foreach (var typedValue in values)
-               {                  
-                  return Convert.ToBoolean(typedValue.Value);
-               }
-            }
-         }
-         return res;
-      }
-
       public static string LoadString(string key)
       {
          string res = string.Empty;
@@ -193,6 +161,38 @@ namespace AlbumPanelColorTiles.Lib
             }
          }
          return res;
+      }
+
+      public static void SaveAbbr(string abbr)
+      {
+         ObjectId idRec = getRec(_recNameAbbr);
+         if (idRec.IsNull)
+            return;
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Text, abbr));
+               xRec.Data = rb;
+            }
+         }
+      }
+
+      public static void SaveBool(bool value, string key)
+      {
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return;
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Bool, value));
+               xRec.Data = rb;
+            }
+         }
       }
 
       public static void SaveNumber(int number, string keyName)
@@ -229,6 +229,22 @@ namespace AlbumPanelColorTiles.Lib
                      rb.Add(new TypedValue((int)DxfCode.Text, value));
                   }
                }
+               xRec.Data = rb;
+            }
+         }
+      }
+
+      public static void SaveString(string text, string key)
+      {
+         ObjectId idRec = getRec(key);
+         if (idRec.IsNull)
+            return;
+
+         using (var xRec = idRec.Open(OpenMode.ForWrite) as Xrecord)
+         {
+            using (ResultBuffer rb = new ResultBuffer())
+            {
+               rb.Add(new TypedValue((int)DxfCode.Text, text));
                xRec.Data = rb;
             }
          }
@@ -281,21 +297,6 @@ namespace AlbumPanelColorTiles.Lib
       private static string getValueRenameMark(MarkArRename renameMark)
       {
          return string.Format("{0};{1}", renameMark.MarkAR.MarkARPanelFullNameCalculated, renameMark.MarkPainting);
-      }
-
-      public static void CopyDict(Database dbDest)
-      {
-         // Копирование словаря АКР в базу
-         var idDict = getDict();
-         if (idDict.IsNull)
-         {
-            Inspector.AddError("Словарь АКР в текущем чертеже не найден.");
-            return;
-         }
-         var ids = new ObjectIdCollection();
-         ids.Add(idDict);
-         var map = new IdMapping();
-         dbDest.WblockCloneObjects(ids, dbDest.NamedObjectsDictionaryId, map, DuplicateRecordCloning.Replace, false);
       }
    }
 }

@@ -18,7 +18,7 @@ namespace AlbumPanelColorTiles.Panels
       public ColorArea(BlockReference blRef, Album album, Matrix3d trans)
       {
          _idblRef = blRef.ObjectId;
-         // Определение габаритов         
+         // Определение габаритов
          _bounds = blRef.GeometricExtents;
          _bounds.TransformBy(trans);
          _paint = album.GetPaint(blRef.Layer);
@@ -47,57 +47,6 @@ namespace AlbumPanelColorTiles.Panels
          // Сортировка зон покраски по размеру
          colorAreas.Sort();
          return colorAreas;
-      }
-
-      private static void IterateColorAreasInBtr(ObjectId idBtr, Album album,
-            List<ColorArea> colorAreas, Matrix3d matrix, string xrefName)
-      {
-         var btr = idBtr.GetObject( OpenMode.ForRead) as BlockTableRecord;
-         foreach (ObjectId idEnt in btr)
-         {
-            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-            {
-               var blRefColorArea = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
-
-               var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
-               if (string.Equals(blName, Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
-               {
-                  ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
-                  colorAreas.Add(colorArea);
-               }
-               else
-               {
-                  // Если это не блок Панели, то ищем вложенные в блоки зоны покраски
-                  if (!MarkSb.IsBlockNamePanel(blName))
-                  {
-                     var btrInner = blRefColorArea.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
-                     // Обработка вложенных зон покраски в блок
-                     if (btrInner.IsFromExternalReference)
-                     {
-                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas, 
-                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), btrInner.Name);
-                     }
-                     else
-                     {
-                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas, 
-                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), xrefName);
-                     }                     
-                  }
-               }
-            }
-         }
-      }
-
-      private static string getBlNameWithoutXrefPrefix(string blName, string xrefName)
-      {
-         if (!string.IsNullOrEmpty(xrefName))
-         {
-            if (blName.IndexOf(xrefName, StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-               return blName.Substring(xrefName.Length + 1);
-            }
-         }         
-         return blName;
       }
 
       // Определение покраски. Попадание точки в зону окраски
@@ -143,6 +92,57 @@ namespace AlbumPanelColorTiles.Panels
       public bool Equals(ColorArea other)
       {
          return _bounds.IsEqualTo(other._bounds, Album.Tolerance);
+      }
+
+      private static string getBlNameWithoutXrefPrefix(string blName, string xrefName)
+      {
+         if (!string.IsNullOrEmpty(xrefName))
+         {
+            if (blName.IndexOf(xrefName, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+               return blName.Substring(xrefName.Length + 1);
+            }
+         }
+         return blName;
+      }
+
+      private static void IterateColorAreasInBtr(ObjectId idBtr, Album album,
+                                                List<ColorArea> colorAreas, Matrix3d matrix, string xrefName)
+      {
+         var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
+         foreach (ObjectId idEnt in btr)
+         {
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            {
+               var blRefColorArea = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
+
+               var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
+               if (string.Equals(blName, Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
+               {
+                  ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
+                  colorAreas.Add(colorArea);
+               }
+               else
+               {
+                  // Если это не блок Панели, то ищем вложенные в блоки зоны покраски
+                  if (!MarkSb.IsBlockNamePanel(blName))
+                  {
+                     var btrInner = blRefColorArea.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
+                     // Обработка вложенных зон покраски в блок
+                     if (btrInner.IsFromExternalReference)
+                     {
+                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas,
+                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), btrInner.Name);
+                     }
+                     else
+                     {
+                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas,
+                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), xrefName);
+                     }
+                  }
+               }
+            }
+         }
       }
    }
 }

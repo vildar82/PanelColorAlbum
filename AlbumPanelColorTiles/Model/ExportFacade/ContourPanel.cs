@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -12,6 +8,17 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    // Построение контура панели
    public class ContourPanel
    {
+      private double endOffset = 500;
+
+      private PanelBtrExport panelBtr;
+
+      private RTreeLib.RTree<Extents3d> treeTiles;
+
+      public ContourPanel(PanelBtrExport panelBtr)
+      {
+         this.panelBtr = panelBtr;
+      }
+
       private enum EnumCorner
       {
          LeftLower,
@@ -20,18 +27,9 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          RightTop
       }
 
-      private PanelBtrExport panelBtr;        
-      private RTreeLib.RTree<Extents3d> treeTiles;
-      private double endOffset = 500;      
-
-      public ContourPanel(PanelBtrExport panelBtr)
-      {
-         this.panelBtr = panelBtr;         
-      }
-
       public void CreateContour(BlockTableRecord btr)
       {
-         if (panelBtr.ExtentsByTile.Diagonal()<100)
+         if (panelBtr.ExtentsByTile.Diagonal() < 100)
          {
             return;
          }
@@ -41,11 +39,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          treeTiles = new RTreeLib.RTree<Extents3d>();
          panelBtr.Tiles.ForEach(t => treeTiles.Add(ColorArea.GetRectangleRTree(t), t));
 
-         // Первый угол панели - левый нижний         
+         // Первый угол панели - левый нижний
          var pt1 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MinPoint, EnumCorner.LeftLower);
-         var pt2 = getCoordTileNoEnd(new Point3d (panelBtr.ExtentsByTile.MinPoint.X, panelBtr.ExtentsByTile.MaxPoint.Y, 0), EnumCorner.LeftTop);
+         var pt2 = getCoordTileNoEnd(new Point3d(panelBtr.ExtentsByTile.MinPoint.X, panelBtr.ExtentsByTile.MaxPoint.Y, 0), EnumCorner.LeftTop);
          var pt3 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MaxPoint, EnumCorner.RightTop);
-         var pt4 = getCoordTileNoEnd(new Point3d(panelBtr.ExtentsByTile.MaxPoint.X, panelBtr.ExtentsByTile.MinPoint.Y,  0), EnumCorner.RightLower);
+         var pt4 = getCoordTileNoEnd(new Point3d(panelBtr.ExtentsByTile.MaxPoint.X, panelBtr.ExtentsByTile.MinPoint.Y, 0), EnumCorner.RightLower);
 
          Extents3d extNoEnd = new Extents3d();
          extNoEnd.AddPoint(pt1);
@@ -59,107 +57,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          pts.Add(pt2);
          pts.Add(pt3);
          pts.Add(pt4);
-         using (Polyline3d poly = new Polyline3d(Poly3dType.SimplePoly, pts, true))            
+         using (Polyline3d poly = new Polyline3d(Poly3dType.SimplePoly, pts, true))
          {
             poly.LayerId = panelBtr.CPS.IdLayerContour;
             btr.AppendEntity(poly);
             btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(poly, true);
-         }
-      }      
-
-      private Point3d getCoordTileNoEnd(Point3d pt, EnumCorner corner)
-      {
-         double x = 0;
-         RTreeLib.Point pt1X = new RTreeLib.Point(pt.X + getOffsetX(corner, endOffset), pt.Y, 0);
-         var resTiles = treeTiles.Nearest(pt1X, 100);
-         if (resTiles.Count == 0)
-         {
-            // Нет плитки - торец!
-            // Найти первую не торцевую плитку
-            var extTileX = findTile(pt.X + getOffsetX(corner, endOffset), pt.Y,corner, true);
-            x = getCoordX(extTileX, corner);
-         }
-         else
-         {
-            // Есть плитки - не торец
-            x = pt.X;
-         }
-
-         double y = 0;
-         RTreeLib.Point pt1Y = new RTreeLib.Point(pt.X, pt.Y + getOffsetY(corner, endOffset), 0);
-         resTiles = treeTiles.Nearest(pt1Y, 100);
-         if (resTiles.Count == 0)
-         {
-            // Нет плитки - торец!
-            // Найти первую не торцевую плитку
-            var extTileY = findTile(pt.X , pt.Y+ getOffsetY(corner, endOffset), corner, false);
-            y = getCoordY(extTileY, corner);
-         }
-         else
-         {
-            // Есть плитки - не торец
-            y = pt.Y;
-         }
-         return new Point3d(x, y, 0);
-      }
-
-      private double getCoordX(Extents3d extentsByTile, EnumCorner corner)
-      {
-         switch (corner)
-         {
-            case EnumCorner.LeftLower:               
-            case EnumCorner.LeftTop:
-               return extentsByTile.MinPoint.X;
-            case EnumCorner.RightLower:               
-            case EnumCorner.RightTop:
-               return extentsByTile.MaxPoint.X;
-            default:
-               return 0;
-         }
-      }
-
-      private double getCoordY(Extents3d extentsByTile, EnumCorner corner)
-      {
-         switch (corner)
-         {
-            case EnumCorner.LeftLower:
-            case EnumCorner.RightLower:
-               return extentsByTile.MinPoint.Y;            
-            case EnumCorner.LeftTop:
-            case EnumCorner.RightTop:
-               return extentsByTile.MaxPoint.Y;
-            default:
-               return 0;
-         }
-      }
-
-      private double getOffsetX(EnumCorner corner, double offset)
-      {
-         switch (corner)
-         {
-            case EnumCorner.LeftLower:               
-            case EnumCorner.LeftTop:
-               return offset;
-            case EnumCorner.RightLower:               
-            case EnumCorner.RightTop:
-               return -offset;
-            default:
-               return 0;               
-         }
-      }
-
-      private double getOffsetY(EnumCorner corner, double offset)
-      {
-         switch (corner)
-         {
-            case EnumCorner.LeftTop:
-            case EnumCorner.RightTop:
-               return -offset;
-            case EnumCorner.LeftLower:
-            case EnumCorner.RightLower:            
-               return offset;
-            default:
-               return 0;
          }
       }
 
@@ -184,6 +86,110 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             var resVal = resTiles.First();
             return resVal;
+         }
+      }
+
+      private Point3d getCoordTileNoEnd(Point3d pt, EnumCorner corner)
+      {
+         double x = 0;
+         RTreeLib.Point pt1X = new RTreeLib.Point(pt.X + getOffsetX(corner, endOffset), pt.Y, 0);
+         var resTiles = treeTiles.Nearest(pt1X, 100);
+         if (resTiles.Count == 0)
+         {
+            // Нет плитки - торец!
+            // Найти первую не торцевую плитку
+            var extTileX = findTile(pt.X + getOffsetX(corner, endOffset), pt.Y, corner, true);
+            x = getCoordX(extTileX, corner);
+         }
+         else
+         {
+            // Есть плитки - не торец
+            x = pt.X;
+         }
+
+         double y = 0;
+         RTreeLib.Point pt1Y = new RTreeLib.Point(pt.X, pt.Y + getOffsetY(corner, endOffset), 0);
+         resTiles = treeTiles.Nearest(pt1Y, 100);
+         if (resTiles.Count == 0)
+         {
+            // Нет плитки - торец!
+            // Найти первую не торцевую плитку
+            var extTileY = findTile(pt.X, pt.Y + getOffsetY(corner, endOffset), corner, false);
+            y = getCoordY(extTileY, corner);
+         }
+         else
+         {
+            // Есть плитки - не торец
+            y = pt.Y;
+         }
+         return new Point3d(x, y, 0);
+      }
+
+      private double getCoordX(Extents3d extentsByTile, EnumCorner corner)
+      {
+         switch (corner)
+         {
+            case EnumCorner.LeftLower:
+            case EnumCorner.LeftTop:
+               return extentsByTile.MinPoint.X;
+
+            case EnumCorner.RightLower:
+            case EnumCorner.RightTop:
+               return extentsByTile.MaxPoint.X;
+
+            default:
+               return 0;
+         }
+      }
+
+      private double getCoordY(Extents3d extentsByTile, EnumCorner corner)
+      {
+         switch (corner)
+         {
+            case EnumCorner.LeftLower:
+            case EnumCorner.RightLower:
+               return extentsByTile.MinPoint.Y;
+
+            case EnumCorner.LeftTop:
+            case EnumCorner.RightTop:
+               return extentsByTile.MaxPoint.Y;
+
+            default:
+               return 0;
+         }
+      }
+
+      private double getOffsetX(EnumCorner corner, double offset)
+      {
+         switch (corner)
+         {
+            case EnumCorner.LeftLower:
+            case EnumCorner.LeftTop:
+               return offset;
+
+            case EnumCorner.RightLower:
+            case EnumCorner.RightTop:
+               return -offset;
+
+            default:
+               return 0;
+         }
+      }
+
+      private double getOffsetY(EnumCorner corner, double offset)
+      {
+         switch (corner)
+         {
+            case EnumCorner.LeftTop:
+            case EnumCorner.RightTop:
+               return -offset;
+
+            case EnumCorner.LeftLower:
+            case EnumCorner.RightLower:
+               return offset;
+
+            default:
+               return 0;
          }
       }
    }

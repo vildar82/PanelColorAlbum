@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AcadLib.Comparers;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Model.Panels;
-using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
@@ -16,12 +11,16 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 {
    public class ConvertPanelService
    {
-      public ExportFacadeService Service { get; private set; }
-      public Database DbExport { get; set; }  
-      public List<PanelBtrExport> PanelsBtrExport { get; private set; }
-
       // Слой для контура панелей
       private ObjectId _idLayerContour;
+
+      public ConvertPanelService(ExportFacadeService service)
+      {
+         Service = service;
+      }
+
+      public Database DbExport { get; set; }
+
       public ObjectId IdLayerContour
       {
          get
@@ -37,10 +36,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
-      public ConvertPanelService(ExportFacadeService service)
-      {
-         Service = service;         
-      }      
+      public List<PanelBtrExport> PanelsBtrExport { get; private set; }
+      public ExportFacadeService Service { get; private set; }
 
       /// <summary>
       /// преобразование панеелей
@@ -50,37 +47,58 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          ProgressMeter progress = new ProgressMeter();
          progress.SetLimit(PanelsBtrExport.Count);
          progress.Start("Преобразование блоков панелей в экспортированном файле");
-         // Преобразования определений блоков панелей         
+         // Преобразования определений блоков панелей
          foreach (var panelBtr in PanelsBtrExport)
          {
             progress.MeterProgress();
+            if (HostApplicationServices.Current.UserBreak())
+               throw new System.Exception("Отменено пользователем.");
             try
             {
                panelBtr.ConvertBtr();
                if (!string.IsNullOrEmpty(panelBtr.ErrMsg))
                {
                   Inspector.AddError(panelBtr.ErrMsg, panelBtr.Panels.First().Extents, panelBtr.Panels.First().IdBlRefAkr);
-               }               
+               }
             }
             catch (System.Exception ex)
             {
                Inspector.AddError("Ошибка конвертации блока панели - {0}", ex.Message);
                Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
-            }            
+            }
          }
          progress.Stop();
       }
 
-      public void Purge()
+      public void ConvertEnds()
       {
-         // Очистка экспортированного чертежа от блоков образмеривания которые были удалены из панелей после копирования
-         ObjectIdGraph graph = new ObjectIdGraph();
-         foreach (var panelBtr in PanelsBtrExport)
+         // Преобразование торцов фасада
+         List<ConvertEndsFacade> convertsEnds = new List<ConvertEndsFacade>();
+         DoubleEqualityComparer comparer = new DoubleEqualityComparer(500);
+         // Все вхождения блоков панелей с торцами слева
+         var panelsWithLeftEndsByX = PanelsBtrExport.SelectMany(pBtr => pBtr.Panels).
+                     Where(pBlRef => pBlRef.PanelBtrExport.IdsEndsLeftEntity.Count > 0).
+                     GroupBy(pBlRef => pBlRef.Position.X, comparer);
+         foreach (var itemLefEndsByY in panelsWithLeftEndsByX)
          {
-            ObjectIdGraphNode node = new ObjectIdGraphNode(panelBtr.IdBtrExport);
-            graph.AddNode(node);
+            ConvertEndsFacade convertEndsFacade = new ConvertEndsFacade(itemLefEndsByY, true, this);
+            convertEndsFacade.Convert();
+            convertsEnds.Add(convertEndsFacade);
          }
-         DbExport.Purge(graph);
+
+         // Все вхождения блоков панелей с торцами справа
+         var panelsWithRightEndsByX = PanelsBtrExport.SelectMany(pBtr => pBtr.Panels).
+                     Where(pBlRef => pBlRef.PanelBtrExport.IdsEndsRightEntity.Count > 0).
+                     GroupBy(pBlRef => pBlRef.Position.X, comparer);
+         foreach (var itemRightEndsByY in panelsWithRightEndsByX)
+         {
+            ConvertEndsFacade convertEndsFacade = new ConvertEndsFacade(itemRightEndsByY, false, this);
+            convertEndsFacade.Convert();
+            convertsEnds.Add(convertEndsFacade);
+         }
+
+         // удаление торцов
+         convertsEnds.ForEach(c => c.DeleteEnds());
       }
 
       public void DefinePanels(List<Facade> facades)
@@ -98,6 +116,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          foreach (var idBlRefPanel in Service.SelectPanels.IdsBlRefPanelAr)
          {
             progress.MeterProgress();
+            if (HostApplicationServices.Current.UserBreak())
+               throw new System.Exception("Отменено пользователем.");
             using (var blRef = idBlRefPanel.Open(OpenMode.ForRead, false, true) as BlockReference)
             {
                // панель определения блока
@@ -114,45 +134,26 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                panelBtrExport.Panels.Add(panelBlRefExport);
 
                // определение фасада панели
-               panelBlRefExport.Facade = defFacadeForPanel(treeFacades, blRef, panelBtrExport, panelBlRefExport);               
+               panelBlRefExport.Facade = defFacadeForPanel(treeFacades, blRef, panelBtrExport, panelBlRefExport);
             }
          }
          PanelsBtrExport = dictPanelsBtrExport.Values.ToList();
          progress.Stop();
       }
 
-      public void ConvertEnds()
+      public void Purge()
       {
-         // Преобразование торцов фасада
-         List<ConvertEndsFacade> convertsEnds = new List<ConvertEndsFacade>();
-         DoubleEqualityComparer comparer = new DoubleEqualityComparer(500);
-         // Все вхождения блоков панелей с торцами слева         
-         var panelsWithLeftEndsByX = PanelsBtrExport.SelectMany(pBtr => pBtr.Panels).
-                     Where(pBlRef => pBlRef.PanelBtrExport.IdsEndsLeftEntity.Count > 0).
-                     GroupBy(pBlRef => pBlRef.Position.X, comparer);
-         foreach (var itemLefEndsByY in panelsWithLeftEndsByX)
+         // Очистка экспортированного чертежа от блоков образмеривания которые были удалены из панелей после копирования
+         ObjectIdGraph graph = new ObjectIdGraph();
+         foreach (var panelBtr in PanelsBtrExport)
          {
-            ConvertEndsFacade convertEndsFacade = new ConvertEndsFacade(itemLefEndsByY, true, this);
-            convertEndsFacade.Convert();
-            convertsEnds.Add(convertEndsFacade);
+            ObjectIdGraphNode node = new ObjectIdGraphNode(panelBtr.IdBtrExport);
+            graph.AddNode(node);
          }
-
-         // Все вхождения блоков панелей с торцами справа         
-         var panelsWithRightEndsByX = PanelsBtrExport.SelectMany(pBtr => pBtr.Panels).
-                     Where(pBlRef => pBlRef.PanelBtrExport.IdsEndsRightEntity.Count > 0).
-                     GroupBy(pBlRef => pBlRef.Position.X, comparer);
-         foreach (var itemRightEndsByY in panelsWithRightEndsByX)
-         {
-            ConvertEndsFacade convertEndsFacade = new ConvertEndsFacade(itemRightEndsByY, false, this);
-            convertEndsFacade.Convert();
-            convertsEnds.Add(convertEndsFacade);
-         }
-
-         // удаление торцов
-         convertsEnds.ForEach(c => c.DeleteEnds());
+         DbExport.Purge(graph);
       }
 
-      private Facade defFacadeForPanel(RTreeLib.RTree<Facade> treeFacades,BlockReference blRef, 
+      private Facade defFacadeForPanel(RTreeLib.RTree<Facade> treeFacades, BlockReference blRef,
                                           PanelBtrExport panelBtrExport, PanelBlRefExport panelBlRefExport)
       {
          Facade resVal = null;
@@ -160,7 +161,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          var facadesFind = treeFacades.Nearest(pt, 100);
          if (facadesFind.Count == 1)
          {
-            resVal = facadesFind.First();            
+            resVal = facadesFind.First();
          }
          else if (facadesFind.Count == 0)
          {

@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Panels;
-using AlbumPanelColorTiles.Model.Select;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
-using AlbumPanelColorTiles.Panels;
-using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.ExportFacade
 {
@@ -20,40 +11,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    /// Экспортная панель
    /// </summary>
    public class PanelBtrExport
-   {      
+   {
       private Extents3d _extentsByTile;
-
-      public ConvertPanelService CPS { get; private set; }
-      public string BlName { get; private set; }
-      /// <summary>
-      /// Определение блока панели в экспортированном файле
-      /// </summary>
-      public ObjectId IdBtrExport { get; set; }
-
-      /// <summary>
-      /// Определение блока панели в файле АКР
-      /// </summary>
-      public ObjectId IdBtrAkr { get; set; }
-
-      public Extents3d ExtentsByTile { get { return _extentsByTile; } }
-      public Extents3d ExtentsNoEnd { get; set; }
-      public double HeightByTile { get; private set; }
-      public string CaptionMarkSb { get; private set; }
-      public string CaptionPaint { get; private set; }
-      public ObjectId CaptionLayerId { get; private set; }
-      public ObjectId IdCaptionMarkSb{ get; set; }
-      public ObjectId IdCaptionPaint { get; set; }
-      public List<Extents3d> Tiles { get; private set; }    
-      public List<PanelBlRefExport> Panels { get; private set; }
-      // Объекты торцов панели
-      public List<ObjectId> IdsEndsLeftEntity { get; set; }
-      public List<ObjectId> IdsEndsRightEntity { get; set; }
-      public List<ObjectId> IdsEndsTopEntity { get; set; }
-      public List<ObjectId> IdsEndsBottomEntity { get; set; }
-      // Объекты линий, полилиний в блоке панели (на одном уровне вложенности в блок)
-      public List<EntityInfo> EntInfos { get; set; }
-      
-      public string ErrMsg { get; private set; }
 
       public PanelBtrExport(ObjectId idBtrAkr, ConvertPanelService cps)
       {
@@ -68,27 +27,44 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          Tiles = new List<Extents3d>();
       }
 
-      public void DeleteEnd(bool isLeftSide)
-      {
-         if (isLeftSide)
-         {
-            deleteEnds(IdsEndsLeftEntity);
-            IdsEndsLeftEntity = new List<ObjectId>();
-         }
-         else
-         {
-            deleteEnds(IdsEndsRightEntity);
-            IdsEndsRightEntity = new List<ObjectId>();
-         }
-      }
+      public string BlName { get; private set; }
+      public ObjectId CaptionLayerId { get; private set; }
+      public string CaptionMarkSb { get; private set; }
+      public string CaptionPaint { get; private set; }
+      public ConvertPanelService CPS { get; private set; }
 
-      public void Def()
-      {
-         using (var btr = IdBtrAkr.Open( OpenMode.ForRead )as BlockTableRecord)
-         {
-            BlName = btr.Name;
-         }
-      }
+      // Объекты линий, полилиний в блоке панели (на одном уровне вложенности в блок)
+      public List<EntityInfo> EntInfos { get; set; }
+
+      public string ErrMsg { get; private set; }
+
+      public Extents3d ExtentsByTile { get { return _extentsByTile; } }
+
+      public Extents3d ExtentsNoEnd { get; set; }
+
+      public double HeightByTile { get; private set; }
+
+      /// <summary>
+      /// Определение блока панели в файле АКР
+      /// </summary>
+      public ObjectId IdBtrAkr { get; set; }
+
+      /// <summary>
+      /// Определение блока панели в экспортированном файле
+      /// </summary>
+      public ObjectId IdBtrExport { get; set; }
+
+      public ObjectId IdCaptionMarkSb { get; set; }
+      public ObjectId IdCaptionPaint { get; set; }
+      public List<ObjectId> IdsEndsBottomEntity { get; set; }
+
+      // Объекты торцов панели
+      public List<ObjectId> IdsEndsLeftEntity { get; set; }
+
+      public List<ObjectId> IdsEndsRightEntity { get; set; }
+      public List<ObjectId> IdsEndsTopEntity { get; set; }
+      public List<PanelBlRefExport> Panels { get; private set; }
+      public List<Extents3d> Tiles { get; private set; }
 
       public void ConvertBtr()
       {
@@ -124,6 +100,41 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
+      public void Def()
+      {
+         using (var btr = IdBtrAkr.Open(OpenMode.ForRead) as BlockTableRecord)
+         {
+            BlName = btr.Name;
+         }
+      }
+
+      public void DeleteEnd(bool isLeftSide)
+      {
+         if (isLeftSide)
+         {
+            deleteEnds(IdsEndsLeftEntity);
+            IdsEndsLeftEntity = new List<ObjectId>();
+         }
+         else
+         {
+            deleteEnds(IdsEndsRightEntity);
+            IdsEndsRightEntity = new List<ObjectId>();
+         }
+      }
+
+      // Удаление мусора из блока
+      private static bool deleteWaste(Entity ent)
+      {
+         if (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade, StringComparison.CurrentCultureIgnoreCase) ||
+                           string.Equals(ent.Layer, Settings.Default.LayerDimensionForm, StringComparison.CurrentCultureIgnoreCase))
+         {
+            ent.UpgradeOpen();
+            ent.Erase();
+            return true;
+         }
+         return false;
+      }
+
       private void defineEnds()
       {
          // условие наличия торцов
@@ -131,25 +142,25 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             ExtentsByTile.Diagonal() - ExtentsNoEnd.Diagonal() < 100)
          {
             return;
-         }         
+         }
 
          // Определение торцевых объектов в блоке
          // Торец слева
-         if ((ExtentsNoEnd.MinPoint.X -ExtentsByTile.MinPoint.X) > 400)
+         if ((ExtentsNoEnd.MinPoint.X - ExtentsByTile.MinPoint.X) > 400)
          {
             // поиск объектов с координатой близкой к ExtentsByTile.MinPoint.X
             var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MinPoint.X, true);
-            if (idsEndEntsTemp.Count>0)
+            if (idsEndEntsTemp.Count > 0)
             {
                HashSet<ObjectId> idsEndLeftEntsHash = new HashSet<ObjectId>();
                idsEndEntsTemp.ForEach(t => idsEndLeftEntsHash.Add(t));
                IdsEndsLeftEntity = idsEndLeftEntsHash.ToList();
-            }            
+            }
          }
          // Торец справа
          if ((ExtentsByTile.MaxPoint.X - ExtentsNoEnd.MaxPoint.X) > 400)
-         {            
-            var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.X, true);            
+         {
+            var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.X, true);
             if (idsEndEntsTemp.Count > 0)
             {
                HashSet<ObjectId> idsEndRightEntsHash = new HashSet<ObjectId>();
@@ -160,7 +171,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          // Торец сверху
          if ((ExtentsByTile.MaxPoint.Y - ExtentsNoEnd.MaxPoint.Y) > 400)
          {
-            var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.Y, false);            
+            var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.Y, false);
             if (idsEndEntsTemp.Count > 0)
             {
                HashSet<ObjectId> idsEndTopEntsHash = new HashSet<ObjectId>();
@@ -169,7 +180,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             }
          }
          // Торец снизу
-         if ((ExtentsNoEnd.MinPoint.Y -ExtentsByTile.MinPoint.Y) > 400)
+         if ((ExtentsNoEnd.MinPoint.Y - ExtentsByTile.MinPoint.Y) > 400)
          {
             var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MinPoint.Y, false);
             if (idsEndEntsTemp.Count > 0)
@@ -181,22 +192,6 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
-      private List<ObjectId> getEndEntsInCoord(double coord, bool isX)
-      {
-         //coord - координата края торца панели по плитке
-         List<ObjectId> resVal = new List<ObjectId>();
-         // выбор объектов блока на нужной координате (+- толщина торца = ширине одной плитки - 300)
-         foreach (var entInfo in EntInfos)
-         {            
-            if (Math.Abs((isX ? entInfo.Extents.MinPoint.X : entInfo.Extents.MinPoint.Y) - coord) < 330 &&
-                Math.Abs((isX ? entInfo.Extents.MaxPoint.X : entInfo.Extents.MaxPoint.Y )- coord) < 330)
-            {
-               resVal.Add(entInfo.Id);
-            }
-         }
-         return resVal;
-      }
-
       private void deleteEnds(List<ObjectId> idsList)
       {
          idsList.ForEach(idEnt =>
@@ -205,7 +200,23 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             {
                ent.Erase();
             }
-         });         
+         });
+      }
+
+      private List<ObjectId> getEndEntsInCoord(double coord, bool isX)
+      {
+         //coord - координата края торца панели по плитке
+         List<ObjectId> resVal = new List<ObjectId>();
+         // выбор объектов блока на нужной координате (+- толщина торца = ширине одной плитки - 300)
+         foreach (var entInfo in EntInfos)
+         {
+            if (Math.Abs((isX ? entInfo.Extents.MinPoint.X : entInfo.Extents.MinPoint.Y) - coord) < 330 &&
+                Math.Abs((isX ? entInfo.Extents.MaxPoint.X : entInfo.Extents.MaxPoint.Y) - coord) < 330)
+            {
+               resVal.Add(entInfo.Id);
+            }
+         }
+         return resVal;
       }
 
       private void iterateEntInBlock(BlockTableRecord btr)
@@ -233,13 +244,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                   else
                   {
                      _extentsByTile.AddExtents(ent.GeometricExtents);
-                  }                  
-                  
+                  }
+
                   try
                   {
                      tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);
                   }
-                  catch (ArgumentException argEx)
+                  catch (ArgumentException)
                   {
                      // Ошибка - плитка с такими границами уже есть
                      ErrMsg += "Наложение плиток. ";
@@ -247,7 +258,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                   catch (Exception ex)
                   {
                      Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
-                  }                  
+                  }
                   continue;
                }
 
@@ -268,8 +279,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                      CaptionLayerId = textCaption.LayerId;
                   }
                   continue;
-               }               
-            }            
+               }
+            }
          }
 
          Tiles = tilesDict.Values.ToList();
@@ -289,19 +300,6 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
          // Определение высоты панели
          HeightByTile = ExtentsByTile.MaxPoint.Y - ExtentsByTile.MinPoint.Y;
-      }
-
-      // Удаление мусора из блока
-      private static bool deleteWaste(Entity ent)
-      {
-         if (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade, StringComparison.CurrentCultureIgnoreCase) ||
-                           string.Equals(ent.Layer, Settings.Default.LayerDimensionForm, StringComparison.CurrentCultureIgnoreCase))
-         {
-            ent.UpgradeOpen();
-            ent.Erase();
-            return true;
-         }
-         return false;
       }
    }
 }

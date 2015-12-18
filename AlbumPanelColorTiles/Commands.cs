@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using AcadLib.Errors;
 using AcadLib;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Model.ExportFacade;
@@ -31,9 +31,9 @@ namespace AlbumPanelColorTiles
    // Для каждого документа свой объект Commands (один чертеж - один альбом).
    public class Commands
    {
+      private static string _curDllDir;
       private static DateTime _lastStartCommandDateTime;
       private static string _lastStartCommandName = string.Empty;
-      private static string _curDllDir;
       private Album _album;
       private ImagePaintingService _imagePainting;
       private string _msgHelp;
@@ -93,11 +93,11 @@ namespace AlbumPanelColorTiles
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.Session | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void AlbumPanelsCommand()
-      {         
+      {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
 
-         string commandName = "AlbumPanels";         
+         string commandName = "AlbumPanels";
          if (string.Equals(_lastStartCommandName, commandName))
          {
             if ((DateTime.Now - _lastStartCommandDateTime).Seconds < 5)
@@ -166,7 +166,7 @@ namespace AlbumPanelColorTiles
                   if (!ex.Message.Contains("Отменено пользователем"))
                   {
                      Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
-                  }                  
+                  }
                }
             }
          }
@@ -175,11 +175,63 @@ namespace AlbumPanelColorTiles
       }
 
       /// <summary>
+      /// Копирование словаря АКР из этого чертежа в другой
+      /// </summary>
+      [CommandMethod("PIK", "AKR-CopyDictionary", CommandFlags.Modal | CommandFlags.Session)]
+      public void CopyDictionaryCommand()
+      {
+         Log.Info("Start Command: AKR-CopyDictionary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         using (var DocLock = doc.LockDocument())
+         {
+            try
+            {
+               Inspector.Clear();
+               // Запрос имени открытого чертежа в который нужно скопировать словарь
+               var res = doc.Editor.GetString("Имя чертежа в который копировать словарь АКР");
+               if (res.Status == PromptStatus.OK)
+               {
+                  // Поиск чертежа среди открытых документов
+                  foreach (Document itemDoc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
+                  {
+                     if (string.Equals(Path.GetFileName(itemDoc.Name), res.StringResult, System.StringComparison.OrdinalIgnoreCase))
+                     {
+                        using (var lockItemDoc = itemDoc.LockDocument())
+                        {
+                           DictNOD.CopyDict(itemDoc.Database);
+                        }
+                     }
+                  }
+               }
+               else
+               {
+                  return;
+               }
+               if (Inspector.HasErrors)
+               {
+                  Inspector.Show();
+               }
+            }
+            catch (System.Exception ex)
+            {
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
+               }
+               doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex.Message);
+            }
+         }
+      }
+
+      /// <summary>
       /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
       /// </summary>
       [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void CreateMountingPlanBlocksCommand()
-      {         
+      {
          Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
@@ -196,7 +248,73 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks. {0}", doc.Name);
-               }               
+               }
+            }
+         }
+      }
+
+      [CommandMethod("PIK", "AKR-EditPanelLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+      public void EditPanelLibraryCommand()
+      {
+         Log.Info("Start Command: AKR-EditPanelLibrary");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         using (var DocLock = doc.LockDocument())
+         {
+            LibraryEditor libEditor = new LibraryEditor();
+            try
+            {
+               libEditor.Edit();
+            }
+            catch (System.Exception ex)
+            {
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
+               }
+               ed.WriteMessage(ex.Message);
+            }
+         }
+      }
+
+      /// <summary>
+      /// Экспорт фасадов (для Архитекторов - создающих листы фасадов)
+      /// </summary>
+      [CommandMethod("PIK", "AKR-ExportFacade", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void ExportFacadeCommand()
+      {
+         Log.Info("Start Command: AKR-ExportFacade");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         Database db = doc.Database;
+         Editor ed = doc.Editor;
+         using (var DocLock = doc.LockDocument())
+         {
+            try
+            {
+               Inspector.Clear();
+
+               ExportFacadeService export = new ExportFacadeService();
+               export.Export();
+
+               if (Inspector.HasErrors)
+               {
+                  Inspector.Show();
+               }
+               else
+               {
+                  doc.Editor.WriteMessage("\nГотово.");
+               }
+            }
+            catch (System.Exception ex)
+            {
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-ExportFacade. {0}", doc.Name);
+               }
+               doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex.Message);
             }
          }
       }
@@ -232,7 +350,7 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-ImagePainting. {0}", doc.Name);
-               }               
+               }
             }
          }
       }
@@ -260,18 +378,18 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary. {0}", doc.Name);
-               }               
+               }
             }
          }
       }
 
       [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
       public void PaintPanelsCommand()
-      {         
+      {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
 
-         // Принудительное сохранение файла 
+         // Принудительное сохранение файла
          if (File.Exists(doc.Name))
          {
             object obj = Autodesk.AutoCAD.ApplicationServices.Application.GetSystemVariable("DBMOD");
@@ -287,18 +405,18 @@ namespace AlbumPanelColorTiles
                {
                   doc.Editor.WriteMessage(ex.Message);
                   Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
-               }               
-            }            
+               }
+            }
          }
 
          string commandName = "PaintPanels";
          if (string.Equals(_lastStartCommandName, commandName))
-         {            
+         {
             if ((DateTime.Now - _lastStartCommandDateTime).Seconds < 5)
             {
                doc.Editor.WriteMessage("Между запусками команды прошло меньше 5 секунд. Отмена.");
                return;
-            }            
+            }
          }
 
          Log.Info("Start Command: AKR-PaintPanels");
@@ -402,7 +520,7 @@ namespace AlbumPanelColorTiles
                         if (!ex.Message.Contains("Отменено пользователем"))
                         {
                            Log.Error(ex, "plotter.PlotDir({0}); {1}", dialog.SelectedPath, doc.Name);
-                        }                        
+                        }
                      }
                   }
                }
@@ -433,7 +551,7 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-RandomPainting. {0}", doc.Name);
-               }               
+               }
             }
          }
       }
@@ -463,7 +581,7 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Не удалось выполнить сброс панелей. {0}", doc.Name);
-               }               
+               }
             }
          }
       }
@@ -487,7 +605,7 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-SavePanelsToLibrary. {0}", doc.Name);
-               }               
+               }
             }
          }
       }
@@ -547,151 +665,6 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("PIK", "AKR-EditPanelLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-      public void EditPanelLibraryCommand()
-      {
-         Log.Info("Start Command: AKR-EditPanelLibrary");         
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Database db = doc.Database;
-         Editor ed = doc.Editor;
-         using (var DocLock = doc.LockDocument())
-         {
-            LibraryEditor libEditor = new LibraryEditor();
-            try
-            {
-               libEditor.Edit();
-            }
-            catch (System.Exception ex)
-            {
-               if (!ex.Message.Contains("Отменено пользователем"))
-               {
-                  Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
-               }
-               ed.WriteMessage(ex.Message);
-            }            
-         }
-      }
-
-      /// <summary>
-      /// Копирование словаря АКР из этого чертежа в другой
-      /// </summary>
-      [CommandMethod("PIK", "AKR-CopyDictionary", CommandFlags.Modal | CommandFlags.Session)]
-      public void CopyDictionaryCommand()
-      {         
-         Log.Info("Start Command: AKR-CopyDictionary");
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Database db = doc.Database;
-         Editor ed = doc.Editor;
-         using (var DocLock = doc.LockDocument())
-         {            
-            try
-            {
-               Inspector.Clear();
-               // Запрос имени открытого чертежа в который нужно скопировать словарь
-               var res = doc.Editor.GetString("Имя чертежа в который копировать словарь АКР");
-               if (res.Status == PromptStatus.OK)
-               {
-                  // Поиск чертежа среди открытых документов
-                  foreach (Document itemDoc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
-                  {
-                     if (string.Equals(Path.GetFileName(itemDoc.Name), res.StringResult, System.StringComparison.OrdinalIgnoreCase))
-                     {
-                        using (var lockItemDoc = itemDoc.LockDocument())
-                        {
-                           DictNOD.CopyDict(itemDoc.Database);
-                        }
-                     }
-                  }
-               }
-               else
-               {
-                  return;
-               }               
-               if (Inspector.HasErrors)
-               {
-                  Inspector.Show();
-               }
-            }
-            catch (System.Exception ex)
-            {
-               if (!ex.Message.Contains("Отменено пользователем"))
-               {
-                  Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
-               }               
-               doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex.Message);
-            }
-         }
-      }
-
-      /// <summary>
-      /// Экспорт фасадов (для Архитекторов - создающих листы фасадов)
-      /// </summary>
-      [CommandMethod("PIK", "AKR-ExportFacade", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
-      public void ExportFacadeCommand()
-      {
-         Log.Info("Start Command: AKR-ExportFacade");
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
-         Database db = doc.Database;
-         Editor ed = doc.Editor;
-         using (var DocLock = doc.LockDocument())
-         {
-            try
-            {
-               Inspector.Clear();
-
-               ExportFacadeService export = new ExportFacadeService();
-               export.Export();
-               
-               if (Inspector.HasErrors)
-               {
-                  Inspector.Show();
-               }
-               else
-               {
-                  doc.Editor.WriteMessage("\nГотово.");
-               }
-            }
-            catch (System.Exception ex)
-            {
-               if (!ex.Message.Contains("Отменено пользователем"))
-               {
-                  Log.Error(ex, "Command: AKR-ExportFacade. {0}", doc.Name);
-               }
-               doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex.Message);
-            }
-         }
-      }
-
-      [CommandMethod("PIK", "TestInsertAKRPanels", CommandFlags.Modal)]
-      public void TestInsertAKRPanels()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         Editor ed = doc.Editor;
-         Database db = doc.Database;
-
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-            Point3d pt = Point3d.Origin;
-            foreach (ObjectId idBtr in bt)
-            {
-               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
-               {
-                  var blRef = new BlockReference(pt, idBtr);
-                  ms.AppendEntity(blRef);
-                  t.AddNewlyCreatedDBObject(blRef, true);
-                  pt = new Point3d(pt.X, pt.Y + 5000, 0);
-               }
-            }
-            t.Commit();
-         }
-      }
-
       [CommandMethod("PIK", "TestClearXdataAKRPanels", CommandFlags.Modal)]
       public void TestClearXdataAKRPanels()
       {
@@ -727,6 +700,33 @@ namespace AlbumPanelColorTiles
                }
             }
             ed.WriteMessage("Удалено словарей {0}, удалено расшданных {1}", countRemovedDict, countRemovedXData);
+            t.Commit();
+         }
+      }
+
+      [CommandMethod("PIK", "TestInsertAKRPanels", CommandFlags.Modal)]
+      public void TestInsertAKRPanels()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         Editor ed = doc.Editor;
+         Database db = doc.Database;
+
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+            Point3d pt = Point3d.Origin;
+            foreach (ObjectId idBtr in bt)
+            {
+               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               {
+                  var blRef = new BlockReference(pt, idBtr);
+                  ms.AppendEntity(blRef);
+                  t.AddNewlyCreatedDBObject(blRef, true);
+                  pt = new Point3d(pt.X, pt.Y + 5000, 0);
+               }
+            }
             t.Commit();
          }
       }

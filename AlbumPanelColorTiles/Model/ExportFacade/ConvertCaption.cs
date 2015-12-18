@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AcadLib.Errors;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -12,7 +7,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 {
    public class ConvertCaption
    {
-      PanelBtrExport panelBtr;
+      private PanelBtrExport panelBtr;
+
       public ConvertCaption(PanelBtrExport panelBtr)
       {
          this.panelBtr = panelBtr;
@@ -26,7 +22,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             Extents3d extMarkSb = convertText(panelBtr.IdCaptionMarkSb, 90, 230, 20);
             Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, 230 + 250, 20);
-            Extents3d extTexts = extMarkSb;            
+            Extents3d extTexts = extMarkSb;
             extTexts.AddExtents(extPaint);
             сreateHatch(extTexts, btr);
          }
@@ -54,9 +50,21 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          return resVal;
       }
 
+      private ObjectId copyText(ObjectId idBdText, BlockTableRecord btr)
+      {
+         using (var text = idBdText.GetObject(OpenMode.ForWrite, false, true) as DBText)
+         {
+            using (var copyText = text.Clone() as DBText)
+            {
+               text.Erase();
+               return btr.AppendEntity(copyText);
+            }
+         }
+      }
+
       private void сreateHatch(Extents3d ext, BlockTableRecord btr)
       {
-         if (ext.Diagonal()<100)
+         if (ext.Diagonal() < 100)
          {
             return;
          }
@@ -73,7 +81,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             h.SetHatchPattern(HatchPatternType.PreDefined, "ANGLE");
             h.PatternScale = 25.0;
             btr.AppendEntity(h);
-            btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(h, true);            
+            btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(h, true);
             h.Associative = false;
             h.HatchStyle = HatchStyle.Normal;
             Point2dCollection pts = new Point2dCollection();
@@ -87,18 +95,6 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
          panelBtr.IdCaptionMarkSb = copyText(panelBtr.IdCaptionMarkSb, btr);
          panelBtr.IdCaptionPaint = copyText(panelBtr.IdCaptionPaint, btr);
-      }
-
-      private ObjectId copyText(ObjectId idBdText, BlockTableRecord btr)
-      {
-         using (var text = idBdText.GetObject(OpenMode.ForWrite, false, true) as DBText)
-         {
-            using (var copyText = text.Clone() as DBText)
-            {
-               text.Erase();
-               return btr.AppendEntity(copyText);
-            }
-         }
       }
    }
 }

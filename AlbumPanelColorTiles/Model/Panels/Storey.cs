@@ -8,12 +8,12 @@ namespace AlbumPanelColorTiles.Panels
 {
    // Этаж
    public class Storey : IEquatable<Storey>, IComparable<Storey>
-   {      
-      private int _number;
-      private string _name;
+   {
       private string _layer;
+      private string _name;
+      private int _number;
+      private EnumStorey _type;
       private double _y;
-      private EnumStorey _type;      
 
       /// <summary>
       /// Высотная отметка этажа
@@ -21,15 +21,16 @@ namespace AlbumPanelColorTiles.Panels
       /// <param name="y">Отметка этажа</param>
       public Storey(double y)
       {
-         _y = y;         
+         _y = y;
       }
+
       public Storey(EnumStorey type)
       {
          _type = type;
          _layer = getLayer();
       }
 
-      public Storey (string name)
+      public Storey(string name)
       {
          if (string.Equals(name, Settings.Default.PaintIndexUpperStorey, StringComparison.OrdinalIgnoreCase))
          {
@@ -51,55 +52,88 @@ namespace AlbumPanelColorTiles.Panels
          _layer = getLayer();
       }
 
+      public string Layer { get { return _layer; } }
+
       public int Number
       {
          get { return _number; }
          set { _number = value; }
       }
 
-      public double Y { get { return _y; } set { _y = value; } }
       public EnumStorey Type { get { return _type; } }
-      public string Layer { get { return _layer; } }
+      public double Y { get { return _y; } set { _y = value; } }
 
       // определение этажей панелей
       public static List<Storey> IdentificationStoreys(List<MarkSb> marksSB, int numberFirstFloor)
       {
          List<Storey> storeys = new List<Storey>();
-         // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.         
+         // Определение этажей панелей (точек вставки панелей по Y.) для всех панелей в чертеже, кроме панелей чердака.
          // Этажи с числовой нумерацией
          List<Storey> storeysNumberType = defStoreyNumberType(marksSB, numberFirstFloor);
          storeys.AddRange(storeysNumberType);
-         // Этажи Ч и П 
+         // Этажи Ч и П
          List<Storey> storeysUpperAndParapetType = defStoreyUpperAndParapetType(marksSB);
          storeys.AddRange(storeysUpperAndParapetType);
          // В итоге у всех панелей (Panel) проставлены этажи (Storey).
          return storeys;
       }
 
-      private static List<Storey> defStoreyUpperAndParapetType(List<MarkSb> marksSB)
+      public int CompareTo(Storey other)
       {
-         // Этажи Ч и П 
-         var storeysUpperAndParapetType = new List<Storey>();
-         var panelsUpperAndParapetType = marksSB.Where(sb => sb.StoreyTypePanel != EnumStorey.Number).SelectMany(sb => sb.MarksAR.SelectMany(ar => ar.Panels));
-         foreach (var panel in panelsUpperAndParapetType)
+         if (_type == EnumStorey.Number)
          {
-            Storey storey = storeysUpperAndParapetType.Find(s => s.Type == panel.MarkAr.MarkSB.StoreyTypePanel);
-            if (storey == null)
-            {
-               // Новый этаж
-               storey = new Storey(panel.MarkAr.MarkSB.StoreyTypePanel);
-               storeysUpperAndParapetType.Add(storey);               
-            }
-            panel.Storey = storey;
+            return _number.CompareTo(other._number);
          }
-         storeysUpperAndParapetType.Sort((Storey s1, Storey s2) => s1.Type.CompareTo(s2.Type));
-         return storeysUpperAndParapetType;
+         else
+         {
+            return _type.CompareTo(other._type);
+         }
+      }
+
+      public bool Equals(Storey other)
+      {
+         if (_type == EnumStorey.Number)
+         {
+            return _number.Equals(other._number);// &&
+            //_y.Equals(other._y);
+         }
+         else
+         {
+            return _type.Equals(other._type);
+         }
+      }
+
+      public string GetName()
+      {
+         switch (_type)
+         {
+            case EnumStorey.Number:
+               return _number.ToString();
+
+            case EnumStorey.Upper:
+               return Settings.Default.PaintIndexUpperStorey;
+
+            case EnumStorey.Parapet:
+               return Settings.Default.PaintIndexParapet;
+
+            default:
+               return string.Empty;
+         }
+      }
+
+      public override string ToString()
+      {
+         if (_name == null)
+         {
+            _name = GetName();
+         }
+         return _name;
       }
 
       private static List<Storey> defStoreyNumberType(List<MarkSb> marksSB, int numberFirstFloor)
       {
          var storeysNumberType = new List<Storey>();
-         var comparerStorey = new DoubleEqualityComparer(Settings.Default.StoreyDefineDeviation); // 2000        
+         var comparerStorey = new DoubleEqualityComparer(Settings.Default.StoreyDefineDeviation); // 2000
          // Панели этажные (без чердака и парапета)
          var panelsStoreyNumberType = marksSB.Where(sb => sb.StoreyTypePanel == EnumStorey.Number).SelectMany(sb => sb.MarksAR.SelectMany(ar => ar.Panels)).OrderBy(p => p.InsPt.Y);
          foreach (var panel in panelsStoreyNumberType)
@@ -121,28 +155,24 @@ namespace AlbumPanelColorTiles.Panels
          return storeysNumberType;
       }
 
-      public override string ToString()
+      private static List<Storey> defStoreyUpperAndParapetType(List<MarkSb> marksSB)
       {
-         if (_name == null)
+         // Этажи Ч и П
+         var storeysUpperAndParapetType = new List<Storey>();
+         var panelsUpperAndParapetType = marksSB.Where(sb => sb.StoreyTypePanel != EnumStorey.Number).SelectMany(sb => sb.MarksAR.SelectMany(ar => ar.Panels));
+         foreach (var panel in panelsUpperAndParapetType)
          {
-            _name = GetName();
+            Storey storey = storeysUpperAndParapetType.Find(s => s.Type == panel.MarkAr.MarkSB.StoreyTypePanel);
+            if (storey == null)
+            {
+               // Новый этаж
+               storey = new Storey(panel.MarkAr.MarkSB.StoreyTypePanel);
+               storeysUpperAndParapetType.Add(storey);
+            }
+            panel.Storey = storey;
          }
-         return _name;
-      }
-
-      public string GetName()
-      {
-         switch (_type)
-         {
-            case EnumStorey.Number:
-               return _number.ToString();               
-            case EnumStorey.Upper:
-               return Settings.Default.PaintIndexUpperStorey;
-            case EnumStorey.Parapet:
-               return Settings.Default.PaintIndexParapet;
-            default:
-               return string.Empty;               
-         }
+         storeysUpperAndParapetType.Sort((Storey s1, Storey s2) => s1.Type.CompareTo(s2.Type));
+         return storeysUpperAndParapetType;
       }
 
       private string getLayer()
@@ -151,43 +181,21 @@ namespace AlbumPanelColorTiles.Panels
          {
             case EnumStorey.Number:
                return Autodesk.AutoCAD.DatabaseServices.SymbolUtilityServices.LayerZeroName;
+
             case EnumStorey.Upper:
                return Settings.Default.LayerUpperStoreyPanels;
+
             case EnumStorey.Parapet:
                return Settings.Default.LayerParapetPanels;
+
             default:
                return Autodesk.AutoCAD.DatabaseServices.SymbolUtilityServices.LayerZeroName;
          }
       }
 
-      public int CompareTo(Storey other)
-      {
-         if (_type == EnumStorey.Number)
-         {
-            return _number.CompareTo(other._number);
-         }
-         else
-         {
-            return _type.CompareTo(other._type);
-         }
-      }
-
-      public bool Equals(Storey other)
-      {
-         if (_type == EnumStorey.Number)
-         {
-            return _number.Equals(other._number);// &&            
-            //_y.Equals(other._y);
-         }
-         else
-         {
-            return _type.Equals(other._type);
-         }         
-      }
-
       //public void DefineYFloor(int minNum)
       //{
-      //   // определение уровня этажа относиельно 0 уровня минимального этажа minNum         
+      //   // определение уровня этажа относиельно 0 уровня минимального этажа minNum
       //   _y = (_number - minNum) * Settings.Default.FacadeFloorHeight;
       //}
    }

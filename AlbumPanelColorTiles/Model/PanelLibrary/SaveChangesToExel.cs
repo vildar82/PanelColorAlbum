@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OfficeOpenXml;
 
 namespace AlbumPanelColorTiles.PanelLibrary
@@ -23,13 +20,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          try
          {
             using (var xlPackage = new ExcelPackage(new FileInfo(fileXls)))
-            {               
+            {
                var worksheet = xlPackage.Workbook.Worksheets[1];
                int row = 2;
 
-               while (worksheet.Cells[row, 1].Text != "")                                 
+               while (worksheet.Cells[row, 1].Text != "")
                   row++;
-                              
+
                foreach (var panel in panelsAkrFacade)
                {
                   worksheet.Cells[row, 1].Value = panel.BlName;

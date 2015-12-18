@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Model;
 using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Model.Select;
@@ -23,14 +22,15 @@ namespace AlbumPanelColorTiles
    // Альбом колористических решений.
    public class Album
    {
-      public const string REGAPPPATH = @"Software\Vildar\AKR";
-      public const string REGKEYABBREVIATE = "Abbreviate";
+      public const string KEYNAMECHECKMARKPAINTING = "CheckMarkPainting";
       public const string KEYNAMENUMBERFIRSTFLOOR = "NumberFirstFloor";
       public const string KEYNAMENUMBERFIRSTSHEET = "NumberFirstSheet";
-      public const string KEYNAMECHECKMARKPAINTING = "CheckMarkPainting";
-      
-      //private string _abbreviateProject;      
+      public const string REGAPPPATH = @"Software\Vildar\AKR";
+      public const string REGKEYABBREVIATE = "Abbreviate";
+
+      //private string _abbreviateProject;
       private List<ColorArea> _colorAreas;
+
       private List<Paint> _colors; // Набор цветов используемых в альбоме.
       private Database _db;
 
@@ -38,20 +38,12 @@ namespace AlbumPanelColorTiles
 
       private List<MarkSb> _marksSB;
 
-      public StartOptions StartOptions { get; private set; }
+      private SheetsSet _sheetsSet;
+
       // Сокращенное имя проеккта
       //private int _numberFirstFloor;
       //private int _numberFirstSheet;
-
-      private SheetsSet _sheetsSet;
       private List<Storey> _storeys;
-      public List<Model.Panels.Section> Sections { get; set; }      
-      /// <summary>
-      /// Общий расход плитки на альбом.
-      /// Список плиток по цветам
-      /// </summary>
-      public List<TileCalc> TotalTilesCalc { get; private set; }
-      public DateTime Date { get; private set; }
 
       public Album()
       {
@@ -62,14 +54,25 @@ namespace AlbumPanelColorTiles
 
       //public int NumberFirstSheet { get { return _numberFirstSheet; } }
       public static Tolerance Tolerance { get { return Tolerance.Global; } }
-     // public string AbbreviateProject { get { return _abbreviateProject; } }
+
+      // public string AbbreviateProject { get { return _abbreviateProject; } }
       public string AlbumDir { get; set; }
+
       public List<Paint> Colors { get { return _colors; } }
-      public string DwgFacade { get { return _doc.Name; } }
+      public DateTime Date { get; private set; }
       public Document Doc { get { return _doc; } }
+      public string DwgFacade { get { return _doc.Name; } }
       public List<MarkSb> MarksSB { get { return _marksSB; } }
+      public List<Model.Panels.Section> Sections { get; set; }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
+      public StartOptions StartOptions { get; private set; }
       public List<Storey> Storeys { get { return _storeys; } }
+
+      /// <summary>
+      /// Общий расход плитки на альбом.
+      /// Список плиток по цветам
+      /// </summary>
+      public List<TileCalc> TotalTilesCalc { get; private set; }
 
       // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
       public static void ResetBlocks()
@@ -146,13 +149,13 @@ namespace AlbumPanelColorTiles
                   {
                      // Подпись марки блока
                      string panelMark = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
-                     captionPanels.AddMarkToPanelBtr(panelMark,idBtr, null);
+                     captionPanels.AddMarkToPanelBtr(panelMark, idBtr, null);
                   }
                }
             }
             t.Commit();
          }
-      }      
+      }
 
       // Проверка панелей на чертеже и панелей в памяти (this)
       public void CheckPanelsInDrawingAndMemory()
@@ -239,7 +242,7 @@ namespace AlbumPanelColorTiles
       public void PaintPanels()
       {
          // Запрос начальных значений - Аббревиатуры, Номера первого этажа, Номера первого листа
-         //promptStartOptions();    
+         //promptStartOptions();
          StartOptions = new StartOptions();
          StartOptions.PromptStartOptions();
 
@@ -279,7 +282,7 @@ namespace AlbumPanelColorTiles
                   "Ошибка. При покраске в чертеже не должно быть блоков панелей марки АР. Найдено {0} блоков марки АР.",
                   selBlocks.IdsBlRefPanelAr.Count));
          }
-         Sections = Model.Panels.Section.GetSections(selBlocks.SectionsBlRefs);         
+         Sections = Model.Panels.Section.GetSections(selBlocks.SectionsBlRefs);
 
          // Определение покраски панелей.
          _marksSB = MarkSb.GetMarksSB(rtreeColorAreas, this, "Покраска панелей...", selBlocks.IdsBlRefPanelSb);
@@ -295,7 +298,7 @@ namespace AlbumPanelColorTiles
          }
 
          // Определение принадлежности блоков панелеи секциям
-         Model.Panels.Section.DefineSections(this);         
+         Model.Panels.Section.DefineSections(this);
 
          // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
          RenamePanelsToArchitectIndex(_marksSB);
@@ -312,7 +315,7 @@ namespace AlbumPanelColorTiles
          // Добавление подписей к панелям
          Caption caption = new Caption(_marksSB);
          caption.CaptionPanels();
-      }      
+      }
 
       // Сброс данных расчета панелей
       public void ResetData()
@@ -324,7 +327,7 @@ namespace AlbumPanelColorTiles
          ObjectId _idLayerMarks = ObjectId.Null;
          _marksSB = null;
          _sheetsSet = null;
-      }     
+      }
 
       // Создание определений блоков панелей марки АР
       private void CreatePanelsMarkAR()
@@ -381,6 +384,6 @@ namespace AlbumPanelColorTiles
             t.Commit();
          }
          progressMeter.Stop();
-      }      
+      }
    }
 }

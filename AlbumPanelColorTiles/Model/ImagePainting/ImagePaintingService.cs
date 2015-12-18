@@ -142,7 +142,7 @@ namespace AlbumPanelColorTiles.ImagePainting
                   progressMeter.Stop();
                   blRefColorAreaTemplate.Erase(true);
                   t.Commit();
-                  
+
                   _doc.Editor.Regen();
                   _doc.Editor.WriteMessage("\nГотово");
                }

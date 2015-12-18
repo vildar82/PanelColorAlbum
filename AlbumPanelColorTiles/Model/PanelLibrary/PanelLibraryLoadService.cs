@@ -9,13 +9,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // вставка панелей из библиотеки
    public class PanelLibraryLoadService
    {
-      public Album Album { get; private set; }
-
       public PanelLibraryLoadService()
       {
-         
       }
 
+      public Album Album { get; private set; }
       // все блоки панелей-СБ в чертеже
       //private List<PanelSB> _allPanelsSB = new List<PanelSB> ();
 
@@ -94,14 +92,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                     // Проверка марки покраски
                                     if (Album.StartOptions.CheckMarkPainting)
                                     {
-                                       isFound = true;                                       
+                                       isFound = true;
                                        if (!string.Equals(mountingPanelSb.MarkPainting, markAr.MarkPaintingFull, StringComparison.CurrentCultureIgnoreCase))
-                                       { 
+                                       {
                                           // Ошибка - марки покраски не совпали.
                                           string errMsg = string.Format("Не совпала марка покраски. Панель АКР {0}, Монтажная панель {1}{2}",
                                                 markAr.MarkARPanelFullName, mountingPanelSb.MarkSb, mountingPanelSb.MarkPainting);
                                           Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr);
-                                          Log.Error(errMsg);                                          
+                                          Log.Error(errMsg);
                                        }
                                        break;
                                     }
@@ -119,7 +117,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                              break;
                                           }
                                        }
-                                    }                                    
+                                    }
                                  }
                               }
                            }
@@ -135,7 +133,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                }
             }
          }
-      }      
+      }
 
       // загрузка АКР-панелей из библиотеки с попыткой расстановить их в виде фасадов если правильно расставлены монтажки
       public void LoadPanels()
@@ -144,10 +142,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Попытка определить фасады по монтажкам
          List<FacadeMounting> facades = FacadeMounting.GetFacadesFromMountingPlans(this);
          if (Inspector.HasErrors)
-         {            
+         {
             Inspector.Show();
             return;
-         }         
+         }
          if (facades.Count > 0)
          {
             // загрузка АКР-панелей из библиотеки
@@ -158,7 +156,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             FacadeMounting.CreateFacades(facades);
          }
          else
-         {            
+         {
             Inspector.AddError("Не удалось определить фасады по монтажным планам.");
          }
          if (Inspector.HasErrors)

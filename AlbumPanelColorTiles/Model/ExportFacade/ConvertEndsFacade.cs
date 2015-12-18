@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -14,15 +10,14 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
    /// </summary>
    public class ConvertEndsFacade
    {
+      public ConvertPanelService CPS;
+
+      private bool isLeftSide;
+
       // скопировать торцы из блоков панелей в блок торцов и вставить в тоже место на чертеже что они были в блоках панелей
       private IGrouping<double, PanelBlRefExport> itemLefEndsByY;
+
       private string sideName;
-      private bool isLeftSide;
-      public string BlNameEnd { get; private set; }
-      public Point3d Position { get; private set; }
-      public ConvertPanelService CPS;
-      public ObjectId IdBtrEnd { get; set; }
-      public bool IsExistsBlockEnd { get; private set; }
 
       public ConvertEndsFacade(IGrouping<double, PanelBlRefExport> itemLefEndsByY, bool isLeftSide, ConvertPanelService cps)
       {
@@ -31,6 +26,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          this.isLeftSide = isLeftSide;
          CPS = cps;
       }
+
+      public string BlNameEnd { get; private set; }
+      public ObjectId IdBtrEnd { get; set; }
+      public bool IsExistsBlockEnd { get; private set; }
+      public Point3d Position { get; private set; }
 
       public void Convert()
       {
@@ -42,64 +42,24 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          Position = defPosition();
 
          // копирование объектов торца в блок торца
-         createBlock();         
+         createBlock();
       }
 
-      private void deleteEndInPanels()
+      public void DeleteEnds()
       {
-         var panelsBtr = itemLefEndsByY.Select(p => p.PanelBtrExport);
-
-         foreach (var panelBtr in panelsBtr)
-         {
-            panelBtr.DeleteEnd(isLeftSide);
-         }         
-      }
-
-      private Point3d defPosition()
-      {
-         // Определение точки вставки блока торца
-         Point3d resVal;
-         // самая нижняя панель в столбце панелей с торцами
-         var panelLower = this.itemLefEndsByY.OrderBy(p => p.Position.Y).First();
-         if (isLeftSide)
-         {
-            resVal = panelLower.PanelBtrExport.ExtentsByTile.MinPoint.TransformBy(panelLower.Transform);
-         }
-         else
-         {
-            resVal = new Point3d(panelLower.PanelBtrExport.ExtentsByTile.MaxPoint.X - 300,
-                                 panelLower.PanelBtrExport.ExtentsByTile.MinPoint.Y, 0).TransformBy(panelLower.Transform);
-         }
-         return resVal;
-      }
-
-      private string defBlNameEnd()
-      {         
-         string nameEnd;
-         // если все панели имеют один фасад, то имя торца по имени осей фасада
-         var facades = itemLefEndsByY.GroupBy(p=>p.Facade);
-         if (facades.Count()==1 && facades.First().Key!=null)
-         {            
-            nameEnd = facades.First().Key.Name;
-         }
-         else
-         {
-            // имя блока торца по координате Y
-            nameEnd = itemLefEndsByY.Key.ToString("0.0");
-         }
-         return string.Format("АКР_Торец_{0}_{1}", nameEnd, sideName);
+         deleteEndInPanels();
       }
 
       private void createBlock()
       {
          // создание определения блока
-         using (var bt = CPS.DbExport.BlockTableId.GetObject( OpenMode.ForRead) as BlockTable)
+         using (var bt = CPS.DbExport.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             IdBtrEnd = getIdBtrEnd(bt);
          }
 
-         // для каждой панели - копирование объектв торца с преобразование в координаты модели  
-         // список копируемых объектов торуа с привязкой к объекту блока панели для дальнейшего перемещения объектов в 0,0 в блоке торца                                  
+         // для каждой панели - копирование объектв торца с преобразование в координаты модели
+         // список копируемых объектов торуа с привязкой к объекту блока панели для дальнейшего перемещения объектов в 0,0 в блоке торца
          foreach (var panelBlRef in itemLefEndsByY)
          {
             Dictionary<ObjectId, PanelBlRefExport> dictIdsEndEnts = new Dictionary<ObjectId, PanelBlRefExport>();
@@ -146,7 +106,6 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          //   dictIdsCopyedEndEnts.Add(itemIdMap.Key, panelBlRef);
          //}
 
-
          //// удаление выбранных объектов
          //foreach (ObjectId idEnt in ids)
          //{
@@ -169,9 +128,63 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
-      public void DeleteEnds()
+      private string defBlNameEnd()
       {
-         deleteEndInPanels();
+         string nameEnd;
+         // если все панели имеют один фасад, то имя торца по имени осей фасада
+         var facades = itemLefEndsByY.GroupBy(p => p.Facade);
+         if (facades.Count() == 1 && facades.First().Key != null)
+         {
+            nameEnd = facades.First().Key.Name;
+         }
+         else
+         {
+            // имя блока торца по координате Y
+            nameEnd = itemLefEndsByY.Key.ToString("0.0");
+         }
+         return string.Format("АКР_Торец_{0}_{1}", nameEnd, sideName);
+      }
+
+      private Point3d defPosition()
+      {
+         // Определение точки вставки блока торца
+         Point3d resVal;
+         // самая нижняя панель в столбце панелей с торцами
+         var panelLower = this.itemLefEndsByY.OrderBy(p => p.Position.Y).First();
+         if (isLeftSide)
+         {
+            resVal = panelLower.PanelBtrExport.ExtentsByTile.MinPoint.TransformBy(panelLower.Transform);
+         }
+         else
+         {
+            resVal = new Point3d(panelLower.PanelBtrExport.ExtentsByTile.MaxPoint.X - 300,
+                                 panelLower.PanelBtrExport.ExtentsByTile.MinPoint.Y, 0).TransformBy(panelLower.Transform);
+         }
+         return resVal;
+      }
+
+      private void deleteEndInPanels()
+      {
+         var panelsBtr = itemLefEndsByY.Select(p => p.PanelBtrExport);
+
+         foreach (var panelBtr in panelsBtr)
+         {
+            panelBtr.DeleteEnd(isLeftSide);
+         }
+      }
+
+      private void eraseEntInBlock(ObjectId idBtr)
+      {
+         using (var btr = idBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+         {
+            foreach (ObjectId idEnt in btr)
+            {
+               using (var ent = idEnt.GetObject(OpenMode.ForWrite, false, true) as Entity)
+               {
+                  ent.Erase();
+               }
+            }
+         }
       }
 
       private ObjectId getIdBtrEnd(BlockTable bt)
@@ -195,20 +208,6 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             }
          }
          return idBtrEnd;
-      }
-
-      private void eraseEntInBlock(ObjectId idBtr)
-      {
-         using (var btr = idBtr.GetObject( OpenMode.ForWrite) as BlockTableRecord)
-         {
-            foreach (ObjectId idEnt in btr)
-            {
-               using (var ent = idEnt.GetObject( OpenMode.ForWrite, false, true)as Entity)
-               {
-                  ent.Erase();
-               }
-            }
-         }
       }
    }
 }

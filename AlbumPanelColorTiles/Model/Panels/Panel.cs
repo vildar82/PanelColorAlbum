@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Model.Panels;
-using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -41,9 +40,8 @@ namespace AlbumPanelColorTiles.Panels
       /// </summary>
       public Extents3d Extents { get { return _extents; } }
 
+      public Facade Facade { get; set; }
       public ObjectId IdBlRefAr { get { return _idBlRefAr; } }
-
-      public Model.Panels.Section Section { get; set; }
 
       /// <summary>
       /// Точка вставки блока панели
@@ -51,13 +49,34 @@ namespace AlbumPanelColorTiles.Panels
       public Point3d InsPt { get { return _insPt; } }
 
       public MarkAr MarkAr { get { return _markAr; } }
-
-      public Facade Facade{ get; set; }
+      public Model.Panels.Section Section { get; set; }
 
       public Storey Storey
       {
          get { return _storey; }
          set { _storey = value; }
+      }
+
+      public static List<ObjectId> GetPanelsBlRefInModel(Database db)
+      {
+         List<ObjectId> ids = new List<ObjectId>();
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  if (MarkSb.IsBlockNamePanel(blRef.Name))
+                  {
+                     ids.Add(idEnt);
+                  }
+               }
+            }
+            t.Commit();
+         }
+         return ids;
       }
 
       public bool Equals(Panel other)
@@ -116,28 +135,6 @@ namespace AlbumPanelColorTiles.Panels
          //   t.AddNewlyCreatedDBObject(blRefPanelAr, true);
          //   t.Commit();
          //}
-      }      
-
-      public static List<ObjectId> GetPanelsBlRefInModel(Database db)
-      {         
-         List<ObjectId> ids = new List<ObjectId>();
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
-            foreach (ObjectId idEnt in ms)
-            {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-               {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (MarkSb.IsBlockNamePanel(blRef.Name))
-                  {
-                     ids.Add(idEnt);
-                  }
-               }
-            }
-            t.Commit();
-         }
-         return ids;
-      }      
+      }
    }
 }

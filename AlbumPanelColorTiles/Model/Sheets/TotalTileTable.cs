@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using AcadLib.Jigs;
-using AlbumPanelColorTiles.Panels;
+﻿using AcadLib.Jigs;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -69,7 +66,7 @@ namespace AlbumPanelColorTiles.Sheets
          table.Cells[1, 4].TextString = "Расход, м.кв.";
 
          int row = 2;
-         int i = 1;         
+         int i = 1;
          int totalCountTile = 0;
          double totalArea = 0;
 
@@ -77,8 +74,8 @@ namespace AlbumPanelColorTiles.Sheets
          {
             table.Cells[row, 0].TextString = i++.ToString(); //"Поз.";
             table.Cells[row, 1].TextString = tileCalcSameColor.ColorMark;  //"Цвет";
-            table.Cells[row, 2].BackgroundColor = tileCalcSameColor.Pattern;  // "Образец";            
-            table.Cells[row, 3].TextString = tileCalcSameColor.Count.ToString();// "Расход, шт.";                        
+            table.Cells[row, 2].BackgroundColor = tileCalcSameColor.Pattern;  // "Образец";
+            table.Cells[row, 3].TextString = tileCalcSameColor.Count.ToString();// "Расход, шт.";
             table.Cells[row, 4].TextString = tileCalcSameColor.TotalArea.ToString();  // "Расход, м.кв.";
 
             totalCountTile += tileCalcSameColor.Count;

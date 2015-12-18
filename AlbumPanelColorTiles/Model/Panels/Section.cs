@@ -8,7 +8,7 @@ using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.Panels
 {
-   public class Section :IComparable<Section>
+   public class Section : IComparable<Section>
    {
       private int _num;
 
@@ -65,7 +65,7 @@ namespace AlbumPanelColorTiles.Model.Panels
 
       public int CompareTo(Section other)
       {
-         if (_num ==0)
+         if (_num == 0)
          {
             return Name.CompareTo(other.Name);
          }

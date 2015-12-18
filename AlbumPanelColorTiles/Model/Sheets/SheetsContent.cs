@@ -30,43 +30,7 @@ namespace AlbumPanelColorTiles.Sheets
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
          _sheetsMarkSB = sheetsSet.SheetsMarkSB;
-         _blFrameInFacade = blFrameInFacade;         
-      }
-
-      // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
-      private static int CalcSheetsContentNumber(int rowsTable, int marksAr)
-      {
-         int res = 0; // Нужное кол листов содержания
-         int rowsToSheetsInTable = rowsTable - 2; // строк в таблице под листы
-         int rowsInFirstSheet = rowsToSheetsInTable - 5;// строк под листы марки АР на первом листе содерж (без облажки тит и т.п )
-         int numSheetsMarksAr = marksAr * 2; // кол листов марок АР (листы фасада и форм)
-         numSheetsMarksAr -= rowsInFirstSheet; // вычитаем листы первого листа содержания
-         res = 1;
-         res += numSheetsMarksAr / rowsToSheetsInTable; // целое кол листов
-         var remaindSheets = numSheetsMarksAr % rowsToSheetsInTable; // остаток листов
-         if (remaindSheets > 0)
-         {
-            res++;
-         }
-         return res;
-      }
-
-      // Определение кол-ва марок АР
-      private int CalcMarksArNumber(List<SheetMarkSB> marksSB)
-      {
-         return marksSB.Sum(sb => sb.SheetsMarkAR.Count);
-      }
-
-      private void CheckEndOfTable(Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
-      {
-         if (row == tableContent.Rows.Count)
-         {
-            // Новый лист содержания
-            tableContent.RecomputeTableBlock(true);
-            CopyContentSheet(t, ++curContentLayout, out tableContent, out blRefStamp);
-            FillingStampContent(blRefStamp, curContentLayout, t);
-            row = _firstRowInTableForSheets;
-         }
+         _blFrameInFacade = blFrameInFacade;
       }
 
       // Содержание тома (Общие данные. Ведомость комплекта чертежей.)
@@ -112,13 +76,13 @@ namespace AlbumPanelColorTiles.Sheets
                tableContent.Cells[row++, 1].TextString = "ТОМ";
 
                int curSheetArNum;
-               if (_album.StartOptions.NumberFirstSheet ==0)
+               if (_album.StartOptions.NumberFirstSheet == 0)
                {
                   curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
                }
                else
                {
-                  curSheetArNum = _album.StartOptions.NumberFirstSheet-1;
+                  curSheetArNum = _album.StartOptions.NumberFirstSheet - 1;
                }
 
                ProgressMeter progressMeter = new ProgressMeter();
@@ -163,6 +127,42 @@ namespace AlbumPanelColorTiles.Sheets
             }
             HostApplicationServices.WorkingDatabase = _dbFacade;
             _dbContent.SaveAs(fileContent, DwgVersion.Current);
+         }
+      }
+
+      // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
+      private static int CalcSheetsContentNumber(int rowsTable, int marksAr)
+      {
+         int res = 0; // Нужное кол листов содержания
+         int rowsToSheetsInTable = rowsTable - 2; // строк в таблице под листы
+         int rowsInFirstSheet = rowsToSheetsInTable - 5;// строк под листы марки АР на первом листе содерж (без облажки тит и т.п )
+         int numSheetsMarksAr = marksAr * 2; // кол листов марок АР (листы фасада и форм)
+         numSheetsMarksAr -= rowsInFirstSheet; // вычитаем листы первого листа содержания
+         res = 1;
+         res += numSheetsMarksAr / rowsToSheetsInTable; // целое кол листов
+         var remaindSheets = numSheetsMarksAr % rowsToSheetsInTable; // остаток листов
+         if (remaindSheets > 0)
+         {
+            res++;
+         }
+         return res;
+      }
+
+      // Определение кол-ва марок АР
+      private int CalcMarksArNumber(List<SheetMarkSB> marksSB)
+      {
+         return marksSB.Sum(sb => sb.SheetsMarkAR.Count);
+      }
+
+      private void CheckEndOfTable(Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
+      {
+         if (row == tableContent.Rows.Count)
+         {
+            // Новый лист содержания
+            tableContent.RecomputeTableBlock(true);
+            CopyContentSheet(t, ++curContentLayout, out tableContent, out blRefStamp);
+            FillingStampContent(blRefStamp, curContentLayout, t);
+            row = _firstRowInTableForSheets;
          }
       }
 

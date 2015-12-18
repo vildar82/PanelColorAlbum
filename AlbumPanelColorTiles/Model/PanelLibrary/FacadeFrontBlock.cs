@@ -9,10 +9,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // Блок обозначения стороны фасада на монтажке
    public class FacadeFrontBlock
    {
+      private string _blName;
       private Extents3d _extents;
       private ObjectId _idBlRef;
       private RTreeLib.Rectangle _rectangleRTree;
-      private string _blName;
 
       public FacadeFrontBlock(BlockReference blRef)
       {

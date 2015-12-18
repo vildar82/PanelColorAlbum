@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AlbumPanelColorTiles.PanelLibrary.LibEditor
+﻿namespace AlbumPanelColorTiles.PanelLibrary.LibEditor
 {
    // редактор библиотеки панелей
    public class LibraryEditor

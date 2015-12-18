@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Select;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -15,8 +14,6 @@ namespace AlbumPanelColorTiles.Panels
    public class MarkSb : IEquatable<MarkSb>
    {
       private string _abbr;
-      public Album Album { get; private set; }
-
       private Point2d _centerPanel;
 
       // зоны покраски внутри определения блока (приоритет выше чем у зон в модели).
@@ -24,12 +21,14 @@ namespace AlbumPanelColorTiles.Panels
 
       // Границы блока по плитке
       private Extents3d _extentsTiles;
-      private double _heightPanelByTile; // Высота панели по плитке
 
+      private double _heightPanelByTile;
       private ObjectId _idBtr;
+
+      // Высота панели по плитке
       private bool _isEndLeftPanel;
-      private bool _isEndRightPanel;      
-      private EnumStorey _storeyTypePanel;
+
+      private bool _isEndRightPanel;
       private List<MarkAr> _marksAR;
       private string _markSb;
 
@@ -42,11 +41,12 @@ namespace AlbumPanelColorTiles.Panels
       private List<Paint> _paints;
 
       private RTree<ColorArea> _rtreeColorArea;
+      private EnumStorey _storeyTypePanel;
 
       // Список плиток в панели Марки СБ
       private List<Tile> _tiles;
 
-      private int _windowSuffix;// индекс отличия панели по виду окна, 1,2,3 и т.д. по порядку.
+      private int _windowSuffix;
 
       // Конструктор. Скрытый.
       private MarkSb(BlockReference blRefPanel, ObjectId idBtrMarkSb, string markSbName, string markSbBlockName, Album album)
@@ -57,7 +57,7 @@ namespace AlbumPanelColorTiles.Panels
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
          defineStoreyTypePanel(blRefPanel);
-         checkPanelIndexes(markSbName, blRefPanel);         
+         checkPanelIndexes(markSbName, blRefPanel);
          _marksAR = new List<MarkAr>();
          _colorAreas = ColorArea.GetColorAreas(_idBtr, album);
          _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
@@ -67,33 +67,22 @@ namespace AlbumPanelColorTiles.Panels
          _centerPanel = GetCenterPanel(_tiles);
       }
 
-      private void defineStoreyTypePanel(BlockReference blRefPanel)
-      {
-         // Определение типа этажа панели
-         if (string.Equals(blRefPanel.Layer, Settings.Default.LayerUpperStoreyPanels, StringComparison.OrdinalIgnoreCase))
-         {
-            _storeyTypePanel = EnumStorey.Upper;
-         }
-         else if (string.Equals(blRefPanel.Layer, Settings.Default.LayerParapetPanels, StringComparison.OrdinalIgnoreCase))
-         {
-            _storeyTypePanel = EnumStorey.Parapet;
-         }
-      }
-
       public string Abbr { get { return _abbr; } }
-
+      public Album Album { get; private set; }
       public Point2d CenterPanel { get { return _centerPanel; } }
+
       public Extents3d ExtentsTiles { get { return _extentsTiles; } }
+
       public double HeightPanelByTile { get { return _heightPanelByTile; } }
 
       public ObjectId IdBtr { get { return _idBtr; } }
 
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
+
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
-      public EnumStorey StoreyTypePanel { get { return _storeyTypePanel; } }
 
       public List<MarkAr> MarksAR { get { return _marksAR; } }
-      public string MarkSbName { get { return _markSb; } }
+
       public string MarkSbBlockName { get { return _markSbBlockName; } }
 
       public string MarkSbClean
@@ -108,7 +97,11 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
+      public string MarkSbName { get { return _markSb; } }
+
       public List<Paint> Paints { get { return _paints; } }
+
+      public EnumStorey StoreyTypePanel { get { return _storeyTypePanel; } }
 
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }
@@ -204,7 +197,7 @@ namespace AlbumPanelColorTiles.Panels
       public static List<MarkSb> GetMarksSB(RTree<ColorArea> rtreeColorAreas, Album album, string progressMsg, List<ObjectId> idsBlRefPanels)
       {
          List<MarkSb> marksSb = new List<MarkSb>();
-         Database db = HostApplicationServices.WorkingDatabase;         
+         Database db = HostApplicationServices.WorkingDatabase;
 
          using (var t = db.TransactionManager.StartTransaction())
          {
@@ -240,7 +233,7 @@ namespace AlbumPanelColorTiles.Panels
             }
             progressMeter.Stop();
             t.Commit();
-         }         
+         }
          return marksSb;
       }
 
@@ -314,91 +307,7 @@ namespace AlbumPanelColorTiles.Panels
          {
             defOtherArchMarks(marksArArchitectIndex);
          }
-      }      
-
-      private void defOtherArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex)
-      {
-         // Панели этажей
-         int i = 1;
-         foreach (var markAR in MarksAR)
-         {
-            string markPaint;
-            var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
-            string floor = String.Join(",", floors);
-            markPaint = string.Format("{0}{1}", Settings.Default.PaintIndexStorey, floor);//Э2,5,8
-            if (marksArArchitectIndex.ContainsKey(markPaint))
-            {
-               markPaint = string.Format("{0}-{1}", markPaint, i++);
-            }
-            marksArArchitectIndex.Add(markPaint, markAR);
-            if (markAR.MarkSB.WindowSuffix > 0)
-            {
-               markPaint += Settings.Default.PaintIndexWindow + markAR.MarkSB.WindowSuffix;// -ОК1
-            }
-            markAR.MarkPaintingCalulated = markPaint;
-         }
       }
-
-      private void defEndsArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex)
-      {
-         // Торцевые панели (Э1ТЛ_Яр1)
-         string endIndex;
-         if (IsEndLeftPanel)
-            endIndex = Settings.Default.PaintIndexEndLeftPanel; // "ТЛ"
-         else
-            endIndex = Settings.Default.PaintIndexEndRightPanel; //"ТП"
-                                                                 // Панели этажей
-         int i = 1;
-         foreach (var markAR in MarksAR)
-         {
-            string markPaint;
-            var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
-            string floor = String.Join(",", floors);
-            markPaint = string.Format("{0}{1}{2}", Settings.Default.PaintIndexStorey, floor, endIndex); // Э2,3,4ТП
-            if (marksArArchitectIndex.ContainsKey(markPaint))
-            {
-               markPaint = string.Format("{0}-{1}", markPaint, i++);
-            }
-            marksArArchitectIndex.Add(markPaint, markAR);
-            if (markAR.MarkSB.WindowSuffix > 0)
-            {
-               markPaint += Settings.Default.PaintIndexWindow + markAR.MarkSB.WindowSuffix; // -ОК1
-            }
-            markAR.MarkPaintingCalulated = markPaint;
-         }
-      }
-
-      private void defUpperStoreyAndParapetArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex, string index)
-      {
-         // Панели чердака
-         // (ЭЧ-#_Яр1)
-         if (MarksAR.Count == 1)
-         {
-            // Если одна марка покраски
-            string markPaint = Settings.Default.PaintIndexStorey + index; // "ЭЧ"
-            marksArArchitectIndex.Add(markPaint, MarksAR[0]);
-            if (MarksAR[0].MarkSB.WindowSuffix > 0)
-            {
-               markPaint += Settings.Default.PaintIndexWindow + MarksAR[0].MarkSB.WindowSuffix; // -ОК1
-            }
-            MarksAR[0].MarkPaintingCalulated = markPaint;
-         }
-         else
-         {
-            // Если несколько марок покраски
-            int i = 1;
-            foreach (var markAR in MarksAR)
-            {
-               string markPaint = string.Format("{0}{1}-{2}", Settings.Default.PaintIndexStorey, index, i++); // ЭЧ-1
-               marksArArchitectIndex.Add(markPaint, markAR);
-               if (markAR.MarkSB.WindowSuffix > 0)
-               {
-                  markPaint += Settings.Default.PaintIndexWindow + markAR.MarkSB.WindowSuffix;//"-ОК1"
-               }
-               markAR.MarkPaintingCalulated = markPaint;
-            }
-         }
-      }      
 
       public bool Equals(MarkSb other)
       {
@@ -422,7 +331,7 @@ namespace AlbumPanelColorTiles.Panels
       // Определение марки СБ, если ее еще нет, то создание и добавление в список marks.
       private static MarkSb GetMarkSb(BlockReference blRefPanelSb, List<MarkSb> marksSb, BlockTable bt, Album album)
       {
-         MarkSb markSb = null;         
+         MarkSb markSb = null;
          string markSbName = GetMarkSbName(blRefPanelSb.Name);
          if (markSbName != string.Empty)
          {
@@ -445,7 +354,7 @@ namespace AlbumPanelColorTiles.Panels
                   Inspector.AddError(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanelSb.Name), blRefPanelSb);
                }
             }
-         }         
+         }
          return markSb;
       }
 
@@ -488,6 +397,104 @@ namespace AlbumPanelColorTiles.Panels
             else
             {
                Inspector.Errors.Add(new Error(string.Format("Не определен индекс окна в блоке панели {0}", blRefPanel.Name), blRefPanel));
+            }
+         }
+      }
+
+      private void defEndsArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex)
+      {
+         // Торцевые панели (Э1ТЛ_Яр1)
+         string endIndex;
+         if (IsEndLeftPanel)
+            endIndex = Settings.Default.PaintIndexEndLeftPanel; // "ТЛ"
+         else
+            endIndex = Settings.Default.PaintIndexEndRightPanel; //"ТП"
+                                                                 // Панели этажей
+         int i = 1;
+         foreach (var markAR in MarksAR)
+         {
+            string markPaint;
+            var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
+            string floor = String.Join(",", floors);
+            markPaint = string.Format("{0}{1}{2}", Settings.Default.PaintIndexStorey, floor, endIndex); // Э2,3,4ТП
+            if (marksArArchitectIndex.ContainsKey(markPaint))
+            {
+               markPaint = string.Format("{0}-{1}", markPaint, i++);
+            }
+            marksArArchitectIndex.Add(markPaint, markAR);
+            if (markAR.MarkSB.WindowSuffix > 0)
+            {
+               markPaint += Settings.Default.PaintIndexWindow + markAR.MarkSB.WindowSuffix; // -ОК1
+            }
+            markAR.MarkPaintingCalulated = markPaint;
+         }
+      }
+
+      // индекс отличия панели по виду окна, 1,2,3 и т.д. по порядку.
+      private void defineStoreyTypePanel(BlockReference blRefPanel)
+      {
+         // Определение типа этажа панели
+         if (string.Equals(blRefPanel.Layer, Settings.Default.LayerUpperStoreyPanels, StringComparison.OrdinalIgnoreCase))
+         {
+            _storeyTypePanel = EnumStorey.Upper;
+         }
+         else if (string.Equals(blRefPanel.Layer, Settings.Default.LayerParapetPanels, StringComparison.OrdinalIgnoreCase))
+         {
+            _storeyTypePanel = EnumStorey.Parapet;
+         }
+      }
+
+      private void defOtherArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex)
+      {
+         // Панели этажей
+         int i = 1;
+         foreach (var markAR in MarksAR)
+         {
+            string markPaint;
+            var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
+            string floor = String.Join(",", floors);
+            markPaint = string.Format("{0}{1}", Settings.Default.PaintIndexStorey, floor);//Э2,5,8
+            if (marksArArchitectIndex.ContainsKey(markPaint))
+            {
+               markPaint = string.Format("{0}-{1}", markPaint, i++);
+            }
+            marksArArchitectIndex.Add(markPaint, markAR);
+            if (markAR.MarkSB.WindowSuffix > 0)
+            {
+               markPaint += Settings.Default.PaintIndexWindow + markAR.MarkSB.WindowSuffix;// -ОК1
+            }
+            markAR.MarkPaintingCalulated = markPaint;
+         }
+      }
+
+      private void defUpperStoreyAndParapetArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex, string index)
+      {
+         // Панели чердака
+         // (ЭЧ-#_Яр1)
+         if (MarksAR.Count == 1)
+         {
+            // Если одна марка покраски
+            string markPaint = Settings.Default.PaintIndexStorey + index; // "ЭЧ"
+            marksArArchitectIndex.Add(markPaint, MarksAR[0]);
+            if (MarksAR[0].MarkSB.WindowSuffix > 0)
+            {
+               markPaint += Settings.Default.PaintIndexWindow + MarksAR[0].MarkSB.WindowSuffix; // -ОК1
+            }
+            MarksAR[0].MarkPaintingCalulated = markPaint;
+         }
+         else
+         {
+            // Если несколько марок покраски
+            int i = 1;
+            foreach (var markAR in MarksAR)
+            {
+               string markPaint = string.Format("{0}{1}-{2}", Settings.Default.PaintIndexStorey, index, i++); // ЭЧ-1
+               marksArArchitectIndex.Add(markPaint, markAR);
+               if (markAR.MarkSB.WindowSuffix > 0)
+               {
+                  markPaint += Settings.Default.PaintIndexWindow + markAR.MarkSB.WindowSuffix;//"-ОК1"
+               }
+               markAR.MarkPaintingCalulated = markPaint;
             }
          }
       }

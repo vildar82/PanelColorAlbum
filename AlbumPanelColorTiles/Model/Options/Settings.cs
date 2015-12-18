@@ -4,39 +4,42 @@
    {
       private static Settings _instance = loadSettings();
 
+      private string _attributeFacadeAxis1;
+      private string _attributeFacadeAxis2;
       private string _attributePanelSbMark;
 
       //
       // Атибуты блоков
       //
       private string _attributePanelSbPaint;
+
+      private string _attributeSectionName;
       private string _blockColorAreaDynPropHeight;
       private string _blockColorAreaDynPropLength;
-      private string _attributeSectionName;
-      private string _attributeFacadeAxis1;
-      private string _attributeFacadeAxis2;
 
       //
       // Имена блоков
       //
       private string _blockColorAreaName;
+
       private string _blockFacadeName;
       private string _blockFrameName;
       private string _blockMountingPlanePrefixName;
       private string _blockPanelPrefixName;
-      private string _blockTileName;
       private string _blockSectionName;
+      private string _blockTileName;
+      private int _captionPanelSecondTextShift;
 
       //
       // Построение фасадов из монтажек
       //
       private int _captionPanelTextHeight;
-      private int _captionPanelSecondTextShift;
 
       //
       // Суффиксы (приставки к именам блоков панелей)
       //
       private string _endLeftPanelSuffix;
+
       private string _endRightPanelSuffix;
       private int _facadeCaptionFloorIndent;
       private int _facadeCaptionFloorTextHeight;
@@ -51,6 +54,7 @@
       // Покраска по картинке
       //
       private int _imagePaintSpotLength;
+
       private string _layerDimensionFacade;
       private string _layerDimensionForm;
 
@@ -58,19 +62,21 @@
       // Слои
       //
       private string _layerMarks;
-      private string _layerUpperStoreyPanels;
+
       private string _layerParapetPanels;
+      private string _layerUpperStoreyPanels;
       private string _layerWindows;
       private string _paintIndexEndLeftPanel;
       private string _paintIndexEndRightPanel;
       private string _paintIndexLastStorey;
+      private string _paintIndexParapet;
       private string _paintIndexStorey;
 
       //
       // Индексы покраски
       //
       private string _paintIndexUpperStorey;
-      private string _paintIndexParapet;
+
       private string _paintIndexWindow;
       private int _sheetPanelEndShift;
 
@@ -78,17 +84,21 @@
       // Листы Альбома АКР
       //
       private int _sheetPanelEndUp;
+
       //_settings.Add("PaintIndexLastStorey", "П");
       private int _sheetScale;
+
       private string _sheetTemplateLayoutNameForContent;
       private string _sheetTemplateLayoutNameForMarkAR;
       private int _storeyDefineDeviation;
+
+      private string _templateBlocksAKRExportFacadeFileName;
 
       //
       // Шаблоны
       //
       private string _templateBlocksAKRFileName;
-      private string _templateBlocksAKRExportFacadeFileName;
+
       private string _templateSheetContentFileName;
       private string _templateSheetMarkSBFileName;
 
@@ -96,6 +106,7 @@
       // Плитка
       //
       private int _tileHeight;
+
       private int _tileLenght;
       private int _tileSeam;
       private string _windowPanelSuffix;
@@ -111,12 +122,11 @@
          }
       }
 
+      public string AttributeFacadeAxis1 { get { return _attributeFacadeAxis1; } }
+      public string AttributeFacadeAxis2 { get { return _attributeFacadeAxis2; } }
       public string AttributePanelSbMark { get { return _attributePanelSbMark; } }
       public string AttributePanelSbPaint { get { return _attributePanelSbPaint; } }
       public string AttributeSectionName { get { return _attributeSectionName; } }
-      public string AttributeFacadeAxis1 { get { return _attributeFacadeAxis1; } }
-      public string AttributeFacadeAxis2 { get { return _attributeFacadeAxis2; } }
-
       public string BlockColorAreaDynPropHeight { get { return _blockColorAreaDynPropHeight; } }
       public string BlockColorAreaDynPropLength { get { return _blockColorAreaDynPropLength; } }
       public string BlockColorAreaName { get { return _blockColorAreaName; } }
@@ -124,9 +134,8 @@
       public string BlockFrameName { get { return _blockFrameName; } }
       public string BlockMountingPlanePrefixName { get { return _blockMountingPlanePrefixName; } }
       public string BlockPanelPrefixName { get { return _blockPanelPrefixName; } }
-      public string BlockTileName { get { return _blockTileName; } }
       public string BlockSectionName { get { return _blockSectionName; } }
-      
+      public string BlockTileName { get { return _blockTileName; } }
       public int CaptionPanelSecondTextShift { get { return _captionPanelSecondTextShift; } }
       public int CaptionPanelTextHeight { get { return _captionPanelTextHeight; } }
       public string EndLeftPanelSuffix { get { return _endLeftPanelSuffix; } }
@@ -143,15 +152,15 @@
       public string LayerDimensionFacade { get { return _layerDimensionFacade; } }
       public string LayerDimensionForm { get { return _layerDimensionForm; } }
       public string LayerMarks { get { return _layerMarks; } }
-      public string LayerUpperStoreyPanels { get { return _layerUpperStoreyPanels; } }
       public string LayerParapetPanels { get { return _layerParapetPanels; } }
+      public string LayerUpperStoreyPanels { get { return _layerUpperStoreyPanels; } }
       public string LayerWindows { get { return _layerWindows; } }
       public string PaintIndexEndLeftPanel { get { return _paintIndexEndLeftPanel; } }
       public string PaintIndexEndRightPanel { get { return _paintIndexEndRightPanel; } }
       public string PaintIndexLastStorey { get { return _paintIndexLastStorey; } }
+      public string PaintIndexParapet { get { return _paintIndexParapet; } }
       public string PaintIndexStorey { get { return _paintIndexStorey; } }
       public string PaintIndexUpperStorey { get { return _paintIndexUpperStorey; } }
-      public string PaintIndexParapet { get { return _paintIndexParapet; } }      
       public string PaintIndexWindow { get { return _paintIndexWindow; } }
       public int SheetPanelEndShift { get { return _sheetPanelEndShift; } }
       public int SheetPanelEndUp { get { return _sheetPanelEndUp; } }
@@ -159,8 +168,8 @@
       public string SheetTemplateLayoutNameForContent { get { return _sheetTemplateLayoutNameForContent; } }
       public string SheetTemplateLayoutNameForMarkAR { get { return _sheetTemplateLayoutNameForMarkAR; } }
       public int StoreyDefineDeviation { get { return _storeyDefineDeviation; } }
-      public string TemplateBlocksAKRFileName { get { return _templateBlocksAKRFileName; } }
       public string TemplateBlocksAKRExportFacadeFileName { get { return _templateBlocksAKRExportFacadeFileName; } }
+      public string TemplateBlocksAKRFileName { get { return _templateBlocksAKRFileName; } }
       public string TemplateSheetContentFileName { get { return _templateSheetContentFileName; } }
       public string TemplateSheetMarkSBFileName { get { return _templateSheetMarkSBFileName; } }
       public int TileHeight { get { return _tileHeight; } }

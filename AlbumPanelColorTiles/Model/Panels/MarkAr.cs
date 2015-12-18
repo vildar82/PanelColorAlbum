@@ -13,16 +13,18 @@ namespace AlbumPanelColorTiles.Panels
    // Марка АР покраски панели
    public class MarkAr : IEquatable<MarkAr>
    {
-      public Album Album { get; private set; }
-      private ObjectId _idBtrAr;
       private string _abbrIndex;
+      private ObjectId _idBtrAr;
       private string _markArBlockName;
       private string _markARPanelFullName;
       private string _markARPanelFullNameCalculated;
       private string _markArTemp;
-      private string _markPainting;      
-      private string _markPaintingCalulated; // вычесленная программой марка покраски, в методе DefineArchitectMarks класса MarkSbPanel
+      private string _markPainting;
+      private string _markPaintingCalulated;
+
+      // вычесленная программой марка покраски, в методе DefineArchitectMarks класса MarkSbPanel
       private MarkSb _markSB;
+
       private List<Paint> _paints;
       private List<Panel> _panels;
       private List<TileCalc> _tilesCalc;
@@ -37,6 +39,7 @@ namespace AlbumPanelColorTiles.Panels
          _panels = new List<Panel>();
       }
 
+      public Album Album { get; private set; }
       public ObjectId IdBtrAr { get { return _idBtrAr; } }
 
       public string MarkArBlockName { get { return _markArBlockName; } }
@@ -75,6 +78,17 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
+      public string MarkPaintingCalulated
+      {
+         get { return _markPaintingCalulated; }
+         set
+         {
+            _markPaintingCalulated = value;
+            _markArBlockName = string.Format("{0}{1}", _markSB.MarkSbBlockName, MarkPaintingFull.GetValidDbSymbolName());
+            _markARPanelFullNameCalculated = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
+         }
+      }
+
       /// <summary>
       /// Марка покраски со скобками - (Э2_Н47Г)
       /// </summary>
@@ -84,17 +98,6 @@ namespace AlbumPanelColorTiles.Panels
          {
             string paint = _markPainting ?? _markPaintingCalulated;
             return string.Format("({0}{1})", paint, _abbrIndex);
-         }
-      }
-
-      public string MarkPaintingCalulated
-      {
-         get { return _markPaintingCalulated; }
-         set
-         {
-            _markPaintingCalulated = value;           
-            _markArBlockName = string.Format("{0}{1}", _markSB.MarkSbBlockName, MarkPaintingFull.GetValidDbSymbolName());
-            _markARPanelFullNameCalculated = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
          }
       }
 
@@ -147,7 +150,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                paintAR = paintSb;
             }
-            paintsAR.Add(paintAR);            
+            paintsAR.Add(paintAR);
          }
          return paintsAR;
       }
@@ -155,7 +158,7 @@ namespace AlbumPanelColorTiles.Panels
       public void AddBlockRefPanel(BlockReference blRefPanel)
       {
          Panel panel = new Panel(blRefPanel, this);
-         _panels.Add(panel);         
+         _panels.Add(panel);
       }
 
       // Создание определения блока Марки АР

@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AlbumPanelColorTiles.Model
@@ -35,6 +28,7 @@ namespace AlbumPanelColorTiles.Model
             return;
          }
       }
+
       private bool checkStartOptions()
       {
          bool isOk = true;
@@ -42,10 +36,10 @@ namespace AlbumPanelColorTiles.Model
          if (!string.IsNullOrEmpty(_startOptions.Abbr) && !_startOptions.Abbr.IsValidDbSymbolName())
          {
             errorProvider1.SetError(propertyGrid1, "Индекс проекта должен отвечать требованиям для именования блоков.");
-            isOk = false;               
+            isOk = false;
          }
 
-         return isOk;         
-      }      
+         return isOk;
+      }
    }
 }

@@ -15,8 +15,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // DWG файл
    public class PanelLibrarySaveService
    {
-      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
       public static readonly string LibPanelsExcelFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.xlsx");
+      public static readonly string LibPanelsFilePath = Path.Combine(AutoCAD_PIK_Manager.Settings.PikSettings.ServerShareSettingsFolder, @"АР\AlbumPanelColorTiles\AKR_Panels.dwg");
       private Database _dbCur;
       private Document _doc;
 
@@ -60,20 +60,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
             ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку.");
             Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
          }
-      }
-
-      private static void removeElectricPanels(List<PanelAkrFacade> panelsAkrFacade)
-      {
-         List<PanelAkrFacade> removes = new List<PanelAkrFacade>();
-         foreach (var panel in panelsAkrFacade)
-         {
-            var markWithoutElectric = MountingPanel.GetMarkWithoutElectric(panel.BlName);
-            if (panel.BlName.Length != markWithoutElectric.Length)
-            {
-               removes.Add(panel);
-            }
-         }
-         removes.ForEach(r => panelsAkrFacade.Remove(r));
       }
 
       public static List<PanelAkrFacade> GetPanelsAkrInDb(Database db)
@@ -121,6 +107,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return panelsInLib;
       }
 
+      public static void WarningBusyLibrary(Exception ex)
+      {
+         // Предупреждение, что библиотека занята
+         var whoHas = Autodesk.AutoCAD.ApplicationServices.Application.GetWhoHasInfo(LibPanelsFilePath);
+         MessageBox.Show(string.Format("Другим пользователем уже выполняется сохранение панелей в библиотеку. Повторите позже.\n" +
+            "Кем занято: {0}, время {1}",
+            whoHas.UserName, whoHas.OpenTime));
+      }
+
       public void SavePanelsToLibrary()
       {
          // Сохранить блоки панелей в файл библиотеки блоков панелей.
@@ -128,7 +123,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Если такой блок уже есть в бибилиотеке? - старому блоку изменить имя с приставкой сегодняшней даты - [АКР_Панель_МаркаСБ]_25.10.2015-14:15
          // Если файл занят другим процессом? - подождать 3 секунды и повторить.
 
-         // Файл библиотеки блоков панелей.         
+         // Файл библиотеки блоков панелей.
          if (!File.Exists(LibPanelsFilePath))
          {
             Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
@@ -151,12 +146,88 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             _doc.Editor.WriteMessage(string.Format("\n{0}", msgReport));
             sendReport(msgReport);
-         }         
+         }
+      }
+
+      private static string getBackupPanelsLibFile(string libPanelsFilePath)
+      {
+         string suffix = string.Format("{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
+         string newFile = Path.Combine(
+            Path.GetDirectoryName(libPanelsFilePath), string.Format("{0}_{1}.{2}",
+            Path.GetFileNameWithoutExtension(libPanelsFilePath), suffix, "dwg"));
+         return newFile;
+      }
+
+      private static void removeElectricPanels(List<PanelAkrFacade> panelsAkrFacade)
+      {
+         List<PanelAkrFacade> removes = new List<PanelAkrFacade>();
+         foreach (var panel in panelsAkrFacade)
+         {
+            var markWithoutElectric = MountingPanel.GetMarkWithoutElectric(panel.BlName);
+            if (panel.BlName.Length != markWithoutElectric.Length)
+            {
+               removes.Add(panel);
+            }
+         }
+         removes.ForEach(r => panelsAkrFacade.Remove(r));
+      }
+
+      private void backupChangedPanels(List<PanelAkrFacade> panelsToSave, List<PanelAkrLib> panelsAkrInLib, Database dbLib)
+      {
+         // сохранение изменяемых панель в файл
+         // создание новоq базы и копирование туда блоков изменяемемых панелей (до изменения)
+
+         ObjectIdCollection idsBtrToCopy = new ObjectIdCollection();
+         foreach (var panelFacadeTosave in panelsToSave)
+         {
+            PanelAkrLib panelLib = panelsAkrInLib.Find(
+               p => string.Equals(p.BlName, panelFacadeTosave.BlName, StringComparison.OrdinalIgnoreCase));
+            if (panelLib != null)
+            {
+               idsBtrToCopy.Add(panelLib.IdBtrAkrPanel);
+            }
+         }
+         if (idsBtrToCopy.Count > 0)
+         {
+            string newFile = getBackupPanelsLibFile(LibPanelsFilePath);
+            using (var dbBak = new Database(true, true))
+            {
+               dbBak.CloseInput(true);
+               IdMapping map = new IdMapping();
+               dbLib.WblockCloneObjects(idsBtrToCopy, dbBak.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+               dbBak.SaveAs(newFile, DwgVersion.Current);
+            }
+         }
+      }
+
+      private void copyLibPanelFile()
+      {
+         string newFile = getBackupPanelsLibFile(LibPanelsFilePath);
+         File.Copy(LibPanelsFilePath, newFile, true);
+      }
+
+      // Копирование новых панелей
+      private void copyNewPanels(Database dbLib, List<PanelAkrFacade> panelsAkrToCopy)
+      {
+         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p => p.IdBtrAkrPanel).ToArray());
+         IdMapping iMap = new IdMapping();
+         dbLib.WblockCloneObjects(ids, dbLib.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+      }
+
+      private string getReport(List<PanelAkrFacade> panels)
+      {
+         StringBuilder msg = new StringBuilder();
+         msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
+         foreach (var panel in panels)
+         {
+            msg.AppendLine(string.Format("{0} - {1}", panel.BlName, panel.ReportStatusString()));
+         }
+         return msg.ToString();
       }
 
       private void savePanelsAkrToLibDb(List<PanelAkrFacade> panelsAkrInFacade, out string msgReport)
       {
-         msgReport = string.Empty; 
+         msgReport = string.Empty;
          using (var dbLib = new Database(false, true))
          {
             try
@@ -175,7 +246,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             // Список изменившихся панелей и новых для записи в базу.
             List<PanelAkrFacade> panelsAkrToSave = PanelAkrFacade.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
 
-            // Форма для просмотра и управления списков сохранения панелей            
+            // Форма для просмотра и управления списков сохранения панелей
             FormSavePanelsToLib formSave = new FormSavePanelsToLib(
                panelsAkrToSave.Where(p => p.ReportStatus == EnumReportStatus.New).ToList(),
                panelsAkrToSave.Where(p => p.ReportStatus == EnumReportStatus.Changed).ToList(),
@@ -207,77 +278,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
                throw new Exception("\nНет панелей для сохранения в библиотеку (в текущем чертеже нет новых и изменившихся панелей).");
             }
          }
-      }
-
-      public static void WarningBusyLibrary(Exception ex)
-      {
-         // Предупреждение, что библиотека занята
-         var whoHas = Autodesk.AutoCAD.ApplicationServices.Application.GetWhoHasInfo(LibPanelsFilePath);
-         MessageBox.Show(string.Format("Другим пользователем уже выполняется сохранение панелей в библиотеку. Повторите позже.\n" +
-            "Кем занято: {0}, время {1}",
-            whoHas.UserName, whoHas.OpenTime));
-      }
-
-      private void backupChangedPanels(List<PanelAkrFacade> panelsToSave, List<PanelAkrLib> panelsAkrInLib, Database dbLib)
-      {
-         // сохранение изменяемых панель в файл         
-         // создание новоq базы и копирование туда блоков изменяемемых панелей (до изменения)
-
-         ObjectIdCollection idsBtrToCopy = new ObjectIdCollection();
-         foreach (var panelFacadeTosave in panelsToSave)
-         {
-            PanelAkrLib panelLib = panelsAkrInLib.Find(
-               p => string.Equals(p.BlName, panelFacadeTosave.BlName, StringComparison.OrdinalIgnoreCase));
-            if (panelLib != null)
-            {
-               idsBtrToCopy.Add(panelLib.IdBtrAkrPanel);
-            }
-         }
-         if (idsBtrToCopy.Count > 0)
-         {
-            string newFile = getBackupPanelsLibFile(LibPanelsFilePath);
-            using (var dbBak = new Database(true, true))
-            {
-               dbBak.CloseInput(true);
-               IdMapping map = new IdMapping();
-               dbLib.WblockCloneObjects(idsBtrToCopy, dbBak.BlockTableId, map, DuplicateRecordCloning.Replace, false);
-               dbBak.SaveAs(newFile, DwgVersion.Current);
-            }
-         }
-      }      
-
-      private void copyLibPanelFile()
-      {
-         string newFile = getBackupPanelsLibFile(LibPanelsFilePath);
-         File.Copy(LibPanelsFilePath, newFile, true);
-      }
-
-      private static string getBackupPanelsLibFile(string libPanelsFilePath)
-      {
-         string suffix = string.Format("{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
-         string newFile = Path.Combine(
-            Path.GetDirectoryName(libPanelsFilePath), string.Format("{0}_{1}.{2}",
-            Path.GetFileNameWithoutExtension(libPanelsFilePath), suffix, "dwg"));
-         return newFile;
-      }
-
-      // Копирование новых панелей
-      private void copyNewPanels(Database dbLib, List<PanelAkrFacade> panelsAkrToCopy)
-      {
-         var ids = new ObjectIdCollection(panelsAkrToCopy.Select(p => p.IdBtrAkrPanel).ToArray());
-         IdMapping iMap = new IdMapping();
-         dbLib.WblockCloneObjects(ids, dbLib.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);         
-      }
-
-      private string getReport(List<PanelAkrFacade> panels)
-      {
-         StringBuilder msg = new StringBuilder();
-         msg.AppendLine(string.Format("Обновлены/добавлены следующие панели, от пользователя {0}:", Environment.UserName));
-         foreach (var panel in panels)
-         {
-            msg.AppendLine(string.Format("{0} - {1}", panel.BlName, panel.ReportStatusString()));
-         }
-         return msg.ToString();
       }
 
       private void sendReport(string msg)

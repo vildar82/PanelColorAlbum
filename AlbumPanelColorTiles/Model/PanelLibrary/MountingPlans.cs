@@ -14,9 +14,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private Database _db;
       private Document _doc;
       private Editor _ed;
-      private string _section;
+      private string _nameFloor;
       private int _numberFloor;
-      private string _nameFloor;      
+      private string _section;
 
       public MountingPlans()
       {
@@ -122,20 +122,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       private void createFloor()
-      {         
+      {
          // запрос номера этажа
-         getNumberFloor();         
+         getNumberFloor();
          // проверка наличия блока монтажки с этим номером
          string indexFloor;
          if (string.IsNullOrEmpty(_nameFloor))
          {
-            indexFloor =  _numberFloor.ToString();
+            indexFloor = _numberFloor.ToString();
             _numberFloor++;
          }
          else
          {
             indexFloor = _nameFloor;
-         }       
+         }
          string floorBlockName;
          if (string.IsNullOrEmpty(_section))
          {
@@ -157,8 +157,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       // Запрос номера этажа
       private void getNumberFloor()
-      {         
-         var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");         
+      {
+         var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
          opt.DefaultValue = _numberFloor;
          string keySection = "Секция" + _section;
          opt.Keywords.Add(keySection);
@@ -186,12 +186,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
                _nameFloor = Settings.Default.PaintIndexParapet;
             }
             else
-            {               
+            {
                throw new Exception("Отменено пользователем.");
             }
          }
          else
-         {            
+         {
             throw new Exception("Отменено пользователем.");
          }
       }
@@ -225,7 +225,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // запрос выбора объектов этажа
       private List<ObjectId> selectFloor(string indexFloor)
       {
-         var selOpt = new PromptSelectionOptions();         
+         var selOpt = new PromptSelectionOptions();
          selOpt.MessageForAdding = string.Format("\nВыбор объектов монтажного плана {0} этажа", indexFloor);
          var selRes = _ed.GetSelection(selOpt);
          if (selRes.Status == PromptStatus.OK)

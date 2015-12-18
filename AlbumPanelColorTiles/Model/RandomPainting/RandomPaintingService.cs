@@ -357,7 +357,7 @@ namespace AlbumPanelColorTiles.RandomPainting
             // Вставка блоков зон
             placementSpots(distributedSpots);
 
-            _ed.Regen();                        
+            _ed.Regen();
          }
          catch (System.Exception ex)
          {
@@ -390,7 +390,7 @@ namespace AlbumPanelColorTiles.RandomPainting
          if (_colorAreaSize.PatternChess)
          {
             double offset = 0;
-            if (y%2 == 0)
+            if (y % 2 == 0)
             {
                offset = _colorAreaSize.LenghtSpot * 0.5;
             }
@@ -402,7 +402,7 @@ namespace AlbumPanelColorTiles.RandomPainting
             position = new Point3d(_colorAreaSize.ExtentsColorArea.MinPoint.X + x * _colorAreaSize.LenghtSpot,
                                    _colorAreaSize.ExtentsColorArea.MinPoint.Y + y * _colorAreaSize.HeightSpot, 0);
          }
-         
+
          IdMapping map = new IdMapping();
          _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
          ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
@@ -433,25 +433,26 @@ namespace AlbumPanelColorTiles.RandomPainting
                t.AddNewlyCreatedDBObject(blRefColorAreaTemplate, true);
                _idBlRefColorAreaTemplate = blRefColorAreaTemplate.Id;
                SetDynParamColorAreaBlock(blRefColorAreaTemplate, _colorAreaSize);
-               _idColCopy = new ObjectIdCollection();
-               _idColCopy.Add(_idBlRefColorAreaTemplate);
-
-               ProgressMeter progressMeter = new ProgressMeter();
-               progressMeter.SetLimit(spots.Count);
-               progressMeter.Start("Вставка блоков зон покраски...");
-
-               _countInsertBlocksSpot = 0;
-               foreach (var spot in spots)
+               using (_idColCopy = new ObjectIdCollection())
                {
-                  progressMeter.MeterProgress();
-                  if (HostApplicationServices.Current.UserBreak())
-                     break;
-                  if (spot != null)
+                  _idColCopy.Add(_idBlRefColorAreaTemplate);
+                  ProgressMeter progressMeter = new ProgressMeter();
+                  progressMeter.SetLimit(spots.Count);
+                  progressMeter.Start("Вставка блоков зон покраски...");
+
+                  _countInsertBlocksSpot = 0;
+                  foreach (var spot in spots)
                   {
-                     insertSpot(spot, spot.Index / _ysize, spot.Index % _ysize, t);
+                     progressMeter.MeterProgress();
+                     if (HostApplicationServices.Current.UserBreak())
+                        break;
+                     if (spot != null)
+                     {
+                        insertSpot(spot, spot.Index / _ysize, spot.Index % _ysize, t);
+                     }
                   }
+                  progressMeter.Stop();
                }
-               progressMeter.Stop();
                Log.Debug("Вставлено блоков {0}", _countInsertBlocksSpot);
 
                blRefColorAreaTemplate.Erase(true);

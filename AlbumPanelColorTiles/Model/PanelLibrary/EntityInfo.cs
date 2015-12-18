@@ -7,11 +7,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    public class EntityInfo : IEquatable<EntityInfo>//, IComparable<EntityInfo>
    {
-      public ObjectId Id { get; set; }
-      public Guid ClassId { get; set; }
-      public string ClassName { get; set; }
-      public System.Drawing.Color Color { get; set; }
-      public Extents3d Extents { get; set; }
       public string Layer;
       public string Linetype;
       public LineWeight Lineweight;
@@ -27,6 +22,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
          Linetype = ent.Linetype;
          Lineweight = ent.LineWeight;
       }
+
+      public Guid ClassId { get; set; }
+      public string ClassName { get; set; }
+      public System.Drawing.Color Color { get; set; }
+      public Extents3d Extents { get; set; }
+      public ObjectId Id { get; set; }
 
       public static List<EntityInfo> GetEntInfoBtr(ObjectId idBtrTest)
       {

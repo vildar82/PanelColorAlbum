@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -19,10 +14,17 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       private const string _keyDict = "FileExportFacade";
       private Document _docAkr = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
 
-      public FileInfo FileExportFacade { get; private set; }
       public FileInfo FileAkrFacade { get; private set; }
+      public FileInfo FileExportFacade { get; private set; }
       public bool IsExistsFileExport { get; private set; }
 
+      public void Backup()
+      {
+         var backupFile = Path.Combine(FileExportFacade.DirectoryName,
+                                       Path.GetFileNameWithoutExtension(FileExportFacade.Name) +
+                                       "_Backup_" + DateTime.Now.ToString("dd.MM.yyyy-HH.mm") + ".bak");
+         FileExportFacade.CopyTo(backupFile, true);
+      }
 
       public void DefineFile()
       {
@@ -32,7 +34,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             throw new Exception("Нужно сохранить текущий чертеж.");
          }
 
-         var fileExportFullName = DictNOD.LoadString(_keyDict);         
+         var fileExportFullName = DictNOD.LoadString(_keyDict);
          if (string.IsNullOrEmpty(fileExportFullName) || !File.Exists(fileExportFullName))
          {
             // Если в имени файла есть АКР, то убираем его и предлагаем пользователю согласиться с этим именем или изменить
@@ -47,7 +49,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                fileExportName = fileAkrName + "_Экспорт";
             }
             fileExportFullName = Path.Combine(FileAkrFacade.DirectoryName, fileExportName + ".dwg");
-         }         
+         }
          FileExportFacade = new FileInfo(fileExportFullName);
 
          promptUserExportFile();
@@ -55,12 +57,17 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          DictNOD.SaveString(FileExportFacade.FullName, _keyDict);
       }
 
-      public void Backup()
+      private string getDwgFileName(string fileName)
       {
-         var backupFile = Path.Combine(FileExportFacade.DirectoryName,
-                                       Path.GetFileNameWithoutExtension(FileExportFacade.Name) +
-                                       "_Backup_" + DateTime.Now.ToString("dd.MM.yyyy-HH.mm") + ".bak");
-         FileExportFacade.CopyTo(backupFile, true);
+         // Подстановка расширения в имя файла, если его нет
+         if (fileName.EndsWith(".dwg", StringComparison.OrdinalIgnoreCase))
+         {
+            return fileName;
+         }
+         else
+         {
+            return fileName + ".dwg";
+         }
       }
 
       private void promptUserExportFile()
@@ -73,15 +80,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          //prOpt.DialogCaption = "";
          prOpt.DialogName = "Экспорт";
          prOpt.Message = "Новый файл или существующий - в существующем файле заменятся блоки панелей.";
-         prOpt.Filter = "Чертеж |*.dwg";         
+         prOpt.Filter = "Чертеж |*.dwg";
          var res = ed.GetFileNameForSave(prOpt);
          if (res.Status != PromptStatus.OK)
          {
             throw new Exception("Отменено пользователем.");
          }
-         FileExportFacade = new FileInfo( getDwgFileName(res.StringResult));         
+         FileExportFacade = new FileInfo(getDwgFileName(res.StringResult));
          IsExistsFileExport = FileExportFacade.Exists;
-         // Если файл существует, то спросить подтверждение экспорта фасадов в существующий файл.         
+         // Если файл существует, то спросить подтверждение экспорта фасадов в существующий файл.
          // Не нужно, т.к. в диалоге уже выдается такой вопрос.
          //if (IsExistsFileExport)
          //{
@@ -96,21 +103,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          //   else if (messageRes == MessageBoxResult.Cancel)
          //   {
          //      throw new Exception("Отменено пользователем.");
-         //   }            
-         //}         
-      }
-
-      private string getDwgFileName(string fileName)
-      {
-         // Подстановка расширения в имя файла, если его нет
-         if (fileName.EndsWith(".dwg", StringComparison.OrdinalIgnoreCase))
-         {
-            return fileName;
-         }
-         else
-         {
-            return fileName + ".dwg";
-         }
+         //   }
+         //}
       }
    }
 }
