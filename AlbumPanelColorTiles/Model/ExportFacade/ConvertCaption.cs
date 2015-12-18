@@ -43,9 +43,12 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             text.TextStyleId = idDbText.Database.GetTextStylePIK();
             // Аннотативность???
-            text.Position = new Point3d(x, y, 0);
-            double angleRadian = Math.PI * angle / 180.0;
-            text.Rotation = angleRadian;
+            if (panelBtr.HeightByTile >= 2000)
+            {
+               text.Position = new Point3d(x, y, 0);
+               double angleRadian = Math.PI * angle / 180.0;
+               text.Rotation = angleRadian;
+            }
             resVal = text.GeometricExtents;
          }
          return resVal;

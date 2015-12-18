@@ -92,7 +92,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             // Нет плитки - торец!
             // Найти первую не торцевую плитку
-            var extTileY = findTile(pt.X , pt.Y+ getOffsetX(corner, endOffset), corner, false);
+            var extTileY = findTile(pt.X , pt.Y+ getOffsetY(corner, endOffset), corner, false);
             y = getCoordY(extTileY, corner);
          }
          else

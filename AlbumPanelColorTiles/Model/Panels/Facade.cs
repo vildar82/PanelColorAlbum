@@ -25,6 +25,10 @@ namespace AlbumPanelColorTiles.Model.Panels
       {
          get
          {
+            if (string.IsNullOrEmpty(Axis1) || string.IsNullOrEmpty(Axis2))
+            {
+               return Extents.MinPoint.X.ToString();
+            }
             return string.Format("{0}_{1}", Axis1, Axis2);
          }
       }

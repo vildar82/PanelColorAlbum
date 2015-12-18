@@ -128,7 +128,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       {
          // условие наличия торцов
          if (ExtentsByTile.Diagonal() < 1000 || ExtentsNoEnd.Diagonal() < 1000 ||
-            ExtentsByTile.Diagonal() - ExtentsNoEnd.Diagonal() < 400)
+            ExtentsByTile.Diagonal() - ExtentsNoEnd.Diagonal() < 100)
          {
             return;
          }         

@@ -659,7 +659,7 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-ExportFacade. {0}", doc.Name);
-               }               
+               }
                doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex.Message);
             }
          }
