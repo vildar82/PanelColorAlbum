@@ -115,16 +115,19 @@ namespace AlbumPanelColorTiles.Model.Select
                         }
                         continue;
                      }
-                     // Блоки Секций
-                     var blNameEff = blRef.GetEffectiveName();
-                     if (string.Equals(blNameEff, Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
+                     if (blRef.IsDynamicBlock)
                      {
-                        SectionsBlRefs.Add(idEnt);
-                     }
-                     // Блоки Фасадов
-                     else if (string.Equals(blNameEff, Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
-                     {
-                        FacadeBlRefs.Add(idEnt);
+                        // Блоки Секций
+                        var blNameEff = blRef.GetEffectiveName();
+                        if (string.Equals(blNameEff, Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                           SectionsBlRefs.Add(idEnt);
+                        }
+                        // Блоки Фасадов
+                        else if (string.Equals(blNameEff, Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                           FacadeBlRefs.Add(idEnt);
+                        }
                      }
                   }
                }
