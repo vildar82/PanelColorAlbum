@@ -225,9 +225,9 @@ namespace AlbumPanelColorTiles
             // Определение цвета слоя
             Database db = HostApplicationServices.WorkingDatabase;
             Color color = null;
-            using (var lt = db.LayerTableId.GetObject(OpenMode.ForRead) as LayerTable)
+            using (var lt = db.LayerTableId.Open(OpenMode.ForRead) as LayerTable)
             {
-               using (var ltr = lt[layerName].GetObject(OpenMode.ForRead) as LayerTableRecord)
+               using (var ltr = lt[layerName].Open(OpenMode.ForRead) as LayerTableRecord)
                {
                   color = ltr.Color;
                }

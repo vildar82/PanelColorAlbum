@@ -39,11 +39,7 @@ namespace AlbumPanelColorTiles.Panels
       public static List<ColorArea> GetColorAreas(ObjectId idBtr, Album album)
       {
          List<ColorArea> colorAreas = new List<ColorArea>();
-         using (var t = idBtr.Database.TransactionManager.StartTransaction())
-         {
-            IterateColorAreasInBtr(idBtr, album, colorAreas, Matrix3d.Identity, string.Empty);
-            t.Commit();
-         }
+         IterateColorAreasInBtr(idBtr, album, colorAreas, Matrix3d.Identity, string.Empty);
          // Сортировка зон покраски по размеру
          colorAreas.Sort();
          return colorAreas;
@@ -109,35 +105,40 @@ namespace AlbumPanelColorTiles.Panels
       private static void IterateColorAreasInBtr(ObjectId idBtr, Album album,
                                                 List<ColorArea> colorAreas, Matrix3d matrix, string xrefName)
       {
-         var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
-         foreach (ObjectId idEnt in btr)
+         using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
          {
-            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            foreach (ObjectId idEnt in btr)
             {
-               var blRefColorArea = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
-
-               var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
-               if (string.Equals(blName, Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
-                  colorAreas.Add(colorArea);
-               }
-               else
-               {
-                  // Если это не блок Панели, то ищем вложенные в блоки зоны покраски
-                  if (!MarkSb.IsBlockNamePanel(blName))
+                  using (var blRefColorArea = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                   {
-                     var btrInner = blRefColorArea.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
-                     // Обработка вложенных зон покраски в блок
-                     if (btrInner.IsFromExternalReference)
+                     var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
+                     if (string.Equals(blName, Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
                      {
-                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas,
-                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), btrInner.Name);
+                        ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
+                        colorAreas.Add(colorArea);
                      }
                      else
                      {
-                        IterateColorAreasInBtr(btrInner.Id, album, colorAreas,
-                           blRefColorArea.BlockTransform.PostMultiplyBy(matrix), xrefName);
+                        // Если это не блок Панели, то ищем вложенные в блоки зоны покраски
+                        if (!MarkSb.IsBlockNamePanel(blName))
+                        {
+                           using (var btrInner = blRefColorArea.BlockTableRecord.Open(OpenMode.ForRead) as BlockTableRecord)
+                           {
+                              // Обработка вложенных зон покраски в блок
+                              if (btrInner.IsFromExternalReference)
+                              {
+                                 IterateColorAreasInBtr(btrInner.Id, album, colorAreas,
+                                    blRefColorArea.BlockTransform.PostMultiplyBy(matrix), btrInner.Name);
+                              }
+                              else
+                              {
+                                 IterateColorAreasInBtr(btrInner.Id, album, colorAreas,
+                                    blRefColorArea.BlockTransform.PostMultiplyBy(matrix), xrefName);
+                              }
+                           }
+                        }
                      }
                   }
                }

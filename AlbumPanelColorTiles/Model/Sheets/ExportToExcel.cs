@@ -17,28 +17,28 @@ namespace AlbumPanelColorTiles.Sheets
             return;
 
          // Открываем книгу
-         Workbook workBook = excelApp.Workbooks.Add();
+         Workbook workBook = excelApp.Workbooks.Add();                 
+
+         // Содержание  
+         try
+         {
+            Worksheet sheetContent =  workBook.ActiveSheet as Worksheet;
+            sheetContent.Name = "Содержание";
+            listContentAlbum(sheetContent, album);
+         }
+         catch { }
 
          // Секции
          if (album.Sections.Count > 0)
          {
             try
             {
-               Worksheet sheetSections = workBook.ActiveSheet as Worksheet;
+               Worksheet sheetSections = workBook.Sheets.Add();
                sheetSections.Name = "Секции";
                listSections(sheetSections, album);
             }
             catch { }
          }
-
-         // Содержание  
-         try
-         {
-            Worksheet sheetContent = workBook.Sheets.Add();
-            sheetContent.Name = "Содержание";
-            listContentAlbum(sheetContent, album);
-         }
-         catch { }
 
          // Плитка
          try
