@@ -8,33 +8,33 @@ namespace AlbumPanelColorTiles.Model
 {
    public class StartOptions
    {
-      [Category()]
+      [Category("Важно")]
       [DisplayName("Индекс проекта")]
       [Description("Добавляется к марке покраски.")]
       [DefaultValue("Н47Г")]
       public string Abbr { get; set; }
 
-      [Category()]
+      [Category("Важно")]
       [DisplayName("Проверка марок покраски")]
       [Description("При создании альбома марки покраски будут сверяться со значениями в блоках монтажных панелей. Необходимо включать эту опцию после выдачи задания по маркам покраски конструкторам.")]
       [DefaultValue(false)]
       [TypeConverter(typeof(BooleanTypeConverter))]
       public bool CheckMarkPainting { get; set; }
 
-      [Category()]
-      [DisplayName("Номер первого этажа")]
-      [Description("Начальный номер для нумерации этажей.")]
+      [Category("Важно")]
+      [DisplayName("Номер первого этажа СБ")]
+      [Description("Первый этаж для сборной части.")]
       [DefaultValue(2)]
       public int NumberFirstFloor { get; set; }
 
-      [Category()]
-      [DisplayName("Номер первого листа")]
-      [Description("Если 0, то этот параметр не учитывается.")]
+      [Category("Не важно")]
+      [DisplayName("Номер первого листа в альбоме")]
+      [Description("Начальный номер для листов панелей в альбоме. Если 0, то этот параметр не учитывается.")]
       [DefaultValue(0)]
       public int NumberFirstSheet { get; set; }
 
       public void PromptStartOptions()
-      {
+      {         
          // Дефолтное значение аббревиатуры проекта
          if (Abbr == null)
          {

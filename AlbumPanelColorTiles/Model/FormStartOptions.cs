@@ -11,7 +11,7 @@ namespace AlbumPanelColorTiles.Model
       {
          _startOptions = startOptions;
          InitializeComponent();
-         propertyGrid1.SelectedObject = _startOptions;
+         propertyGrid1.SelectedObject = _startOptions;         
       }
 
       private void buttonDefault_Click(object sender, EventArgs e)

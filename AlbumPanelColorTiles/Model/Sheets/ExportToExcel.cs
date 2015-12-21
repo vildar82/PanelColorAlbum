@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Microsoft.Office.Interop.Excel;
 
@@ -6,7 +7,7 @@ namespace AlbumPanelColorTiles.Sheets
 {
    public static class ExportToExcel
    {
-      public static void Export(SheetsSet sheetsSet, Album album)
+      public static void Export(Album album)
       {
          // Експорт списка панелей в ексель.
 
@@ -21,32 +22,57 @@ namespace AlbumPanelColorTiles.Sheets
          // Секции
          if (album.Sections.Count > 0)
          {
-            Worksheet sheetSections = workBook.ActiveSheet as Worksheet;
-            sheetSections.Name = "Секции";
-            listSections(sheetSections, album);
+            try
+            {
+               Worksheet sheetSections = workBook.ActiveSheet as Worksheet;
+               sheetSections.Name = "Секции";
+               listSections(sheetSections, album);
+            }
+            catch { }
          }
 
+         // Содержание  
+         try
+         {
+            Worksheet sheetContent = workBook.Sheets.Add();
+            sheetContent.Name = "Содержание";
+            listContentAlbum(sheetContent, album);
+         }
+         catch { }
+
          // Плитка
-         Worksheet sheetTiles = workBook.Sheets.Add();
-         sheetTiles.Name = "Плитка";
-         listTiles(sheetTiles, album);
+         try
+         {
+            Worksheet sheetTiles = workBook.Sheets.Add();
+            sheetTiles.Name = "Плитка";
+            listTiles(sheetTiles, album);
+         }
+         catch { }
 
          // Этажи
-         Worksheet sheetFloors = workBook.Sheets.Add();
-         sheetFloors.Name = "Этажи";
-         listFloors(sheetFloors, album);
+         try
+         {
+            Worksheet sheetFloors = workBook.Sheets.Add();
+            sheetFloors.Name = "Этажи";
+            listFloors(sheetFloors, album);
+         }
+         catch { }
 
          // Панели
-         Worksheet sheetPanels = workBook.Sheets.Add();
-         sheetPanels.Name = "Панели";
-         listPanels(sheetsSet, album, sheetPanels);
+         try
+         {
+            Worksheet sheetPanels = workBook.Sheets.Add();
+            sheetPanels.Name = "Панели";
+            listPanels(album, sheetPanels);
+         }
+         catch { }
 
          // Показать ексель.
-         // Лучше сохранить файл и закрыть!!!???
+         // Лучше сохранить файл и закрыть!!!???         
          string excelFile = Path.Combine(album.AlbumDir, "АКР_" + Path.GetFileNameWithoutExtension(album.DwgFacade) + ".xlsx");
          excelApp.Visible = true;
          workBook.SaveAs(excelFile);
-      }
+      }     
 
       private static int addTitle(Worksheet sheet, Album album)
       {
@@ -91,7 +117,7 @@ namespace AlbumPanelColorTiles.Sheets
          sheetFloors.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
-      private static void listPanels(SheetsSet sheetsSet, Album album, Worksheet sheetPanels)
+      private static void listPanels(Album album, Worksheet sheetPanels)
       {
          int row = addTitle(sheetPanels, album);
          // Название
@@ -106,7 +132,7 @@ namespace AlbumPanelColorTiles.Sheets
          // Записываем данные
          int i = 1;
          int totalCountPanels = 0;
-         foreach (var sheetSb in sheetsSet.SheetsMarkSB)
+         foreach (var sheetSb in album.SheetsSet.SheetsMarkSB)
          {
             foreach (var sheetAr in sheetSb.SheetsMarkAR)
             {
@@ -206,6 +232,31 @@ namespace AlbumPanelColorTiles.Sheets
          col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;
          sheetTiles.Columns[4].HorizontalAlignment = XlHAlign.xlHAlignCenter;
          sheetTiles.Columns[5].HorizontalAlignment = XlHAlign.xlHAlignCenter;
+      }
+
+      private static void listContentAlbum(Worksheet sheetContent, Album album)
+      {
+         int row = addTitle(sheetContent, album);
+         row++;
+         sheetContent.Cells[row, 1].Value = "Содержание альбома панелей";
+         row++;         
+         sheetContent.Cells[row, 1].Value = "Лист";
+         sheetContent.Cells[row, 2].Value = "Панель";         
+         row++;                  
+         foreach (var sheetMarkSb in album.SheetsSet.SheetsMarkSB)
+         {
+            foreach (var sheetMarkAr in sheetMarkSb.SheetsMarkAR)
+            {
+               sheetContent.Cells[row, 1].Value = sheetMarkAr.SheetNumber; //Лист;
+               sheetContent.Cells[row, 2].Value = sheetMarkAr.MarkAR.MarkARPanelFullName; //"Панели";               
+               row++;
+            }
+         }         
+
+         sheetContent.Columns.AutoFit();
+         var col1 = sheetContent.Columns[1];
+         col1.ColumnWidth = 5;
+         col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;         
       }
    }
 }

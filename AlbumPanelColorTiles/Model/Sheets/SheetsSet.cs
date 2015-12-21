@@ -99,7 +99,7 @@ namespace AlbumPanelColorTiles.Sheets
          // Еспорт списка панелей в ексель.
          try
          {
-            ExportToExcel.Export(this, _album);
+            ExportToExcel.Export(_album);
          }
          catch (Exception ex)
          {
