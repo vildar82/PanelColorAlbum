@@ -25,7 +25,7 @@ namespace AlbumPanelColorTiles.Sheets
          // подсчет итогового кол плитки
          Table table = getTable(db);
 
-         TableJig jigTable = new TableJig(table, 100, "\nВставка итоговой таблицы плитки на альбом");
+         TableJig jigTable = new TableJig(table, 1/db.Cannoscale.Scale, "\nВставка итоговой таблицы плитки на альбом");
          if (ed.Drag(jigTable).Status == PromptStatus.OK)
          {
             using (var t = db.TransactionManager.StartTransaction())
