@@ -120,24 +120,24 @@ namespace AlbumPanelColorTiles.Panels
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
       {
-         var idBtrMarkSb = Lib.Block.CopyBtr(idBtrMarkAr, markSbBlName);
-         // Перенос блоков плиток на слой 0
-         Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
+         // Копирование блока
+         var idBtrMarkSb = Lib.Block.CopyBtr(idBtrMarkAr, markSbBlName);         
+         // Перенос блоков плиток на слой 0         
+         using (var btrMarkSb = idBtrMarkSb.Open(OpenMode.ForRead) as BlockTableRecord)
          {
-            var btrMarkSb = t.GetObject(idBtrMarkSb, OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btrMarkSb)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.GetEffectiveName() == Settings.Default.BlockTileName)
+                  using (var blRef = idEnt.Open( OpenMode.ForWrite, false, true) as BlockReference)
                   {
-                     blRef.Layer = "0";
+                     if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        blRef.Layer = "0";
+                     }
                   }
                }
             }
-            t.Commit();
          }
       }
 

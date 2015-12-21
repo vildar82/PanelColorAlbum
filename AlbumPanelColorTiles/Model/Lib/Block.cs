@@ -69,33 +69,38 @@ namespace AlbumPanelColorTiles.Lib
       {
          ObjectId idBtrCopy = ObjectId.Null;
          Database db = idBtrSource.Database;
-         using (var t = db.TransactionManager.StartTransaction())
+         ObjectIdCollection ids = new ObjectIdCollection ();
+         using (var btrSource = idBtrSource.Open(OpenMode.ForRead) as BlockTableRecord)
          {
-            var btrSource = t.GetObject(idBtrSource, OpenMode.ForRead) as BlockTableRecord;
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            //проверка имени блока
-            if (bt.Has(name))
+            using (var bt = db.BlockTableId.Open( OpenMode.ForRead) as BlockTable)
             {
-               idBtrCopy = bt[name];
-            }
-            else
-            {
-               var btrCopy = btrSource.Clone() as BlockTableRecord;
-               btrCopy.Name = name;
-               bt.UpgradeOpen();
-               idBtrCopy = bt.Add(btrCopy);
-               t.AddNewlyCreatedDBObject(btrCopy, true);
-               // Копирование объектов блока
-               ObjectIdCollection ids = new ObjectIdCollection();
-               foreach (ObjectId idEnt in btrSource)
+               //проверка имени блока
+               if (bt.Has(name))
                {
-                  ids.Add(idEnt);
+                  idBtrCopy = bt[name];
                }
-               IdMapping map = new IdMapping();
-               db.DeepCloneObjects(ids, idBtrCopy, map, false);
+               else
+               {
+                  using (var btrCopy = btrSource.Clone() as BlockTableRecord)
+                  {
+                     btrCopy.Name = name;
+                     bt.UpgradeOpen();
+                     idBtrCopy = bt.Add(btrCopy);                     
+                     // Объекты в блоке для копирования
+                     foreach (ObjectId idEnt in btrSource)
+                     {
+                        ids.Add(idEnt);
+                     }                     
+                  }
+               }
             }
-            t.Commit();
-         }
+         }         
+         if (ids.Count>0)
+         {
+            // Копирование объектов блока                     
+            IdMapping map = new IdMapping();
+            db.DeepCloneObjects(ids, idBtrCopy, map, false);
+         }         
          return idBtrCopy;
       }
 

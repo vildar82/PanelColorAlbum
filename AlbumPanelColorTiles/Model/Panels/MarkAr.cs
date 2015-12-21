@@ -166,9 +166,8 @@ namespace AlbumPanelColorTiles.Panels
       {
          // Создание копии блока маркиСБ, с покраской блоков плиток
          Database db = HostApplicationServices.WorkingDatabase;
-         using (var t = db.TransactionManager.StartTransaction())
+         using (var bt = db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
          {
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
             // Проверка нет ли уже определения блока панели Марки АР в таблице блоков чертежа
             if (bt.Has(_markArBlockName))
             {
@@ -176,37 +175,40 @@ namespace AlbumPanelColorTiles.Panels
                throw new System.Exception("\nВ чертеже не должно быть блоков Марки АР - " + _markArBlockName +
                            "\nРекомендуется выполнить команду сброса боков Марки АР до Марок СБ - ResetPanels.");
             }
-            var btrMarkSb = t.GetObject(_markSB.IdBtr, OpenMode.ForRead) as BlockTableRecord;
-            // Копирование определения блока
-            _idBtrAr = Lib.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);
-            var btrMarkAr = t.GetObject(_idBtrAr, OpenMode.ForRead) as BlockTableRecord;
+         }
+         // Копирование определения блока
+         _idBtrAr = Lib.Block.CopyBtr(_markSB.IdBtr, _markArBlockName);
+         using (var btrMarkAr = _idBtrAr.Open(OpenMode.ForRead) as BlockTableRecord)
+         {
             int i = 0;
             foreach (ObjectId idEnt in btrMarkAr)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as BlockReference;
-                  if (blRef.GetEffectiveName() == Settings.Default.BlockTileName)
+                  using (var blRef = idEnt.Open(OpenMode.ForWrite, false, true) as BlockReference)
                   {
-                     // это блок плитки. Покраска плитки.
-                     var paintAr = _paints[i++];
-                     if (paintAr == null)
+                     var blNameEff = blRef.GetEffectiveName();
+                     if (string.Equals(blNameEff, Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {
-                        blRef.Layer = "0";
+                        // это блок плитки. Покраска плитки.
+                        var paintAr = _paints[i++];
+                        if (paintAr == null)
+                        {
+                           blRef.Layer = "0";
+                        }
+                        else
+                        {
+                           blRef.Layer = paintAr.LayerName;
+                        }
                      }
-                     else
+                     else if (string.Equals( blNameEff, Settings.Default.BlockColorAreaName, StringComparison.CurrentCultureIgnoreCase))
                      {
-                        blRef.Layer = paintAr.LayerName;
+                        // Блок зоны покраски. Удаляем его
+                        blRef.Erase(true);
                      }
-                  }
-                  else if (blRef.GetEffectiveName() == Settings.Default.BlockColorAreaName)
-                  {
-                     // Блок зоны покраски. Удаляем его
-                     blRef.Erase(true);
                   }
                }
             }
-            t.Commit();
          }
       }
 
