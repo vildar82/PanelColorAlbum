@@ -39,25 +39,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
          }
          return panelsAkrLIb;
-      }
-
-      public PanelAkrLib CopyLibBlockElectricInTempFile(MountingPanel panelSb)
-      {
-         PanelAkrLib panelAkrLib = null;
-         try
-         {
-            string markAkr = panelSb.MarkSbBlockName;
-            SymbolUtilityServices.ValidateSymbolName(markAkr, false);
-            // копирование блока с новым именем с электрикой
-            ObjectId idBtrAkeElectricInTempLib = Lib.Block.CopyBtr(_idBtrAkrPanel, markAkr);
-            panelAkrLib = new PanelAkrLib(idBtrAkeElectricInTempLib, markAkr);
-            panelAkrLib.IsElectricCopy = true;
-         }
-         catch
-         {
-            // неудалось создать копию блока
-         }
-         return panelAkrLib;
-      }
+      }      
    }
 }

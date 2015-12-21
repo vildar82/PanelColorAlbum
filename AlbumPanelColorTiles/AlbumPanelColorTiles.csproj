@@ -60,7 +60,6 @@
     </Reference>
     <Reference Include="EPPlus">
       <HintPath>..\..\..\..\Package\Excel\EPPlus.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
