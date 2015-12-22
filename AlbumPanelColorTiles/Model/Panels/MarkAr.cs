@@ -74,7 +74,8 @@ namespace AlbumPanelColorTiles.Panels
             //_markARPanelFullName = string.Format("{0}({1}_{2})", _markSB.MarkSbClean, _markPainting, _markSB.Abbr);
             _markARPanelFullName = string.Format("{0}{1}", _markSB.MarkSbClean, MarkPaintingFull);
             // Переименование подписей марок панелей (текстовый объект внутри блока панелели)
-            Caption.AddMarkToPanelBtr(this, _idBtrAr);
+            Caption caption = new Caption(_idBtrAr.Database);
+            caption.AddMarkToPanelBtr(MarkARPanelFullName, _idBtrAr);
          }
       }
 

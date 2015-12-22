@@ -124,7 +124,7 @@ namespace AlbumPanelColorTiles
                   }
                }
             }
-            Caption captionPanels = new Caption(t, db);
+            Caption captionPanels = new Caption(db);
             // Удаление определений блоков Марок АР.
             foreach (ObjectId idBtr in bt)
             {
@@ -149,7 +149,7 @@ namespace AlbumPanelColorTiles
                   {
                      // Подпись марки блока
                      string panelMark = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
-                     captionPanels.AddMarkToPanelBtr(panelMark, idBtr, null);
+                     captionPanels.AddMarkToPanelBtr(panelMark, idBtr);
                   }
                }
             }
