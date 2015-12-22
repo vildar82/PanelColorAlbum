@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.Select
 {
@@ -88,12 +90,13 @@ namespace AlbumPanelColorTiles.Model.Select
       /// + выбор блоков Секций.
       /// + выбор фасадов
       /// </summary>
-      public void SelectBlRefsInModel()
-      {
-         IdsBlRefPanelAr = new List<ObjectId>();
-         IdsBlRefPanelSb = new List<ObjectId>();
+      public void SelectBlRefsInModel(bool sortPanels)
+      {         
          SectionsBlRefs = new List<ObjectId>();
          FacadeBlRefs = new List<ObjectId>();
+         List<KeyValuePair<Point3d, ObjectId>> listPtsIdsBlRefMarkAr = new List<KeyValuePair<Point3d, ObjectId>>();
+         List<KeyValuePair<Point3d, ObjectId>> listPtsIdsBlRefMarkSb = new List<KeyValuePair<Point3d, ObjectId>>();
+
          using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(_db).Open(OpenMode.ForRead) as BlockTableRecord)
          {
             foreach (ObjectId idEnt in ms)
@@ -107,11 +110,11 @@ namespace AlbumPanelColorTiles.Model.Select
                      {
                         if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
                         {
-                           IdsBlRefPanelAr.Add(idEnt);
+                           listPtsIdsBlRefMarkAr.Add(new KeyValuePair<Point3d, ObjectId>( blRef.Position, idEnt));
                         }
                         else
                         {
-                           IdsBlRefPanelSb.Add(idEnt);
+                           listPtsIdsBlRefMarkSb.Add(new KeyValuePair<Point3d, ObjectId>(blRef.Position, idEnt));
                         }
                         continue;
                      }
@@ -133,6 +136,26 @@ namespace AlbumPanelColorTiles.Model.Select
                }
             }
          }
+         if (sortPanels)
+         {
+            // сортировка блоков панелей
+            IdsBlRefPanelAr = getSortedIdBlrefPanel(listPtsIdsBlRefMarkAr);
+            IdsBlRefPanelSb = getSortedIdBlrefPanel(listPtsIdsBlRefMarkSb);
+         }
+         else
+         {
+            // Без сортировки панелей
+            IdsBlRefPanelAr = listPtsIdsBlRefMarkAr.Select(p=>p.Value).ToList();
+            IdsBlRefPanelSb = listPtsIdsBlRefMarkSb.Select(p=>p.Value).ToList();
+         }
+      }
+
+      private List<ObjectId> getSortedIdBlrefPanel(List<KeyValuePair<Point3d, ObjectId>> listPtsIdsBlRefMarkAr)
+      {
+         // группировка по Y с допуском 2000, потом сортировка по X в каждой группе.
+         AcadLib.Comparers.DoubleEqualityComparer comparerY = new AcadLib.Comparers.DoubleEqualityComparer(2000);
+         return listPtsIdsBlRefMarkAr.OrderBy(p => p.Key.X).GroupBy(p => p.Key.Y, comparerY)
+                  .OrderBy(g => g.Key).SelectMany(g=>g).Select(g=>g.Value).ToList();         
       }
 
       public void SelectSectionBlRefs()

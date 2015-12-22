@@ -730,5 +730,33 @@ namespace AlbumPanelColorTiles
             t.Commit();
          }
       }
+
+      [CommandMethod("PIK", "Test", CommandFlags.Modal)]
+      public void Test()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         Editor ed = doc.Editor;
+         Database db = doc.Database;
+
+         Model.Select.SelectionBlocks sel = new Model.Select.SelectionBlocks();
+         sel.SelectBlRefsInModel(false);
+
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            int count = 0;
+            var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            foreach (var idBlRefPanel in sel.IdsBlRefPanelAr)
+            {
+               var blRef = idBlRefPanel.GetObject(OpenMode.ForRead) as BlockReference;
+               var text = new DBText();
+               text.SetDatabaseDefaults(db);
+               text.TextString = count++.ToString();
+               text.Position = blRef.Position;
+               ms.AppendEntity(text);
+               t.AddNewlyCreatedDBObject(text, true);
+            }
+            t.Commit();
+         }
+      }
    }
 }

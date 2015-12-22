@@ -5,13 +5,13 @@ namespace AlbumPanelColorTiles.Model
 {
    public partial class FormStartOptions : Form
    {
-      private StartOptions _startOptions;
+      public StartOption StartOptions { get; set; }
 
-      public FormStartOptions(StartOptions startOptions)
+      public FormStartOptions(StartOption startOptions)
       {
-         _startOptions = startOptions;
+         StartOptions = startOptions;
          InitializeComponent();
-         propertyGrid1.SelectedObject = _startOptions;         
+         propertyGrid1.SelectedObject = StartOptions;         
       }
 
       private void buttonDefault_Click(object sender, EventArgs e)
@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles.Model
       {
          bool isOk = true;
          // Аббревиатура проекта должна иметь допустимое имя для блоков
-         if (!string.IsNullOrEmpty(_startOptions.Abbr) && !_startOptions.Abbr.IsValidDbSymbolName())
+         if (!string.IsNullOrEmpty(StartOptions.Abbr) && !StartOptions.Abbr.IsValidDbSymbolName())
          {
             errorProvider1.SetError(propertyGrid1, "Индекс проекта должен отвечать требованиям для именования блоков.");
             isOk = false;
