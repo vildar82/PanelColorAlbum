@@ -24,7 +24,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, 230 + 250, 20);
             Extents3d extTexts = extMarkSb;
             extTexts.AddExtents(extPaint);
-            сreateHatch(extTexts, btr);
+            сreateHatch(extTexts, btr);            
          }
       }
 
@@ -50,7 +50,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          return resVal;
       }
 
-      private ObjectId copyText(ObjectId idBdText, BlockTableRecord btr)
+      private ObjectId replaceText(ObjectId idBdText, BlockTableRecord btr)
       {
          using (var text = idBdText.GetObject(OpenMode.ForWrite, false, true) as DBText)
          {
@@ -62,39 +62,57 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
       }
 
-      private void сreateHatch(Extents3d ext, BlockTableRecord btr)
+      private void сreateHatch(Extents3d extText, BlockTableRecord btr)
       {
-         if (ext.Diagonal() < 100)
+         if (extText.Diagonal() < 100)
          {
             return;
          }
+         // Отступ контура штриховки от границ текста
+         Extents3d ext = new Extents3d(new Point3d(extText.MinPoint.X - 10, extText.MinPoint.Y - 10, 0),
+                                       new Point3d(extText.MaxPoint.X + 10, extText.MaxPoint.Y + 10, 0));
+         var h = new Hatch();
+         h.SetDatabaseDefaults(btr.Database);
+         if (!panelBtr.CaptionLayerId.IsNull)
+            h.LayerId = panelBtr.CaptionLayerId;         
+         h.LineWeight = LineWeight.LineWeight015;
+         h.Linetype = SymbolUtilityServices.LinetypeContinuousName;
+         h.Color = Color.FromRgb(250, 250, 250);
+         h.Transparency = new Transparency(80);
+         h.SetHatchPattern(HatchPatternType.PreDefined, "ANGLE");
+         h.PatternScale = 25.0;
+         btr.AppendEntity(h);
+         var t = btr.Database.TransactionManager.TopTransaction;
+         t.AddNewlyCreatedDBObject(h, true);
+         h.Associative = true;
+         h.HatchStyle = HatchStyle.Normal;
 
-         using (var h = new Hatch())
-         {
-            h.SetDatabaseDefaults(btr.Database);
-            if (!panelBtr.CaptionLayerId.IsNull)
-               h.LayerId = panelBtr.CaptionLayerId;
-            //h.Linetype = SymbolUtilityServices.LinetypeByLayerName;
-            h.LineWeight = LineWeight.LineWeight015;
-            h.Color = Color.FromRgb(250, 250, 250);
-            h.Transparency = new Transparency(80);
-            h.SetHatchPattern(HatchPatternType.PreDefined, "ANGLE");
-            h.PatternScale = 25.0;
-            btr.AppendEntity(h);
-            btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(h, true);
-            h.Associative = false;
-            h.HatchStyle = HatchStyle.Normal;
-            Point2dCollection pts = new Point2dCollection();
-            pts.Add(ext.MinPoint.Convert2d());
-            pts.Add(new Point2d(ext.MaxPoint.X, ext.MinPoint.Y));
-            pts.Add(ext.MaxPoint.Convert2d());
-            pts.Add(new Point2d(ext.MinPoint.X, ext.MaxPoint.Y));
-            DoubleCollection bulges = new DoubleCollection(4);
-            h.AppendLoop(HatchLoopTypes.Default, pts, bulges);
-            h.EvaluateHatch(true);
-         }
-         panelBtr.IdCaptionMarkSb = copyText(panelBtr.IdCaptionMarkSb, btr);
-         panelBtr.IdCaptionPaint = copyText(panelBtr.IdCaptionPaint, btr);
+         // Полилиния по контуру текста
+         Polyline pl = new Polyline();
+         pl.SetDatabaseDefaults(btr.Database);
+         pl.LineWeight = LineWeight.LineWeight015;
+         pl.Linetype = SymbolUtilityServices.LinetypeContinuousName;
+         pl.ColorIndex = 256; // ПоСлою
+         if (!panelBtr.CaptionLayerId.IsNull)
+            pl.LayerId = panelBtr.CaptionLayerId;
+         pl.AddVertexAt(0, ext.MinPoint.Convert2d(), 0, 0, 0);
+         pl.AddVertexAt(0, new Point2d(ext.MaxPoint.X, ext.MinPoint.Y), 0, 0, 0);
+         pl.AddVertexAt(0, ext.MaxPoint.Convert2d(), 0, 0, 0);
+         pl.AddVertexAt(0, new Point2d(ext.MinPoint.X, ext.MaxPoint.Y), 0, 0, 0);
+         pl.Closed = true;
+                  
+         ObjectId idPl = btr.AppendEntity(pl);
+         t.AddNewlyCreatedDBObject(pl, true);
+
+         // добавление контура полилинии в гштриховку
+         var ids = new ObjectIdCollection();
+         ids.Add(idPl);
+         h.AppendLoop(HatchLoopTypes.Default, ids);
+         h.EvaluateHatch(true);
+
+         // Замена текстов - чтобы они стали поверх штриховки.
+         panelBtr.IdCaptionMarkSb = replaceText(panelBtr.IdCaptionMarkSb, btr);
+         panelBtr.IdCaptionPaint = replaceText(panelBtr.IdCaptionPaint, btr);
       }
    }
 }
