@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 
 namespace AlbumPanelColorTiles.Model
 {
-   public class StartOptions
+   public class StartOption
    {
       [Category("Важно")]
       [DisplayName("Индекс проекта")]
@@ -27,48 +27,55 @@ namespace AlbumPanelColorTiles.Model
       [DefaultValue(2)]
       public int NumberFirstFloor { get; set; }
 
+      [Category("Важно")]
+      [DisplayName("Сортировка перед покраской")]
+      [Description("Сортировка блоков панелей перед покраской - слева-направо, снизу-вверх по этажам. Влияет на порядок присвоения марок панелям. Для старых проектов выбирайте Нет, для новых Да. После нового года эта опция будет скрыта и включена по-умолчанию.")]
+      [DefaultValue(false)]
+      [TypeConverter(typeof(BooleanTypeConverter))]
+      public bool SortPanels { get; set; }
+
       [Category("Не важно")]
       [DisplayName("Номер первого листа в альбоме")]
       [Description("Начальный номер для листов панелей в альбоме. Если 0, то этот параметр не учитывается.")]
-      [DefaultValue(0)]
+      [DefaultValue(0)]      
       public int NumberFirstSheet { get; set; }
 
-      public void PromptStartOptions()
+      public void LoadDefault()
       {         
          // Дефолтное значение аббревиатуры проекта
          if (Abbr == null)
          {
             Abbr = loadAbbreviateName();// "Н47Г";
             CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);
-         }
-         // дефолтное значение номера первого этажа
-         if (NumberFirstFloor == 0)
-         {
             NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
-         }
-         // дефолтное значение номера первого листа
-         if (NumberFirstSheet == 0)
-         {
             NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
-         }
+            SortPanels = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);            
+         }         
+      }
 
-         // Запрос начальных значений
-         FormStartOptions formStartOptions = new FormStartOptions(this);
+      public StartOption PromptStartOptions()
+      {
+         StartOption resVal = this;
+         //Запрос начальных значений
+        FormStartOptions formStartOptions = new FormStartOptions((StartOption)resVal.MemberwiseClone());
          if (Application.ShowModalDialog(formStartOptions) != System.Windows.Forms.DialogResult.OK)
          {
             throw new System.Exception("Отменено пользователем.");
          }
          try
-         {
+         {            
+            resVal = formStartOptions.StartOptions;
             saveAbbreviateName(Abbr);
             saveNumberToDict(NumberFirstFloor, Album.KEYNAMENUMBERFIRSTFLOOR);
             saveNumberToDict(NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
             DictNOD.SaveBool(CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
+            DictNOD.SaveBool(SortPanels, Album.KEYNAMESORTPANELS);
          }
          catch (Exception ex)
          {
             Log.Error(ex, "Не удалось сохранить стартовые параметры.");
          }
+         return resVal;
       }
 
       private string loadAbbreviateName()

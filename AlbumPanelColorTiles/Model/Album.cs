@@ -23,6 +23,7 @@ namespace AlbumPanelColorTiles
    public class Album
    {
       public const string KEYNAMECHECKMARKPAINTING = "CheckMarkPainting";
+      public const string KEYNAMESORTPANELS = "SortPanels";
       public const string KEYNAMENUMBERFIRSTFLOOR = "NumberFirstFloor";
       public const string KEYNAMENUMBERFIRSTSHEET = "NumberFirstSheet";
       public const string REGAPPPATH = @"Software\Vildar\AKR";
@@ -50,6 +51,8 @@ namespace AlbumPanelColorTiles
          _doc = Application.DocumentManager.MdiActiveDocument;
          _db = _doc.Database;
          Date = DateTime.Now;
+         StartOptions = new StartOption();
+         StartOptions.LoadDefault();
       }
 
       //public int NumberFirstSheet { get { return _numberFirstSheet; } }
@@ -65,7 +68,7 @@ namespace AlbumPanelColorTiles
       public List<MarkSb> MarksSB { get { return _marksSB; } }
       public List<Model.Panels.Section> Sections { get; set; }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
-      public StartOptions StartOptions { get; private set; }
+      public StartOption StartOptions { get; private set; }
       public List<Storey> Storeys { get { return _storeys; } }
 
       /// <summary>
@@ -173,7 +176,7 @@ namespace AlbumPanelColorTiles
          var rtreeColorAreas = ColorArea.GetRTree(colorAreasCheck);
 
          SelectionBlocks selBlocks = new SelectionBlocks(_db);
-         selBlocks.SelectBlRefsInModel();
+         selBlocks.SelectBlRefsInModel(StartOptions.SortPanels);
 
          var marksSbCheck = MarkSb.GetMarksSB(rtreeColorAreas, this, "Проверка панелей...", selBlocks.IdsBlRefPanelAr);
          //RenamePanelsToArchitectIndex(marksSbCheck);
@@ -242,9 +245,8 @@ namespace AlbumPanelColorTiles
       public void PaintPanels()
       {
          // Запрос начальных значений - Аббревиатуры, Номера первого этажа, Номера первого листа
-         //promptStartOptions();
-         StartOptions = new StartOptions();
-         StartOptions.PromptStartOptions();
+         //promptStartOptions();         
+         StartOptions = StartOptions.PromptStartOptions();
 
          // Определение марок покраски панелей (Марок АР).
          // Создание определениц блоков марок АР.
@@ -274,7 +276,7 @@ namespace AlbumPanelColorTiles
          }
 
          SelectionBlocks selBlocks = new SelectionBlocks(_db);
-         selBlocks.SelectBlRefsInModel();
+         selBlocks.SelectBlRefsInModel(StartOptions.SortPanels);
          // В чертеже не должно быть панелей марки АР
          if (selBlocks.IdsBlRefPanelAr.Count > 0)
          {

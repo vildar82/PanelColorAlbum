@@ -24,7 +24,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       {
          // Список панелей для экспорта
          SelectPanels = new SelectionBlocks();
-         SelectPanels.SelectBlRefsInModel();
+         SelectPanels.SelectBlRefsInModel(false);
          if (SelectPanels.IdsBlRefPanelSb.Count > 0)
          {
             Inspector.AddError("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
@@ -136,7 +136,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
       {
          // Удаление блоков панелей из существующего чертежа экпорта фасадов
          SelectionBlocks selPanels = new SelectionBlocks(dbExport);
-         selPanels.SelectBlRefsInModel();
+         selPanels.SelectBlRefsInModel(false);
          deleteBlRefs(selPanels.IdsBlRefPanelAr);
          // Панелей СБ не должно быть, но на всякий случай удалю.
          deleteBlRefs(selPanels.IdsBlRefPanelSb);
