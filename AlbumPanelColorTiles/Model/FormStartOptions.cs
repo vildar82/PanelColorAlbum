@@ -38,7 +38,6 @@ namespace AlbumPanelColorTiles.Model
             errorProvider1.SetError(propertyGrid1, "Индекс проекта должен отвечать требованиям для именования блоков.");
             isOk = false;
          }
-
          return isOk;
       }
    }
