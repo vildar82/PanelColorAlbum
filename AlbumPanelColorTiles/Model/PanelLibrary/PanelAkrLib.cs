@@ -6,8 +6,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 {
    public class PanelAkrLib : PanelAKR
    {
-      protected ObjectId _idBtrPanelAkrInFacade;
-      private bool _isElectricCopy;
+      protected ObjectId _idBtrPanelAkrInFacade;      
 
       public PanelAkrLib(ObjectId idBtr, string blName) : base(idBtr, blName)
       {
@@ -17,9 +16,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          get { return _idBtrPanelAkrInFacade; }
          set { _idBtrPanelAkrInFacade = value; }
-      }
-
-      public bool IsElectricCopy { get { return _isElectricCopy; } set { _isElectricCopy = value; } }
+      }     
 
       public static List<PanelAkrLib> GetAkrPanelLib(Database dbLib)
       {

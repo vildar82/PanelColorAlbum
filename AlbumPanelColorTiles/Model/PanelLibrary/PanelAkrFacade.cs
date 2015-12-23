@@ -124,7 +124,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (!getFirstBlRefInFacade(out _idBlRefForShow))
             {
                // вставка блока
-               _idBlRefForShow = AcadLib.Blocks.BlockInsert.Insert(_blName);
+               _idBlRefForShow = AcadLib.Blocks.BlockInsert.Insert(BlName);
                if (_idBlRefForShow.IsNull)
                {
                   return;

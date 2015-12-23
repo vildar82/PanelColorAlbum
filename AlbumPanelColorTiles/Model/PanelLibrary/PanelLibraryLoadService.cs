@@ -84,7 +84,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            {
                               foreach (var mountingPanelSb in mountingsPanelSb)
                               {
-                                 string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
+                                 string markSbWithoutWhite = mountingPanelSb.MarkSbWithoutElectric.Replace(' ', '-');
                                  string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
@@ -97,7 +97,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                        {
                                           // Ошибка - марки покраски не совпали.
                                           string errMsg = string.Format("Не совпала марка покраски. Панель АКР {0}, Монтажная панель {1}{2}",
-                                                markAr.MarkARPanelFullName, mountingPanelSb.MarkSb, mountingPanelSb.MarkPainting);
+                                                markAr.MarkARPanelFullName, mountingPanelSb.MarkSbWithoutElectric, mountingPanelSb.MarkPainting);
                                           Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr);
                                           Log.Error(errMsg);
                                        }
@@ -107,7 +107,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                     else
                                     {
                                        var atrInfo = mountingPanelSb.AttrDet.Find
-                                       (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
+                                                   (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint,
+                                                                        StringComparison.CurrentCultureIgnoreCase));
                                        if (atrInfo != null)
                                        {
                                           using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)

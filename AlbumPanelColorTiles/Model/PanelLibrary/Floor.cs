@@ -5,68 +5,39 @@ using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Этаж - блоки АКР-панелей этажа и связаннный с ним блок монтажки с блоком обозначения стороны фасада
    public class Floor : IComparable<Floor>
    {
-      // Панели СБ - все что есть внутри блока монтажки
-      private List<MountingPanel> _allPanelsSbInFloor;
-
-      // Имя/номер этажа
-      private string _blRefName;
-
-      private Extents3d _extBlMounting;
-
-      // обозначение стороны фасада на монтажном плане
-      private FacadeFrontBlock _facadeFrontBlock;
-
-      private double _height;
-
-      // Блок монтажного плана
-      private ObjectId _idBlRefMounting;
-
-      // высота этажа
-      private List<MountingPanel> _panelsSbInFront;
-
-      // Точка вставки блока монтажки
-      private Point3d _ptBlMounting;
-
-      private Storey _storey; // этаж
-      private double _xmax;
-      private double _xmin; // мин значение х среди всех границ блоков панелей внктри этажа
-                            // макс значение х среди всех границ блоков панелей внктри этажа
-                            // блоки панелей СБ входящие внутрь блока стороны фасада
+      public List<MountingPanel> AllPanelsSbInFloor { get; private set; }
+      public string BlRefName { get; private set; }
+      public FacadeFrontBlock FacadeFrontBlock { get; private set; }
+      public double Height { get; set; }
+      public ObjectId IdBlRefMounting { get; private set; }
+      public PanelLibraryLoadService LibLoadServ { get; private set; }
+      public List<MountingPanel> PanelsSbInFront { get; private set; }
+      public Storey Storey { get; private set; }
+      public double XMax { get; private set; }
+      public double XMin { get; private set; }
 
       public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {
          LibLoadServ = libLoadServ;
-         _idBlRefMounting = blRefMounting.Id;
-         _extBlMounting = blRefMounting.GeometricExtents;
-         _ptBlMounting = blRefMounting.Position;
-         _blRefName = blRefMounting.Name;
+         IdBlRefMounting = blRefMounting.Id;
+         BlRefName = blRefMounting.Name;
+
          //defFloorNameAndNumber(blRefMounting);
          // Получение всех блоков панелей СБ из блока монтажки
-         _allPanelsSbInFloor = MountingPanel.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform, LibLoadServ);
-         _xmin = getXMinFloor();
-         _xmax = getXMaxFloor();
+         AllPanelsSbInFloor = MountingPanel.GetPanels(blRefMounting, LibLoadServ);
+         XMin = getXMinFloor();
+         XMax = getXMaxFloor();
          //// добавление блоков паненлей в общий список панелей СБ
          //libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
 
-      //public Point3d PtBlMounting { get { return _ptBlMounting; } }
-      public List<MountingPanel> AllPanelsSbInFloor { get { return _allPanelsSbInFloor; } }
-
-      public FacadeFrontBlock FacadeFrontBlock { get { return _facadeFrontBlock; } }
-      public double Height { get { return _height; } set { _height = value; } }
-      public PanelLibraryLoadService LibLoadServ { get; private set; }
-      public List<MountingPanel> PanelsSbInFront { get { return _panelsSbInFront; } }
-      public Storey Storey { get { return _storey; } set { _storey = value; } }
-      public double XMax { get { return _xmax; } }
-
-      public double XMin { get { return _xmin; } }
+      // мин значение х среди всех границ блоков панелей внктри этажа
 
       /// <summary>
       /// Поиск всех блоков монтажек в модели
@@ -74,18 +45,19 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public static List<Floor> GetMountingBlocks(PanelLibraryLoadService libLoadServ)
       {
          List<Floor> floors = new List<Floor>();
-
          var db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
             // Найдем все блоки обозначения фасада
             List<FacadeFrontBlock> facadeFrontBlocks = FacadeFrontBlock.GetFacadeFrontBlocks();
-            // Дерево прямоугольников от блоков обозначений сторон фасада, для поиска пересечений с блоками монтажек
+            // Дерево прямоугольников от блоков обозначений сторон фасада, для поиска пересечений с
+            // блоками монтажек
             RTreeLib.RTree<FacadeFrontBlock> rtreeFront = new RTreeLib.RTree<FacadeFrontBlock>();
             foreach (var front in facadeFrontBlocks)
             {
                rtreeFront.Add(front.RectangleRTree, front);
             }
+
             // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
             //// Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
@@ -95,18 +67,23 @@ namespace AlbumPanelColorTiles.PanelLibrary
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+
                   // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
                   if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);
+
                      // найти соотв обозн стороны фасада
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
-                     // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в фасады, просто так вставлен
+
+                     // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в
+                     // фасады, просто так вставлен
                      if (frontsIntersects.Count == 0)
                      {
                         continue;
                      }
-                     // если больше одного пересечения с фасадами, то это ошибка, на одной монтажке должен быть один блок обозначения стороны фасада
+                     // если больше одного пересечения с фасадами, то это ошибка, на одной монтажке
+                     // должен быть один блок обозначения стороны фасада
                      else if (frontsIntersects.Count > 1)
                      {
                         Inspector.AddError("На монтажном плане не должно быть больше одного блока обозначения фасада.", blRefMounting);
@@ -126,17 +103,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public int CompareTo(Floor other)
       {
-         return _storey.CompareTo(other._storey);
+         return Storey.CompareTo(other.Storey);
       }
 
       public void DefineStorey(List<Storey> storeysNumbersTypeInAllFacades)
       {
-         var indexFloor = _blRefName.IndexOf("эт-");
+         var indexFloor = BlRefName.IndexOf("эт-");
          string nameStorey = string.Empty;
          if (indexFloor == -1)
-            nameStorey = _blRefName.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
+            nameStorey = BlRefName.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
          else
-            nameStorey = _blRefName.Substring(indexFloor + "эт-".Length);
+            nameStorey = BlRefName.Substring(indexFloor + "эт-".Length);
          try
          {
             var storey = new Storey(nameStorey);
@@ -152,54 +129,55 @@ namespace AlbumPanelColorTiles.PanelLibrary
                {
                   storey = storeyAllFacades;
                }
-               _height = Settings.Default.FacadeFloorHeight;
+               Height = Settings.Default.FacadeFloorHeight;
             }
-            _storey = storey;
+            Storey = storey;
          }
          catch (Exception ex)
          {
-            // ошибка определения номера этажа монтажки - это не чердак (Ч), не парапет (П), и не просто число
-            Inspector.AddError(ex.Message + _blRefName, _extBlMounting, _idBlRefMounting);
+            // ошибка определения номера этажа монтажки - это не чердак (Ч), не парапет (П), и не
+            // просто число
+            Inspector.AddError(ex.Message + BlRefName, IdBlRefMounting);
             Log.Error(ex, "Floor - DefineStorey()");
          }
       }
 
       private double getXMaxFloor()
       {
-         if (_allPanelsSbInFloor.Count == 0) return 0;
-         return _allPanelsSbInFloor.Max(p => p.ExtTransToModel.MaxPoint.X);
+         if (AllPanelsSbInFloor.Count == 0) return 0;
+         return AllPanelsSbInFloor.Max(p => p.ExtTransToModel.MaxPoint.X);
       }
 
       private double getXMinFloor()
       {
-         if (_allPanelsSbInFloor.Count == 0) return 0;
-         return _allPanelsSbInFloor.Min(p => p.ExtTransToModel.MinPoint.X);
+         if (AllPanelsSbInFloor.Count == 0) return 0;
+         return AllPanelsSbInFloor.Min(p => p.ExtTransToModel.MinPoint.X);
       }
 
       // Добавление стороны фасада в этаж
       private void SetFacadeFrontBlock(FacadeFrontBlock facadeFrontBlock)
       {
-         _facadeFrontBlock = facadeFrontBlock;
-         _panelsSbInFront = new List<MountingPanel>();
+         FacadeFrontBlock = facadeFrontBlock;
+         PanelsSbInFront = new List<MountingPanel>();
+
          // найти блоки панелей-СБ входящих внутрь границ блока стороны фасада
-         foreach (var panelSb in _allPanelsSbInFloor)
+         foreach (var panelSb in AllPanelsSbInFloor)
          {
             if (facadeFrontBlock.Extents.IsPointInBounds(panelSb.ExtTransToModel.MinPoint) &&
                facadeFrontBlock.Extents.IsPointInBounds(panelSb.ExtTransToModel.MaxPoint))
-            {
-               panelSb.IsInFloor = true;
-               _panelsSbInFront.Add(panelSb);
+            {               
+               PanelsSbInFront.Add(panelSb);
             }
          }
-         if (_panelsSbInFront.Count == 0)
+         if (PanelsSbInFront.Count == 0)
          {
             Inspector.AddError(string.Format("В блоке обозначения стороны фасада {0} не найдена ни одна панель.", facadeFrontBlock.BlName),
                facadeFrontBlock.Extents, facadeFrontBlock.IdBlRef);
          }
          else
          {
-            _xmax = _panelsSbInFront.Max(p => p.ExtTransToModel.MaxPoint.X);
-            _xmin = _panelsSbInFront.Min(p => p.ExtTransToModel.MinPoint.X);
+            XMax = PanelsSbInFront.Max(p => p.ExtTransToModel.MaxPoint.X);
+            XMin = PanelsSbInFront.Min(p => p.ExtTransToModel.MinPoint.X);
          }
       }
    }
