@@ -71,11 +71,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          using (var btr = IdBtrExport.GetObject(OpenMode.ForWrite) as BlockTableRecord)
          {
             // Итерация по объектам в блоке и выполнение различных операций к элементам
-            iterateEntInBlock(btr);
-
-            // Повортот подписи марки (Марки СБ и Марки Покраски) и добавление фоновой штриховки
-            ConvertCaption caption = new ConvertCaption(this);
-            caption.Convert(btr);
+            iterateEntInBlock(btr);            
 
             // Контур панели (так же определяется граница панели без торцов)
             ContourPanel contourPanel = new ContourPanel(this);
@@ -83,14 +79,17 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
             // Определение торцевых объектов (плитки и полилинии контура торца)
             defineEnds();
-
-            // если это ОЛ, то удаление торца
+            
             // Удаление объектов торцов из блока панели, если это ОЛ
             if (CaptionMarkSb.StartsWith("ОЛ", StringComparison.CurrentCultureIgnoreCase))
             {
                deleteEnds(IdsEndsTopEntity);
                IdsEndsTopEntity = new List<ObjectId>();
             }
+
+            // Повортот подписи марки (Марки СБ и Марки Покраски) и добавление фоновой штриховки
+            ConvertCaption caption = new ConvertCaption(this);
+            caption.Convert(btr);
 
             //Если есть ошибки при конвертации, то подпись заголовка этих ошибок
             if (!string.IsNullOrEmpty(ErrMsg))

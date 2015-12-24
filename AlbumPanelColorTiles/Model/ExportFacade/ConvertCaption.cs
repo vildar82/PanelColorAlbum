@@ -20,15 +20,17 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          // Расположение и поворот марки СБ
          if (!panelBtr.IdCaptionMarkSb.IsNull)
          {
-            Extents3d extMarkSb = convertText(panelBtr.IdCaptionMarkSb, 90, 230, 20);
-            Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, 230 + 250, 20);
+            Point3d posMarkSb = new Point3d(panelBtr.ExtentsNoEnd.MinPoint.X + 230, panelBtr.ExtentsNoEnd.MinPoint.Y + 20, 0);
+            Extents3d extMarkSb = convertText(panelBtr.IdCaptionMarkSb, 90, posMarkSb);
+            Point3d posMarkPaint = new Point3d(posMarkSb.X + 250, posMarkSb.Y + 20, 0);
+            Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, posMarkPaint);
             Extents3d extTexts = extMarkSb;
             extTexts.AddExtents(extPaint);
             сreateHatch(extTexts, btr);            
          }
       }
 
-      private Extents3d convertText(ObjectId idDbText, int angle, int x, int y)
+      private Extents3d convertText(ObjectId idDbText, int angle, Point3d pos)
       {
          Extents3d resVal = new Extents3d();
          if (idDbText.IsNull)
@@ -41,7 +43,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             // Аннотативность???
             if (panelBtr.HeightByTile >= 2000)
             {
-               text.Position = new Point3d(x, y, 0);
+               text.Position = pos;
                double angleRadian = Math.PI * angle / 180.0;
                text.Rotation = angleRadian;
             }
