@@ -45,9 +45,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          var pt3 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MaxPoint, EnumCorner.RightTop);
          var pt4 = getCoordTileNoEnd(new Point3d(panelBtr.ExtentsByTile.MaxPoint.X, panelBtr.ExtentsByTile.MinPoint.Y, 0), EnumCorner.RightLower);
 
-         Extents3d extNoEnd = new Extents3d();
-         extNoEnd.AddPoint(pt1);
-         extNoEnd.AddPoint(pt2);
+         Extents3d extNoEnd = new Extents3d(pt1, pt2);                  
          extNoEnd.AddPoint(pt3);
          extNoEnd.AddPoint(pt4);
          panelBtr.ExtentsNoEnd = extNoEnd;
