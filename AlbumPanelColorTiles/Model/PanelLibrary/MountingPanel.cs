@@ -38,7 +38,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public static string GetMarkWithoutElectric(string markSB)
       {
          string res = markSB;
-         var matchs = Regex.Matches(markSB, @"-\d{0,2}[э,Э]$");
+         var matchs = Regex.Matches(markSB, @"-\d{0,2}[э,Э]($|_)");
          if (matchs.Count == 1)
          {
             res = markSB.Substring(0, matchs[0].Index);

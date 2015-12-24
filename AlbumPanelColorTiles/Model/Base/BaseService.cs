@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using AcadLib.Errors;
+using AlbumPanelColorTiles.PanelLibrary;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
