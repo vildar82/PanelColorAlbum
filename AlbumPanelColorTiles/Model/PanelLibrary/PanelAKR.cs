@@ -7,7 +7,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Панель АКР - под покраску - блок из библиотеки панелей АКР.
-   public abstract class PanelAKR
+   public class PanelAKR
    {
       protected Extents3d _extentsTiles;
 
@@ -15,19 +15,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public string Description { get; set; }
       public List<EntityInfo> EntInfos { get; private set; }
       public double HeightPanelByTile { get; private set; }
-      public ObjectId IdBtrAkrPanel { get; private set; }
-      //public bool IsEndLeftPanel { get; private set; }
-      //public bool IsEndRightPanel { get; private set; }
+      public ObjectId IdBtrAkrPanel { get; private set; }      
       public string MarkAkrWithoutWhite { get; private set; }
+      public ObjectId IdBtrPanelAkrInFacade { get; set; }
 
       public PanelAKR(ObjectId idBtrAkrPanel, string blName)
       {
          IdBtrAkrPanel = idBtrAkrPanel;
          BlName = blName;
          Description = "";
-         MarkAkrWithoutWhite = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName)).Replace(' ', '-');
-         // определение - торцов панели
-         //defineEndsPanel(blName);
+         MarkAkrWithoutWhite = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName)).Replace(' ', '-');         
          // Список объектов в блоке
          EntInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);
       }
@@ -80,17 +77,24 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return string.Format("{0}{1}{2}", BlName, string.IsNullOrEmpty(Description) ? "" : " - ", Description);
       }
 
-      // границы блока по плиткам
-      //private void defineEndsPanel(string markAkrWithoutWhite)
-      //{
-      //   if (markAkrWithoutWhite.IndexOf(Settings.Default.EndLeftPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
-      //   {
-      //      _isEndLeftPanel = true; //markSbName.EndsWith(Album.Options.endLeftPanelSuffix); // Торец слева
-      //   }
-      //   if (markAkrWithoutWhite.IndexOf(Settings.Default.EndRightPanelSuffix, StringComparison.OrdinalIgnoreCase) != -1)
-      //   {
-      //      _isEndRightPanel = true; //markSbName.EndsWith(Album.Options.endRightPanelSuffix); // Торец спрва
-      //   }
-      //}
+      public static List<PanelAKR> GetAkrPanelLib(Database dbLib)
+      {
+         List<PanelAKR> panelsAkrLIb = new List<PanelAKR>();
+         using (var bt = dbLib.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
+         {
+            foreach (ObjectId idBtr in bt)
+            {
+               using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
+               {
+                  if (MarkSb.IsBlockNamePanel(btr.Name))
+                  {
+                     PanelAKR panelAkr = new PanelAKR(idBtr, btr.Name);
+                     panelsAkrLIb.Add(panelAkr);
+                  }
+               }
+            }
+         }
+         return panelsAkrLIb;
+      }
    }
 }

@@ -20,7 +20,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public ObjectId IdBlRef { get; private set; }      
       public string MarkPainting { get; private set; }
       public string MarkSbWithoutElectric { get; private set; }      
-      public PanelAkrLib PanelAkrLib { get; private set; }
+      public PanelAKR PanelAkrLib { get; private set; }
       public Point3d PtCenterPanelSbInModel { get; private set; }
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
@@ -130,13 +130,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
             using (var t = dbLib.TransactionManager.StartTransaction())
             {
                // список блоков АКР-Панелей в библиотеке (полные имена блоков).
-               List<PanelAkrLib> panelsAkrInLib = PanelAkrLib.GetAkrPanelLib(dbLib);
+               List<PanelAKR> panelsAkrInLib = PanelAKR.GetAkrPanelLib(dbLib);
                // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
-               Dictionary<ObjectId, PanelAkrLib> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAkrLib>();
+               Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
                List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Floors.SelectMany(s => s.PanelsSbInFront)).ToList();
                foreach (var panelSb in allPanelsSb)
                {
-                  PanelAkrLib panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
+                  PanelAKR panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
                   if (panelAkrLib == null)
                   {
                      // Не найден блок в библиотеке
@@ -174,10 +174,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
          facades.ForEach(f => f.DefYForUpperAndParapetStorey());
       }      
       
-      private static PanelAkrLib CompareMarkSbAndAkrs(List<PanelAkrLib> panelsAkrLib, string markSb, MountingPanel panelSb)
+      private static PanelAKR CompareMarkSbAndAkrs(List<PanelAKR> panelsAkrLib, string markSb, MountingPanel panelSb)
       {
          // Поиск соответствующей АКР-Панели с учетом торцов
-         PanelAkrLib panelAkrLib = null;
+         PanelAKR panelAkrLib = null;
          foreach (var panelAkrItem in panelsAkrLib)
          {
             if (string.Equals(markSb, panelAkrItem.MarkAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
@@ -189,7 +189,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return panelAkrLib;
       }
 
-      private static PanelAkrLib findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAkrLib> panelsAkrInLib)
+      private static PanelAKR findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAKR> panelsAkrInLib)
       {
          return CompareMarkSbAndAkrs(panelsAkrInLib, panelSb.MarkSbWithoutElectric, panelSb);
       }
