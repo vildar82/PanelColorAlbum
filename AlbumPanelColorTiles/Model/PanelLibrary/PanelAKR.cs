@@ -21,14 +21,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       protected bool _isEndLeftPanel;
       protected bool _isEndRightPanel;
-      protected string _markAkrWithoutWhite;
+      protected string _markAkr;
 
       public PanelAKR(ObjectId idBtrAkrPanel, string blName)
       {
          _idBtrAkrPanel = idBtrAkrPanel;
          _blName = blName;
          _description = "";
-         _markAkrWithoutWhite = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName)).Replace(' ', '-');
+         _markAkr = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName));//.Replace(' ', '-');
          // определение - торцов панели
          defineEndsPanel(blName);
          // Список объектов в блоке
@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public ObjectId IdBtrAkrPanel { get { return _idBtrAkrPanel; } }
       public bool IsEndLeftPanel { get { return _isEndLeftPanel; } }
       public bool IsEndRightPanel { get { return _isEndRightPanel; } }
-      public string MarkAkrWithoutWhite { get { return _markAkrWithoutWhite; } }
+      public string MarkAkr { get { return _markAkr; } }
 
       public void DefineGeom(ObjectId idBtrPanelAkr)
       {

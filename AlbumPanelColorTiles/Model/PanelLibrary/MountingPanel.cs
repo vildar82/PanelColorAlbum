@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
-         _markSb = mark;// GetMarkWithoutElectric(mark).Replace(' ', '-');
+         _markSb = GetMarkWithoutElectric(mark);//.Replace(' ', '-');
          MarkPainting = painting;
          _extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
          _extTransToModel = new Extents3d();
@@ -205,7 +205,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          PanelAkrLib panelAkrLib = null;
          foreach (var panelAkrItem in panelsAkrLib)
          {
-            if (string.Equals(markSb, panelAkrItem.MarkAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
+            if (string.Equals(markSb, panelAkrItem.MarkAkr, StringComparison.CurrentCultureIgnoreCase))
             {
                panelAkrLib = panelAkrItem;
                break;
@@ -215,10 +215,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       private static PanelAkrLib findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAkrLib> panelsAkrInLib)
-      {
-         PanelAkrLib panelAkrLib = null;
+      {         
          // точное соответствие - торцы можно не проыерять
-         panelAkrLib = CompareMarkSbAndAkrs(panelsAkrInLib, panelSb.MarkSb, panelSb);
+         PanelAkrLib panelAkrLib = CompareMarkSbAndAkrs(panelsAkrInLib, panelSb.MarkSb, panelSb);
          //if (panelAkrLib == null)
          //{
          //   // поиск панели без электрики с проверкой торцов
