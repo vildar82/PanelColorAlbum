@@ -32,7 +32,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
-         _markSb = GetMarkWithoutElectric(mark).Replace(' ', '-');
+         _markSb = mark;// GetMarkWithoutElectric(mark).Replace(' ', '-');
          MarkPainting = painting;
          _extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
          _extTransToModel = new Extents3d();

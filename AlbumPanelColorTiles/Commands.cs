@@ -9,6 +9,7 @@ using AcadLib.Errors;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Model.ExportFacade;
+using AlbumPanelColorTiles.Model.Tests;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.PanelLibrary.LibEditor;
@@ -729,6 +730,21 @@ namespace AlbumPanelColorTiles
             }
             t.Commit();
          }
-      }      
+      }
+
+      [CommandMethod("PIK", "TestRemoveDashAKR", CommandFlags.Modal)]
+      public void TestRemoveDashAKR()
+      {
+         // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
+         TestRemoveDash testRemoveDash = new TestRemoveDash();
+         testRemoveDash.RemoveDashAKR();
+      }
+      [CommandMethod("PIK", "TestReplaceWindows", CommandFlags.Modal)]
+      public void TestReplaceWindows()
+      {
+         // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
+         TestReplaceWindows testReplaceWindows = new TestReplaceWindows();
+         testReplaceWindows.Replace();
+      }
    }
 }
