@@ -134,6 +134,8 @@
     <Compile Include="Model\PanelLibrary\FormSavePanelsToLib.Designer.cs">
       <DependentUpon>FormSavePanelsToLib.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\Panels\AlbumInfos\AlbumInfo.cs" />
+    <Compile Include="Model\Panels\AlbumInfos\CoverAndTitle.cs" />
     <Compile Include="Model\Panels\Caption.cs" />
     <Compile Include="Model\Panels\ColorArea.cs" />
     <Compile Include="Model\Panels\EnumStorey.cs" />
@@ -164,7 +166,7 @@
     <Compile Include="Model\Panels\Panel.cs" />
     <Compile Include="Model\Plot\PlotMultiPdf.cs" />
     <Compile Include="Model\Plot\PlotMultiPdfReadDwg.cs" />
-    <Compile Include="Model\Panels\BlockFrameAKR.cs" />
+    <Compile Include="Model\Panels\AlbumInfos\FrameSheet.cs" />
     <Compile Include="Model\RandomPainting\FormRandomPainting.cs">
       <SubType>Form</SubType>
     </Compile>

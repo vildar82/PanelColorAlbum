@@ -51,7 +51,7 @@ namespace AlbumPanelColorTiles.Sheets
          CreateAlbumFolder();
 
          //Поиск блока рамки на текущем чертеже фасада
-         BlockFrameAKR blFrameSearch = new BlockFrameAKR();
+         FrameSheet blFrameSearch = new FrameSheet();
          blFrameSearch.Search();
 
          // Титульные листы и обложеи в одном файле "Содержание".

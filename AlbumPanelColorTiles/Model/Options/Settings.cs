@@ -2,114 +2,7 @@
 {
    public class Settings
    {
-      private static Settings _instance = loadSettings();
-
-      private string _attributeFacadeAxis1;
-      private string _attributeFacadeAxis2;
-      private string _attributePanelSbMark;
-
-      //
-      // Атибуты блоков
-      //
-      private string _attributePanelSbPaint;
-
-      private string _attributeSectionName;
-      private string _blockColorAreaDynPropHeight;
-      private string _blockColorAreaDynPropLength;
-
-      //
-      // Имена блоков
-      //
-      private string _blockColorAreaName;
-
-      private string _blockFacadeName;
-      private string _blockFrameName;
-      private string _blockMountingPlanePrefixName;
-      private string _blockPanelPrefixName;
-      private string _blockSectionName;
-      private string _blockTileName;
-      private int _captionPanelSecondTextShift;
-
-      //
-      // Построение фасадов из монтажек
-      //
-      private int _captionPanelTextHeight;
-
-      //
-      // Суффиксы (приставки к именам блоков панелей)
-      //
-      private string _endLeftPanelSuffix;
-
-      private string _endRightPanelSuffix;
-      private int _facadeCaptionFloorIndent;
-      private int _facadeCaptionFloorTextHeight;
-      private int _facadeEndsPanelIndent;
-      private int _facadeFloorHeight;
-      private int _facadeIndentFromMountingPlanes;
-      private int _imagePaintFormHeight;
-      private int _imagePaintFormWidth;
-      private int _imagePaintSpotHeight;
-
-      //
-      // Покраска по картинке
-      //
-      private int _imagePaintSpotLength;
-
-      private string _layerDimensionFacade;
-      private string _layerDimensionForm;
-
-      //
-      // Слои
-      //
-      private string _layerMarks;
-
-      private string _layerParapetPanels;
-      private string _layerUpperStoreyPanels;
-      private string _layerWindows;
-      private string _paintIndexEndLeftPanel;
-      private string _paintIndexEndRightPanel;
-      private string _paintIndexLastStorey;
-      private string _paintIndexParapet;
-      private string _paintIndexStorey;
-
-      //
-      // Индексы покраски
-      //
-      private string _paintIndexUpperStorey;
-
-      private string _paintIndexWindow;
-      private int _sheetPanelEndShift;
-
-      //
-      // Листы Альбома АКР
-      //
-      private int _sheetPanelEndUp;
-
-      //_settings.Add("PaintIndexLastStorey", "П");
-      private int _sheetScale;
-
-      private string _sheetTemplateLayoutNameForContent;
-      private string _sheetTemplateLayoutNameForMarkAR;
-      private int _storeyDefineDeviation;
-
-      private string _templateBlocksAKRExportFacadeFileName;
-
-      //
-      // Шаблоны
-      //
-      private string _templateBlocksAKRFileName;
-
-      private string _templateSheetContentFileName;
-      private string _templateSheetMarkSBFileName;
-
-      //
-      // Плитка
-      //
-      private int _tileHeight;
-
-      private int _tileLenght;
-      private int _tileSeam;
-      private string _windowPanelSuffix;
+      private static Settings _instance = loadSettings();      
 
       private Settings()
       { }
@@ -122,60 +15,62 @@
          }
       }
 
-      public string AttributeFacadeAxis1 { get { return _attributeFacadeAxis1; } }
-      public string AttributeFacadeAxis2 { get { return _attributeFacadeAxis2; } }
-      public string AttributePanelSbMark { get { return _attributePanelSbMark; } }
-      public string AttributePanelSbPaint { get { return _attributePanelSbPaint; } }
-      public string AttributeSectionName { get { return _attributeSectionName; } }
-      public string BlockColorAreaDynPropHeight { get { return _blockColorAreaDynPropHeight; } }
-      public string BlockColorAreaDynPropLength { get { return _blockColorAreaDynPropLength; } }
-      public string BlockColorAreaName { get { return _blockColorAreaName; } }
-      public string BlockFacadeName { get { return _blockFacadeName; } }
-      public string BlockFrameName { get { return _blockFrameName; } }
-      public string BlockMountingPlanePrefixName { get { return _blockMountingPlanePrefixName; } }
-      public string BlockPanelPrefixName { get { return _blockPanelPrefixName; } }
-      public string BlockSectionName { get { return _blockSectionName; } }
-      public string BlockTileName { get { return _blockTileName; } }
-      public int CaptionPanelSecondTextShift { get { return _captionPanelSecondTextShift; } }
-      public int CaptionPanelTextHeight { get { return _captionPanelTextHeight; } }
-      public string EndLeftPanelSuffix { get { return _endLeftPanelSuffix; } }
-      public string EndRightPanelSuffix { get { return _endRightPanelSuffix; } }
-      public int FacadeCaptionFloorIndent { get { return _facadeCaptionFloorIndent; } }
-      public int FacadeCaptionFloorTextHeight { get { return _facadeCaptionFloorTextHeight; } }
-      public int FacadeEndsPanelIndent { get { return _facadeEndsPanelIndent; } }
-      public int FacadeFloorHeight { get { return _facadeFloorHeight; } }
-      public int FacadeIndentFromMountingPlanes { get { return _facadeIndentFromMountingPlanes; } }
-      public int ImagePaintFormHeight { get { return _imagePaintFormHeight; } }
-      public int ImagePaintFormWidth { get { return _imagePaintFormWidth; } }
-      public int ImagePaintSpotHeight { get { return _imagePaintSpotHeight; } }
-      public int ImagePaintSpotLength { get { return _imagePaintSpotLength; } }
-      public string LayerDimensionFacade { get { return _layerDimensionFacade; } }
-      public string LayerDimensionForm { get { return _layerDimensionForm; } }
-      public string LayerMarks { get { return _layerMarks; } }
-      public string LayerParapetPanels { get { return _layerParapetPanels; } }
-      public string LayerUpperStoreyPanels { get { return _layerUpperStoreyPanels; } }
-      public string LayerWindows { get { return _layerWindows; } }
-      public string PaintIndexEndLeftPanel { get { return _paintIndexEndLeftPanel; } }
-      public string PaintIndexEndRightPanel { get { return _paintIndexEndRightPanel; } }
-      public string PaintIndexLastStorey { get { return _paintIndexLastStorey; } }
-      public string PaintIndexParapet { get { return _paintIndexParapet; } }
-      public string PaintIndexStorey { get { return _paintIndexStorey; } }
-      public string PaintIndexUpperStorey { get { return _paintIndexUpperStorey; } }
-      public string PaintIndexWindow { get { return _paintIndexWindow; } }
-      public int SheetPanelEndShift { get { return _sheetPanelEndShift; } }
-      public int SheetPanelEndUp { get { return _sheetPanelEndUp; } }
-      public int SheetScale { get { return _sheetScale; } }
-      public string SheetTemplateLayoutNameForContent { get { return _sheetTemplateLayoutNameForContent; } }
-      public string SheetTemplateLayoutNameForMarkAR { get { return _sheetTemplateLayoutNameForMarkAR; } }
-      public int StoreyDefineDeviation { get { return _storeyDefineDeviation; } }
-      public string TemplateBlocksAKRExportFacadeFileName { get { return _templateBlocksAKRExportFacadeFileName; } }
-      public string TemplateBlocksAKRFileName { get { return _templateBlocksAKRFileName; } }
-      public string TemplateSheetContentFileName { get { return _templateSheetContentFileName; } }
-      public string TemplateSheetMarkSBFileName { get { return _templateSheetMarkSBFileName; } }
-      public int TileHeight { get { return _tileHeight; } }
-      public int TileLenght { get { return _tileLenght; } }
-      public int TileSeam { get { return _tileSeam; } }
-      public string WindowPanelSuffix { get { return _windowPanelSuffix; } }
+      public string AttributeFacadeAxis1 { get; set; }
+      public string AttributeFacadeAxis2 { get; set; }
+      public string AttributePanelSbMark { get; set; }
+      public string AttributePanelSbPaint { get; set; }
+      public string AttributeSectionName { get; set; }
+      public string BlockColorAreaDynPropHeight { get; set; }
+      public string BlockColorAreaDynPropLength { get; set; }
+      public string BlockColorAreaName { get; set; }
+      public string BlockFacadeName { get; set; }
+      public string BlockFrameName { get; set; }
+      public string BlockCoverName { get; set; }
+      public string BlockTitleName { get; set; }
+      public string BlockMountingPlanePrefixName { get; set; }
+      public string BlockPanelPrefixName { get; set; }
+      public string BlockSectionName { get; set; }
+      public string BlockTileName { get; set; }
+      public int CaptionPanelSecondTextShift { get; set; }
+      public int CaptionPanelTextHeight { get; set; }
+      public string EndLeftPanelSuffix { get; set; }
+      public string EndRightPanelSuffix { get; set; }
+      public int FacadeCaptionFloorIndent { get; set; }
+      public int FacadeCaptionFloorTextHeight { get; set; }
+      public int FacadeEndsPanelIndent { get; set; }
+      public int FacadeFloorHeight { get; set; }
+      public int FacadeIndentFromMountingPlanes { get; set; }
+      public int ImagePaintFormHeight { get; set; }
+      public int ImagePaintFormWidth { get; set; }
+      public int ImagePaintSpotHeight { get; set; }
+      public int ImagePaintSpotLength { get; set; }
+      public string LayerDimensionFacade { get; set; }
+      public string LayerDimensionForm { get; set; }
+      public string LayerMarks { get; set; }
+      public string LayerParapetPanels { get; set; }
+      public string LayerUpperStoreyPanels { get; set; }
+      public string LayerWindows { get; set; }
+      public string PaintIndexEndLeftPanel { get; set; }
+      public string PaintIndexEndRightPanel { get; set; }
+      public string PaintIndexLastStorey { get; set; }
+      public string PaintIndexParapet { get; set; }
+      public string PaintIndexStorey { get; set; }
+      public string PaintIndexUpperStorey { get; set; }
+      public string PaintIndexWindow { get; set; }
+      public int SheetPanelEndShift { get; set; }
+      public int SheetPanelEndUp { get; set; }
+      public int SheetScale { get; set; }
+      public string SheetTemplateLayoutNameForContent { get; set; }
+      public string SheetTemplateLayoutNameForMarkAR { get; set; }
+      public int StoreyDefineDeviation { get; set; }
+      public string TemplateBlocksAKRExportFacadeFileName { get; set; }
+      public string TemplateBlocksAKRFileName { get; set; }
+      public string TemplateSheetContentFileName { get; set; }
+      public string TemplateSheetMarkSBFileName { get; set; }
+      public int TileHeight { get; set; }
+      public int TileLenght { get; set; }
+      public int TileSeam { get; set; }
+      public string WindowPanelSuffix { get; set; }
 
       private static Settings loadSettings()
       {
@@ -190,110 +85,62 @@
 
       private void setDefault()
       {
-         _blockColorAreaName = "АКР_Зона-покраски";
-         _blockFrameName = "АКР_Рамка";
-         _blockPanelPrefixName = "АКР_Панель_";
-         _blockMountingPlanePrefixName = "АКР_Монтажка_";
-         _blockFacadeName = "АКР_Фасад";
-         _blockTileName = "АКР_Плитка";
-         _blockSectionName = "АКР_Секция";
-         _attributePanelSbPaint = "ПОКРАСКА";
-         _attributePanelSbMark = "МАРКА";
-         _attributeSectionName = "СЕКЦИЯ";
-         _attributeFacadeAxis1 = "ОСЬ1";
-         _attributeFacadeAxis2 = "ОСЬ2";
-         _endLeftPanelSuffix = "_тл";
-         _endRightPanelSuffix = "_тп";
-         _windowPanelSuffix = "_ок";
-         _layerMarks = "АР_Марки";
-         _layerUpperStoreyPanels = "АР_Панели_Чердак";
-         _layerParapetPanels = "АР_Панели_Парапет";
-         _layerWindows = "АР_Окна";
-         _layerDimensionFacade = "АР_Размеры на фасаде";
-         _layerDimensionForm = "АР_Размеры в форме";
-         _templateBlocksAKRFileName = "АКР_Блоки.dwg";
-         _templateBlocksAKRExportFacadeFileName = "АКР_Блоки-ЭкспортФасада.dwg";
-         _sheetTemplateLayoutNameForContent = "Содержание";
-         _templateSheetContentFileName = "АКР_Шаблон_Содержание.dwg";
-         _templateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";
-         _sheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
-         _tileHeight = 88;
-         _tileLenght = 288;
-         _tileSeam = 12;
-         _captionPanelTextHeight = 180;
-         _captionPanelSecondTextShift = 250;
-         _imagePaintSpotLength = 300;
-         _imagePaintSpotHeight = 300;
-         _imagePaintFormWidth = 1200;
-         _imagePaintFormHeight = 900;
-         _facadeFloorHeight = 2800;
-         _facadeCaptionFloorTextHeight = 250;
-         _facadeCaptionFloorIndent = 3000;
-         _facadeIndentFromMountingPlanes = 10000;
-         _facadeEndsPanelIndent = 890;
-         _paintIndexUpperStorey = "Ч";
-         _paintIndexParapet = "П";
-         _paintIndexWindow = "-ОК";
-         _paintIndexEndLeftPanel = "ТЛ";
-         _paintIndexEndRightPanel = "ТП";
-         _paintIndexStorey = "Э";
-         _paintIndexLastStorey = "П";
-         _storeyDefineDeviation = 2000;
-         _blockColorAreaDynPropLength = "Длина";
-         _blockColorAreaDynPropHeight = "Высота";
-         _sheetPanelEndUp = 1400;
-         _sheetPanelEndShift = 700;
-         _sheetScale = 25;
+         BlockColorAreaName = "АКР_Зона-покраски";
+         BlockFrameName = "АКР_Рамка";
+         BlockCoverName = "АКР_Обложка";
+         BlockTitleName = "АКР_Титульный";
+         BlockPanelPrefixName = "АКР_Панель_";
+         BlockMountingPlanePrefixName = "АКР_Монтажка_";
+         BlockFacadeName = "АКР_Фасад";
+         BlockTileName = "АКР_Плитка";
+         BlockSectionName = "АКР_Секция";
+         AttributePanelSbPaint = "ПОКРАСКА";
+         AttributePanelSbMark = "МАРКА";
+         AttributeSectionName = "СЕКЦИЯ";
+         AttributeFacadeAxis1 = "ОСЬ1";
+         AttributeFacadeAxis2 = "ОСЬ2";
+         EndLeftPanelSuffix = "_тл";
+         EndRightPanelSuffix = "_тп";
+         WindowPanelSuffix = "_ок";
+         LayerMarks = "АР_Марки";
+         LayerUpperStoreyPanels = "АР_Панели_Чердак";
+         LayerParapetPanels = "АР_Панели_Парапет";
+         LayerWindows = "АР_Окна";
+         LayerDimensionFacade = "АР_Размеры на фасаде";
+         LayerDimensionForm = "АР_Размеры в форме";
+         TemplateBlocksAKRFileName = "АКР_Блоки.dwg";
+         TemplateBlocksAKRExportFacadeFileName = "АКР_Блоки-ЭкспортФасада.dwg";
+         SheetTemplateLayoutNameForContent = "Содержание";
+         TemplateSheetContentFileName = "АКР_Шаблон_Содержание.dwg";
+         TemplateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";
+         SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";
+         TileHeight = 88;
+         TileLenght = 288;
+         TileSeam = 12;
+         CaptionPanelTextHeight = 180;
+         CaptionPanelSecondTextShift = 250;
+         ImagePaintSpotLength = 300;
+         ImagePaintSpotHeight = 300;
+         ImagePaintFormWidth = 1200;
+         ImagePaintFormHeight = 900;
+         FacadeFloorHeight = 2800;
+         FacadeCaptionFloorTextHeight = 250;
+         FacadeCaptionFloorIndent = 3000;
+         FacadeIndentFromMountingPlanes = 10000;
+         FacadeEndsPanelIndent = 890;
+         PaintIndexUpperStorey = "Ч";
+         PaintIndexParapet = "П";
+         PaintIndexWindow = "-ОК";
+         PaintIndexEndLeftPanel = "ТЛ";
+         PaintIndexEndRightPanel = "ТП";
+         PaintIndexStorey = "Э";
+         PaintIndexLastStorey = "П";
+         StoreyDefineDeviation = 2000;
+         BlockColorAreaDynPropLength = "Длина";
+         BlockColorAreaDynPropHeight = "Высота";
+         SheetPanelEndUp = 1400;
+         SheetPanelEndShift = 700;
+         SheetScale = 25;
       }
    }
 }
-
-//namespace AlbumPanelColorTiles
-//{
-//public class Options
-//{
-//
-// Имена блоков
-//
-//public string BlockColorAreaName = "АКР_Зона-покраски";
-//public string BlockFrameName = "АКР_Рамка";
-//public string BlockPanelPrefixName = "АКР_Панель_";
-//public string BlockTileName = "АКР_Плитка";
-//public string BlockMountingPlanePrefixName = "АКР_Монтажка_";
-//public string BlockFacadeName = "АКР_Фасад"; // Блок обозначения стороны фасада на монтажном плане
-//
-// Атибуты блоков
-//
-//public string AttributePanelSbPaint = "ПОКРАСКА";
-//public string AttributePanelSbMark = "МАРКА";
-
-////
-//// Суффиксы (приставки к именам блоков панелей)
-////
-//public string EndLeftPanelSuffix = "_тл";// Суффикс для торцевых панелей слева
-//public string EndRightPanelSuffix = "_тп";// Суффикс для торцевых панелей справа
-//public string WindowPanelSuffix = "_ок";// панель отличается формой окна. _ОК1, _ОК2 и т.д. - к марке покраске прибалять -ОК1, -ОК2 и т.д.
-////
-//// Слои
-////
-//public string LayerMarks = "АР_Марки";// Слой для подписей марок панелей
-//public string LayerUpperStoreyPanels = "АР_Панели_Чердак";// Слой для панелей чердака. Панель на этом слое считается панелью чердака.
-//public string LayerWindows = "АР_Окна";// Слой окон (отключать на листе панели для формы)
-//public string LayerDimensionFacade = "АР_Размеры на фасаде";
-//public string LayerDimensionForm = "АР_Размеры в форме";
-////
-//// Шаблоны
-////
-//public string TemplateBlocksAKRFileName = "АКР_Блоки.dwg";// Файл шаблона с блоками АКР (зона покраски, плитка, панель Марки СБ).
-//public string SheetTemplateLayoutNameForContent = "Содержание";// Имя листа шаблона содержания в файле шаблона листов.
-//public string TemplateSheetContentFileName = "АКР_Шаблон_Содержание.dwg";// Имя файла шаблона содержания (АКР_Шаблон_Содержание.dwg)
-//public string TemplateSheetMarkSBFileName = "АКР_Шаблон_МаркаСБ.dwg";// Имя файла шаблона МаркиСБ с шаблоном листа для МАрки АР. АКР_Шаблон_МаркаСБ.dwg
-//public string SheetTemplateLayoutNameForMarkAR = "TemplateMarkAR";// Имя листа шаблона для Марки АР в файле шаблона листов.
-////
-//// Плитка
-////
-//public int TileHeight = 88; //Высота плитки
-//public int TileLenght = 288; // Длина плитки
-//public int TileSeam = 12; // Ширина шва между плитками
-//}
-//}

@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание файла марки СБ и листов с панелями марок АР
-      public void CreateSheetMarkSB(SheetsSet sheetSet, int count, BlockFrameAKR blFrameFacade)
+      public void CreateSheetMarkSB(SheetsSet sheetSet, int count, FrameSheet blFrameFacade)
       {
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateFileMarkSB(_markSB, sheetSet.Album.AlbumDir, sheetSet.SheetTemplateFileMarkSB, count);
