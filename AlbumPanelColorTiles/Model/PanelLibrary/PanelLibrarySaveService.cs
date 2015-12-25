@@ -163,8 +163,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          List<PanelAkrFacade> removes = new List<PanelAkrFacade>();
          foreach (var panel in panelsAkrFacade)
          {
-            var markWithoutElectric = panel.BlName;// MountingPanel.GetMarkWithoutElectric(panel.BlName);
-            if (panel.BlName.Length != markWithoutElectric.Length)
+            var markNoElec = MountingPanel.GetMarkWithoutElectric(panel.BlName);
+            if (panel.BlName.Length != markNoElec.Length)
             {
                removes.Add(panel);
                _doc.Editor.WriteMessage("\n{0} панель с элетрикой проигнорирована.".f(panel.BlName));
