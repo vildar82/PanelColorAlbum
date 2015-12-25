@@ -16,23 +16,19 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private List<AttributeRefDetail> _attrsDet;
       private Extents3d _extBlRefPanel;
       private Extents3d _extTransToModel;
-      private ObjectId _idBlRef;
-      //// панель торцевая - торец слева
-      //private bool _isEndRightPanel;
-      //private bool _isEndLeftPanel;
-
-      // границы панели трансформированные в координаты модели
-      private bool _isInFloor;
-
+      private ObjectId _idBlRef;      
       private string _markSb;
       private PanelAkrLib _panelAkrLib;
-      private Point3d _ptCenterPanelSbInModel; // точка вставки в Модели
-                                               // панель входит в этаж - внутри блока монтажного плана и внутри блока обозначения стороны фасада
-                                               // панель торцевая - торец справа
+      private Point3d _ptCenterPanelSbInModel; 
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
          _markSb = GetMarkWithoutElectric(mark);//.Replace(' ', '-');
+         // Проверка есть ли запись Окна _ОК1 в имени марки панели
+         string windowSx;
+         _markSb = GetMarkWithoutWindowsSuffix(_markSb, out windowSx);
+         WindowSuffix = windowSx;
+
          MarkPainting = painting;
          _extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
          _extTransToModel = new Extents3d();
@@ -41,29 +37,40 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _idBlRef = blRefPanelSB.Id;
          _attrsDet = attrsDet;
          _ptCenterPanelSbInModel = getCenterPanelInModel();
-      }
+      }      
 
       public List<AttributeRefDetail> AttrDet { get { return _attrsDet; } }
       public Extents3d ExtTransToModel { get { return _extTransToModel; } }
-      public ObjectId IdBlRef { get { return _idBlRef; } }
-
-      //public bool IsEndLeftPanel { get { return _isEndLeftPanel; } set { _isEndLeftPanel = value; } }
-      //public bool IsEndRightPanel { get { return _isEndRightPanel; } set { _isEndRightPanel = value; } }
-      public bool IsInFloor { get { return _isInFloor; } set { _isInFloor = value; } }
+      public ObjectId IdBlRef { get { return _idBlRef; } }      
 
       public string MarkPainting { get; private set; }
       public string MarkSb { get { return _markSb; } }
-      public string MarkSbBlockName { get { return Panels.MarkSb.GetMarkSbBlockName(_markSb); } }
+      public string WindowSuffix { get; private set; }      
       public PanelAkrLib PanelAkrLib { get { return _panelAkrLib; } set { _panelAkrLib = value; } }
       public Point3d PtCenterPanelSbInModel { get { return _ptCenterPanelSbInModel; } }
+
+      public static string GetMarkWithoutWindowsSuffix(string markSB, out string windowSuffix)
+      {
+         windowSuffix = string.Empty;
+         string res = markSB;
+         var matchs = Regex.Matches(markSB, @"_ок\d{0,2}($|_)", RegexOptions.IgnoreCase);
+         if (matchs.Count == 1)
+         {
+            res = markSB.Substring(0, matchs[0].Index);
+            windowSuffix = matchs[0].Value.EndsWith("_")? matchs[0].Value.Substring(1, matchs[0].Length - 2): matchs[0].Value.Substring(1);
+         }
+         return res;
+      }
 
       public static string GetMarkWithoutElectric(string markSB)
       {
          string res = markSB;
-         var matchs = Regex.Matches(markSB, @"-\d{0,2}[э,Э]($|_)");
+         // "-1э" или в конце строи или перед разделителем "_".
+         var matchs = Regex.Matches(markSB, @"-\d{0,2}э($|_)", RegexOptions.IgnoreCase);
          if (matchs.Count == 1)
          {
-            res = markSB.Substring(0, matchs[0].Index);
+            int indexAfterElectric = matchs[0].Index + (matchs[0].Value.EndsWith("_") ? matchs[0].Value.Length - 1 : matchs[0].Value.Length);
+            res = markSB.Substring(0, matchs[0].Index) + markSB.Substring(indexAfterElectric);
          }
          return res;
       }
@@ -197,43 +204,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          return new Point3d(PtCenterPanelSbInModel.X - panelAkrLib.DistToCenterFromBase,
                               PtCenterPanelSbInModel.Y + 500, 0);
-      }
-
-      // Поиск соответствующей АКР-Панели с учетом торцов
-      private static PanelAkrLib CompareMarkSbAndAkrs(List<PanelAkrLib> panelsAkrLib, string markSb, MountingPanel panelSb)
-      {
-         PanelAkrLib panelAkrLib = null;
-         foreach (var panelAkrItem in panelsAkrLib)
-         {
-            if (string.Equals(markSb, panelAkrItem.MarkAkr, StringComparison.CurrentCultureIgnoreCase))
-            {
-               panelAkrLib = panelAkrItem;
-               break;
-            }
-         }
-         return panelAkrLib;
-      }
+      }      
 
       private static PanelAkrLib findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAkrLib> panelsAkrInLib)
       {         
-         // точное соответствие - торцы можно не проыерять
-         PanelAkrLib panelAkrLib = CompareMarkSbAndAkrs(panelsAkrInLib, panelSb.MarkSb, panelSb);
-         //if (panelAkrLib == null)
-         //{
-         //   // поиск панели без электрики с проверкой торцов
-         //   panelAkrLib = CompareMarkSbAndAkrs(panelsAkrInLib, panelSb.MarkSbWithoutWhiteAndElectric, panelSb);
-         //   if (panelAkrLib != null)
-         //   {
-         //      // Копирование блока АКР-Панели без индекса электрики - с прибавкой индекса электрики
-         //      PanelAkrLib panelAkrElectric = panelAkrLib.CopyLibBlockElectricInTempFile(panelSb);
-         //      if (panelAkrElectric != null)
-         //      {
-         //         panelAkrLib = panelAkrElectric;
-         //         panelsAkrInLib.Add(panelAkrElectric);
-         //      }
-         //   }
-         //}
-         return panelAkrLib;
+         return panelsAkrInLib.Find(
+                           p => string.Equals(p.MarkAkr, panelSb.MarkSb, StringComparison.CurrentCultureIgnoreCase) &&
+                                string.Equals(p.WindowSuffix, panelSb.WindowSuffix, StringComparison.CurrentCultureIgnoreCase));
       }
 
       // Определение точки центра блока панели СБ в Модели

@@ -186,8 +186,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             if (facadeFrontBlock.Extents.IsPointInBounds(panelSb.ExtTransToModel.MinPoint) &&
                facadeFrontBlock.Extents.IsPointInBounds(panelSb.ExtTransToModel.MaxPoint))
-            {
-               panelSb.IsInFloor = true;
+            {               
                _panelsSbInFront.Add(panelSb);
             }
          }

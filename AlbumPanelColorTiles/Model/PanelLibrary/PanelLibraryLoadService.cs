@@ -88,6 +88,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                  string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
+                                    // Проверка индекса окна
+                                    if (!string.Equals(mountingPanelSb.WindowSuffix, "ок" + markSbAkr.WindowSuffix, StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                       //Inspector.AddError(
+                                       //    "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}",
+                                       //    panelAr.Extents, panelAr.IdBlRefAr);
+                                       continue;
+                                    }
+
                                     //Найдена монтажная панель
                                     // Проверка марки покраски
                                     if (Album.StartOptions.CheckMarkPainting)

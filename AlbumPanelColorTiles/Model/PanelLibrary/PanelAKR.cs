@@ -28,13 +28,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _idBtrAkrPanel = idBtrAkrPanel;
          _blName = blName;
          _description = "";
-         _markAkr = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName));//.Replace(' ', '-');
+         var val = MarkSb.GetMarkSbName(blName);
+         string windowSx;
+         MountingPanel.GetMarkWithoutWindowsSuffix(val,out windowSx);
+         WindowSuffix = windowSx;
+         _markAkr = MarkSb.GetMarkSbCleanName(val);//.Replace(' ', '-');
          // определение - торцов панели
          defineEndsPanel(blName);
          // Список объектов в блоке
          _entInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);
       }
 
+      public string WindowSuffix { get; private set; }
       public string BlName { get { return _blName; } }
       public string Description { get { return _description; } set { _description = value; } }
       public double DistToCenterFromBase { get { return _distToCenterFromBase; } }
