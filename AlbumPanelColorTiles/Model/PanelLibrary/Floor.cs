@@ -14,26 +14,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
    {
       // Панели СБ - все что есть внутри блока монтажки
       private List<MountingPanel> _allPanelsSbInFloor;
-
       // Имя/номер этажа
       private string _blRefName;
-
       private Extents3d _extBlMounting;
-
+      private Matrix3d _transformMounting;
       // обозначение стороны фасада на монтажном плане
       private FacadeFrontBlock _facadeFrontBlock;
-
       private double _height;
-
       // Блок монтажного плана
       private ObjectId _idBlRefMounting;
-
+      private ObjectId _idBtrMounting;
       // высота этажа
       private List<MountingPanel> _panelsSbInFront;
-
       // Точка вставки блока монтажки
       private Point3d _ptBlMounting;
-
       private Storey _storey; // этаж
       private double _xmax;
       private double _xmin; // мин значение х среди всех границ блоков панелей внктри этажа
@@ -44,14 +38,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          LibLoadServ = libLoadServ;
          _idBlRefMounting = blRefMounting.Id;
+         _idBtrMounting = blRefMounting.BlockTableRecord;
+         _transformMounting = blRefMounting.BlockTransform;
          _extBlMounting = blRefMounting.GeometricExtents;
          _ptBlMounting = blRefMounting.Position;
          _blRefName = blRefMounting.Name;
-         //defFloorNameAndNumber(blRefMounting);
-         // Получение всех блоков панелей СБ из блока монтажки
-         _allPanelsSbInFloor = MountingPanel.GetPanels(blRefMounting, blRefMounting.Position, blRefMounting.BlockTransform, LibLoadServ);
-         _xmin = getXMinFloor();
-         _xmax = getXMaxFloor();
+         //defFloorNameAndNumber(blRefMounting);                     
          //// добавление блоков паненлей в общий список панелей СБ
          //libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
@@ -99,6 +91,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);
+                     floor.GetAllPanels();
                      // найти соотв обозн стороны фасада
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
                      // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в фасады, просто так вставлен
@@ -122,6 +115,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
             t.Commit();
          }
          return floors;
+      }
+
+      private void GetAllPanels()
+      {
+         // Получение всех блоков панелей СБ из блока монтажки
+         using (var btr = this._idBtrMounting.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         {
+            _allPanelsSbInFloor = MountingPanel.GetPanels(btr, _ptBlMounting, _transformMounting, LibLoadServ);
+         }
+         _xmin = getXMinFloor();
+         _xmax = getXMaxFloor();
       }
 
       public int CompareTo(Floor other)

@@ -76,53 +76,50 @@ namespace AlbumPanelColorTiles.PanelLibrary
       }
 
       // Поиск всех панелей СБ в определении блока
-      public static List<MountingPanel> GetPanels(BlockReference blRefMounting, Point3d ptBase, Matrix3d trans, PanelLibraryLoadService libLoadServ)
+      public static List<MountingPanel> GetPanels(BlockTableRecord btr, Point3d ptBase, Matrix3d trans, PanelLibraryLoadService libLoadServ)
       {
          List<MountingPanel> panelsSB = new List<MountingPanel>();
-         using (var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         foreach (ObjectId idEnt in btr)
          {
-            foreach (ObjectId idEnt in btr)
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
                {
-                  using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
+                  // как определить что это блок панели СБ?
+                  // По набору атрибутов: Покраска, МАРКА
+                  string mark = string.Empty;
+                  string paint = string.Empty;
+                  if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
                   {
-                     // как определить что это блок панели СБ?
-                     // По набору атрибутов: Покраска, МАРКА
-                     string mark = string.Empty;
-                     string paint = string.Empty;
-                     if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
+                     List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
+                     foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
                      {
-                        List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
-                        foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
+                        var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference;
+                        // Покраска
+                        if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                         {
-                           var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference;
-                           // Покраска
-                           if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
+                           atrRef.UpgradeOpen();
+                           var atrDet = new AttributeRefDetail(atrRef);
+                           attrsDet.Add(atrDet);
+                           paint = atrRef.TextString;
+                           if (libLoadServ?.Album != null && !(libLoadServ.Album.StartOptions.CheckMarkPainting))
                            {
-                              atrRef.UpgradeOpen();
-                              var atrDet = new AttributeRefDetail(atrRef);
-                              attrsDet.Add(atrDet);
-                              paint = atrRef.TextString;
-                              if (libLoadServ.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
-                              {
-                                 // Удаление старой марки покраски из блока монтажной панели
-                                 atrRef.TextString = string.Empty;
-                              }
-                           }
-                           // МАРКА
-                           else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
-                           {
-                              var atrDet = new AttributeRefDetail(atrRef);
-                              attrsDet.Add(atrDet);
-                              mark = atrRef.TextString;
+                              // Удаление старой марки покраски из блока монтажной панели
+                              atrRef.TextString = string.Empty;
                            }
                         }
-                        if (attrsDet.Count == 2)
+                        // МАРКА
+                        else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
                         {
-                           MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, trans, mark, paint);
-                           panelsSB.Add(panelSb);
+                           var atrDet = new AttributeRefDetail(atrRef);
+                           attrsDet.Add(atrDet);
+                           mark = atrRef.TextString;
                         }
+                     }
+                     if (attrsDet.Count == 2)
+                     {
+                        MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, trans, mark, paint);
+                        panelsSB.Add(panelSb);
                      }
                   }
                }
@@ -131,7 +128,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          if (panelsSB.Count == 0)
          {
             // Ошибка - в блоке монтажного плана, не найдена ни одна панель
-            Inspector.AddError(string.Format("В блоке монтажного плана {0} не найдена ни одна панель.", blRefMounting.Name), blRefMounting);
+            Inspector.AddError(string.Format("В блоке монтажного плана {0} не найдена ни одна панель.", btr.Name),
+               new  Extents3d(ptBase, new Point3d (ptBase.X+10000, ptBase.Y+10000,0)), btr.Id);
          }
          return panelsSB;
       }
@@ -219,6 +217,24 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return new Point3d(_extTransToModel.MinPoint.X + (_extTransToModel.MaxPoint.X - _extTransToModel.MinPoint.X) * 0.5,
                                        _extTransToModel.MinPoint.Y + (_extTransToModel.MaxPoint.Y - _extTransToModel.MinPoint.Y) * 0.5,
                                        0);
+      }
+
+      public void RemoveWindowSuffix()
+      {
+         if (!string.IsNullOrEmpty(WindowSuffix))
+         {
+            var atrMarkInfo = AttrDet.Find(a => string.Equals(a.Tag, Settings.Default.AttributePanelSbMark,
+                                                         StringComparison.CurrentCultureIgnoreCase));
+            if (atrMarkInfo != null)
+            {
+               var atr = atrMarkInfo.IdAtrRef.GetObject(OpenMode.ForWrite, false, true) as AttributeReference;
+               var indexOfWindowSuf = atr.TextString.LastIndexOf(WindowSuffix, StringComparison.CurrentCultureIgnoreCase);
+               if (indexOfWindowSuf != -1)
+               {                  
+                  atr.TextString = atr.TextString.Substring(0, indexOfWindowSuf-1);
+               }               
+            }
+         }
       }
    }
 }

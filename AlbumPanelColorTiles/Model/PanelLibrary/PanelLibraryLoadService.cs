@@ -115,8 +115,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                     // Заполнение атрибута покраски
                                     else
                                     {
-                                       var atrInfo = mountingPanelSb.AttrDet.Find
-                                       (a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase));
+                                       var atrInfo = mountingPanelSb.AttrDet.Find (a => 
+                                                         string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint,
+                                                         StringComparison.CurrentCultureIgnoreCase));
                                        if (atrInfo != null)
                                        {
                                           using (var atrRef = atrInfo.IdAtrRef.Open(OpenMode.ForWrite) as AttributeReference)

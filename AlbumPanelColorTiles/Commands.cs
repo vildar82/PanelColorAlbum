@@ -666,6 +666,37 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("PIK", "AKR-RemoveWindowSuffixFromMountingPanels", CommandFlags.Modal)]
+      public void RemoveWindowSuffixFromMountingPanelsCommands()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         Editor ed = doc.Editor;
+         Database db = doc.Database;
+
+         using (var t = db.TransactionManager.StartTransaction())
+         {
+            // Все монтажные блоки панелей в модели
+            var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForRead) as BlockTableRecord;
+            var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null);
+            mountingsPanelsInMs.ForEach(p => p.RemoveWindowSuffix());
+            foreach (ObjectId idEnt in ms)
+            {
+               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               {
+                  var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;                  
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  {
+                     var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
+                     var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform , null);
+                     mountingsPanels.ForEach(p => p.RemoveWindowSuffix());
+                  }
+               }
+            }
+            t.Commit();
+         }
+         ed.Regen();
+      }
+
       [CommandMethod("PIK", "TestClearXdataAKRPanels", CommandFlags.Modal)]
       public void TestClearXdataAKRPanels()
       {
