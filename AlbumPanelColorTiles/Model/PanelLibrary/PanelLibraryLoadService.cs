@@ -84,17 +84,19 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            {
                               foreach (var mountingPanelSb in mountingsPanelSb)
                               {
-                                 string markSbWithoutWhite = mountingPanelSb.MarkSb.Replace(' ', '-');
+                                 string markSbWithoutWhite = mountingPanelSb.MarkSbWithoutElectric.Replace(' ', '-');
                                  string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
-                                    // Проверка индекса окна
-                                    if (!string.Equals(mountingPanelSb.WindowSuffix, "ок" + markSbAkr.WindowSuffix, StringComparison.CurrentCultureIgnoreCase))
+                                    //Проверка индекса окна
+                                    if (markSbAkr.WindowSuffix !=0 && 
+                                       !string.Equals(mountingPanelSb.WindowSuffix, "ок" + markSbAkr.WindowSuffix,
+                                                                        StringComparison.CurrentCultureIgnoreCase))
                                     {
-                                       //Inspector.AddError(
-                                       //    "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}",
-                                       //    panelAr.Extents, panelAr.IdBlRefAr);
-                                       continue;
+                                       Inspector.AddError(
+                                           "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}",
+                                           panelAr.Extents, panelAr.IdBlRefAr);
+                                       //continue;
                                     }
 
                                     //Найдена монтажная панель
@@ -106,7 +108,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                        {
                                           // Ошибка - марки покраски не совпали.
                                           string errMsg = string.Format("Не совпала марка покраски. Панель АКР {0}, Монтажная панель {1}{2}",
-                                                markAr.MarkARPanelFullName, mountingPanelSb.MarkSb, mountingPanelSb.MarkPainting);
+                                                markAr.MarkARPanelFullName, mountingPanelSb.MarkSbWithoutElectric, mountingPanelSb.MarkPainting);
                                           Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr);
                                           Log.Error(errMsg);
                                        }

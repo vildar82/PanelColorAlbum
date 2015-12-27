@@ -29,19 +29,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
          MarkSbWithoutElectric = GetMarkWithoutElectric(mark);//.Replace(' ', '-');
          // Проверка есть ли запись Окна _ОК1 в имени марки панели
          string windowSx;
-         MarkSbWithoutElectric = GetMarkWithoutWindowsSuffix(_markSb, out windowSx);
+         MarkSbWithoutElectric = GetMarkWithoutWindowsSuffix(MarkSbWithoutElectric, out windowSx);
          WindowSuffix = windowSx;
 
          MarkPainting = painting;
-         var extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;
-         ExtTransToModel = new Extents3d(extBlRefPanel.MinPoint.TransformBy(trans),
-                                             extBlRefPanel.MaxPoint.TransformBy(trans));
+         var extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;         
+         extBlRefPanel.TransformBy(trans);
+         ExtTransToModel = extBlRefPanel;         
          IdBlRef = blRefPanelSB.Id;
          AttrDet = attrsDet;
          PtCenterPanelSbInModel = getCenterPanelInModel();
-      }
-
-      public List<AttributeRefDetail> AttrDet { get { return _attrsDet; } }
+      }      
       
       public string WindowSuffix { get; private set; }      
       
@@ -72,40 +70,38 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return res;
       }
 
-      public static List<MountingPanel> GetPanels(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
+      public static List<MountingPanel> GetPanels(BlockTableRecord btr, Point3d ptBase, Matrix3d transform, PanelLibraryLoadService libLoadServ)
       {
-      // Поиск всех панелей СБ в определении блока
+         // Поиск всех панелей СБ в определении блока
          List<MountingPanel> panelsSB = new List<MountingPanel>();
-         using (var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         foreach (ObjectId idEnt in btr)
          {
-            foreach (ObjectId idEnt in btr)
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
                {
-                  using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
+                  // как определить что это блок панели СБ?
+                  // По набору атрибутов: Покраска, МАРКА
+                  string mark = string.Empty;
+                  string paint = string.Empty;
+                  if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
                   {
-                     // как определить что это блок панели СБ?
-                     // По набору атрибутов: Покраска, МАРКА
-                     string mark = string.Empty;
-                     string paint = string.Empty;
-                     if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
+                     List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
+                     foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
                      {
-                        List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
-                        foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
+                        using (var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference)
                         {
-                           using (var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference)
-                           {
-                              // ПОКРАСКА
+                           // ПОКРАСКА
                            if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
                            {
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
                               paint = atrRef.TextString;
-                                 // Если выполняется создание альбома и выключена опция проверки покраски, то стираем марку покраски из монтажной панели
-                                 if (libLoadServ.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
+                              // Если выполняется создание альбома и выключена опция проверки покраски, то стираем марку покраски из монтажной панели
+                              if (libLoadServ?.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
                               {
                                  // Удаление старой марки покраски из блока монтажной панели
-                                    atrRef.UpgradeOpen();
+                                 atrRef.UpgradeOpen();
                                  atrRef.TextString = string.Empty;
                               }
                            }
@@ -117,21 +113,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
                               mark = atrRef.TextString;
                            }
                         }
-                        }
-                        if (attrsDet.Count == 2)
-                        {
-                           MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, blRefMounting.BlockTransform, mark, paint);
-                           panelsSB.Add(panelSb);
-                        }
+                     }
+                     if (attrsDet.Count == 2)
+                     {
+                        MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, transform, mark, paint);
+                        panelsSB.Add(panelSb);
                      }
                   }
                }
             }
-         }
+         }         
          if (panelsSB.Count == 0)
          {
             // Ошибка - в блоке монтажного плана, не найдена ни одна панель
-            Inspector.AddError(string.Format("В блоке монтажного плана {0} не найдена ни одна панель.", blRefMounting.Name), blRefMounting);
+            Inspector.AddError(string.Format("В блоке монтажного плана {0} не найдена ни одна панель.", btr.Name),
+                              new Extents3d(ptBase, new Point3d(ptBase.X + 10000, ptBase.Y + 10000, 0)), btr.Id);
          }
          return panelsSB;
       }
@@ -204,10 +200,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       
 
-      private static PanelAkrLib findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAkrLib> panelsAkrInLib)
+      private static PanelAKR findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAKR> panelsAkrInLib)
       {
          return panelsAkrInLib.Find(
-                           p => string.Equals(p.MarkAkr, panelSb.MarkSb, StringComparison.CurrentCultureIgnoreCase) &&
+                           p => string.Equals(p.MarkAkr, panelSb.MarkSbWithoutElectric, StringComparison.CurrentCultureIgnoreCase) &&
                                 string.Equals(p.WindowSuffix, panelSb.WindowSuffix, StringComparison.CurrentCultureIgnoreCase));
       }
 
@@ -233,6 +229,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   atr.TextString = atr.TextString.Substring(0, indexOfWindowSuf-1);
                }               
             }
+         }
+      }
+
+      public void RemoveMarkPainting()
+      {
+         AttributeRefDetail atrMarkPaintInfo = AttrDet.Find(a => string.Equals(a.Tag, Settings.Default.AttributePanelSbPaint,
+                                                         StringComparison.CurrentCultureIgnoreCase));
+         if (atrMarkPaintInfo != null)
+         {
+            var atrRef = atrMarkPaintInfo.IdAtrRef.GetObject(OpenMode.ForWrite, false, true) as AttributeReference;
+            atrRef.TextString = ""; 
          }
       }
    }

@@ -12,11 +12,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       protected Extents3d _extentsTiles;
 
       public string BlName { get; private set; }
+      public string WindowSuffix { get; private set; }
       public string Description { get; set; }
       public List<EntityInfo> EntInfos { get; private set; }
       public double HeightPanelByTile { get; private set; }
       public ObjectId IdBtrAkrPanel { get; private set; }      
-      public string MarkAkrWithoutWhite { get; private set; }
+      public string MarkAkr { get; private set; }
       public ObjectId IdBtrPanelAkrInFacade { get; set; }
 
       public PanelAKR(ObjectId idBtrAkrPanel, string blName)
@@ -24,7 +25,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
          IdBtrAkrPanel = idBtrAkrPanel;
          BlName = blName;
          Description = "";
-         MarkAkrWithoutWhite = MarkSb.GetMarkSbCleanName(MarkSb.GetMarkSbName(blName)).Replace(' ', '-');         
+
+         var val = MarkSb.GetMarkSbName(blName);
+         string windowSx;
+         MountingPanel.GetMarkWithoutWindowsSuffix(val, out windowSx);
+         WindowSuffix = windowSx;
+         MarkAkr = MarkSb.GetMarkSbCleanName(val);//.Replace(' ', '-');
+                  
          // Список объектов в блоке
          EntInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);
       }

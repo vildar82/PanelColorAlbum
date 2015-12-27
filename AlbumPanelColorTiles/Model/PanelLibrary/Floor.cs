@@ -5,6 +5,7 @@ using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -16,6 +17,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public FacadeFrontBlock FacadeFrontBlock { get; private set; }
       public double Height { get; set; }
       public ObjectId IdBlRefMounting { get; private set; }
+      public ObjectId IdBtrMounting { get; private set; }
+      public Point3d PosBlMounting { get; private set; }
+      public Matrix3d Transform { get; private set; }
       public PanelLibraryLoadService LibLoadServ { get; private set; }
       public List<MountingPanel> PanelsSbInFront { get; private set; }
       public Storey Storey { get; private set; }
@@ -24,12 +28,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {
+         IdBtrMounting = blRefMounting.BlockTableRecord;         
          LibLoadServ = libLoadServ;
          IdBlRefMounting = blRefMounting.Id;
          BlRefName = blRefMounting.Name;
+         Transform = blRefMounting.BlockTransform;
 
          //defFloorNameAndNumber(blRefMounting);
-         
+
          //// добавление блоков паненлей в общий список панелей СБ
          //libLoadServ.AllPanelsSB.AddRange(_allPanelsSbInFloor);
       }
@@ -101,12 +107,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private void GetAllPanels()
       {
          // Получение всех блоков панелей СБ из блока монтажки
-         using (var btr = this._idBtrMounting.GetObject(OpenMode.ForRead) as BlockTableRecord)
+         using (var btr = this.IdBtrMounting.GetObject(OpenMode.ForRead) as BlockTableRecord)
          {
-            _allPanelsSbInFloor = MountingPanel.GetPanels(btr, _ptBlMounting, _transformMounting, LibLoadServ);
+            AllPanelsSbInFloor = MountingPanel.GetPanels(btr, PosBlMounting, Transform, LibLoadServ);
          }
-         _xmin = getXMinFloor();
-         _xmax = getXMaxFloor();
+         XMin = getXMinFloor();
+         XMax = getXMaxFloor();
       }
 
       public int CompareTo(Floor other)

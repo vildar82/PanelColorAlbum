@@ -54,7 +54,7 @@ namespace AlbumPanelColorTiles.Lib
 
       public static bool LoadBool(string key)
       {
-         bool res = false;
+         bool res = true; // default
          ObjectId idRec = getRec(key);
          if (idRec.IsNull)
             return res;

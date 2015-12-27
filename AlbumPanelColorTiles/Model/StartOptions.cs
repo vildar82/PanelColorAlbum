@@ -30,7 +30,7 @@ namespace AlbumPanelColorTiles.Model
       [Category("Важно")]
       [DisplayName("Сортировка перед покраской")]
       [Description("Сортировка блоков панелей перед покраской - слева-направо, снизу-вверх по этажам. Влияет на порядок присвоения марок панелям. Для старых проектов выбирайте Нет, для новых Да. После нового года эта опция будет скрыта и включена по-умолчанию.")]
-      [DefaultValue(false)]
+      [DefaultValue(true)]
       [TypeConverter(typeof(BooleanTypeConverter))]
       public bool SortPanels { get; set; }
 
