@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       //   }
       //}
 
-      public static List<PanelAkrFacade> GetChangedAndNewPanels(List<PanelAkrFacade> panelsAkrInFacade, List<PanelAkrLib> panelsAkrInLib)
+      public static List<PanelAkrFacade> GetChangedAndNewPanels(List<PanelAkrFacade> panelsAkrInFacade, List<PanelAKR> panelsAkrInLib)
       {
          List<PanelAkrFacade> panelsChangedAndNew = new List<PanelAkrFacade>();
          foreach (var panelAkrInFacade in panelsAkrInFacade)
@@ -124,7 +124,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (!getFirstBlRefInFacade(out _idBlRefForShow))
             {
                // вставка блока
-               _idBlRefForShow = AcadLib.Blocks.BlockInsert.Insert(_blName);
+               _idBlRefForShow = AcadLib.Blocks.BlockInsert.Insert(BlName);
                if (_idBlRefForShow.IsNull)
                {
                   return;

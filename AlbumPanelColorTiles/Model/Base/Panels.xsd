@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Panels">
+    <xs:complexType>
+      <xs:sequence maxOccurs ="unbounded">
+        <xs:element name="Panel">
+          <xs:complexType>
+            <xs:sequence maxOccurs="1" minOccurs="1">
+              <xs:element name="gab">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="length" type="xs:double" />
+                    <xs:element name="height" type="xs:double" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="windows" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence maxOccurs="unbounded">
+                    <xs:element name="window">
+                      <xs:complexType>
+                        <xs:sequence maxOccurs ="1">
+                          <xs:element name="width" type="xs:double" />
+                          <xs:element name="height" type="xs:double" />
+                          <xs:element name="posi">
+                            <xs:complexType>
+                              <xs:sequence maxOccurs="1">
+                                <xs:element name="X" type="xs:double" />
+                                <xs:element name="Y" type="xs:double" />
+                                <xs:element name="Z" type="xs:double" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="mark" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

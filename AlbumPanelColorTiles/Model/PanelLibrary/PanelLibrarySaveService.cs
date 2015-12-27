@@ -84,9 +84,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return panels;
       }
 
-      public static List<PanelAkrLib> GetPanelsInLib()
+      public static List<PanelAKR> GetPanelsInLib()
       {
-         List<PanelAkrLib> panelsInLib = new List<PanelAkrLib>();
+         List<PanelAKR> panelsInLib = new List<PanelAKR>();
          // Получение списка панелей в библиотеке
          // файл библиотеки
          if (!File.Exists(PanelLibrarySaveService.LibPanelsFilePath))
@@ -102,7 +102,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             dbLib.ReadDwgFile(PanelLibrarySaveService.LibPanelsFilePath, FileShare.ReadWrite, true, "");
             dbLib.CloseInput(true);
             // список блоков АКР-Панелей в библиотеке (полные имена блоков).
-            panelsInLib = PanelAkrLib.GetAkrPanelLib(dbLib);
+            panelsInLib = PanelAKR.GetAkrPanelLib(dbLib);
          }
          return panelsInLib;
       }
@@ -167,13 +167,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (panel.BlName.Length != markNoElec.Length)
             {
                removes.Add(panel);
-               _doc.Editor.WriteMessage("\n{0} панель с элетрикой проигнорирована.".f(panel.BlName));
+               _doc.Editor.WriteMessage("\n{0} панель с индексом электрики проигнорирована.".f(panel.BlName));
             }
          }
          removes.ForEach(r => panelsAkrFacade.Remove(r));
       }
 
-      private void backupChangedPanels(List<PanelAkrFacade> panelsToSave, List<PanelAkrLib> panelsAkrInLib, Database dbLib)
+      private void backupChangedPanels(List<PanelAkrFacade> panelsToSave, List<PanelAKR> panelsAkrInLib, Database dbLib)
       {
          // сохранение изменяемых панель в файл
          // создание новоq базы и копирование туда блоков изменяемемых панелей (до изменения)
@@ -181,7 +181,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          ObjectIdCollection idsBtrToCopy = new ObjectIdCollection();
          foreach (var panelFacadeTosave in panelsToSave)
          {
-            PanelAkrLib panelLib = panelsAkrInLib.Find(
+            PanelAKR panelLib = panelsAkrInLib.Find(
                p => string.Equals(p.BlName, panelFacadeTosave.BlName, StringComparison.OrdinalIgnoreCase));
             if (panelLib != null)
             {
@@ -243,7 +243,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             dbLib.CloseInput(true);
             // список панелей в библиотеке
-            List<PanelAkrLib> panelsAkrInLib = PanelAkrLib.GetAkrPanelLib(dbLib); //GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
+            List<PanelAKR> panelsAkrInLib = PanelAKR.GetAkrPanelLib(dbLib); //GetPanelsAkrInDb(dbLib); //GetPanelsInLib();
             // Список изменившихся панелей и новых для записи в базу.
             List<PanelAkrFacade> panelsAkrToSave = PanelAkrFacade.GetChangedAndNewPanels(panelsAkrInFacade, panelsAkrInLib);
 

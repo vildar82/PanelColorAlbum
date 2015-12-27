@@ -8,6 +8,7 @@ using AcadLib;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
+using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.Model.ExportFacade;
 using AlbumPanelColorTiles.Model.Tests;
 using AlbumPanelColorTiles.Options;
@@ -379,6 +380,34 @@ namespace AlbumPanelColorTiles
                if (!ex.Message.Contains("Отменено пользователем"))
                {
                   Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary. {0}", doc.Name);
+               }
+            }
+         }
+      }
+
+      /// <summary>
+      /// Создание фасадов из правильно расставленных блоков монтажных планов с блоками обозначения сторон фасада
+      /// Панели АКР создаются по описанию из базы Конструкторов
+      /// </summary>
+      [CommandMethod("PIK", "AKR-CreateFacadeCommand", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void CreateFacadeCommand()
+      {
+         Log.Info("Start Command: AKR-CreateFacadeCommand");
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;
+         using (var DocLock = doc.LockDocument())
+         {
+            try
+            {
+               PanelLibraryLoadService loadPanelsService = new PanelLibraryLoadService();
+               loadPanelsService.LoadPanels();
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\n{0}", ex.Message);
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Command: AKR-CreateFacadeCommand. {0}", doc.Name);
                }
             }
          }
@@ -763,13 +792,7 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("PIK", "TestRemoveDashAKR", CommandFlags.Modal)]
-      public void TestRemoveDashAKR()
-      {
-         // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
-         TestRemoveDash testRemoveDash = new TestRemoveDash();
-         testRemoveDash.RemoveDashAKR();
-      }
+      
       [CommandMethod("PIK", "TestReplaceWindows", CommandFlags.Modal)]
       public void TestReplaceWindows()
       {
@@ -777,5 +800,24 @@ namespace AlbumPanelColorTiles
          TestReplaceWindows testReplaceWindows = new TestReplaceWindows();
          testReplaceWindows.Replace();
       }
+
+      [CommandMethod("PIK", "TestRemoveDashAKR", CommandFlags.Modal)]
+      public void TestRemoveDashAKR()
+      {
+         // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
+         TestRemoveDash testRemoveDash = new TestRemoveDash();
+         testRemoveDash.RemoveDashAKR();
+      }    
+
+      [CommandMethod("PIK", "TestBase", CommandFlags.Modal)]
+      public void TestBase()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         Editor ed = doc.Editor;
+         Database db = doc.Database;
+
+         BaseService baseService = new BaseService();
+         baseService.LoadPanels();
+      }      
    }
 }
