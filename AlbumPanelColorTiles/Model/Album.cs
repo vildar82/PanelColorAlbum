@@ -69,6 +69,7 @@ namespace AlbumPanelColorTiles
       public List<Model.Panels.Section> Sections { get; set; }
       public SheetsSet SheetsSet { get { return _sheetsSet; } }
       public StartOption StartOptions { get; private set; }
+      public AlbumInfo AlbumInfo { get; set; }
       public List<Storey> Storeys { get { return _storeys; } }
 
       /// <summary>

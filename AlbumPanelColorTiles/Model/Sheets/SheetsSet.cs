@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;
@@ -11,19 +12,17 @@ namespace AlbumPanelColorTiles.Sheets
    // Ведомость альбома панелей
    public class SheetsSet
    {
-      private Album _album;
-
       private List<SheetMarkSB> _sheetsMarkSB;
       private string _sheetTemplateFileContent;
       private string _sheetTemplateFileMarkSB;
 
       public SheetsSet(Album album)
       {
-         _album = album;
+         Album = album;
          _sheetsMarkSB = new List<SheetMarkSB>();
       }
 
-      public Album Album { get { return _album; } }
+      public Album Album { get; set; }
       public List<SheetMarkSB> SheetsMarkSB { get { return _sheetsMarkSB; } }
       public string SheetTemplateFileContent { get { return _sheetTemplateFileContent; } }
       public string SheetTemplateFileMarkSB { get { return _sheetTemplateFileMarkSB; } }
@@ -41,7 +40,7 @@ namespace AlbumPanelColorTiles.Sheets
             throw new System.Exception("\nНе найден файл шаблона для содержания альбома - " + _sheetTemplateFileContent);
 
          // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)
-         _sheetsMarkSB = ProcessingSheets(_album.MarksSB);
+         _sheetsMarkSB = ProcessingSheets(Album.MarksSB);
          if (_sheetsMarkSB.Count == 0)
          {
             throw new System.Exception("Не определены панели марок АР");
@@ -51,13 +50,13 @@ namespace AlbumPanelColorTiles.Sheets
          CreateAlbumFolder();
 
          //Поиск блока рамки на текущем чертеже фасада
-         FrameSheet blFrameSearch = new FrameSheet();
-         blFrameSearch.Search();
+         Album.AlbumInfo = new AlbumInfo();
+         Album.AlbumInfo.Search();
 
          // Титульные листы и обложеи в одном файле "Содержание".
          // Создание титульных листов
          // Листы содержания
-         SheetsContent content = new SheetsContent(this, blFrameSearch);
+         SheetsContent content = new SheetsContent(this);
          content.Contents();
 
          ProgressMeter progressMeter = new ProgressMeter();
@@ -69,7 +68,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (HostApplicationServices.Current.UserBreak())
                throw new System.Exception("Отменено пользователем.");
             progressMeter.MeterProgress();
-            sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++, blFrameSearch);
+            sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++);
          }
          progressMeter.Stop();
 
@@ -77,12 +76,12 @@ namespace AlbumPanelColorTiles.Sheets
          try
          {
             PanelLibraryLoadService libService = new PanelLibraryLoadService();
-            libService.FillMarkPainting(_album);
+            libService.FillMarkPainting(Album);
          }
          catch (Exception ex)
          {
             string errMsg = "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);";
-            _album.Doc.Editor.WriteMessage("\n{0} - {1}", errMsg, ex.ToString());
+            Album.Doc.Editor.WriteMessage("\n{0} - {1}", errMsg, ex.ToString());
             Log.Error(ex, errMsg);
          }
 
@@ -99,7 +98,7 @@ namespace AlbumPanelColorTiles.Sheets
          // Еспорт списка панелей в ексель.
          try
          {
-            ExportToExcel.Export(_album);
+            ExportToExcel.Export(Album);
          }
          catch (Exception ex)
          {
@@ -109,7 +108,7 @@ namespace AlbumPanelColorTiles.Sheets
          // вставка итоговой таблицы по плитке
          try
          {
-            TotalTileTable tableTileTotal = new TotalTileTable(_album);
+            TotalTileTable tableTileTotal = new TotalTileTable(Album);
             tableTileTotal.InsertTableTotalTile();
          }
          catch (Exception ex)
@@ -122,14 +121,14 @@ namespace AlbumPanelColorTiles.Sheets
       private void CreateAlbumFolder()
       {
          // Папка альбома панелей
-         string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension(_album.DwgFacade);
-         string curDwgFacadeFolder = Path.GetDirectoryName(_album.DwgFacade);
-         _album.AlbumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
-         if (Directory.Exists(_album.AlbumDir))
+         string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension(Album.DwgFacade);
+         string curDwgFacadeFolder = Path.GetDirectoryName(Album.DwgFacade);
+         Album.AlbumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
+         if (Directory.Exists(Album.AlbumDir))
          {
-            Directory.Delete(_album.AlbumDir, true);
+            Directory.Delete(Album.AlbumDir, true);
          }
-         Directory.CreateDirectory(_album.AlbumDir);
+         Directory.CreateDirectory(Album.AlbumDir);
       }
 
       // Обработка панелей. получение списка Марок СБ SheetMarkSB (без создания папок, файлов и листов автокада)

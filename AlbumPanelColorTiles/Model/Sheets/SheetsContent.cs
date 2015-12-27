@@ -17,20 +17,18 @@ namespace AlbumPanelColorTiles.Sheets
       // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
-      private Album _album;
-      private FrameSheet _blFrameInFacade;
+      private Album _album;      
       private int _countContentSheets;
       private Database _dbContent;
       private Database _dbFacade;
       private List<SheetMarkSB> _sheetsMarkSB;
       private SheetsSet _sheetsSet;
 
-      public SheetsContent(SheetsSet sheetsSet, FrameSheet blFrameInFacade)
+      public SheetsContent(SheetsSet sheetsSet)
       {
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
-         _sheetsMarkSB = sheetsSet.SheetsMarkSB;
-         _blFrameInFacade = blFrameInFacade;
+         _sheetsMarkSB = sheetsSet.SheetsMarkSB;         
       }
 
       // Содержание тома (Общие данные. Ведомость комплекта чертежей.)
@@ -49,7 +47,8 @@ namespace AlbumPanelColorTiles.Sheets
             _dbContent.CloseInput(true);
 
             // Замена блока рамки из чертежа фасада, если он есть
-            _blFrameInFacade.ChangeBlockFrame(_dbContent, Settings.Default.BlockFrameName);
+            _album.AlbumInfo?.Frame?.ChangeBlockFrame(_dbContent);
+            _album?.AlbumInfo?.CoverTitle?.ChangeCoverAndTitle(_dbContent);
 
             using (var t = _dbContent.TransactionManager.StartTransaction())
             {

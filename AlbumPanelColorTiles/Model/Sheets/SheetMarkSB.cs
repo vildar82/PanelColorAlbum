@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание файла марки СБ и листов с панелями марок АР
-      public void CreateSheetMarkSB(SheetsSet sheetSet, int count, FrameSheet blFrameFacade)
+      public void CreateSheetMarkSB(SheetsSet sheetSet, int count)
       {
          // Создание файла панели Марки СБ и создание в нем листов с панелями Марки АР
          _fileMarkSB = CreateFileMarkSB(_markSB, sheetSet.Album.AlbumDir, sheetSet.SheetTemplateFileMarkSB, count);
@@ -56,7 +56,7 @@ namespace AlbumPanelColorTiles.Sheets
             dbMarkSB.CloseInput(true);
 
             // Замена блока рамки
-            blFrameFacade.ChangeBlockFrame(dbMarkSB, Settings.Default.BlockFrameName);
+            sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB);            
 
             // Копирование всех определений блоков марки АР в файл Марки СБ
             CopyBtrMarksARToSheetMarkSB(dbMarkSB);

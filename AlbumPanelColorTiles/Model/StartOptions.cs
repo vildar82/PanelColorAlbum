@@ -45,12 +45,12 @@ namespace AlbumPanelColorTiles.Model
          // Дефолтное значение аббревиатуры проекта
          if (Abbr == null)
          {
-            Abbr = loadAbbreviateName();// "Н47Г";
-            CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);
-            NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
-            NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
-            SortPanels = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);            
-         }         
+            Abbr = loadAbbreviateName();// "Н47Г";                     
+         }
+         CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);
+         NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
+         NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
+         SortPanels = DictNOD.LoadBool(Album.KEYNAMESORTPANELS);
       }
 
       public StartOption PromptStartOptions()
@@ -65,11 +65,11 @@ namespace AlbumPanelColorTiles.Model
          try
          {            
             resVal = formStartOptions.StartOptions;
-            saveAbbreviateName(Abbr);
-            saveNumberToDict(NumberFirstFloor, Album.KEYNAMENUMBERFIRSTFLOOR);
-            saveNumberToDict(NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
-            DictNOD.SaveBool(CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
-            DictNOD.SaveBool(SortPanels, Album.KEYNAMESORTPANELS);
+            saveAbbreviateName(resVal.Abbr);
+            saveNumberToDict(resVal.NumberFirstFloor, Album.KEYNAMENUMBERFIRSTFLOOR);
+            saveNumberToDict(resVal.NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
+            DictNOD.SaveBool(resVal.CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
+            DictNOD.SaveBool(resVal.SortPanels, Album.KEYNAMESORTPANELS);
          }
          catch (Exception ex)
          {

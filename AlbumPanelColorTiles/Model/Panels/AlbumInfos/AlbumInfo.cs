@@ -22,8 +22,8 @@ namespace AlbumPanelColorTiles.Model.Panels
 
       public AlbumInfo ()
       {
-         Document doc = Application.DocumentManager.MdiActiveDocument;
-         Database db = doc.Database;
+         doc = Application.DocumentManager.MdiActiveDocument;
+         db = doc.Database;
       }
 
       public void Search()
@@ -38,18 +38,24 @@ namespace AlbumPanelColorTiles.Model.Panels
             ObjectId msId = bt[BlockTableRecord.ModelSpace];
 
             // Рамка
+            Frame = new FrameSheet();
             if (!idBtrFrame.IsNull)
             {
-               var blRefFrame = getFirstBlRefInModel(idBtrFrame, msId);
-               Frame = new FrameSheet();
-               Frame.Check(blRefFrame);
+               ObjectId idBlRefFrame = getFirstBlRefInModel(idBtrFrame, msId);               
+               Frame.Check(idBlRefFrame);
             }
-            // Титул
+            // Обложка
+            CoverTitle = new CoverAndTitle();
             if (!idBtrCover.IsNull)
             {
-               var blRefCover = getFirstBlRefInModel(idBtrCover, msId);
-               CoverTitle = new CoverAndTitle();
-               CoverTitle.Check(blRefCover);
+               ObjectId idBlRefCover = getFirstBlRefInModel(idBtrCover, msId);               
+               CoverTitle.CheckCover(idBlRefCover);
+            }
+            // Титул            
+            if (!idBtrTitle.IsNull)
+            {
+               ObjectId idBlRefTitle = getFirstBlRefInModel(idBtrTitle, msId);
+               CoverTitle.CheckTitle(idBlRefTitle);
             }
          }
       }      
@@ -67,7 +73,7 @@ namespace AlbumPanelColorTiles.Model.Panels
          }
       }
 
-      private BlockReference getFirstBlRefInModel(ObjectId idBtrFrame, ObjectId msId)
+      private ObjectId getFirstBlRefInModel(ObjectId idBtrFrame, ObjectId msId)
       {
          using (var btr = idBtrFrame.Open( OpenMode.ForRead) as BlockTableRecord)
          {
@@ -78,12 +84,12 @@ namespace AlbumPanelColorTiles.Model.Panels
                {
                   if (blRef.OwnerId == msId)
                   {
-                     return blRef;
+                     return idBlRef;
                   }
                }
             }
          }
-         return null;
+         return ObjectId.Null;
       }
    }
 }

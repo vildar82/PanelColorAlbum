@@ -16,50 +16,62 @@ namespace AlbumPanelColorTiles.Panels
       private ObjectId _idBtrFrame;      
       public bool IsOk { get; private set; }
 
-      public void Check(BlockReference blRefFrame)
+      public void Check(ObjectId idBlRefFrame)
       {
-         if (blRefFrame.AttributeCollection == null)
+         if (idBlRefFrame.IsNull)
          {
-            Inspector.AddError("Блок {0} не соответствует требованиям. У него должны быть атрибуты: Наименование, Вид, Лист.",
+            Inspector.AddError("Блок {0} не найден.",
                               Settings.Default.BlockFrameName);
             return;
          }
-         _attrs = new Dictionary<string, string>();
-         foreach (ObjectId idAtrRef in blRefFrame.AttributeCollection)
+
+         using (var blRefFrame = idBlRefFrame.Open(OpenMode.ForRead, false, true) as BlockReference)
          {
-            using (var atrRef = idAtrRef.Open(OpenMode.ForRead, false, true) as AttributeReference)
+            _idBtrFrame = blRefFrame.BlockTableRecord;
+            if (blRefFrame.AttributeCollection == null)
             {
-               string key = atrRef.Tag.ToUpper();
-               if (!_attrs.ContainsKey(key))
+               Inspector.AddError("Блок {0} не соответствует требованиям. У него должны быть атрибуты: Наименование, Вид, Лист.",
+                                 Settings.Default.BlockFrameName);
+               return;
+            }
+            _attrs = new Dictionary<string, string>();
+            foreach (ObjectId idAtrRef in blRefFrame.AttributeCollection)
+            {
+               using (var atrRef = idAtrRef.Open(OpenMode.ForRead, false, true) as AttributeReference)
                {
-                  _attrs.Add(key, atrRef.TextString);
+                  string key = atrRef.Tag.ToUpper();
+                  if (!_attrs.ContainsKey(key))
+                  {
+                     _attrs.Add(key, atrRef.TextString);
+                  }
                }
             }
-         }
-         string errMsg = string.Empty;
-         if (!_attrs.ContainsKey("ВИД"))
-         {
-            errMsg += "Не найден атибут ВИД. ";
-         }
-         if (!_attrs.ContainsKey("НАИМЕНОВАНИЕ"))
-         {
-            errMsg += "Не найден атибут НАИМЕНОВАНИЕ. ";
-         }
-         if (!_attrs.ContainsKey("ЛИСТ"))
-         {
-            errMsg += "Не найден атибут ЛИСТ. ";
-         }
-         if (!string.IsNullOrEmpty(errMsg))
-         {
-            Inspector.AddError("Ошибки в блоке {0}: {1}".f(Settings.Default.BlockFrameName, errMsg), blRefFrame);
-         }
-         else
-         {
-            IsOk = true;
+
+            string errMsg = string.Empty;
+            if (!_attrs.ContainsKey("ВИД"))
+            {
+               errMsg += "Не найден атибут ВИД. ";
+            }
+            if (!_attrs.ContainsKey("НАИМЕНОВАНИЕ"))
+            {
+               errMsg += "Не найден атибут НАИМЕНОВАНИЕ. ";
+            }
+            if (!_attrs.ContainsKey("ЛИСТ"))
+            {
+               errMsg += "Не найден атибут ЛИСТ. ";
+            }
+            if (!string.IsNullOrEmpty(errMsg))
+            {
+               Inspector.AddError("Ошибки в блоке {0}: {1}".f(Settings.Default.BlockFrameName, errMsg), blRefFrame);
+            }
+            else
+            {
+               IsOk = true;
+            }
          }
       }
 
-      public void ChangeBlockFrame(Database db, string blName)
+      public void ChangeBlockFrame(Database db)
       {
          // Замена блока рамки если он есть в чертеже фасада
          if (IsOk)
@@ -69,7 +81,7 @@ namespace AlbumPanelColorTiles.Panels
             ids.Add(_idBtrFrame);
             db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
             // Запись атрибутов (Наименование, и другие если есть)
-            changeBlkRefFrame(db, blName);
+            changeBlkRefFrame(db, Settings.Default.BlockFrameName);
          }
       }
 
@@ -137,7 +149,7 @@ namespace AlbumPanelColorTiles.Panels
                      if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                      {
                         var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                        if (blRef.GetEffectiveName().Equals(blName))
+                        if (string.Equals(blRef.GetEffectiveName(),blName, StringComparison.CurrentCultureIgnoreCase))
                         {
                            updateBlRefFrame(blRef, btrFrame, t);
                         }
