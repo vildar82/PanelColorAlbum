@@ -44,7 +44,7 @@ namespace AlbumPanelColorTiles.Model.Panels
 		}
 		public void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
 		{
-			using (BlockTableRecord btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
+			using (BlockTableRecord btr = idBtr.Open(OpenMode.ForWrite) as BlockTableRecord)
 			{
 				foreach (ObjectId idEnt in btr)
 				{                          
