@@ -14,12 +14,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
    public class FacadeMounting
    {
       public List<Floor> Floors { get; private set; }
+      public Point3d PosPtFloors { get; private set; }
       public double XMax { get; private set; }
       public double XMin { get; private set; }
 
-      public FacadeMounting(double xmin)
+      public FacadeMounting(Floor floor)
       {
-         XMin = xmin;
+         XMin = floor.XMin;
+         PosPtFloors = floor.PosBlMounting;
          Floors = new List<Floor>();
       }
       
@@ -115,11 +117,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var comparer = new DoubleEqualityComparer(100); // FacadeVerticalDeviation
          foreach (var floor in floors)
          {
-            FacadeMounting facade = facades.Find(f => comparer.Equals(f.XMin, floor.XMin));
+            FacadeMounting facade = facades.Find(f => comparer.Equals(f.PosPtFloors.X, floor.PosBlMounting.X));
             if (facade == null)
             {
                // Новый фасад
-               facade = new FacadeMounting(floor.XMin);
+               facade = new FacadeMounting(floor);
                facades.Add(facade);
             }
             facade.Floors.Add(floor);

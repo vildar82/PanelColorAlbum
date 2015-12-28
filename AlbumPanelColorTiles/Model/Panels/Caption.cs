@@ -15,27 +15,26 @@ namespace AlbumPanelColorTiles.Model.Panels
 		private List<MarkSb> _marksSB;
 		public Caption(Database db)
 		{
-			this._db = db;
-			this._captionLayer = Caption.GetLayerForMark(db);
-			this._idTextstylePik = DbExtensions.GetTextStylePIK(this._db);
+			_db = db;
+			_captionLayer = Caption.GetLayerForMark(db);
+			_idTextstylePik = DbExtensions.GetTextStylePIK(_db);
 		}
 		public Caption(List<MarkSb> marksSB)
 		{
-			this._db = HostApplicationServices.get_WorkingDatabase();
-			this._marksSB = marksSB;
-			this._captionLayer = Caption.GetLayerForMark(this._db);
-			this._idTextstylePik = DbExtensions.GetTextStylePIK(this._db);
+			_db = HostApplicationServices.WorkingDatabase;
+			_marksSB = marksSB;
+			_captionLayer = Caption.GetLayerForMark(_db);
+			_idTextstylePik = DbExtensions.GetTextStylePIK(_db);
 		}
 		public static string GetLayerForMark(Database db)
 		{
-			using (LayerTable layerTable = db.get_LayerTableId().Open(0) as LayerTable)
-			{
-				bool flag = !layerTable.Has(Settings.Default.LayerMarks);
-				if (flag)
+			using (LayerTable layerTable = db.LayerTableId.Open(0) as LayerTable)
+			{				
+				if (!layerTable.Has(Settings.Default.LayerMarks))
 				{
 					using (LayerTableRecord layerTableRecord = new LayerTableRecord())
 					{
-						layerTableRecord.set_Name(Settings.Default.LayerMarks);
+						layerTableRecord.Name = Settings.Default.LayerMarks;
 						layerTable.UpgradeOpen();
 						layerTable.Add(layerTableRecord);
 					}
@@ -45,74 +44,66 @@ namespace AlbumPanelColorTiles.Model.Panels
 		}
 		public void AddMarkToPanelBtr(string panelMark, ObjectId idBtr)
 		{
-			using (BlockTableRecord blockTableRecord = idBtr.Open(1) as BlockTableRecord)
+			using (BlockTableRecord btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
 			{
-				using (BlockTableRecordEnumerator enumerator = blockTableRecord.GetEnumerator())
-				{
-					while (enumerator.MoveNext())
+				foreach (ObjectId idEnt in btr)
+				{                          
+					if (idEnt.ObjectClass.Name == "AcDbText" || idEnt.ObjectClass.Name == "AcDbHatch")
 					{
-						ObjectId current = enumerator.get_Current();
-						bool flag = current.get_ObjectClass().get_Name() == "AcDbText" || current.get_ObjectClass().get_Name() == "AcDbHatch";
-						if (flag)
-						{
-							using (Entity entity = current.Open(0, false, true) as Entity)
+						using (Entity entity = idEnt.Open( OpenMode.ForRead, false, true) as Entity)
+						{                     
+							if (string.Equals(entity.Layer, Settings.Default.LayerMarks, StringComparison.OrdinalIgnoreCase))
 							{
-								bool flag2 = string.Equals(entity.get_Layer(), Settings.Default.LayerMarks, StringComparison.OrdinalIgnoreCase);
-								if (flag2)
-								{
-									entity.UpgradeOpen();
-									entity.Erase(true);
-								}
+								entity.UpgradeOpen();
+								entity.Erase(true);
 							}
 						}
 					}
-				}
-				bool flag3 = panelMark.EndsWith(")");
-				if (flag3)
+				}				
+				if (panelMark.EndsWith(")"))
 				{
-					this.CreateCaptionMarkAr(panelMark, blockTableRecord);
+					CreateCaptionMarkAr(panelMark, btr);
 				}
 				else
 				{
-					this.CreateCaptionMarkSb(panelMark, blockTableRecord);
+					CreateCaptionMarkSb(panelMark, btr);
 				}
 			}
 		}
 		public void CaptionPanels()
 		{
-			this._captionLayer = Caption.GetLayerForMark(this._db);
-			foreach (MarkSb current in this._marksSB)
-			{
-				bool flag = HostApplicationServices.get_Current().UserBreak();
-				if (flag)
+			_captionLayer = Caption.GetLayerForMark(_db);
+			foreach (MarkSb markSb in _marksSB)
+			{				
+				if (HostApplicationServices.Current.UserBreak())
 				{
 					throw new Exception("Отменено пользователем.");
 				}
-				this.AddMarkToPanelBtr(current.MarkSbClean, current.IdBtr);
-				foreach (MarkAr current2 in current.MarksAR)
+				AddMarkToPanelBtr(markSb.MarkSbClean, markSb.IdBtr);
+				foreach (MarkAr markAr in markSb.MarksAR)
 				{
-					this.AddMarkToPanelBtr(current2.MarkARPanelFullName, current2.IdBtrAr);
+					AddMarkToPanelBtr(markAr.MarkARPanelFullName, markAr.IdBtrAr);
 				}
 			}
 		}
 		private void CreateCaptionMarkAr(string panelMark, BlockTableRecord btr)
 		{
 			int num = panelMark.LastIndexOf('(');
-			string text = panelMark.Substring(0, num);
-			string text2 = panelMark.Substring(num);
-			using (DBText dBText = this.GetDBText(text2))
+			string textMarkSb = panelMark.Substring(0, num);
+			string textMarkPaint = panelMark.Substring(num);
+			using (DBText dBTextPaint = GetDBText(textMarkPaint))
 			{
-				btr.AppendEntity(dBText);
+				btr.AppendEntity(dBTextPaint);
 			}
-			using (DBText dBText2 = this.GetDBText(text))
+			using (DBText dBTextMarkSb = GetDBText(textMarkSb))
 			{
-				dBText2.set_Position(new Point3d(0.0, (double)Settings.Default.CaptionPanelSecondTextShift, 0.0));
-				btr.AppendEntity(dBText2);
+				dBTextMarkSb.Position =new Point3d(0.0, Settings.Default.CaptionPanelSecondTextShift, 0.0);
+				btr.AppendEntity(dBTextMarkSb);
 			}
 		}
 		private void CreateCaptionMarkSb(string panelMark, BlockTableRecord btr)
 		{
-			using (DBText dBText = this.GetDBText(panelMark))
+			using (DBText dBText = GetDBText(panelMark))
 			{
 				btr.AppendEntity(dBText);
 			}
@@ -120,15 +111,15 @@ namespace AlbumPanelColorTiles.Model.Panels
 		private DBText GetDBText(string text)
 		{
 			DBText dBText = new DBText();
-			dBText.SetDatabaseDefaults(this._db);
-			dBText.set_TextStyleId(this._idTextstylePik);
-			dBText.set_Color(Color.FromColorIndex(192, 256));
-			dBText.set_Linetype(SymbolUtilityServices.get_LinetypeByLayerName());
-			dBText.set_LineWeight(-1);
-			dBText.set_TextString(text);
-			dBText.set_Height((double)Settings.Default.CaptionPanelTextHeight);
-			dBText.set_Annotative(1);
-			dBText.set_Layer(this._captionLayer);
+			dBText.SetDatabaseDefaults(_db);
+			dBText.TextStyleId =_idTextstylePik;
+			dBText.Color =Color.FromColorIndex( ColorMethod.ByLayer, 256);
+			dBText.Linetype= SymbolUtilityServices.LinetypeByLayerName;
+			dBText.LineWeight = LineWeight.ByLayer;
+			dBText.TextString =text;
+			dBText.Height = Settings.Default.CaptionPanelTextHeight;
+			dBText.Annotative = AnnotativeStates.False;
+			dBText.Layer=_captionLayer;
 			return dBText;
 		}
 	}

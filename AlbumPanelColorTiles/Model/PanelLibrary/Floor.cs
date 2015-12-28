@@ -28,7 +28,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {
-         IdBtrMounting = blRefMounting.BlockTableRecord;         
+         IdBtrMounting = blRefMounting.BlockTableRecord;
+         PosBlMounting = blRefMounting.Position;
          LibLoadServ = libLoadServ;
          IdBlRefMounting = blRefMounting.Id;
          BlRefName = blRefMounting.Name;
