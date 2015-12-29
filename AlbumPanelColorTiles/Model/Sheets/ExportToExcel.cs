@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using AcadLib.Errors;
 using Microsoft.Office.Interop.Excel;
 
 namespace AlbumPanelColorTiles.Sheets
@@ -24,7 +25,7 @@ namespace AlbumPanelColorTiles.Sheets
          {
             Worksheet sheetContent =  workBook.ActiveSheet as Worksheet;
             sheetContent.Name = "Содержание";
-            listContentAlbum(sheetContent, album);
+            sheetContentAlbumFill(sheetContent, album);
          }
          catch { }
 
@@ -35,7 +36,7 @@ namespace AlbumPanelColorTiles.Sheets
             {
                Worksheet sheetSections = workBook.Sheets.Add();
                sheetSections.Name = "Секции";
-               listSections(sheetSections, album);
+               ExportToExcel.sheetSectionFill(sheetSections, album);
             }
             catch { }
          }
@@ -45,7 +46,7 @@ namespace AlbumPanelColorTiles.Sheets
          {
             Worksheet sheetTiles = workBook.Sheets.Add();
             sheetTiles.Name = "Плитка";
-            listTiles(sheetTiles, album);
+            ExportToExcel.sheetTileFill(sheetTiles, album);
          }
          catch { }
 
@@ -54,7 +55,7 @@ namespace AlbumPanelColorTiles.Sheets
          {
             Worksheet sheetFloors = workBook.Sheets.Add();
             sheetFloors.Name = "Этажи";
-            listFloors(sheetFloors, album);
+            ExportToExcel.sheetFloorFill(sheetFloors, album);
          }
          catch { }
 
@@ -63,9 +64,21 @@ namespace AlbumPanelColorTiles.Sheets
          {
             Worksheet sheetPanels = workBook.Sheets.Add();
             sheetPanels.Name = "Панели";
-            listPanels(album, sheetPanels);
+            ExportToExcel.sheetPanelFill(album, sheetPanels);
          }
          catch { }
+
+         // Ошибки
+         if (Inspector.HasErrors)
+         {
+            try
+            {
+               Worksheet sheetError = workBook.Sheets.Add();
+               sheetError.Name = "Ошибки";
+               sheetErrorFill(sheetError, album);
+            }
+            catch { }
+         }
 
          // Показать ексель.
          // Лучше сохранить файл и закрыть!!!???         
@@ -81,7 +94,7 @@ namespace AlbumPanelColorTiles.Sheets
          return row;
       }
 
-      private static void listFloors(Worksheet sheetFloors, Album album)
+      private static void sheetFloorFill(Worksheet sheetFloors, Album album)
       {
          int row = addTitle(sheetFloors, album);
          row++;
@@ -117,7 +130,7 @@ namespace AlbumPanelColorTiles.Sheets
          sheetFloors.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
-      private static void listPanels(Album album, Worksheet sheetPanels)
+      private static void sheetPanelFill(Album album, Worksheet sheetPanels)
       {
          int row = addTitle(sheetPanels, album);
          // Название
@@ -154,7 +167,7 @@ namespace AlbumPanelColorTiles.Sheets
          sheetPanels.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
-      private static void listSections(Worksheet sheetSections, Album album)
+      private static void sheetSectionFill(Worksheet sheetSections, Album album)
       {
          // Список панелей по Секциям
          int row = addTitle(sheetSections, album);
@@ -190,7 +203,7 @@ namespace AlbumPanelColorTiles.Sheets
          sheetSections.Columns[3].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
-      private static void listTiles(Worksheet sheetTiles, Album album)
+      private static void sheetTileFill(Worksheet sheetTiles, Album album)
       {
          // Название
          int row = addTitle(sheetTiles, album);
@@ -234,7 +247,7 @@ namespace AlbumPanelColorTiles.Sheets
          sheetTiles.Columns[5].HorizontalAlignment = XlHAlign.xlHAlignCenter;
       }
 
-      private static void listContentAlbum(Worksheet sheetContent, Album album)
+      private static void sheetContentAlbumFill(Worksheet sheetContent, Album album)
       {
          int row = addTitle(sheetContent, album);
          row++;
@@ -257,6 +270,20 @@ namespace AlbumPanelColorTiles.Sheets
          var col1 = sheetContent.Columns[1];
          col1.ColumnWidth = 5;
          col1.HorizontalAlignment = XlHAlign.xlHAlignLeft;         
+      }
+
+      private static void sheetErrorFill(Worksheet sheetError, Album album)
+      {
+         int row = addTitle(sheetError, album);
+         row++;
+         sheetError.Cells[row, 1].Value = "Ошибки при создании альбома";         
+         row++;
+         foreach (var error in Inspector.Errors)
+         {
+            sheetError.Cells[row, 1].Value = error.Message;            
+            row++;
+         }
+         sheetError.Columns.AutoFit();         
       }
    }
 }
