@@ -36,18 +36,9 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
          var fileExportFullName = DictNOD.LoadString(_keyDict);
          if (string.IsNullOrEmpty(fileExportFullName) || !File.Exists(fileExportFullName))
-         {
-            // Если в имени файла есть АКР, то убираем его и предлагаем пользователю согласиться с этим именем или изменить
-            string fileExportName;
+         {  
             var fileAkrName = Path.GetFileNameWithoutExtension(FileAkrFacade.Name);
-            if (fileAkrName.Contains("АКР"))
-            {
-               fileExportName = fileAkrName.Replace("АКР", "");
-            }
-            else
-            {
-               fileExportName = fileAkrName + "_Экспорт";
-            }
+            string fileExportName = fileAkrName + "_Экспорт";
             fileExportFullName = Path.Combine(FileAkrFacade.DirectoryName, fileExportName + ".dwg");
          }
          FileExportFacade = new FileInfo(fileExportFullName);
