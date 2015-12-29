@@ -94,7 +94,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                                                         StringComparison.CurrentCultureIgnoreCase))
                                     {
                                        Inspector.AddError(
-                                           "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}",
+                                           "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}".f(
+                                              markAr.MarkARPanelFullName, mountingPanelSb.MarkSbWithoutElectric),
                                            panelAr.Extents, panelAr.IdBlRefAr);
                                        //continue;
                                     }

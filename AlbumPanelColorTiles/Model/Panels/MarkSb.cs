@@ -387,15 +387,23 @@ namespace AlbumPanelColorTiles.Panels
          int indexWindowSuffix = markSbName.IndexOf(Settings.Default.WindowPanelSuffix, StringComparison.OrdinalIgnoreCase);
          if (indexWindowSuffix != -1)
          {
-            if (int.TryParse(markSbName.Substring(indexWindowSuffix + Settings.Default.WindowPanelSuffix.Length, 1), out _windowSuffix))
+            try
             {
-               if (_windowSuffix == 0)
+               if (int.TryParse(markSbName.Substring(indexWindowSuffix + Settings.Default.WindowPanelSuffix.Length, 1), out _windowSuffix))
                {
-                  Inspector.Errors.Add(new Error(string.Format("Индекс окна не может быть равен 0 в блоке панели {0}", blRefPanel.Name), blRefPanel));
+                  if (_windowSuffix == 0)
+                  {
+                     Inspector.Errors.Add(new Error(string.Format("Индекс окна не может быть равен 0 в блоке панели {0}", blRefPanel.Name), blRefPanel));
+                  }
+               }
+               else
+               {
+                  Inspector.Errors.Add(new Error(string.Format("Не определен индекс окна в блоке панели {0}", blRefPanel.Name), blRefPanel));
                }
             }
-            else
+            catch (System.Exception ex)
             {
+               // Неверный индекс окна в имени блока панели
                Inspector.Errors.Add(new Error(string.Format("Не определен индекс окна в блоке панели {0}", blRefPanel.Name), blRefPanel));
             }
          }
