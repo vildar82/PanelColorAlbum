@@ -16,10 +16,16 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public string XmlBasePanelsFile { get; set; }
 
+      public int CountPanelsFromBase
+      {
+         get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count;  }
+      }
+
       public BaseService()
       {
          XmlBasePanelsFile = @"c:\dev\АР\AlbumPanelColorTiles\PanelColorAlbum\AlbumPanelColorTiles\Model\Base\Panels.xml";
       }
+
       public BaseService(string xmlBasePanelsFile)
       {
          XmlBasePanelsFile = xmlBasePanelsFile;
@@ -27,12 +33,12 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public void ReadPanelsFromBase()
       {
-         if (File.Exists(XmlBasePanelsFile))
+         if (!File.Exists(XmlBasePanelsFile))
          {
             throw new FileNotFoundException("XML файл базы панелей не найден.", XmlBasePanelsFile);
          }
 
-         // TODO: Проверка валидности xml
+         // TODO: Проверка валидности xml         
 
          // Чтение файла базы панелей
          _panelsFromBase = new Dictionary<string, Panel>();
@@ -45,10 +51,9 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                _panelsFromBase.Add(panel.mark, panel);
             }
-            catch (Exception)
+            catch (ArgumentException ex)
             {
-
-               throw;
+               Inspector.AddError("Ошибка получения панелей из базы xml - Такая панель уже есть. {0}", ex.Message);
             }            
          }
       }

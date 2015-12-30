@@ -16,7 +16,17 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
       {
          // Проверка считывания Xml базы панелей
          BaseService baseService = new BaseService();
-         baseService.LoadPanels();         
+
+         baseService.ReadPanelsFromBase();
+         int expectedCount = baseService.CountPanelsFromBase;
+
+         Assert.AreNotEqual(expectedCount, 0);
+      }
+
+      [Test()]
+      public void CreateBtrPanelFromBase()
+      {
+         
       }
    }
 }
