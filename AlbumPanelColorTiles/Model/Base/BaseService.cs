@@ -13,7 +13,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace AlbumPanelColorTiles.Model.Base
 {
    public class BaseService
-   {  
+   {
       private Dictionary<string,Panel> _panelsFromBase;
       public CreatePanelsBtrEnvironment Env { get; private set; }
       public string XmlBasePanelsFile { get; set; }
@@ -48,7 +48,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
          // Чтение файла базы панелей
          _panelsFromBase = new Dictionary<string, Panel>();
-         XmlSerializer ser = new XmlSerializer(typeof(Base.Panels));
+         XmlSerializer ser = new XmlSerializer(typeof(Base.Panels));         
          using (var fileStreamXml = new FileStream(XmlBasePanelsFile, FileMode.Open))
          {
             Panels panels = ser.Deserialize(fileStreamXml) as Panels;
