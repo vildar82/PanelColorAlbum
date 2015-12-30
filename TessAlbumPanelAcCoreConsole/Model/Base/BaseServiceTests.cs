@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
 
       [Test]
       public void ReadPanelsFromXmlTest()
-      {         
+      {
          int expectedCount = baseService.CountPanelsInBase;
          // Кол панелей в базе не должно быть равно нулю.
          Assert.AreNotEqual(expectedCount, 0);
