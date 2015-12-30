@@ -20,6 +20,11 @@ namespace AlbumPanelColorTiles.Model.Base
       public int CountPanelsInBase { get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count; } }
       public Database Db { get; set; }
 
+      public int CountPanelsFromBase
+      {
+         get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count;  }
+      }
+
       public BaseService()
       {
          XmlBasePanelsFile = @"c:\dev\АР\AlbumPanelColorTiles\PanelColorAlbum\AlbumPanelColorTiles\Model\Base\Panels.xml";
@@ -28,8 +33,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public BaseService(string xmlBasePanelsFile)
       {
          XmlBasePanelsFile = xmlBasePanelsFile;
-      }     
-      
+      }
+
 
       public void InitToCreationPanels(Database db)
       {
@@ -44,19 +49,19 @@ namespace AlbumPanelColorTiles.Model.Base
             throw new FileNotFoundException("XML файл базы панелей не найден.", XmlBasePanelsFile);
          }
 
-         // TODO: Проверка валидности xml         
+         // TODO: Проверка валидности xml
 
          // Чтение файла базы панелей
          _panelsFromBase = new Dictionary<string, Panel>();
-         XmlSerializer ser = new XmlSerializer(typeof(Base.Panels));         
+         XmlSerializer ser = new XmlSerializer(typeof(Base.Panels));                  
          using (var fileStreamXml = new FileStream(XmlBasePanelsFile, FileMode.Open))
          {
             Panels panels = ser.Deserialize(fileStreamXml) as Panels;
-            var panelsList = panels.Panel.ToList();
-            foreach (var panel in panelsList)
+         var panelsList = panels.Panel.ToList();
+         foreach (var panel in panelsList)
+         {
+            try
             {
-               try
-               {
                   _panelsFromBase.Add(panel.mark.ToUpper(), panel);
                }
                catch (ArgumentException ex)
@@ -82,7 +87,7 @@ namespace AlbumPanelColorTiles.Model.Base
                   using (var blRefPanel = idBlRefPanel.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
                   {
                      blRefPanel.Erase();
-                  }
+            }
                }
                btrPanel.Erase();
             }
@@ -90,7 +95,7 @@ namespace AlbumPanelColorTiles.Model.Base
       }     
 
       public Panel CreateBtrPanel(string markSb)
-      {         
+            {
          Panel panel;
          if (_panelsFromBase.TryGetValue(markSb.ToUpper(), out panel))
          {
@@ -119,7 +124,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
             }            
-         }                                                 
+         }
       }
    }
 }
