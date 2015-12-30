@@ -20,6 +20,11 @@ namespace AlbumPanelColorTiles.Model.Base
       public int CountPanelsInBase { get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count; } }
       public Database Db { get; set; }
 
+      public int CountPanelsFromBase
+      {
+         get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count;  }
+      }
+
       public BaseService()
       {
          XmlBasePanelsFile = @"c:\dev\АР\AlbumPanelColorTiles\PanelColorAlbum\AlbumPanelColorTiles\Model\Base\Panels.xml";
@@ -28,7 +33,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public BaseService(string xmlBasePanelsFile)
       {
          XmlBasePanelsFile = xmlBasePanelsFile;
-      }
+      }     
       
 
       public void InitToCreationPanels(Database db)
@@ -155,7 +160,7 @@ namespace AlbumPanelColorTiles.Model.Base
             catch (Exception ex)
             {
                Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
-            }
+               }
                btrPanel.Erase();
             }
          }
@@ -191,7 +196,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
             }            
-         }
+         }                                                 
       }
    }
 }
