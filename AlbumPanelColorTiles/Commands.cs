@@ -863,7 +863,7 @@ namespace AlbumPanelColorTiles
          Database db = doc.Database;
 
          BaseService baseService = new BaseService();
-         baseService.LoadPanels();
+         //baseService.LoadPanels();
       }      
    }
 }
