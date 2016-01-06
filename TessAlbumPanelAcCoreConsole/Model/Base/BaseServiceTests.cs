@@ -58,7 +58,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
                   baseService.InitToCreationPanels(db);
                   panel = baseService.CreateBtrPanel(mark);
                   t.Commit();
-               }
+               }               
             }
             db.SaveAs(testFile, DwgVersion.Current);
          }                  
@@ -68,6 +68,6 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
       }
 
-
+      
    }
 }
