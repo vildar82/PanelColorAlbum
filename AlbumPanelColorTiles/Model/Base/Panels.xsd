@@ -14,9 +14,9 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="windows" maxOccurs="1">
+              <xs:element name="windows" maxOccurs="1" minOccurs="0">
                 <xs:complexType>
-                  <xs:sequence maxOccurs="unbounded">
+                  <xs:sequence maxOccurs="unbounded" minOccurs="0">
                     <xs:element name="window">
                       <xs:complexType>
                         <xs:sequence maxOccurs ="1">

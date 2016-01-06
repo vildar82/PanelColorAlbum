@@ -108,6 +108,9 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Base\BaseService.cs" />
+    <Compile Include="Model\Base\CreatePanelData.cs" />
+    <Compile Include="Model\Base\CreatePanelsBtrEnvironment.cs" />
+    <Compile Include="Model\Base\Panel.cs" />
     <Compile Include="Model\Base\Panels.cs">
       <DependentUpon>Panels.xsd</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

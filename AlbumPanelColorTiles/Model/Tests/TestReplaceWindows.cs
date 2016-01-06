@@ -196,7 +196,7 @@ namespace AlbumPanelColorTiles.Model.Tests
          foreach (ObjectId idBtr in bt)
          {
             var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
-            if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+            if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
             {
                idsBtrPanels.Add(idBtr);
             }

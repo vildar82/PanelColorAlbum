@@ -74,7 +74,7 @@ namespace AlbumPanelColorTiles
                       "\nAKR-CreateMountingPlanBlocks - создание блоков монтажек из монтажных планов конструкторов." +
                       "\nAKR-CopyDictionary - копирование словаря текущего чертежа в другой чертеж. В словаре хранится список переименований панелей, индекс проекта, номер первого этажа." +
                       "\nИмена блоков и слоев:" +
-                      "\nБлоки панелей с префиксом - " + Settings.Default.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
+                      "\nБлоки панелей с префиксом - " + Settings.Default.BlockPanelAkrPrefixName + ", дальше марка СБ, без скобок в конце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Settings.Default.BlockColorAreaName +
                       "\nБлок плитки (разложенная в блоке панели) - " + Settings.Default.BlockTileName +
                       "\nБлок обозначения стороны фасада на монтажном плане - " + Settings.Default.BlockFacadeName +
@@ -790,7 +790,7 @@ namespace AlbumPanelColorTiles
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                {
                   if (!btr.ExtensionDictionary.IsNull)
                   {
@@ -826,7 +826,7 @@ namespace AlbumPanelColorTiles
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                {
                   var blRef = new BlockReference(pt, idBtr);
                   ms.AppendEntity(blRef);
