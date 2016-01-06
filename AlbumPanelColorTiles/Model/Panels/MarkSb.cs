@@ -143,7 +143,7 @@ namespace AlbumPanelColorTiles.Panels
 
       public static string GetMarkSbBlockName(string markSb)
       {
-         return Settings.Default.BlockPanelPrefixName + markSb;
+         return Settings.Default.BlockPanelAkrPrefixName + markSb;
       }
 
       /// <summary>
@@ -180,7 +180,7 @@ namespace AlbumPanelColorTiles.Panels
          if (IsBlockNamePanel(blName))
          {
             // Хвостовая часть
-            markSb = blName.Substring(Settings.Default.BlockPanelPrefixName.Length);
+            markSb = blName.Substring(Settings.Default.BlockPanelAkrPrefixName.Length);
             if (markSb.EndsWith(")"))
             {
                int lastDirectBracket = markSb.LastIndexOf('(');
@@ -270,7 +270,7 @@ namespace AlbumPanelColorTiles.Panels
       // Проверка, это блок панели, по имени (Марки СБ или Марки АР)
       public static bool IsBlockNamePanel(string blName)
       {
-         return blName.StartsWith(Settings.Default.BlockPanelPrefixName);
+         return blName.StartsWith(Settings.Default.BlockPanelAkrPrefixName);
       }
 
       // Проверка, это имя блоки марки АР, по имени блока.

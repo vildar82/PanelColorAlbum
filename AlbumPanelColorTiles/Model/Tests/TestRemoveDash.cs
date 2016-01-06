@@ -28,10 +28,10 @@ namespace AlbumPanelColorTiles.Model.Tests
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                {
                   // если есть первое тире, то попытка переименовыать имя блока без тире
-                  var markSb = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
+                  var markSb = btr.Name.Substring(Settings.Default.BlockPanelAkrPrefixName.Length);
                   var valType = getTypeName(markSb);
                   if (string.IsNullOrEmpty(valType))
                   {
@@ -41,7 +41,7 @@ namespace AlbumPanelColorTiles.Model.Tests
                   // если след символ тире
                   if (markSb.Substring(valType.Length, 1) == "-")
                   {
-                     string newBlNameWithoutDash = "{0}{1} {2}".f(Settings.Default.BlockPanelPrefixName, valType,
+                     string newBlNameWithoutDash = "{0}{1} {2}".f(Settings.Default.BlockPanelAkrPrefixName, valType,
                                  markSb.Substring(valType.Length + 1));
                      if (bt.Has(newBlNameWithoutDash))
                      {

@@ -13,13 +13,13 @@ namespace TessAlbumPanelAcCoreConsole
    [TestFixture, Apartment(ApartmentState.STA)]
    public class Class1
    {
-      [Test]
+      [Test, Ignore("Тестовый пример.")]
       public void Test1()
       {
          using (var db = new Database(false, true))
          {
             string fileDwgTest = @"c:\temp\test\АКР\TestsAcCoreConsole\Test.dwg";
-            db.ReadDwgFile(fileDwgTest, FileOpenMode.OpenForReadAndAllShare,  false, "");
+            db.ReadDwgFile(fileDwgTest, FileOpenMode.OpenForReadAndAllShare, false, "");
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
                SelectionBlocks select = new SelectionBlocks();

@@ -27,14 +27,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          {
             if (_idLayerContour.IsNull)
             {
-               // Создание контура плитки
-               var layer = new AcadLib.Layers.LayerInfo("АР_Швы");
-               layer.LineWeight = LineWeight.LineWeight030;
-               _idLayerContour = AcadLib.Layers.LayerExt.GetLayerOrCreateNew(layer);
+               _idLayerContour = ContourPanel.CreateLayerContourPanel();
             }
             return _idLayerContour;
          }
       }
+
+      
 
       public List<PanelBtrExport> PanelsBtrExport { get; private set; }
       public ExportFacadeService Service { get; private set; }

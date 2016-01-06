@@ -7,19 +7,16 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.PanelLibrary;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
    public class BaseService
-   {
+   {      
       private Dictionary<string,Panel> _panelsFromBase;
-
+      public CreatePanelsBtrEnvironment Env { get; private set; }
       public string XmlBasePanelsFile { get; set; }
-
-      public int CountPanelsFromBase
-      {
-         get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count;  }
-      }
+      public int CountPanelsInBase { get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count; } }
 
       public BaseService()
       {
@@ -29,6 +26,27 @@ namespace AlbumPanelColorTiles.Model.Base
       public BaseService(string xmlBasePanelsFile)
       {
          XmlBasePanelsFile = xmlBasePanelsFile;
+      }
+      
+      public ObjectId CreateBtrPanel (string markSb)
+      {
+         ObjectId resIdBtrPanel = ObjectId.Null;
+         Panel panel;         
+         if ( _panelsFromBase.TryGetValue(markSb.ToUpper(), out panel ))
+         {
+            resIdBtrPanel = panel.CreateBlock(this);
+         }
+         else
+         {
+            // Ошибка - панели с такой маркой нет в базе
+            throw new ArgumentException("Панели с такой маркой нет в базе - {0}".f(markSb), "markSb");
+         }
+         return resIdBtrPanel;
+      }
+
+      public void InitToCreationPanels()
+      {
+         Env = new CreatePanelsBtrEnvironment(); 
       }
 
       public void ReadPanelsFromBase()
@@ -42,19 +60,22 @@ namespace AlbumPanelColorTiles.Model.Base
 
          // Чтение файла базы панелей
          _panelsFromBase = new Dictionary<string, Panel>();
-         XmlSerializer ser = new XmlSerializer(typeof(Base.Panels));                  
-         Panels panels = ser.Deserialize(new FileStream(XmlBasePanelsFile, FileMode.Open)) as Panels;
-         var panelsList = panels.Panel.ToList();
-         foreach (var panel in panelsList)
+         XmlSerializer ser = new XmlSerializer(typeof(Base.Panels));
+         using (var fileStreamXml = new FileStream(XmlBasePanelsFile, FileMode.Open))
          {
-            try
+            Panels panels = ser.Deserialize(fileStreamXml) as Panels;
+            var panelsList = panels.Panel.ToList();
+            foreach (var panel in panelsList)
             {
-               _panelsFromBase.Add(panel.mark, panel);
+               try
+               {
+                  _panelsFromBase.Add(panel.mark.ToUpper(), panel);
+               }
+               catch (ArgumentException ex)
+               {
+                  Inspector.AddError("Ошибка получения панели из базы xml - такая панель уже есть. {0}", ex.Message);
+               }
             }
-            catch (ArgumentException ex)
-            {
-               Inspector.AddError("Ошибка получения панелей из базы xml - Такая панель уже есть. {0}", ex.Message);
-            }            
          }
       }
    }

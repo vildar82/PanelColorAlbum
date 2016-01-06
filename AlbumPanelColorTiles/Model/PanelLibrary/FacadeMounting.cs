@@ -105,7 +105,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
       /// </summary>
       /// <returns></returns>
-      public static List<FacadeMounting> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ)
+      public static List<FacadeMounting> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ = null)
       {
          List<FacadeMounting> facades = new List<FacadeMounting>();
 
