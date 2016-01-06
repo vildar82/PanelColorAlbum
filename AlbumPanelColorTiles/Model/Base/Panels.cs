@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Xml.Serialization;
 
 // 
@@ -147,7 +148,7 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             this.markField = value;
          }
-      }
+      }      
    }
 
    /// <remarks/>

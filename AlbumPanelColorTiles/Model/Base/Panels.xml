@@ -6,20 +6,20 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>  </cheeks>
-		<windows>
-			<window>
+		<windows> 
+			<window> 
 				<width> 1500.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 1494.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
+				</posi> 
 			</window>
 			<window>
 				<width> 1500.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 5094.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
+				</posi> 
 			</window>
 		</windows>
 		<balcony>  </balcony>
@@ -34,7 +34,7 @@
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
-			<window>
+			<window> 
 				<width> 1200.0 </width>
 				<height> 1805.0 </height>
 				<posi>
@@ -48,7 +48,7 @@
 					<X> 2695.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
 				</posi>
 			</window>
-		</windows>
+		</windows> 
 		<balcony>  </balcony>
 		<undercuts>
 			<undercut>
@@ -68,13 +68,13 @@
 		<cheeks>
 			<cheek> right </cheek>
 		</cheeks>
-		<windows>
-			<window>
+		<windows> 
+			<window> 
 				<width> 1200.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 1195.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
+				</posi> 
 			</window>
 			<window>
 				<width> 600.0 </width>
@@ -82,62 +82,62 @@
 				<posi>
 					<X> 2695.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
 				</posi>
-			</window>
+			</window> 
 		</windows>
 		<balcony>  </balcony>
 		<undercuts>  </undercuts>
 	</Panel>
 	<Panel mark = "3НСг 39.29.32-8-1">
-		<gab>
+		<gab> 
 			<length> 3889.0 </length>
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
 			<cheek> right </cheek>
 		</cheeks>
-		<windows>
-			<window>
+		<windows> 
+			<window> 
 				<width> 1200.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 1195.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
+				</posi> 
 			</window>
-			<window>
+			<window> 
 				<width> 600.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 2695.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
-			</window>
-		</windows>
+				</posi>        
+			</window> 
+		</windows> 
 		<balcony>  </balcony>
 		<undercuts>  </undercuts>
 	</Panel>
 	<Panel mark = "3НСг 39.29.32-2-1Б">
-		<gab>
+		<gab> 
 			<length> 3889.0 </length>
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
 		</cheeks>
-		<windows>
-			<window>
+		<windows> 
+			<window> 
 				<width> 1200.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 894.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
+				</posi> 
 			</window>
-			<window>
+			<window> 
 				<width> 600.0 </width>
 				<height> 1805.0 </height>
 				<posi>
 					<X> 2394.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
-			</window>
-		</windows>
+				</posi> 
+			</window> 
+		</windows> 
 		<balcony>			
 			<width>1200.0</width>
 			<height> 205.0 </height>
