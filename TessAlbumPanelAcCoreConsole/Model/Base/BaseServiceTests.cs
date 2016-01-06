@@ -55,7 +55,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
                using (var t = db.TransactionManager.StartTransaction())
-               {
+      {
                   baseService.InitToCreationPanels(db);
                   panel = baseService.CreateBtrPanel(mark);
                   t.Commit();
@@ -63,7 +63,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
             }
             db.SaveAs(testFile, DwgVersion.Current);
          }                  
-
+         
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
       }
 
