@@ -12,6 +12,8 @@ namespace AlbumPanelColorTiles.Model.Base
    public partial class Panel
    {
       private BaseService _service;
+      public string BlNameAkr { get; set; }
+      private List<Extents3d> _openings;
 
       /// <summary>
       /// Создание определения блока панели по описанию из базы XML от конструкторов.
@@ -22,15 +24,15 @@ namespace AlbumPanelColorTiles.Model.Base
       public ObjectId CreateBlock(BaseService service)
       {
          _service = service;
-         CreatePanelData panelData = new CreatePanelData();
+         _openings = new List<Extents3d>();
          ObjectId resIdBtrPanel = ObjectId.Null;
          Database db = HostApplicationServices.WorkingDatabase;
          Transaction t = db.TransactionManager.TopTransaction;
          BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable;
          // Имя для блока панели АКР
          // Пока без "Щечек" и без окон
-         
-         panelData.BlNameAkr = Settings.Default.BlockPanelAkrPrefixName + mark;
+
+         BlNameAkr = Settings.Default.BlockPanelAkrPrefixName + mark;
 
          // Ошибка если блок с таким именем уже есть
          if (bt.Has(this.mark))
@@ -41,9 +43,10 @@ namespace AlbumPanelColorTiles.Model.Base
          }
 
          BlockTableRecord btrPanel = new BlockTableRecord();
-         btrPanel.Name = panelData.BlNameAkr;
+         btrPanel.Name = BlNameAkr;
          resIdBtrPanel = bt.Add(btrPanel);
-         t.AddNewlyCreatedDBObject(btrPanel, true);         
+         t.AddNewlyCreatedDBObject(btrPanel, true);    
+              
          // Добавление полилинии контура
          Polyline plContour = createContour();         
          btrPanel.AppendEntity(plContour);
@@ -53,7 +56,7 @@ namespace AlbumPanelColorTiles.Model.Base
          addWindows(btrPanel, t);
 
          // заполнение плиткой
-         addTiles(btrPanel, t, panelData);
+         addTiles(btrPanel, t);
 
          return resIdBtrPanel;
       }      
@@ -81,33 +84,45 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Polyline plWindow = new Polyline();
                plWindow.LayerId = _service.Env.IdLayerContourPanel;
-               Point2d ptBaseWindow = new Point2d(item.posi.X, item.posi.Y);
-               plWindow.AddVertexAt(0, ptBaseWindow, 0, 0, 0);
-               plWindow.AddVertexAt(0, new Point2d(ptBaseWindow.X, ptBaseWindow.Y + item.height), 0, 0, 0);
-               plWindow.AddVertexAt(0, new Point2d(ptBaseWindow.X + item.width, ptBaseWindow.Y + item.height), 0, 0, 0);
-               plWindow.AddVertexAt(0, new Point2d(ptBaseWindow.X + item.width, ptBaseWindow.Y), 0, 0, 0);
+               Point2d ptMinWindow = new Point2d(item.posi.X, item.posi.Y);
+               plWindow.AddVertexAt(0, ptMinWindow, 0, 0, 0);
+               plWindow.AddVertexAt(0, new Point2d(ptMinWindow.X, ptMinWindow.Y + item.height), 0, 0, 0);
+               Point2d ptMaxWindow = new Point2d(ptMinWindow.X + item.width, ptMinWindow.Y + item.height);
+               plWindow.AddVertexAt(0, ptMaxWindow, 0, 0, 0);
+               plWindow.AddVertexAt(0, new Point2d(ptMinWindow.X + item.width, ptMinWindow.Y), 0, 0, 0);
                plWindow.Closed = true;
                btrPanel.AppendEntity(plWindow);
                t.AddNewlyCreatedDBObject(plWindow, true);
+
+               _openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
             }
          }
       }
 
-      private void addTiles(BlockTableRecord btrPanel, Transaction t, CreatePanelData panelData)
+      private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
          for (int x = 0; x < this.gab.length- Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+ Settings.Default.TileSeam)
          {
             for (int y = 0; y < this.gab.height- Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
             {
                Point3d pt = new Point3d(x, y, 0);
-               BlockReference blRefTile = new BlockReference(pt, _service.Env.IdBtrTile);
-               blRefTile.Layer = "0";
-               blRefTile.ColorIndex = 256; // ByLayer
 
-               btrPanel.AppendEntity(blRefTile);
-               t.AddNewlyCreatedDBObject(blRefTile, true);
+               if (!openingsContainPoint(pt))
+               {
+                  BlockReference blRefTile = new BlockReference(pt, _service.Env.IdBtrTile);
+                  blRefTile.Layer = "0";
+                  blRefTile.ColorIndex = 256; // ByLayer
+
+                  btrPanel.AppendEntity(blRefTile);
+                  t.AddNewlyCreatedDBObject(blRefTile, true);
+               }
             }
          }
+      }
+
+      private bool openingsContainPoint(Point3d pt)
+      {
+         return _openings.Any(b => b.IsPointInBounds(pt));
       }
    }
 }
