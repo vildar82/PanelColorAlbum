@@ -36,7 +36,7 @@ namespace AlbumPanelColorTiles.Model.Base
          BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable;
          // Имя для блока панели АКР
          // Пока без "Щечек" и без окон
-         
+
          BlNameAkr = Settings.Default.BlockPanelAkrPrefixName + mark;
 
          // Ошибка если блок с таким именем уже есть
@@ -50,7 +50,7 @@ namespace AlbumPanelColorTiles.Model.Base
          BlockTableRecord btrPanel = new BlockTableRecord();
          btrPanel.Name = BlNameAkr;
          IdBtrPanel = bt.Add(btrPanel);
-         t.AddNewlyCreatedDBObject(btrPanel, true);         
+         t.AddNewlyCreatedDBObject(btrPanel, true);    
               
          // Добавление полилинии контура
          Polyline plContour = createContour();         
@@ -122,13 +122,13 @@ namespace AlbumPanelColorTiles.Model.Base
                if (!openingsContainPoint(pt))
                {
                   BlockReference blRefTile = new BlockReference(pt, Service.Env.IdBtrTile);
-               blRefTile.Layer = "0";
-               blRefTile.ColorIndex = 256; // ByLayer
+                  blRefTile.Layer = "0";
+                  blRefTile.ColorIndex = 256; // ByLayer
 
-               btrPanel.AppendEntity(blRefTile);
-               t.AddNewlyCreatedDBObject(blRefTile, true);
+                  btrPanel.AppendEntity(blRefTile);
+                  t.AddNewlyCreatedDBObject(blRefTile, true);
+               }
             }
-         }
          }
       }
 

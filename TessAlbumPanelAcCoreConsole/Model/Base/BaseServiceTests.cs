@@ -34,7 +34,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
 
       [Test]
       public void ReadPanelsFromXmlTest()
-      {
+      {         
          int expectedCount = baseService.CountPanelsInBase;
          // Кол панелей в базе не должно быть равно нулю.
          Assert.AreNotEqual(expectedCount, 0);
@@ -50,20 +50,20 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
 
          using (var db = new Database(false, true))
-         {
+         {  
             db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
-            {
+            {               
                using (var t = db.TransactionManager.StartTransaction())
-      {
+               {
                   baseService.InitToCreationPanels(db);
                   panel = baseService.CreateBtrPanel(mark);
-                  t.Commit();
+                  t.Commit();                  
                }               
             }
             db.SaveAs(testFile, DwgVersion.Current);
          }                  
-         
+
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
       }
 
