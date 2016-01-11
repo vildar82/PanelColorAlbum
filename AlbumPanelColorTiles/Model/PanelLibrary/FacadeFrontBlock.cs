@@ -27,27 +27,24 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public ObjectId IdBlRef { get { return _idBlRef; } }
       public RTreeLib.Rectangle RectangleRTree { get { return _rectangleRTree; } }
 
-      public static List<FacadeFrontBlock> GetFacadeFrontBlocks()
+      public static List<FacadeFrontBlock> GetFacadeFrontBlocks(BlockTableRecord ms)
       {
-         List<FacadeFrontBlock> facadeFrontBlocks = new List<FacadeFrontBlock>();
-         var db = HostApplicationServices.WorkingDatabase;
-         using (var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForRead) as BlockTableRecord)
+         List<FacadeFrontBlock> facadeFrontBlocks = new List<FacadeFrontBlock>();         
+
+         foreach (ObjectId idEnt in ms)
          {
-            foreach (ObjectId idEnt in ms)
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                {
-                  using (var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
+                  // Если это блок обозначения стороны фасада - по имени блока
+                  if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
                   {
-                     // Если это блок обозначения стороны фасада - по имени блока
-                     if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
-                     {
-                        FacadeFrontBlock front = new FacadeFrontBlock(blRef);
-                        facadeFrontBlocks.Add(front);
-                     }
+                     FacadeFrontBlock front = new FacadeFrontBlock(blRef);
+                     facadeFrontBlocks.Add(front);
                   }
                }
-            }
+            }            
          }
          return facadeFrontBlocks;
       }

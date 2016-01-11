@@ -52,8 +52,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
+            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
             // Найдем все блоки обозначения фасада
-            List<FacadeFrontBlock> facadeFrontBlocks = FacadeFrontBlock.GetFacadeFrontBlocks();
+            List<FacadeFrontBlock> facadeFrontBlocks = FacadeFrontBlock.GetFacadeFrontBlocks(ms);
             // Дерево прямоугольников от блоков обозначений сторон фасада, для поиска пересечений с
             // блоками монтажек
             RTreeLib.RTree<FacadeFrontBlock> rtreeFront = new RTreeLib.RTree<FacadeFrontBlock>();
@@ -62,8 +63,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                rtreeFront.Add(front.RectangleRTree, front);
             }
 
-            // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада                        
             //// Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
             //libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
             foreach (ObjectId idEnt in ms)
@@ -77,7 +77,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);
                      floor.GetAllPanels();
-                     // найти соотв обозн стороны фасада
+                     // найти соотв обозн стороны фасада                              
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
 
                      // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в
