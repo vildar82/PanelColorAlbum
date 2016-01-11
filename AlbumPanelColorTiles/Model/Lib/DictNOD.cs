@@ -52,9 +52,9 @@ namespace AlbumPanelColorTiles.Lib
          return res;
       }
 
-      public static bool LoadBool(string key)
+      public static bool LoadBool(string key, bool defValue)
       {
-         bool res = true; // default
+         bool res = defValue; // default
          ObjectId idRec = getRec(key);
          if (idRec.IsNull)
             return res;
