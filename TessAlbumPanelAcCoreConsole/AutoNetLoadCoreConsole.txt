@@ -1,0 +1,5 @@
+CoreConsole
+/s "c:\dev\°À\AlbumPanelColorTiles\PanelColorAlbum\TessAlbumPanelAcCoreConsole\AutoNetLoadCoreConsole.scr" > testsAcCoreConsole.out
+
+AutoCAD
+/b "c:\dev\°À\AlbumPanelColorTiles\PanelColorAlbum\TessAlbumPanelAcCoreConsole\AutoNetLoadCoreConsole.scr"
