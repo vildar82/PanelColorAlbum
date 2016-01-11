@@ -69,6 +69,6 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
       }
 
-      
+
    }
 }

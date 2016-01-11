@@ -63,7 +63,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                rtreeFront.Add(front.RectangleRTree, front);
             }
 
-            // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада
+            // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада                        
             //// Поиск панелейСБ в Модели и добавление в общий список панелей СБ.
             //libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
             foreach (ObjectId idEnt in ms)
@@ -77,7 +77,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);
                      floor.GetAllPanels();
-                     // найти соотв обозн стороны фасада
+                     // найти соотв обозн стороны фасада                              
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
 
                      // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в
