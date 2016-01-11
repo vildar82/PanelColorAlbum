@@ -47,10 +47,10 @@ namespace AlbumPanelColorTiles.Model
          {
             Abbr = loadAbbreviateName();// "Н47Г";                     
          }
-         CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING);
+         CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING, false);
          NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
          NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
-         SortPanels = DictNOD.LoadBool(Album.KEYNAMESORTPANELS);
+         SortPanels = DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
       }
 
       public StartOption PromptStartOptions()
