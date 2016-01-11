@@ -51,11 +51,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      captionFloor(facade.XMin, yFloor, floor, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
                      {
-                        if (panelSb.PanelAkrLib != null)
+                        if (panelSb.PanelAkr != null)
                         {
                            Point3d ptPanelAkr = new Point3d(panelSb.ExtTransToModel.MinPoint.X, yFloor, 0);
                            //testGeom(panelSb, facade, floor, yFloor, t, ms);
-                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkrLib.IdBtrPanelAkrInFacade);
+                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkr.IdBtrPanelAkrInFacade);
                            blRefPanelAkr.Layer = floor.Storey.Layer;
                            ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
@@ -146,7 +146,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var floorUpper = Floors.Where(f => f.Storey.Type == EnumStorey.Upper).FirstOrDefault();
          if (floorUpper != null)
          {
-            var maxHeightPanel = floorUpper.PanelsSbInFront.Where(p => p.PanelAkrLib != null)?.Max(p => p.PanelAkrLib?.HeightPanelByTile);
+            var maxHeightPanel = floorUpper.PanelsSbInFront.Where(p => p.PanelAkr != null)?.Max(p => p.PanelAkr?.HeightPanelByTile);
             if (maxHeightPanel.HasValue)
             {
                floorUpper.Storey.Y = yLastNumberFloor + Settings.Default.FacadeFloorHeight;
@@ -159,7 +159,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             yParapet = yParapet != 0 ? yParapet : yLastNumberFloor + Settings.Default.FacadeFloorHeight;
             floorParapet.Storey.Y = yParapet;
-            var maxHeightPanel = floorParapet.PanelsSbInFront.Where(p => p.PanelAkrLib != null)?.Max(p => p.PanelAkrLib?.HeightPanelByTile);
+            var maxHeightPanel = floorParapet.PanelsSbInFront.Where(p => p.PanelAkr != null)?.Max(p => p.PanelAkr?.HeightPanelByTile);
             if (maxHeightPanel.HasValue)
             {
                floorParapet.Height = maxHeightPanel.Value;

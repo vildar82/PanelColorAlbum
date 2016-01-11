@@ -18,6 +18,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public string BlNameAkr { get; set; }
       [XmlIgnore]
       public List<Extents3d> Openings { get; set; }
+      [XmlIgnore]
+      public ObjectId IdBtrPanel { get; set; }
 
       /// <summary>
       /// Создание определения блока панели по описанию из базы XML от конструкторов.
@@ -25,11 +27,10 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       /// <exception cref="Autodesk.AutoCAD.Runtime.Exception">DuplicateBlockName</exception>
       /// <returns>ObjectId созданного определения блока в текущей базе.</returns>            
-      public ObjectId CreateBlock(BaseService service)
+      public void CreateBlock(BaseService service)
       {
          Service = service;
-         Openings = new List<Extents3d>();
-         ObjectId resIdBtrPanel = ObjectId.Null;
+         Openings = new List<Extents3d>();         
          Database db = HostApplicationServices.WorkingDatabase;
          Transaction t = db.TransactionManager.TopTransaction;
          BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable;
@@ -48,7 +49,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
          BlockTableRecord btrPanel = new BlockTableRecord();
          btrPanel.Name = BlNameAkr;
-         resIdBtrPanel = bt.Add(btrPanel);
+         IdBtrPanel = bt.Add(btrPanel);
          t.AddNewlyCreatedDBObject(btrPanel, true);    
               
          // Добавление полилинии контура
@@ -67,9 +68,7 @@ namespace AlbumPanelColorTiles.Model.Base
          dimFacade.Create();
          // Образмеривание (в Форме)
          DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
-         dimForm.Create();
-
-         return resIdBtrPanel;
+         dimForm.Create();         
       }      
 
       private Polyline createContour()
