@@ -13,7 +13,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace AlbumPanelColorTiles.Model.Base
 {
    public class BaseService
-   {      
+   {  
       private Dictionary<string,Panel> _panelsFromBase;
       public CreatePanelsBtrEnvironment Env { get; private set; }
       public string XmlBasePanelsFile { get; set; }
@@ -144,6 +144,41 @@ namespace AlbumPanelColorTiles.Model.Base
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting)
       {
          var panelsMountUnique = facadesMounting.SelectMany(f => f.Floors?.SelectMany(fl => fl.PanelsSbInFront)).
+                                             GroupBy(p => p.MarkSb).Select(g=>g.First());
+         foreach (var panelMount in panelsMountUnique)
+         {
+            try
+            {
+               Panel panelBase = CreateBtrPanel(panelMount.MarkSb);
+               panelMount.PanelAkr = new PanelAKR(panelBase);
+            }
+            catch (Exception ex)
+            {
+               Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
+            }
+               btrPanel.Erase();
+            }
+         }
+      }     
+
+      public Panel CreateBtrPanel(string markSb)
+      {         
+         Panel panel;
+         if (_panelsFromBase.TryGetValue(markSb.ToUpper(), out panel))
+         {
+            panel.CreateBlock(this);            
+         }
+         else
+         {
+            // Ошибка - панели с такой маркой нет в базе
+            throw new ArgumentException("Панели с такой маркой нет в базе - {0}".f(markSb), "markSb");
+         }
+         return panel;
+      }
+
+      public void CreateBtrPanels(List<FacadeMounting> facadesMounting)
+      {
+         var panelsMountUnique = facadesMounting.SelectMany(f => f.Floors.SelectMany(fl => fl.PanelsSbInFront)).
                                              GroupBy(p => p.MarkSb).Select(g=>g.First());
          foreach (var panelMount in panelsMountUnique)
          {
