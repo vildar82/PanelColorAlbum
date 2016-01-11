@@ -1,0 +1,1 @@
+/b "c:\dev\Ра\AlbumPanelColorTiles\PanelColorAlbum\TestAKRAutoCAD\AutoCADNetLoad.scr"
