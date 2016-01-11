@@ -68,26 +68,6 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
       }
 
-      [Test, Ignore("Пока не работает")]      
-      public void CreateFacadeTest()
-      {
-         Assert.DoesNotThrow(() =>
-         {
-            string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
-            using (var db = new Database(false, true))
-            {
-               db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
-               using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
-               {
-                  // Определение фасадов
-                  List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
-                  using (var t = db.TransactionManager.StartTransaction())
-                  {
-                     // Очиста чертежа от блоков панелей АКР
-                     baseService.ClearPanelsAkrFromDrawing(db);
-                     // Создание определений блоков панелей по базе 
-                     baseService.InitToCreationPanels(db);
-                     baseService.CreateBtrPanels(facadesMounting);
 
                      // Создание фасадов
                      FacadeMounting.CreateFacades(facadesMounting);
