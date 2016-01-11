@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using System.Xml.Serialization;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
    public partial class Panel
    {
-      private BaseService _service;
+      [XmlIgnore]
+      public BaseService Service { get; set; }
+      [XmlIgnore]
       public string BlNameAkr { get; set; }
-      private List<Extents3d> _openings;
+      [XmlIgnore]
+      public List<Extents3d> Openings { get; set; }
 
       /// <summary>
       /// Создание определения блока панели по описанию из базы XML от конструкторов.
@@ -23,8 +27,8 @@ namespace AlbumPanelColorTiles.Model.Base
       /// <returns>ObjectId созданного определения блока в текущей базе.</returns>            
       public ObjectId CreateBlock(BaseService service)
       {
-         _service = service;
-         _openings = new List<Extents3d>();
+         Service = service;
+         Openings = new List<Extents3d>();
          ObjectId resIdBtrPanel = ObjectId.Null;
          Database db = HostApplicationServices.WorkingDatabase;
          Transaction t = db.TransactionManager.TopTransaction;
@@ -58,13 +62,20 @@ namespace AlbumPanelColorTiles.Model.Base
          // заполнение плиткой
          addTiles(btrPanel, t);
 
+         // Образмеривание (на Фасаде)
+         DimensionFacade dimFacade = new DimensionFacade(btrPanel, t, this);
+         dimFacade.Create();
+         // Образмеривание (в Форме)
+         DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
+         dimForm.Create();
+
          return resIdBtrPanel;
       }      
 
       private Polyline createContour()
       {
          Polyline plContour = new Polyline();
-         plContour.LayerId = _service.Env.IdLayerContourPanel;
+         plContour.LayerId = Service.Env.IdLayerContourPanel;
 
          plContour.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
          plContour.AddVertexAt(0, new Point2d(0, this.gab.height), 0, 0, 0);
@@ -83,7 +94,7 @@ namespace AlbumPanelColorTiles.Model.Base
             foreach (var item in this.windows.window)
             {
                Polyline plWindow = new Polyline();
-               plWindow.LayerId = _service.Env.IdLayerContourPanel;
+               plWindow.LayerId = Service.Env.IdLayerContourPanel;
                Point2d ptMinWindow = new Point2d(item.posi.X, item.posi.Y);
                plWindow.AddVertexAt(0, ptMinWindow, 0, 0, 0);
                plWindow.AddVertexAt(0, new Point2d(ptMinWindow.X, ptMinWindow.Y + item.height), 0, 0, 0);
@@ -94,8 +105,10 @@ namespace AlbumPanelColorTiles.Model.Base
                btrPanel.AppendEntity(plWindow);
                t.AddNewlyCreatedDBObject(plWindow, true);
 
-               _openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
+               Openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
             }
+            // Сортировка окон слева-направо
+            Openings.Sort((w1, w2) => w1.MinPoint.X.CompareTo(w2.MinPoint.X));
          }
       }
 
@@ -109,7 +122,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
                if (!openingsContainPoint(pt))
                {
-                  BlockReference blRefTile = new BlockReference(pt, _service.Env.IdBtrTile);
+                  BlockReference blRefTile = new BlockReference(pt, Service.Env.IdBtrTile);
                   blRefTile.Layer = "0";
                   blRefTile.ColorIndex = 256; // ByLayer
 
@@ -122,7 +135,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private bool openingsContainPoint(Point3d pt)
       {
-         return _openings.Any(b => b.IsPointInBounds(pt));
-      }
+         return Openings.Any(b => b.IsPointInBounds(pt));
+      }      
    }
 }

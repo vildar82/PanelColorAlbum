@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
+using System.Reflection;
+using Moq;
+using System.IO;
 
 namespace AlbumPanelColorTiles.Model.Base.Tests
 {
@@ -37,18 +40,22 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          // Тест создания определения блока панели по описанию в xml базе.                  
          ObjectId idBtr;
 
-         using (var db = new Database(true, true))
-         {  
+         string testFile = @"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\" + mark + ".dwg";
+         File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
+
+         using (var db = new Database(false, true))
+         {
+            db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
-            {               
+            {
                using (var t = db.TransactionManager.StartTransaction())
                {
-                  baseService.InitToCreationPanels();
+                  baseService.InitToCreationPanels(db);
                   idBtr = baseService.CreateBtrPanel(mark);
-                  t.Commit();                  
-               }               
+                  t.Commit();
+               }
             }
-            db.SaveAs(@"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\" + mark + ".dwg", DwgVersion.Current);
+            db.SaveAs(testFile, DwgVersion.Current);
          }                  
 
          Assert.AreNotEqual(idBtr, ObjectId.Null);

@@ -12,11 +12,12 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace AlbumPanelColorTiles.Model.Base
 {
    public class BaseService
-   {      
+   {  
       private Dictionary<string,Panel> _panelsFromBase;
       public CreatePanelsBtrEnvironment Env { get; private set; }
       public string XmlBasePanelsFile { get; set; }
       public int CountPanelsInBase { get { return (_panelsFromBase == null) ? 0 : _panelsFromBase.Count; } }
+      public Database Db { get; set; }
 
       public BaseService()
       {
@@ -44,9 +45,10 @@ namespace AlbumPanelColorTiles.Model.Base
          return resIdBtrPanel;
       }
 
-      public void InitToCreationPanels()
+      public void InitToCreationPanels(Database db)
       {
-         Env = new CreatePanelsBtrEnvironment(); 
+         Db = db;
+         Env = new CreatePanelsBtrEnvironment(this); 
       }
 
       public void ReadPanelsFromBase()
