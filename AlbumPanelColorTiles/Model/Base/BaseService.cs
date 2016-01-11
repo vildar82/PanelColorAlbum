@@ -13,7 +13,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace AlbumPanelColorTiles.Model.Base
 {
    public class BaseService
-   {      
+   {  
       private Dictionary<string,Panel> _panelsFromBase;
       public CreatePanelsBtrEnvironment Env { get; private set; }
       public string XmlBasePanelsFile { get; set; }
@@ -82,8 +82,8 @@ namespace AlbumPanelColorTiles.Model.Base
                   using (var blRefPanel = idBlRefPanel.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
                   {
                      blRefPanel.Erase();
+                  }
             }
-               }
                btrPanel.Erase();
             }
          }
