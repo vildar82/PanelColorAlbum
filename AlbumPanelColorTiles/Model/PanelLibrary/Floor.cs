@@ -77,7 +77,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);
                      floor.GetAllPanels();
-                     // найти соотв обозн стороны фасада                              
+                     // найти соотв обозн стороны фасада                       
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
 
                      // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в
