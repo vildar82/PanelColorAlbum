@@ -178,7 +178,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting)
       {
-         var panelsMountUnique = facadesMounting.SelectMany(f => f.Floors.SelectMany(fl => fl.PanelsSbInFront)).
+         var panelsMountUnique = facadesMounting.SelectMany(f => f.Floors?.SelectMany(fl => fl.PanelsSbInFront)).
                                              GroupBy(p => p.MarkSb).Select(g=>g.First());
          foreach (var panelMount in panelsMountUnique)
          {
