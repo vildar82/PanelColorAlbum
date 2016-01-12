@@ -64,7 +64,7 @@ namespace AlbumPanelColorTiles.Model.Select
          {
             foreach (ObjectId idEnt in bt)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               if (idEnt.ObjectClass.Name == "AcDbBlockTableRecord")
                {
                   using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
                   {
