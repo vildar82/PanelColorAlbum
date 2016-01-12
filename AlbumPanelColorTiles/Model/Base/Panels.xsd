@@ -4,7 +4,7 @@
     <xs:complexType>
       <xs:sequence maxOccurs ="unbounded">
         <xs:element name="Panel">
-          <xs:complexType>
+          <xs:complexType>            
             <xs:sequence maxOccurs="1" minOccurs="1">
               <xs:element name="gab" minOccurs="1" maxOccurs="1">
                 <xs:complexType>
@@ -86,7 +86,7 @@
               </xs:element>
             </xs:sequence>
             <xs:attribute name="mark" type="xs:string" use="required" />
-          </xs:complexType>
+          </xs:complexType>          
         </xs:element>
       </xs:sequence>
     </xs:complexType>
