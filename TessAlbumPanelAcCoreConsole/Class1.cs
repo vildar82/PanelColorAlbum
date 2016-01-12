@@ -27,6 +27,6 @@ namespace TessAlbumPanelAcCoreConsole
                Assert.AreEqual(select.SectionsBlRefs.Count, 1);
             }
          }
-      }
+      }      
    }
 }
