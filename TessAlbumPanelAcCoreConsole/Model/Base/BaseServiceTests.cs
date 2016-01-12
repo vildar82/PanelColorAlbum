@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
 using System.Reflection;
-using Moq;
 using System.IO;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;

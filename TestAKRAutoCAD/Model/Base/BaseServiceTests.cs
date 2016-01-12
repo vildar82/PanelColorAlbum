@@ -24,7 +24,7 @@ namespace TestAKRAutoCAD.Model.Base
       }
       
       public void CreateFacadeTest()
-      {
+      {         
          string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
          using (var db = new Database(false, true))
          {
@@ -33,10 +33,12 @@ namespace TestAKRAutoCAD.Model.Base
             {
                // Определение фасадов
                List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
+               
+               // Очиста чертежа от блоков панелей АКР
+               baseService.ClearPanelsAkrFromDrawing(db);
+
                using (var t = db.TransactionManager.StartTransaction())
-               {
-                  // Очиста чертежа от блоков панелей АКР
-                  baseService.ClearPanelsAkrFromDrawing(db);
+               {                  
                   // Создание определений блоков панелей по базе 
                   baseService.InitToCreationPanels(db);
                   baseService.CreateBtrPanels(facadesMounting);

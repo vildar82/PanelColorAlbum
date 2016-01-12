@@ -28,7 +28,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public BaseService(string xmlBasePanelsFile)
       {
          XmlBasePanelsFile = xmlBasePanelsFile;
-      }
+      }     
       
 
       public void InitToCreationPanels(Database db)
@@ -71,26 +71,63 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          SelectionBlocks sel = new SelectionBlocks(db);
          sel.SelectAKRPanelsBtr();
-         List<ObjectId> idsBtrPanel = sel.IdsBtrPanelAr;
-         idsBtrPanel.AddRange(sel.IdsBtrPanelSb);
-         foreach (ObjectId idBtrPanel in idsBtrPanel)
+
+         List<ObjectId> idsBtrPanelsAkr = sel.IdsBtrPanelAr.ToList();
+         idsBtrPanelsAkr.AddRange(sel.IdsBtrPanelSb);
+
+         List<ObjectId> idsBtrOther = new List<ObjectId>();
+
+         foreach (ObjectId idBtrPanel in idsBtrPanelsAkr)
          {
-            using (var btrPanel = idBtrPanel.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+            using (var btrPanel = idBtrPanel.Open(OpenMode.ForRead) as BlockTableRecord)
             {
                foreach (ObjectId idBlRefPanel in btrPanel.GetBlockReferenceIds(false, true))
                {
-                  using (var blRefPanel = idBlRefPanel.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
+                  using (var blRefPanel = idBlRefPanel.Open(OpenMode.ForWrite, false, true) as BlockReference)
                   {
                      blRefPanel.Erase();
                   }
+               }
+               foreach (ObjectId idEnt in btrPanel)
+               {
+                  if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                  {
+                     using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
+                     {
+                        idsBtrOther.Add(blRef.BlockTableRecord);
+                     }
+                  }
+               }
             }
-               btrPanel.Erase();
+         }
+
+         eraseIdsDbo(idsBtrPanelsAkr);
+         eraseIdsDbo(idsBtrOther);
+      }
+
+      private static void eraseIdsDbo(List<ObjectId> idsDbobjects)
+      {
+         foreach (ObjectId idEnt in idsDbobjects)
+         {
+            if (!idEnt.IsNull && !idEnt.IsErased)
+            {
+               using (var dbo = idEnt.Open(OpenMode.ForWrite, false) as DBObject)
+               {
+                  if (dbo != null)
+                  {
+                     try
+                     {
+                        dbo.Erase();
+                     }
+                     catch { }
+                  }
+               }
             }
          }
       }     
 
       public Panel CreateBtrPanel(string markSb)
-            {
+      {         
          Panel panel;
          if (_panelsFromBase.TryGetValue(markSb.ToUpper(), out panel))
          {
@@ -118,8 +155,8 @@ namespace AlbumPanelColorTiles.Model.Base
             catch (Exception ex)
             {
                Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
-            }
-         }
+            }            
+         }                                                 
       }
    }
 }
