@@ -66,37 +66,6 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
       }
 
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
-      }
-
-
-                     // Создание фасадов
-                     FacadeMounting.CreateFacades(facadesMounting);
-
-                  t.Commit();
-               }
-            }
-            db.SaveAs(testFile, DwgVersion.Current);
-         }                  
-         });
-      }
-
-      [Test]
-      public void TestGetFloors()
-      {
-         string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
-         using (var db = new Database(false, true))
-         {
-            db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
-            using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
-            {
-               Assert.DoesNotThrow(() =>
-               {
-                  var floors = Floor.GetMountingBlocks(null);
-               });
-            }
-         }
-      }
-
-      
+      } 
    }
 }
