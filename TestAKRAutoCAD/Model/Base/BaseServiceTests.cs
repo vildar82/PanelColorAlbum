@@ -24,7 +24,7 @@ namespace TestAKRAutoCAD.Model.Base
       }
       
       public void CreateFacadeTest()
-      {         
+      {  
          string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
          using (var db = new Database(false, true))
          {
