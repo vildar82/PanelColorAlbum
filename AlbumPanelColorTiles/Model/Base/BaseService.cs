@@ -13,7 +13,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 namespace AlbumPanelColorTiles.Model.Base
 {
    public class BaseService
-   {      
+   {  
       private Dictionary<string,Panel> _panelsFromBase;
       public CreatePanelsBtrEnvironment Env { get; private set; }
       public string XmlBasePanelsFile { get; set; }
@@ -86,7 +86,7 @@ namespace AlbumPanelColorTiles.Model.Base
                   using (var blRefPanel = idBlRefPanel.Open(OpenMode.ForWrite, false, true) as BlockReference)
                   {
                      blRefPanel.Erase();
-            }
+                  }
                }
                foreach (ObjectId idEnt in btrPanel)
                {
@@ -155,8 +155,41 @@ namespace AlbumPanelColorTiles.Model.Base
             catch (Exception ex)
             {
                Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
+            }
+               foreach (ObjectId idEnt in btrPanel)
+               {
+                  if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                  {
+                     using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
+                     {
+                        idsBtrOther.Add(blRef.BlockTableRecord);
+                     }
+                  }
                }
-               btrPanel.Erase();
+            }
+         }
+
+         eraseIdsDbo(idsBtrPanelsAkr);
+         eraseIdsDbo(idsBtrOther);
+      }
+
+      private static void eraseIdsDbo(List<ObjectId> idsDbobjects)
+      {
+         foreach (ObjectId idEnt in idsDbobjects)
+         {
+            if (!idEnt.IsNull && !idEnt.IsErased)
+            {
+               using (var dbo = idEnt.Open(OpenMode.ForWrite, false) as DBObject)
+               {
+                  if (dbo != null)
+                  {
+                     try
+                     {
+                        dbo.Erase();
+                     }
+                     catch { }
+                  }
+               }
             }
          }
       }     
