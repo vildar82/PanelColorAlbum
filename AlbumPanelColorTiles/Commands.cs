@@ -241,8 +241,8 @@ namespace AlbumPanelColorTiles
          {
             try
             {
-               MountingPlans mountingPlans = new MountingPlans();
-               mountingPlans.CreateMountingPlans();
+               BlockPlans mountingPlans = new BlockPlans( BlockPlanTypeEnum.Mounting);
+               mountingPlans.CreateBlockPlans();
             }
             catch (System.Exception ex)
             {
@@ -760,7 +760,7 @@ namespace AlbumPanelColorTiles
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;                  
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
                      var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform , null);
@@ -791,7 +791,7 @@ namespace AlbumPanelColorTiles
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
                      var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform, null);

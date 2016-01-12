@@ -17,14 +17,14 @@ namespace AlbumPanelColorTiles.Model.Panels
          IdsBlRef = new List<ObjectId>();
          ExtentsList = new List<Extents3d>();
          IdsBlRef.Add(idBlRef);
-         Panels = new List<Panel>();
+         Panels = new List<AlbumPanelColorTiles.Panels.Panel>();
          getSectionParams(idBlRef);
       }
 
       public List<Extents3d> ExtentsList { get; private set; }
       public List<ObjectId> IdsBlRef { get; private set; }
       public string Name { get; private set; }
-      public List<Panel> Panels { get; private set; }
+      public List<AlbumPanelColorTiles.Panels.Panel> Panels { get; private set; }
 
       public static void DefineSections(Album album)
       {
@@ -75,7 +75,7 @@ namespace AlbumPanelColorTiles.Model.Panels
          }
       }
 
-      private void AddPanel(Panel panel)
+      private void AddPanel(AlbumPanelColorTiles.Panels.Panel panel)
       {
          Panels.Add(panel);
          panel.Section = this;
