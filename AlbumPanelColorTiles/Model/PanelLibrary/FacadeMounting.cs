@@ -76,7 +76,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // удаление старых АКР-Панелей фасадов
          Database db = HostApplicationServices.WorkingDatabase;
          // список всех акр панелей в модели
-         List<ObjectId> idsBlRefPanelAkr = Panel.GetPanelsBlRefInModel(db);
+         List<ObjectId> idsBlRefPanelAkr = Panels.Panel.GetPanelsBlRefInModel(db);
 
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.SetLimit(idsBlRefPanelAkr.Count);

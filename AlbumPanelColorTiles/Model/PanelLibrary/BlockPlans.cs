@@ -9,7 +9,13 @@ using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
-   public class MountingPlans
+   public enum BlockPlanTypeEnum
+   {
+      Mounting,
+      Architect
+   }
+
+   public class BlockPlans
    {
       private Database _db;
       private Document _doc;
@@ -17,22 +23,29 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private string _nameFloor;
       private int _numberFloor;
       private string _section;
+      private BlockPlanTypeEnum _planType;
+      private string _planTypeName;
+      private string _prefixBlockName;
 
-      public MountingPlans()
+      public BlockPlans(BlockPlanTypeEnum planType)
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
          _db = _doc.Database;
          _section = string.Empty;
+         _planType = planType;
+         _planTypeName = _planType == BlockPlanTypeEnum.Mounting ? "монтажного" : "архитектурного";
+         _prefixBlockName = _planType == BlockPlanTypeEnum.Mounting ? Settings.Default.BlockPlaneMountingPrefixName :
+                                                                      Settings.Default.BlockPlaneMountingPrefixName;
       }
 
       // создание блоков монтажных планов из выбранных планов монтажек пользователем
-      public void CreateMountingPlans()
+      public void CreateBlockPlans()
       {
          _numberFloor = 2;
-         _ed.WriteMessage("\nКоманда создания блоков монтажных планов вида АКР_Монтажка_2.");
+         _ed.WriteMessage($"\nКоманда создания блока {_planTypeName} плана.");
          createFloor();
-      }
+      }     
 
       // проверка наличия блока монтажки этого этажа
       private bool checkBlock(string floorBlockName)
@@ -42,7 +55,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             if (bt.Has(floorBlockName))
             {
-               var prOpt = new PromptKeywordOptions(string.Format("Блок монтажки {0} уже определен в чертеже. Что делать?", floorBlockName));
+               var prOpt = new PromptKeywordOptions(string.Format("Блок плана {0} уже определен в чертеже. Что делать?", floorBlockName));
                prOpt.Keywords.Add("Выход");
                prOpt.Keywords.Add("Пропустить");
                prOpt.Keywords.Default = "Выход";
@@ -75,7 +88,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // создаение блока монтажки
       private void createBlock(List<ObjectId> idsFloor, string floorBlockName)
       {
-         Point3d location = getPoint(string.Format("Точка вставки блока монтажного плана {0}", floorBlockName)).TransformBy(_ed.CurrentUserCoordinateSystem);
+         Point3d location = getPoint($"Точка вставки блока {_planTypeName} плана {floorBlockName}").TransformBy(_ed.CurrentUserCoordinateSystem);
          using (var t = _db.TransactionManager.StartTransaction())
          {
             var bt = t.GetObject(_db.BlockTableId, OpenMode.ForWrite) as BlockTable;
@@ -139,11 +152,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          string floorBlockName;
          if (string.IsNullOrEmpty(_section))
          {
-            floorBlockName = string.Format("{0}эт-{1}", Settings.Default.BlockMountingPlanePrefixName, indexFloor);
+            floorBlockName = string.Format("{0}эт-{1}", Settings.Default.BlockPlaneMountingPrefixName, indexFloor);
          }
          else
          {
-            floorBlockName = string.Format("{0}С{1}_эт-{2}", Settings.Default.BlockMountingPlanePrefixName, _section, indexFloor);
+            floorBlockName = string.Format("{0}С{1}_эт-{2}", Settings.Default.BlockPlaneMountingPrefixName, _section, indexFloor);
          }
          if (!checkBlock(floorBlockName))
          {

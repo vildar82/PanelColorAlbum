@@ -167,7 +167,7 @@
       <DependentUpon>FormPanelDesc.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\PanelLibrary\LibEditor\LibraryEditor.cs" />
-    <Compile Include="Model\PanelLibrary\MountingPlans.cs" />
+    <Compile Include="Model\PanelLibrary\BlockPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelAKR.cs" />
     <Compile Include="Model\PanelLibrary\PanelAkrFacade.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibraryLoadService.cs" />

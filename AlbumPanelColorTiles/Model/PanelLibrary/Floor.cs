@@ -73,7 +73,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
 
                   // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      Floor floor = new Floor(blRefMounting, libLoadServ);
                      floor.GetAllPanels();
@@ -126,7 +126,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var indexFloor = BlRefName.IndexOf("эт-");
          string nameStorey = string.Empty;
          if (indexFloor == -1)
-            nameStorey = BlRefName.Substring(Settings.Default.BlockMountingPlanePrefixName.Length);
+            nameStorey = BlRefName.Substring(Settings.Default.BlockPlaneMountingPrefixName.Length);
          else
             nameStorey = BlRefName.Substring(indexFloor + "эт-".Length);
          try
