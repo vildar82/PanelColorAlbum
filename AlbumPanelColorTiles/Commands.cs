@@ -231,25 +231,25 @@ namespace AlbumPanelColorTiles
       /// <summary>
       /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
       /// </summary>
-      [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
-      public void CreateMountingPlanBlocksCommand()
+      [CommandMethod("PIK", "AKR-CreatePlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void CreatePlanBlocksCommand()
       {
-         Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
+         Log.Info("Start Command: AKR-CreatePlanBlocks");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
             try
             {
-               BlockPlans mountingPlans = new BlockPlans( BlockPlanTypeEnum.Mounting);
+               BlockPlans mountingPlans = new BlockPlans();
                mountingPlans.CreateBlockPlans();
             }
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.Message);
                if (!ex.Message.Contains("Отменено пользователем"))
-               {
-                  Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks. {0}", doc.Name);
+               {                  
+                  Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
                }
             }
          }

@@ -92,7 +92,7 @@
          BlockTitleName = "АКР_Титульный";
          BlockPanelAkrPrefixName = "АКР_Панель_";
          BlockPlaneMountingPrefixName = "АКР_Монтажка_";
-         BlockPlaneArchitectPrefixName = "АКР_Монтажка_";
+         BlockPlaneArchitectPrefixName = "АКР_Архитектура_";
          BlockFacadeName = "АКР_Фасад";
          BlockTileName = "АКР_Плитка";
          BlockSectionName = "АКР_Секция";
