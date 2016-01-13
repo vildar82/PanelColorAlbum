@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -24,7 +25,8 @@ namespace TestAKRAutoCAD.Model.Base
       }
       
       public void CreateFacadeTest()
-      {  
+      {
+         Inspector.Clear();
          string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
          using (var db = new Database(false, true))
          {
@@ -51,6 +53,10 @@ namespace TestAKRAutoCAD.Model.Base
                }
             }
             db.SaveAs(testFile, DwgVersion.Current);
+         }
+         if (Inspector.HasErrors)
+         {
+            Inspector.Show();
          }
          doc.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + testFile);
       }

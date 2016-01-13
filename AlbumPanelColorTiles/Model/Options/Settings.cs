@@ -128,7 +128,7 @@
          FacadeFloorHeight = 2800;
          FacadeCaptionFloorTextHeight = 250;
          FacadeCaptionFloorIndent = 3000;
-         FacadeIndentFromMountingPlanes = 10000;
+         FacadeIndentFromMountingPlanes = 20000;
          FacadeEndsPanelIndent = 890;
          PaintIndexUpperStorey = "Ч";
          PaintIndexParapet = "П";
