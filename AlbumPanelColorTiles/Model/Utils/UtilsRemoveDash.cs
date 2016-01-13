@@ -9,9 +9,9 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Tests
+namespace AlbumPanelColorTiles.Model.Utils
 {
-   class TestRemoveDash
+   class UtilsRemoveDash
    {      
       public void RemoveDashAKR()
       {

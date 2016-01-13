@@ -9,7 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Tests
+namespace AlbumPanelColorTiles.Model.Utils
 {
    public enum EnumOpening
    {
@@ -60,7 +60,7 @@ namespace AlbumPanelColorTiles.Model.Tests
       }
    }
 
-   public class TestReplaceWindows
+   public class UtilsReplaceWindows
    {
       Document doc;
       Editor ed;
