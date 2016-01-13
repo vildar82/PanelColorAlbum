@@ -103,38 +103,17 @@ namespace AlbumPanelColorTiles.Model.Base
 
          eraseIdsDbo(idsBtrPanelsAkr);
          eraseIdsDbo(idsBtrOther);
-      }
-
-      private static void eraseIdsDbo(List<ObjectId> idsDbobjects)
-      {
-         foreach (ObjectId idEnt in idsDbobjects)
-         {
-            if (!idEnt.IsNull && !idEnt.IsErased)
-            {
-               using (var dbo = idEnt.Open(OpenMode.ForWrite, false) as DBObject)
-               {
-                  if (dbo != null)
-                  {
-            try
-            {
-                        dbo.Erase();
-                     }
-                     catch { }
-                  }
-               }
-            }
-         }
-      }     
+      }      
 
       public Panel CreateBtrPanel(string markSb)
-      {         
+      {
          Panel panel;
          if (_panelsFromBase.TryGetValue(markSb.ToUpper(), out panel))
          {
-            panel.CreateBlock(this);            
-            }
+            panel.CreateBlock(this);
+         }
          else
-            {
+         {
             // Ошибка - панели с такой маркой нет в базе
             throw new ArgumentException("Панели с такой маркой нет в базе - {0}".f(markSb), "markSb");
          }
@@ -156,21 +135,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
             }
-               foreach (ObjectId idEnt in btrPanel)
-               {
-                  if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-                  {
-                     using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
-                     {
-                        idsBtrOther.Add(blRef.BlockTableRecord);
-                     }
-                  }
-               }
-            }
-         }
-
-         eraseIdsDbo(idsBtrPanelsAkr);
-         eraseIdsDbo(idsBtrOther);
+         }         
       }
 
       private static void eraseIdsDbo(List<ObjectId> idsDbobjects)
@@ -190,39 +155,6 @@ namespace AlbumPanelColorTiles.Model.Base
                      catch { }
                   }
                }
-            }
-         }
-      }     
-
-      public Panel CreateBtrPanel(string markSb)
-            {
-         Panel panel;
-         if (_panelsFromBase.TryGetValue(markSb.ToUpper(), out panel))
-         {
-            panel.CreateBlock(this);            
-         }
-         else
-         {
-            // Ошибка - панели с такой маркой нет в базе
-            throw new ArgumentException("Панели с такой маркой нет в базе - {0}".f(markSb), "markSb");
-         }
-         return panel;
-      }
-
-      public void CreateBtrPanels(List<FacadeMounting> facadesMounting)
-      {
-         var panelsMountUnique = facadesMounting.SelectMany(f => f.Floors?.SelectMany(fl => fl.PanelsSbInFront)).
-                                             GroupBy(p => p.MarkSb).Select(g=>g.First());
-         foreach (var panelMount in panelsMountUnique)
-         {
-            try
-            {
-               Panel panelBase = CreateBtrPanel(panelMount.MarkSb);
-               panelMount.PanelAkr = new PanelAKR(panelBase);
-            }
-            catch (Exception ex)
-            {
-               Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
             }
          }
       }
