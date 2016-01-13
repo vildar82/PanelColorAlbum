@@ -29,6 +29,7 @@ namespace TestAKRAutoCAD.Model.Base
          using (var db = new Database(false, true))
          {
             db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
+            db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
                // Определение фасадов

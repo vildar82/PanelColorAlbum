@@ -51,6 +51,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          using (var db = new Database(false, true))
          {  
             db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
+            db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {               
                using (var t = db.TransactionManager.StartTransaction())
