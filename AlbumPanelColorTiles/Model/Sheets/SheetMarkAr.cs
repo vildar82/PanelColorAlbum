@@ -73,7 +73,8 @@ namespace AlbumPanelColorTiles.Sheets
             //
             //Создание листа для Марки АР ("на Фасаде").
             //
-            var idLayoutMarkAR = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
+            //var idLayoutMarkAR = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
+            var idLayoutMarkAR = AcadLib.Blocks.Block.CloneLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
             // Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
             if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary).Count == 3)
             {
@@ -106,7 +107,8 @@ namespace AlbumPanelColorTiles.Sheets
             var idBlRefMarkArForm = InsertBlRefMarkAR(dbMarkSB, ptInsertMarkArForm);
             // Зеркалирование блока
             MirrorMarkArForFormSheet(idBlRefMarkArForm);
-            var idLayoutMarkArForm = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
+            //var idLayoutMarkArForm = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, LayoutName, LayoutName + ".1");
+            var idLayoutMarkArForm = AcadLib.Blocks.Block.CloneLayout(dbMarkSB, LayoutName, LayoutName + ".1");
             // Направение видового экрана на блок марки АР(з).
             var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t,
                            dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false, out extentsViewPort);

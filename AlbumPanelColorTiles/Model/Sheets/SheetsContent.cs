@@ -251,7 +251,8 @@ namespace AlbumPanelColorTiles.Sheets
             nameLay = Settings.Default.SheetTemplateLayoutNameForContent;
             nameCopy = (_countSheetsBeforContent + 2).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
             idLayoutContentCur = lm.GetLayoutId(nameLay);
-            lm.CopyLayout(nameLay, nameCopy);
+            //lm.CopyLayout(nameLay, nameCopy);
+            AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy);
             lm.RenameLayout(nameLay, (_countSheetsBeforContent + 1).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent);
          }
          else
@@ -259,7 +260,8 @@ namespace AlbumPanelColorTiles.Sheets
             nameLay = (_countSheetsBeforContent + curSheetContentNum).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
             nameCopy = (_countSheetsBeforContent + (++curSheetContentNum)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
             idLayoutContentCur = lm.GetLayoutId(nameLay);
-            lm.CopyLayout(nameLay, nameCopy);
+            //lm.CopyLayout(nameLay, nameCopy);
+            AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy);
          }
          return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;
       }

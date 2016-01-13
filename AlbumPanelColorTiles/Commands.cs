@@ -513,8 +513,7 @@ namespace AlbumPanelColorTiles
             optPrompt.Keywords.Add("Текущего");
             optPrompt.Keywords.Add("Папки");
 
-            var resPrompt = ed.GetKeywords(optPrompt);
-            PlotMultiPDF plotter = new PlotMultiPDF();
+            var resPrompt = ed.GetKeywords(optPrompt);            
             if (resPrompt.Status == PromptStatus.OK)
             {
                if (resPrompt.StringResult == "Текущего")
@@ -522,7 +521,13 @@ namespace AlbumPanelColorTiles
                   Log.Info("Текущего");
                   try
                   {
-                     plotter.PlotCur();
+                     if (!File.Exists(doc.Name))
+                     {
+                        throw new System.Exception("Нужно сохранить текущий чертеж.");
+                     }
+                     string filePdfName = Path.Combine(Path.GetDirectoryName(doc.Name), Path.GetFileNameWithoutExtension(doc.Name) + ".pdf");
+                     AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(new string[] { doc.Name }, filePdfName);
+                     plotter.Plot();
                   }
                   catch (System.Exception ex)
                   {
@@ -551,7 +556,8 @@ namespace AlbumPanelColorTiles
                   {
                      try
                      {
-                        plotter.PlotDir(dialog.SelectedPath);
+                        AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(dialog.SelectedPath);
+                        plotter.Plot();
                      }
                      catch (System.Exception ex)
                      {
