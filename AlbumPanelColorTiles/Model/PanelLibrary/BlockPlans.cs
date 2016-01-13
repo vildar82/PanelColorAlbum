@@ -17,6 +17,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
    public class BlockPlans
    {
+      private const string BLOCKMOUNTING = "Монтажного";
+      private const string BLOCKARCHITECT = "Архитектурного";
+
       private Database _db;
       private Document _doc;
       private Editor _ed;
@@ -27,16 +30,28 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private string _planTypeName;
       private string _prefixBlockName;
 
-      public BlockPlans(BlockPlanTypeEnum planType)
+      public BlockPlans()
       {
          _doc = Application.DocumentManager.MdiActiveDocument;
          _ed = _doc.Editor;
          _db = _doc.Database;
          _section = string.Empty;
-         _planType = planType;
-         _planTypeName = _planType == BlockPlanTypeEnum.Mounting ? "монтажного" : "архитектурного";
-         _prefixBlockName = _planType == BlockPlanTypeEnum.Mounting ? Settings.Default.BlockPlaneMountingPrefixName :
-                                                                      Settings.Default.BlockPlaneMountingPrefixName;
+         setTypeBlock( BlockPlanTypeEnum.Mounting);
+      }
+
+      private void setTypeBlock(BlockPlanTypeEnum type)
+      {
+         _planType = type;
+         if (type == BlockPlanTypeEnum.Mounting)
+         {
+            _planTypeName = BLOCKMOUNTING;
+            _prefixBlockName = Settings.Default.BlockPlaneMountingPrefixName;
+         }
+         else
+         {
+            _planTypeName = BLOCKARCHITECT;
+            _prefixBlockName = Settings.Default.BlockPlaneArchitectPrefixName;
+         }         
       }
 
       // создание блоков монтажных планов из выбранных планов монтажек пользователем
@@ -55,7 +70,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             if (bt.Has(floorBlockName))
             {
-               var prOpt = new PromptKeywordOptions(string.Format("Блок плана {0} уже определен в чертеже. Что делать?", floorBlockName));
+               var prOpt = new PromptKeywordOptions($"Блок плана {floorBlockName} уже определен в чертеже. Что делать?");
                prOpt.Keywords.Add("Выход");
                prOpt.Keywords.Add("Пропустить");
                prOpt.Keywords.Default = "Выход";
@@ -152,11 +167,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          string floorBlockName;
          if (string.IsNullOrEmpty(_section))
          {
-            floorBlockName = string.Format("{0}эт-{1}", Settings.Default.BlockPlaneMountingPrefixName, indexFloor);
+            floorBlockName = string.Format("{0}эт-{1}", _prefixBlockName, indexFloor);
          }
          else
          {
-            floorBlockName = string.Format("{0}С{1}_эт-{2}", Settings.Default.BlockPlaneMountingPrefixName, _section, indexFloor);
+            floorBlockName = string.Format("{0}С{1}_эт-{2}", _prefixBlockName, _section, indexFloor);
          }
          if (!checkBlock(floorBlockName))
          {
@@ -173,6 +188,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
          opt.DefaultValue = _numberFloor;
+         opt.Keywords.Add(_planTypeName);
          string keySection = "Секция" + _section;
          opt.Keywords.Add(keySection);
          opt.Keywords.Add("Чердак");
@@ -197,6 +213,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             else if (res.StringResult == "Парапет")
             {
                _nameFloor = Settings.Default.PaintIndexParapet;
+            }
+            else if (res.StringResult == _planTypeName)
+            {
+               setTypeBlock(_planType == BlockPlanTypeEnum.Mounting ? BlockPlanTypeEnum.Architect : BlockPlanTypeEnum.Mounting);               
+               getNumberFloor();
             }
             else
             {
