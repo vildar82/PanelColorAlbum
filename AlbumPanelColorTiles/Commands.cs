@@ -10,7 +10,7 @@ using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.Model.ExportFacade;
-using AlbumPanelColorTiles.Model.Tests;
+using AlbumPanelColorTiles.Model.Utils;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.PanelLibrary.LibEditor;
@@ -875,7 +875,7 @@ namespace AlbumPanelColorTiles
       public void TestReplaceWindows()
       {
          // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
-         TestReplaceWindows testReplaceWindows = new TestReplaceWindows();
+         UtilsReplaceWindows testReplaceWindows = new UtilsReplaceWindows();
          testReplaceWindows.Replace();
       }
 
@@ -883,7 +883,7 @@ namespace AlbumPanelColorTiles
       public void TestRemoveDashAKR()
       {
          // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
-         TestRemoveDash testRemoveDash = new TestRemoveDash();
+         UtilsRemoveDash testRemoveDash = new UtilsRemoveDash();
          testRemoveDash.RemoveDashAKR();
       }    
 
