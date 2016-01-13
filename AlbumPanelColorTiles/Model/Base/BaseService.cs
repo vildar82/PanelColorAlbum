@@ -115,25 +115,28 @@ namespace AlbumPanelColorTiles.Model.Base
          else
          {
             // Ошибка - панели с такой маркой нет в базе
-            throw new ArgumentException("Панели с такой маркой нет в базе - {0}".f(markSb), "markSb");
+            throw new ArgumentException($"Панели с такой маркой нет в базе - {markSb}");
          }
          return panel;
       }
 
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting)
       {
-         var panelsMountUnique = facadesMounting.SelectMany(f => f.Floors?.SelectMany(fl => fl.PanelsSbInFront)).
-                                             GroupBy(p => p.MarkSb).Select(g=>g.First());
-         foreach (var panelMount in panelsMountUnique)
+         var panelsMountUniqueGroup = facadesMounting.SelectMany(f => f.Floors?.SelectMany(fl => fl.PanelsSbInFront)).
+                                             GroupBy(p => p.MarkSb);
+         var panelsUniqueCount = panelsMountUniqueGroup.Count();
+         foreach (var panelMountGroup in panelsMountUniqueGroup)
          {
             try
             {
-               Panel panelBase = CreateBtrPanel(panelMount.MarkSb);
-               panelMount.PanelAkr = new PanelAKR(panelBase);
+               Panel panelBase = CreateBtrPanel(panelMountGroup.Key);
+               var panelAkr = new PanelAKR(panelBase);
+               foreach (var itemPanelSb in panelMountGroup)
+                  itemPanelSb.PanelAkr = panelAkr;
             }
             catch (Exception ex)
             {
-               Inspector.AddError("Не создана панель {0}. Ошибка - {1}", panelMount.MarkSb, ex.Message);
+               Inspector.AddError($"Не создана панель {panelMountGroup.Key}. Ошибка - {ex.Message}");
             }
          }         
       }

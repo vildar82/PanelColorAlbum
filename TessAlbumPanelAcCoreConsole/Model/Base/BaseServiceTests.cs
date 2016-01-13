@@ -31,7 +31,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          baseService.ReadPanelsFromBase();
       }
 
-      [Test]
+      [Test(Description ="Считывание баы панелей из XML")]
       public void ReadPanelsFromXmlTest()
       {         
          int expectedCount = baseService.CountPanelsInBase;
@@ -39,7 +39,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          Assert.AreNotEqual(expectedCount, 0);
       }
 
-      [Test]
+      [Test(Description ="Тест создания нескольких блоков панелей АКР")]
       public void CreateBtrPanelFromBase([Values("3НСг 72.29.32-5", "3НСг 72.29.32-1", "3НСг 72.29.32", "3НСг 72.29.32-16")] string mark)
       {
          // Тест создания определения блока панели по описанию в xml базе.                  

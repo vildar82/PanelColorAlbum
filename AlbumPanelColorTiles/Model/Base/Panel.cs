@@ -7,11 +7,14 @@ using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System.Xml.Serialization;
+using AlbumPanelColorTiles.PanelLibrary;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
    public partial class Panel
    {
+      private string _markWithoutElectric;
+
       [XmlIgnore]
       public BaseService Service { get; set; }
       [XmlIgnore]
@@ -20,6 +23,18 @@ namespace AlbumPanelColorTiles.Model.Base
       public List<Extents3d> Openings { get; set; }
       [XmlIgnore]
       public ObjectId IdBtrPanel { get; set; }
+      [XmlIgnore]
+      public string MarkWithoutElectric
+      {
+         get
+         {
+            if (string.IsNullOrEmpty(_markWithoutElectric))
+            {
+               _markWithoutElectric = MountingPanel.GetMarkWithoutElectric(markField);
+            }
+            return _markWithoutElectric;
+         }
+      }
 
       /// <summary>
       /// Создание определения блока панели по описанию из базы XML от конструкторов.
@@ -37,14 +52,14 @@ namespace AlbumPanelColorTiles.Model.Base
          // Имя для блока панели АКР
          // Пока без "Щечек" и без окон
 
-         BlNameAkr = Settings.Default.BlockPanelAkrPrefixName + mark;
+         BlNameAkr = Settings.Default.BlockPanelAkrPrefixName + MarkWithoutElectric;
 
          // Ошибка если блок с таким именем уже есть
-         if (bt.Has(this.mark))
+         if (bt.Has(BlNameAkr))
          {
             throw new Autodesk.AutoCAD.Runtime.Exception(
                            Autodesk.AutoCAD.Runtime.ErrorStatus.DuplicateBlockName, 
-                           "Блок с именем {0} уже определен в чертеже".f(this.mark));
+                           $"Блок с именем {BlNameAkr} уже определен в чертеже");
          }
 
          BlockTableRecord btrPanel = new BlockTableRecord();
