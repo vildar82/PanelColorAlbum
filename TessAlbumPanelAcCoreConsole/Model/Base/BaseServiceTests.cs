@@ -40,7 +40,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
       }
 
       [Test]
-      public void CreateBtrPanelFromBase([Values("3НСг 72.29.32-5", "3НСг 72.29.32-1", "3НСг 72.29.32", "3НСг 72.29.32-16")] string mark) 
+      public void CreateBtrPanelFromBase([Values("3НСг 72.29.32-5", "3НСг 72.29.32-1", "3НСг 72.29.32", "3НСг 72.29.32-16")] string mark)
       {
          // Тест создания определения блока панели по описанию в xml базе.                  
          Panel panel;
@@ -49,24 +49,21 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
 
          using (var db = new Database(false, true))
-         {  
+         {
             db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
             db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
-            {               
+            {
                using (var t = db.TransactionManager.StartTransaction())
                {
                   baseService.InitToCreationPanels(db);
                   panel = baseService.CreateBtrPanel(mark);
-                  t.Commit();                  
-               }               
+                  t.Commit();
+               }
             }
             db.SaveAs(testFile, DwgVersion.Current);
-         }                  
-         });
-      }
-
+         }
          Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
-      } 
+      }       
    }
 }
