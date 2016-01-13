@@ -58,7 +58,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public void CreateBlockPlans()
       {
          _numberFloor = 2;
-         _ed.WriteMessage($"\nКоманда создания блока {_planTypeName} плана.");
+         _ed.WriteMessage($"\nКоманда создания блока блоков монтажных и архитектурных планов.");
          createFloor();
       }     
 
@@ -167,11 +167,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
          string floorBlockName;
          if (string.IsNullOrEmpty(_section))
          {
-            floorBlockName = string.Format("{0}эт-{1}", _prefixBlockName, indexFloor);
+            floorBlockName = $"{_prefixBlockName}эт-{indexFloor}";
          }
          else
          {
-            floorBlockName = string.Format("{0}С{1}_эт-{2}", _prefixBlockName, _section, indexFloor);
+            floorBlockName = $"{_prefixBlockName}С{_section}_эт-{indexFloor}";
          }
          if (!checkBlock(floorBlockName))
          {
@@ -186,7 +186,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // Запрос номера этажа
       private void getNumberFloor()
       {
-         var opt = new PromptIntegerOptions("\nВведи номер этажа монтажного плана");
+         var opt = new PromptIntegerOptions($"\nВведи номер этажа {_planTypeName} плана");
          opt.DefaultValue = _numberFloor;
          opt.Keywords.Add(_planTypeName);
          string keySection = "Секция" + _section;
@@ -260,7 +260,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       private List<ObjectId> selectFloor(string indexFloor)
       {
          var selOpt = new PromptSelectionOptions();
-         selOpt.MessageForAdding = string.Format("\nВыбор объектов монтажного плана {0} этажа", indexFloor);
+         selOpt.MessageForAdding = $"\nВыбор объектов {_planTypeName} плана {indexFloor} этажа";
          var selRes = _ed.GetSelection(selOpt);
          if (selRes.Status == PromptStatus.OK)
          {
