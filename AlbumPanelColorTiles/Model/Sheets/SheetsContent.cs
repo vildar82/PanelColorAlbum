@@ -263,7 +263,7 @@ namespace AlbumPanelColorTiles.Sheets
             //lm.CopyLayout(nameLay, nameCopy);
             AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy);
          }
-         return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;
+         return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;         
       }
    }
 }

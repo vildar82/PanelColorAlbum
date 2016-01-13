@@ -20,6 +20,7 @@ namespace TessAlbumPanelAcCoreConsole
          {
             string fileDwgTest = @"c:\temp\test\АКР\TestsAcCoreConsole\Test.dwg";
             db.ReadDwgFile(fileDwgTest, FileOpenMode.OpenForReadAndAllShare, false, "");
+            db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
                SelectionBlocks select = new SelectionBlocks();
