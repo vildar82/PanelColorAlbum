@@ -27,6 +27,14 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          RightTop
       }
 
+      public static ObjectId CreateLayerContourPanel()
+      {
+         // Создание контура плитки
+         var layer = new AcadLib.Layers.LayerInfo("АР_Контур-панели");
+         layer.LineWeight = LineWeight.LineWeight030;
+         return AcadLib.Layers.LayerExt.GetLayerOrCreateNew(layer);
+      }
+
       public void CreateContour(BlockTableRecord btr)
       {
          if (panelBtr.ExtentsByTile.Diagonal() < 100)

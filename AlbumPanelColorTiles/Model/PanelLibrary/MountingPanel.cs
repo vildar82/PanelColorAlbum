@@ -19,13 +19,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public Extents3d ExtTransToModel { get; private set; }
       public ObjectId IdBlRef { get; private set; }      
       public string MarkPainting { get; private set; }
+      public string MarkSb { get; private set; }
       public string MarkSbWithoutElectric { get; private set; }      
-      public PanelAKR PanelAkrLib { get; private set; }
+      public PanelAKR PanelAkr { get; set; }
       public Point3d PtCenterPanelSbInModel { get; private set; }
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
-         
+         MarkSb = mark;
          MarkSbWithoutElectric = GetMarkWithoutElectric(mark);//.Replace(' ', '-');
          // Проверка есть ли запись Окна _ОК1 в имени марки панели
          string windowSx;
@@ -172,7 +173,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      {
                         idsPanelsAkrInLibAndFacade.Add(panelAkrLib.IdBtrAkrPanel, panelAkrLib);
                      }
-                     panelSb.PanelAkrLib = panelAkrLib;
+                     panelSb.PanelAkr = panelAkrLib;
                   }
                }
                // Копирование блоков в базу чертежа фасада
@@ -195,10 +196,6 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // определение отметок этажей Ч и П в фасадах
          facades.ForEach(f => f.DefYForUpperAndParapetStorey());
       }
-
-      
-
-      
 
       private static PanelAKR findAkrPanelFromPanelSb(MountingPanel panelSb, List<PanelAKR> panelsAkrInLib)
       {

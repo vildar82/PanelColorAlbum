@@ -37,6 +37,15 @@
     <AssemblyVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyVersionSettings>
     <AssemblyFileVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyFileVersionSettings>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugConsole|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugConsole\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcadLib">
       <HintPath>..\..\..\..\AcadLib\AcadLib\bin\Release\AcadLib.dll</HintPath>
@@ -108,6 +117,11 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Base\BaseService.cs" />
+    <Compile Include="Model\Base\CreatePanelsBtrEnvironment.cs" />
+    <Compile Include="Model\Base\DimensionAbstract.cs" />
+    <Compile Include="Model\Base\DimensionFacade.cs" />
+    <Compile Include="Model\Base\DimensionForm.cs" />
+    <Compile Include="Model\Base\Panel.cs" />
     <Compile Include="Model\Base\Panels.cs">
       <DependentUpon>Panels.xsd</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -153,7 +167,7 @@
       <DependentUpon>FormPanelDesc.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\PanelLibrary\LibEditor\LibraryEditor.cs" />
-    <Compile Include="Model\PanelLibrary\MountingPlans.cs" />
+    <Compile Include="Model\PanelLibrary\BlockPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelAKR.cs" />
     <Compile Include="Model\PanelLibrary\PanelAkrFacade.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibraryLoadService.cs" />
@@ -294,6 +308,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Doc\Построение фасадов.docx" />
     <None Include="Model\Base\Panels.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -321,9 +336,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="Model\Base\Panels.xml">
+    <None Include="Model\Base\Panels.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets" Condition="Exists('..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets')" />

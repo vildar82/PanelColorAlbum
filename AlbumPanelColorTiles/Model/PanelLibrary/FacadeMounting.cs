@@ -51,11 +51,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      captionFloor(facade.XMin, yFloor, floor, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
                      {
-                        if (panelSb.PanelAkrLib != null)
+                        if (panelSb.PanelAkr != null)
                         {
                            Point3d ptPanelAkr = new Point3d(panelSb.ExtTransToModel.MinPoint.X, yFloor, 0);
                            //testGeom(panelSb, facade, floor, yFloor, t, ms);
-                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkrLib.IdBtrPanelAkrInFacade);
+                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkr.IdBtrPanelAkrInFacade);
                            blRefPanelAkr.Layer = floor.Storey.Layer;
                            ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
@@ -76,7 +76,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // удаление старых АКР-Панелей фасадов
          Database db = HostApplicationServices.WorkingDatabase;
          // список всех акр панелей в модели
-         List<ObjectId> idsBlRefPanelAkr = Panel.GetPanelsBlRefInModel(db);
+         List<ObjectId> idsBlRefPanelAkr = Panels.Panel.GetPanelsBlRefInModel(db);
 
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.SetLimit(idsBlRefPanelAkr.Count);
@@ -105,7 +105,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// Получение фасадов из блоков монтажных планов и обозначений стороны фасада в чертеже
       /// </summary>
       /// <returns></returns>
-      public static List<FacadeMounting> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ)
+      public static List<FacadeMounting> GetFacadesFromMountingPlans(PanelLibraryLoadService libLoadServ = null)
       {
          List<FacadeMounting> facades = new List<FacadeMounting>();
 
@@ -146,7 +146,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var floorUpper = Floors.Where(f => f.Storey.Type == EnumStorey.Upper).FirstOrDefault();
          if (floorUpper != null)
          {
-            var maxHeightPanel = floorUpper.PanelsSbInFront.Where(p => p.PanelAkrLib != null)?.Max(p => p.PanelAkrLib?.HeightPanelByTile);
+            var maxHeightPanel = floorUpper.PanelsSbInFront.Where(p => p.PanelAkr != null)?.Max(p => p.PanelAkr?.HeightPanelByTile);
             if (maxHeightPanel.HasValue)
             {
                floorUpper.Storey.Y = yLastNumberFloor + Settings.Default.FacadeFloorHeight;
@@ -159,7 +159,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             yParapet = yParapet != 0 ? yParapet : yLastNumberFloor + Settings.Default.FacadeFloorHeight;
             floorParapet.Storey.Y = yParapet;
-            var maxHeightPanel = floorParapet.PanelsSbInFront.Where(p => p.PanelAkrLib != null)?.Max(p => p.PanelAkrLib?.HeightPanelByTile);
+            var maxHeightPanel = floorParapet.PanelsSbInFront.Where(p => p.PanelAkr != null)?.Max(p => p.PanelAkr?.HeightPanelByTile);
             if (maxHeightPanel.HasValue)
             {
                floorParapet.Height = maxHeightPanel.Value;

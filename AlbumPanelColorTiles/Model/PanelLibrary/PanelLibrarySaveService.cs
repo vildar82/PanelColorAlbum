@@ -230,10 +230,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          msgReport = string.Empty;
          using (var dbLib = new Database(false, true))
-         {
+         {            
             try
             {
                dbLib.ReadDwgFile(LibPanelsFilePath, FileShare.Read, false, "");
+               dbLib.CloseInput(true);
             }
             catch (Exception ex)
             {

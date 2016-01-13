@@ -16,6 +16,7 @@ using System.Xml.Serialization;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
+
    /// <remarks/>
    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
    [System.SerializableAttribute()]
@@ -54,7 +55,13 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private Gab gabField;
 
+      private Cheeks cheeksField;
+
       private Windows windowsField;
+
+      private Balcony balconyField;
+
+      private Undercuts undercutsField;
 
       private string markField;
 
@@ -74,6 +81,20 @@ namespace AlbumPanelColorTiles.Model.Base
 
       /// <remarks/>
       [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Cheeks cheeks
+      {
+         get
+         {
+            return this.cheeksField;
+         }
+         set
+         {
+            this.cheeksField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
       public Windows windows
       {
          get
@@ -83,6 +104,34 @@ namespace AlbumPanelColorTiles.Model.Base
          set
          {
             this.windowsField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Balcony balcony
+      {
+         get
+         {
+            return this.balconyField;
+         }
+         set
+         {
+            this.balconyField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Undercuts undercuts
+      {
+         get
+         {
+            return this.undercutsField;
+         }
+         set
+         {
+            this.undercutsField = value;
          }
       }
 
@@ -139,6 +188,32 @@ namespace AlbumPanelColorTiles.Model.Base
          set
          {
             this.heightField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Cheeks
+   {
+
+      private string cheekField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public string cheek
+      {
+         get
+         {
+            return this.cheekField;
+         }
+         set
+         {
+            this.cheekField = value.Trim();
          }
       }
    }
@@ -281,6 +356,148 @@ namespace AlbumPanelColorTiles.Model.Base
          set
          {
             this.zField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Balcony
+   {
+
+      private double widthField;
+
+      private double heightField;
+
+      private Posi posiField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public double width
+      {
+         get
+         {
+            return this.widthField;
+         }
+         set
+         {
+            this.widthField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public double height
+      {
+         get
+         {
+            return this.heightField;
+         }
+         set
+         {
+            this.heightField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Posi posi
+      {
+         get
+         {
+            return this.posiField;
+         }
+         set
+         {
+            this.posiField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Undercuts
+   {
+
+      private Undercut[] undercutField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute("undercut", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Undercut[] undercut
+      {
+         get
+         {
+            return this.undercutField;
+         }
+         set
+         {
+            this.undercutField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Undercut
+   {
+
+      private double widthField;
+
+      private double heightField;
+
+      private Posi posiField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public double width
+      {
+         get
+         {
+            return this.widthField;
+         }
+         set
+         {
+            this.widthField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public double height
+      {
+         get
+         {
+            return this.heightField;
+         }
+         set
+         {
+            this.heightField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Posi posi
+      {
+         get
+         {
+            return this.posiField;
+         }
+         set
+         {
+            this.posiField = value;
          }
       }
    }

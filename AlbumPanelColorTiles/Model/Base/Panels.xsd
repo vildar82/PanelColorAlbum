@@ -4,19 +4,26 @@
     <xs:complexType>
       <xs:sequence maxOccurs ="unbounded">
         <xs:element name="Panel">
-          <xs:complexType>
+          <xs:complexType>            
             <xs:sequence maxOccurs="1" minOccurs="1">
-              <xs:element name="gab">
+              <xs:element name="gab" minOccurs="1" maxOccurs="1">
                 <xs:complexType>
-                  <xs:sequence>
+                  <xs:sequence maxOccurs="1" minOccurs="1">
                     <xs:element name="length" type="xs:double" />
                     <xs:element name="height" type="xs:double" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="windows" maxOccurs="1">
+              <xs:element name="cheeks" minOccurs="0" maxOccurs="1">
                 <xs:complexType>
-                  <xs:sequence maxOccurs="unbounded">
+                  <xs:sequence minOccurs="0">
+                    <xs:element name="cheek" type="xs:string" />                    
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="windows" maxOccurs="1" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence maxOccurs="unbounded" minOccurs="0">
                     <xs:element name="window">
                       <xs:complexType>
                         <xs:sequence maxOccurs ="1">
@@ -37,9 +44,49 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="balcony" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence maxOccurs="1" minOccurs="0">
+                    <xs:element name="width" type="xs:double" />
+                    <xs:element name="height" type="xs:double" />
+                    <xs:element name="posi" maxOccurs="1" minOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence maxOccurs="1">
+                          <xs:element name="X" type="xs:double" />
+                          <xs:element name="Y" type="xs:double" />
+                          <xs:element name="Z" type="xs:double" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="undercuts" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence maxOccurs="unbounded" minOccurs="0">
+                    <xs:element name="undercut">
+                      <xs:complexType>
+                        <xs:sequence maxOccurs ="1">
+                          <xs:element name="width" type="xs:double" />
+                          <xs:element name="height" type="xs:double" />
+                          <xs:element name="posi" maxOccurs="1" minOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence maxOccurs="1">
+                                <xs:element name="X" type="xs:double" />
+                                <xs:element name="Y" type="xs:double" />
+                                <xs:element name="Z" type="xs:double" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
             <xs:attribute name="mark" type="xs:string" use="required" />
-          </xs:complexType>
+          </xs:complexType>          
         </xs:element>
       </xs:sequence>
     </xs:complexType>

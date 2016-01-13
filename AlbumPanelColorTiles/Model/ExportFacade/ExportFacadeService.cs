@@ -48,13 +48,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          CPS.DefinePanels(facades);
 
          using (Database dbExport = new Database(!_fileExport.IsExistsFileExport, true))
-         {
+         {            
             if (_fileExport.IsExistsFileExport)
             {
                // удалить старые панели из файла экспорта
                try
                {
-                  dbExport.ReadDwgFile(_fileExport.FileExportFacade.FullName, FileShare.Read, true, "");
+                  dbExport.ReadDwgFile(_fileExport.FileExportFacade.FullName, FileShare.Read, true, "");                  
                }
                catch (Exception ex)
                {
@@ -67,6 +67,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                dbExport.CloseInput(true);
                deletePanels(dbExport);
             }
+            dbExport.CloseInput(true);
             CPS.DbExport = dbExport;
 
             // Копирование панелей АР в экспортный файл

@@ -152,7 +152,7 @@ namespace AlbumPanelColorTiles
                   else
                   {
                      // Подпись марки блока
-                     string panelMark = btr.Name.Substring(Settings.Default.BlockPanelPrefixName.Length);
+                     string panelMark = btr.Name.Substring(Settings.Default.BlockPanelAkrPrefixName.Length);
                      captionPanels.AddMarkToPanelBtr(panelMark, idBtr);
                   }
                }
@@ -259,8 +259,7 @@ namespace AlbumPanelColorTiles
 
          // Определение зон покраски в Модели
          _colorAreas = ColorArea.GetColorAreas(SymbolUtilityServices.GetBlockModelSpaceId(_db), this);
-         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);
-
+         RTree<ColorArea> rtreeColorAreas = ColorArea.GetRTree(_colorAreas);         
          // Бонус - покраска блоков плитки разложенных просто в Модели
          Tile.PaintTileInModel(rtreeColorAreas);
 

@@ -74,7 +74,7 @@ namespace AlbumPanelColorTiles
                       "\nAKR-CreateMountingPlanBlocks - создание блоков монтажек из монтажных планов конструкторов." +
                       "\nAKR-CopyDictionary - копирование словаря текущего чертежа в другой чертеж. В словаре хранится список переименований панелей, индекс проекта, номер первого этажа." +
                       "\nИмена блоков и слоев:" +
-                      "\nБлоки панелей с префиксом - " + Settings.Default.BlockPanelPrefixName + ", дальше марка СБ, без скобок в конце." +
+                      "\nБлоки панелей с префиксом - " + Settings.Default.BlockPanelAkrPrefixName + ", дальше марка СБ, без скобок в конце." +
                       "\nБлок зоны покраски (на слое марки цвета для плитки) - " + Settings.Default.BlockColorAreaName +
                       "\nБлок плитки (разложенная в блоке панели) - " + Settings.Default.BlockTileName +
                       "\nБлок обозначения стороны фасада на монтажном плане - " + Settings.Default.BlockFacadeName +
@@ -231,25 +231,25 @@ namespace AlbumPanelColorTiles
       /// <summary>
       /// Создание блоков монтажных планов (создаются блоки с именем вида АКР_Монтажка_2).
       /// </summary>
-      [CommandMethod("PIK", "AKR-CreateMountingPlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
-      public void CreateMountingPlanBlocksCommand()
+      [CommandMethod("PIK", "AKR-CreatePlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      public void CreatePlanBlocksCommand()
       {
-         Log.Info("Start Command: AKR-CreateMountingPlanBlocks");
+         Log.Info("Start Command: AKR-CreatePlanBlocks");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
          using (var DocLock = doc.LockDocument())
          {
             try
             {
-               MountingPlans mountingPlans = new MountingPlans();
-               mountingPlans.CreateMountingPlans();
+               BlockPlans mountingPlans = new BlockPlans();
+               mountingPlans.CreateBlockPlans();
             }
             catch (System.Exception ex)
             {
                doc.Editor.WriteMessage("\n{0}", ex.Message);
                if (!ex.Message.Contains("Отменено пользователем"))
-               {
-                  Log.Error(ex, "Command: AKR-CreateMountingPlanBlocks. {0}", doc.Name);
+               {                  
+                  Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
                }
             }
          }
@@ -728,7 +728,7 @@ namespace AlbumPanelColorTiles
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;                  
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
                      var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform , null);
@@ -759,7 +759,7 @@ namespace AlbumPanelColorTiles
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockMountingPlanePrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
                      var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
                      var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform, null);
@@ -790,7 +790,7 @@ namespace AlbumPanelColorTiles
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                {
                   if (!btr.ExtensionDictionary.IsNull)
                   {
@@ -826,7 +826,7 @@ namespace AlbumPanelColorTiles
             foreach (ObjectId idBtr in bt)
             {
                var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (btr.Name.StartsWith(Settings.Default.BlockPanelPrefixName))
+               if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                {
                   var blRef = new BlockReference(pt, idBtr);
                   ms.AppendEntity(blRef);
@@ -863,7 +863,7 @@ namespace AlbumPanelColorTiles
          Database db = doc.Database;
 
          BaseService baseService = new BaseService();
-         baseService.LoadPanels();
+         //baseService.LoadPanels();
       }      
    }
 }

@@ -19,6 +19,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public ObjectId IdBtrAkrPanel { get; private set; }      
       public string MarkAkr { get; private set; }
       public ObjectId IdBtrPanelAkrInFacade { get; set; }
+      public Model.Base.Panel PanelBase { get; private set; }
 
       public PanelAKR(ObjectId idBtrAkrPanel, string blName)
       {
@@ -34,6 +35,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   
          // Список объектов в блоке
          EntInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);
+      }
+
+      public PanelAKR (Model.Base.Panel panel)
+      {
+         PanelBase = panel;
+         IdBtrPanelAkrInFacade = panel.IdBtrPanel;
       }
 
       public void DefineGeom(ObjectId idBtrPanelAkr)
