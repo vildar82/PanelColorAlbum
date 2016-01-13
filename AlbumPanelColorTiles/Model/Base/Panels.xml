@@ -1,41 +1,46 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<Panels>
-	<Panel mark = "3НСг 75.29.32-9П1">
-		<gab>
-			<length> 7489.0 </length>
-			<height> 2788.0 </height>
-		</gab>
-		<cheeks>
-			<cheek> left </cheek>			
-			<cheek> right </cheek>
-		</cheeks>
-		<windows>
-			<window>
-				<width> 2094.0 </width>
-				<height> 1805.0 </height>
-				<posi>
-					<X> 894.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
-			</window>
-			<window>
-				<width> 2100.0 </width>
-				<height> 1805.0 </height>
-				<posi>
-					<X> 4494.0 </X> <Y> 489.0 </Y> <Z> 0.0 </Z>
-				</posi>
-			</window>
-		</windows>
-		<balconys>  </balconys>
-		<undercuts>
-			<undercut>
-				<width> 2100.0 </width>
-				<height> 200.0 </height>
-				<posi>
-					<X> 4494.0 </X> <Y> 2608.0 </Y> <Z> 0.0 </Z>
-				</posi>
-			</undercut>
-		</undercuts>
-	</Panel>
+<Panels xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Panels.xsd">	
+  <Panel mark = "3НСг 75.29.32-9П1">
+    <gab>
+      <length> 7489.0 </length>
+      <height> 2788.0 </height>
+    </gab>
+    <cheeks>
+      <cheek> left </cheek>
+    </cheeks>
+    <windows>
+      <window>
+        <width> 2094.0 </width>
+        <height> 1805.0 </height>
+        <posi>
+          <X> 894.0 </X>
+          <Y> 489.0 </Y>
+          <Z> 0.0 </Z>
+        </posi>
+      </window>
+      <window>
+        <width> 2100.0 </width>
+        <height> 1805.0 </height>
+        <posi>
+          <X> 4494.0 </X>
+          <Y> 489.0 </Y>
+          <Z> 0.0 </Z>
+        </posi>
+      </window>
+    </windows>
+    <balconys>  </balconys>
+    <undercuts>
+      <undercut>
+        <width> 2100.0 </width>
+        <height> 200.0 </height>
+        <posi>
+          <X> 4494.0 </X>
+          <Y> 2608.0 </Y>
+          <Z> 0.0 </Z>
+        </posi>
+      </undercut>
+    </undercuts>
+  </Panel>
 	<Panel mark = "3НСНг60.29.42-14-1-1э">
 		<gab>
 			<length> 5988.0 </length>
@@ -244,8 +249,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -322,10 +325,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> left </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -351,8 +351,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -515,8 +513,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> left </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -543,7 +539,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -630,7 +625,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -757,10 +751,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -785,10 +776,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -814,8 +802,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -892,10 +878,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1800.0 </width>
@@ -920,10 +903,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1790.0 </width>
@@ -949,8 +929,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -978,8 +956,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -1006,10 +982,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1800.0 </width>
@@ -1130,10 +1103,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1800.0 </width>
@@ -1217,8 +1187,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -1297,7 +1265,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -1470,8 +1437,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -1525,8 +1490,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -1603,9 +1566,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -1663,8 +1624,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -1899,7 +1858,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -1927,8 +1885,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -1971,7 +1927,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -2012,7 +1967,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2127,10 +2081,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 600.0 </width>
@@ -2250,8 +2201,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2315,8 +2264,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2344,8 +2291,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2661,7 +2606,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2704,7 +2648,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2796,7 +2739,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -2887,8 +2829,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -3028,7 +2968,6 @@
 		</gab>
 		<cheeks>
 			<cheek> right </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -3139,8 +3078,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -3227,7 +3164,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -3397,10 +3333,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -3426,10 +3359,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> left </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -3463,8 +3393,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -3631,7 +3559,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -3723,10 +3650,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -3946,8 +3870,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -4668,8 +4590,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -4705,8 +4625,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -4903,8 +4821,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -5106,8 +5022,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -5278,10 +5192,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>  </windows>
 		<balconys>  </balconys>
 		<undercuts>  </undercuts>
@@ -5553,10 +5464,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1796.0 </width>
@@ -5652,10 +5560,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1797.0 </width>
@@ -5732,8 +5637,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -5880,8 +5783,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -5902,8 +5803,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -5930,10 +5829,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -5958,10 +5854,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -6054,8 +5947,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -6895,7 +6786,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -6916,8 +6806,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -6971,8 +6859,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -7027,8 +6913,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -7077,8 +6961,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -7439,8 +7321,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -7509,8 +7389,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -7562,10 +7440,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -7590,10 +7465,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 600.0 </width>
@@ -8067,10 +7939,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -8095,10 +7964,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 600.0 </width>
@@ -8139,8 +8005,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -8192,8 +8056,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -8246,8 +8108,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -9237,10 +9097,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -9265,10 +9122,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -9357,10 +9211,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -9385,10 +9236,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -9445,10 +9293,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1503.0 </width>
@@ -9473,10 +9318,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 900.0 </width>
@@ -9702,10 +9544,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -9755,10 +9594,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -9820,10 +9656,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 900.0 </width>
@@ -9848,10 +9681,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -9982,10 +9812,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -10049,7 +9876,6 @@
 			<height> 2788.0 </height>
 		</gab>
 		<cheeks>
-			<cheek> right </cheek>
 			<cheek> right </cheek>
 		</cheeks>
 		<windows>
@@ -10240,10 +10066,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -10268,10 +10091,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -10339,8 +10159,6 @@
 		</gab>
 		<cheeks>
 			<cheek> left </cheek>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
 		</cheeks>
 		<windows>
 			<window>
@@ -10878,10 +10696,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -10977,10 +10792,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -11005,10 +10817,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1500.0 </width>
@@ -11033,10 +10842,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 2100.0 </width>
@@ -11054,10 +10860,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 1503.0 </width>
@@ -11082,10 +10885,7 @@
 			<length> 7188.0 </length>
 			<height> 2788.0 </height>
 		</gab>
-		<cheeks>
-			<cheek> left </cheek>
-			<cheek> right </cheek>
-		</cheeks>
+		<cheeks>  </cheeks>
 		<windows>
 			<window>
 				<width> 900.0 </width>
