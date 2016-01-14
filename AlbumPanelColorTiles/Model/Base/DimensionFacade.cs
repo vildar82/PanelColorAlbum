@@ -13,7 +13,7 @@ namespace AlbumPanelColorTiles.Model.Base
    // Образмеривание панели (на Фасаде)
    public class DimensionFacade : DimensionAbstract
    {
-      public DimensionFacade(BlockTableRecord btrPanel, Transaction t, Panel panel) : base(btrPanel, t, panel)
+      public DimensionFacade(BlockTableRecord btrPanel, Transaction t, PanelBase panel) : base(btrPanel, t, panel)
       {
 
       }

@@ -36,6 +36,7 @@ namespace TestAKRAutoCAD.Model.Base
             {
                // Определение фасадов
                List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
+               List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db);
                
                // Очиста чертежа от блоков панелей АКР
                baseService.ClearPanelsAkrFromDrawing(db);
@@ -44,7 +45,7 @@ namespace TestAKRAutoCAD.Model.Base
                {                  
                   // Создание определений блоков панелей по базе 
                   baseService.InitToCreationPanels(db);
-                  baseService.CreateBtrPanels(facadesMounting);
+                  baseService.CreateBtrPanels(facadesMounting, floorsAr);
 
                   // Создание фасадов
                   FacadeMounting.CreateFacades(facadesMounting);
@@ -52,7 +53,7 @@ namespace TestAKRAutoCAD.Model.Base
                   t.Commit();
                }
             }
-            db.SaveAs(testFile, DwgVersion.Current);
+            db.SaveAs(@"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-CreateFacade.dwg", DwgVersion.Current);
          }
          if (Inspector.HasErrors)
          {

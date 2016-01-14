@@ -23,6 +23,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public string MarkSbWithoutElectric { get; private set; }      
       public PanelAKR PanelAkr { get; set; }
       public Point3d PtCenterPanelSbInModel { get; private set; }
+      public Point3d PtBlRef { get; private set; }
+      public Model.Base.PanelBase PanelBase { get; set; }      
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
@@ -39,6 +41,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          ExtTransToModel = extBlRefPanel;         
          IdBlRef = blRefPanelSB.Id;
          AttrDet = attrsDet;
+         PtBlRef = blRefPanelSB.Position;
          PtCenterPanelSbInModel = getCenterPanelInModel();
       }      
       
