@@ -11,14 +11,14 @@ namespace AlbumPanelColorTiles.Model.Base
 {
    public class DimensionForm : DimensionAbstract
    {
-      public DimensionForm(BlockTableRecord btrPanel, Transaction t, Panel panel) : base(btrPanel, t, panel)
+      public DimensionForm(BlockTableRecord btrPanel, Transaction t, PanelBase panel) : base(btrPanel, t, panel)
       {
 
       }
 
       public void Create()
       {
-         double xCenter = panel.gab.length * 0.5;
+         double xCenter = panel.Panel.gab.length * 0.5;
          Matrix3d matrixMirr = Matrix3d.Mirroring(new Line3d(new Point3d(xCenter, 0, 0), new Point3d(xCenter, 1000, 0)));
 
          // Создание определения блока образмеривыания - пустого

@@ -11,26 +11,31 @@ using AlbumPanelColorTiles.PanelLibrary;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
-   public partial class Panel
+   public class PanelBase
    {
       private string _markWithoutElectric;
-
-      [XmlIgnore]
-      public BaseService Service { get; set; }
-      [XmlIgnore]
+      
+      public BaseService Service { get; private set; }      
       public string BlNameAkr { get; set; }
-      [XmlIgnore]
-      public List<Extents3d> Openings { get; set; }
-      [XmlIgnore]
+      public string WindowsPrefix { get; set; }
+      public List<Extents3d> Openings { get; set; }      
       public ObjectId IdBtrPanel { get; set; }
-      [XmlIgnore]
+      public Panel Panel { get; private set; }
+      public Dictionary<Point3d, string> WindowsBase { get; set; } = new Dictionary<Point3d, string>();
+
+      public PanelBase(Panel panelXml, BaseService service)
+      {
+         Panel = panelXml;
+         Service = service;
+      }
+
       public string MarkWithoutElectric
       {
          get
          {
             if (string.IsNullOrEmpty(_markWithoutElectric))
             {
-               _markWithoutElectric = MountingPanel.GetMarkWithoutElectric(markField);
+               _markWithoutElectric = MountingPanel.GetMarkWithoutElectric(Panel.mark);
             }
             return _markWithoutElectric;
          }
@@ -42,9 +47,8 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       /// <exception cref="Autodesk.AutoCAD.Runtime.Exception">DuplicateBlockName</exception>
       /// <returns>ObjectId созданного определения блока в текущей базе.</returns>            
-      public void CreateBlock(BaseService service)
-      {
-         Service = service;
+      public void CreateBlock()
+      {         
          Openings = new List<Extents3d>();         
          Database db = HostApplicationServices.WorkingDatabase;
          Transaction t = db.TransactionManager.TopTransaction;
@@ -52,7 +56,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Имя для блока панели АКР
          // Пока без "Щечек" и без окон
 
-         BlNameAkr = Settings.Default.BlockPanelAkrPrefixName + MarkWithoutElectric;
+         BlNameAkr = defineBlockPanelAkrName();
 
          // Ошибка если блок с таким именем уже есть
          if (bt.Has(BlNameAkr))
@@ -84,7 +88,23 @@ namespace AlbumPanelColorTiles.Model.Base
          // Образмеривание (в Форме)
          DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
          dimForm.Create();         
-      }      
+      }
+
+      private string defineBlockPanelAkrName()
+      {
+         string blName = Settings.Default.BlockPanelAkrPrefixName + MarkWithoutElectric;
+
+         // щечки
+         string cheek = Panel.cheeks?.cheek;
+         if (!string.IsNullOrWhiteSpace(cheek))
+         {
+            string cheekPrefix = cheek.Equals("right", StringComparison.OrdinalIgnoreCase) ? "_тп" : "_тл";
+            blName += cheekPrefix;
+         }
+         blName += WindowsPrefix;
+
+         return blName;
+      }
 
       private Polyline createContour()
       {
@@ -92,20 +112,19 @@ namespace AlbumPanelColorTiles.Model.Base
          plContour.LayerId = Service.Env.IdLayerContourPanel;
 
          plContour.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
-         plContour.AddVertexAt(0, new Point2d(0, this.gab.height), 0, 0, 0);
-         plContour.AddVertexAt(0, new Point2d(this.gab.length, this.gab.height), 0, 0, 0);
-         plContour.AddVertexAt(0, new Point2d(this.gab.length, 0), 0, 0, 0);
+         plContour.AddVertexAt(0, new Point2d(0, Panel.gab.height), 0, 0, 0);
+         plContour.AddVertexAt(0, new Point2d(Panel.gab.length, Panel.gab.height), 0, 0, 0);
+         plContour.AddVertexAt(0, new Point2d(Panel.gab.length, 0), 0, 0, 0);
          plContour.Closed= true;
 
          return plContour;
       }
 
       private void addWindows(BlockTableRecord btrPanel, Transaction t)
-      {
-         // Пока данных по окнам из Архитектуры нет - добавление контура окон.
-         if (this.windows?.window != null)
+      {         
+         if (Panel.windows?.window != null)
          {
-            foreach (var item in this.windows.window)
+            foreach (var item in Panel.windows.window)
             {
                Polyline plWindow = new Polyline();
                plWindow.LayerId = Service.Env.IdLayerContourPanel;
@@ -120,6 +139,18 @@ namespace AlbumPanelColorTiles.Model.Base
                t.AddNewlyCreatedDBObject(plWindow, true);
 
                Openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
+
+               // Поиск соотв марки окна
+               var xCenter = item.posi.X + item.width * 0.5;
+               var winMark = WindowsBase.First(w => (w.Key.X - xCenter) < 500);
+               if (!string.IsNullOrWhiteSpace(winMark.Value))
+               {
+                  DBText dbTextWin = new DBText();
+                  dbTextWin.Position = new Point3d(item.posi.X, item.posi.Y, 0);
+                  dbTextWin.TextString = winMark.Value;
+                  btrPanel.AppendEntity(dbTextWin);
+                  t.AddNewlyCreatedDBObject(dbTextWin, true);
+               }
             }
             // Сортировка окон слева-направо
             Openings.Sort((w1, w2) => w1.MinPoint.X.CompareTo(w2.MinPoint.X));
@@ -128,9 +159,9 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
-         for (int x = 0; x < this.gab.length- Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+ Settings.Default.TileSeam)
+         for (int x = 0; x < Panel.gab.length- Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+ Settings.Default.TileSeam)
          {
-            for (int y = 0; y < this.gab.height- Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
+            for (int y = 0; y < Panel.gab.height- Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
             {
                Point3d pt = new Point3d(x, y, 0);
 

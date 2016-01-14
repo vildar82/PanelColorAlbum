@@ -43,7 +43,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
       public void CreateBtrPanelFromBase([Values("3НСг 72.29.32-5", "3НСг 72.29.32-1", "3НСг 72.29.32", "3НСг 72.29.32-16")] string mark)
       {
          // Тест создания определения блока панели по описанию в xml базе.                  
-         Panel panel;
+         PanelBase panelBase;
 
          string testFile = @"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\" + mark + ".dwg";
          File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
@@ -57,13 +57,15 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
                using (var t = db.TransactionManager.StartTransaction())
                {
                   baseService.InitToCreationPanels(db);
-                  panel = baseService.CreateBtrPanel(mark);
+                  Panel panelXml = baseService.GetPanelXml(mark);
+                  panelBase = new PanelBase(panelXml, baseService);
+                  panelBase.CreateBlock();
                   t.Commit();
                }
             }
             db.SaveAs(testFile, DwgVersion.Current);
          }
-         Assert.AreNotEqual(panel.IdBtrPanel, ObjectId.Null);
+         Assert.AreNotEqual(panelBase.IdBtrPanel, ObjectId.Null);
       }       
    }
 }

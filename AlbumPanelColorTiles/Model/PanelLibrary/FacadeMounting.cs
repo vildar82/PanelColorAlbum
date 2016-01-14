@@ -13,16 +13,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
    // Фасад - это ряд блоков монтажных планов этажей с блоками обозначения стороны плана фасада - составляющие один фасада дома
    public class FacadeMounting
    {
-      public List<Floor> Floors { get; private set; }
+      public List<FloorMounting> Floors { get; private set; }
       public Point3d PosPtFloors { get; private set; }
       public double XMax { get; private set; }
       public double XMin { get; private set; }
 
-      public FacadeMounting(Floor floor)
+      public FacadeMounting(FloorMounting floor)
       {
          XMin = floor.XMin;
          PosPtFloors = floor.PosBlMounting;
-         Floors = new List<Floor>();
+         Floors = new List<FloorMounting>();
       }
       
       public static void CreateFacades(List<FacadeMounting> facades)
@@ -51,15 +51,26 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      captionFloor(facade.XMin, yFloor, floor, ms, t);
                      foreach (var panelSb in floor.PanelsSbInFront)
                      {
-                        if (panelSb.PanelAkr != null)
+                        if (panelSb.PanelAkr != null || panelSb.PanelBase !=null)
                         {
                            Point3d ptPanelAkr = new Point3d(panelSb.ExtTransToModel.MinPoint.X, yFloor, 0);
                            //testGeom(panelSb, facade, floor, yFloor, t, ms);
-                           var blRefPanelAkr = new BlockReference(ptPanelAkr, panelSb.PanelAkr.IdBtrPanelAkrInFacade);
+                           ObjectId idBtrPanelAkr;
+                           if (panelSb.PanelBase != null)
+                           {
+                              if (panelSb.PanelBase.IdBtrPanel.IsNull) continue;                              
+                              idBtrPanelAkr = panelSb.PanelBase.IdBtrPanel;
+                           }
+                           else
+                           {
+                              idBtrPanelAkr = panelSb.PanelAkr.IdBtrPanelAkrInFacade;
+                           }
+                           
+                           var blRefPanelAkr = new BlockReference(ptPanelAkr, idBtrPanelAkr);
                            blRefPanelAkr.Layer = floor.Storey.Layer;
                            ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
-                           blRefPanelAkr.Draw();
+                           //blRefPanelAkr.Draw();
                         }
                      }
                      progress.MeterProgress();
@@ -110,7 +121,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          List<FacadeMounting> facades = new List<FacadeMounting>();
 
          // Поиск всех блоков монтажных планов в Модели чертежа с соотв обозначением стороны фасада
-         List<Floor> floors = Floor.GetMountingBlocks(libLoadServ);
+         List<FloorMounting> floors = FloorMounting.GetMountingBlocks(libLoadServ);
 
          // Упорядочивание блоков этажей в фасады (блоки монтажек по вертикали образуют фасад)
          // сортировка блоков монтажек по X, потом по Y (все монтажки в одну вертикаль снизу вверх)
@@ -167,7 +178,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
       
-      private static void captionFloor(double x, double yFloor, Floor floor, BlockTableRecord ms, Transaction t)
+      private static void captionFloor(double x, double yFloor, FloorMounting floor, BlockTableRecord ms, Transaction t)
       {
          // Подпись номера этажа
          DBText textFloor = new DBText();

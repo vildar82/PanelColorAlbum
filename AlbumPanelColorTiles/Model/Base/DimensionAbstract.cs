@@ -15,11 +15,11 @@ namespace AlbumPanelColorTiles.Model.Base
    {
       protected BlockTableRecord btrDim;
       protected BlockTableRecord btrPanel;
-      protected Panel panel;
+      protected PanelBase panel;
       protected Transaction t;
       protected ObjectId idBlRefDim;
 
-      public DimensionAbstract(BlockTableRecord btrPanel, Transaction t, Panel panel)
+      public DimensionAbstract(BlockTableRecord btrPanel, Transaction t, PanelBase panel)
       {
          this.btrPanel = btrPanel;
          this.t = t;
@@ -58,7 +58,7 @@ namespace AlbumPanelColorTiles.Model.Base
       protected void sizesBot()
       {
          Point3d ptBotLeft = new Point3d(0, 0, 0);
-         Point3d ptBotRight = new Point3d(panel.gab.length, 0, 0);
+         Point3d ptBotRight = new Point3d(panel.Panel.gab.length, 0, 0);
          double yTotal = -250 - 200;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
          createDim(ptBotLeft, ptBotRight, ptDimLineTotal, false, Matrix3d.Identity);
@@ -72,9 +72,9 @@ namespace AlbumPanelColorTiles.Model.Base
       protected void sizesTop(bool doTrans, Matrix3d trans)
       {         
          // Общий размер
-         Point3d ptTopLeft = new Point3d(0, panel.gab.height, 0);
-         Point3d ptTopRight = new Point3d(panel.gab.length, panel.gab.height, 0);
-         double yTotal = panel.Openings.Count > 1 ? panel.gab.height + 250 + 200 : panel.gab.height + 250;
+         Point3d ptTopLeft = new Point3d(0, panel.Panel.gab.height, 0);
+         Point3d ptTopRight = new Point3d(panel.Panel.gab.length, panel.Panel.gab.height, 0);
+         double yTotal = panel.Openings.Count > 0 ? panel.Panel.gab.height + 250 + 200 : panel.Panel.gab.height + 250;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
          createDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans);
 

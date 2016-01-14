@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.Panels
 {
+   // Описание блока Секции
    public class Section : IComparable<Section>
    {
       private int _num;

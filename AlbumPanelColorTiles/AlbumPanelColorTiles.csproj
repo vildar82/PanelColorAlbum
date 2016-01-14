@@ -99,6 +99,10 @@
       <HintPath>..\..\..\..\Package\Excel\EPPlus.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MoreLinq, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.1.4.0\lib\net35\MoreLinq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -121,6 +125,7 @@
     <Compile Include="Model\Base\DimensionAbstract.cs" />
     <Compile Include="Model\Base\DimensionFacade.cs" />
     <Compile Include="Model\Base\DimensionForm.cs" />
+    <Compile Include="Model\Base\FloorArchitect.cs" />
     <Compile Include="Model\Base\Panel.cs" />
     <Compile Include="Model\Base\Panels.cs">
       <DependentUpon>Panels.xsd</DependentUpon>
@@ -152,7 +157,7 @@
     <Compile Include="Model\PanelLibrary\EntityInfo.cs" />
     <Compile Include="Model\PanelLibrary\FacadeMounting.cs" />
     <Compile Include="Model\PanelLibrary\FacadeFrontBlock.cs" />
-    <Compile Include="Model\PanelLibrary\Floor.cs" />
+    <Compile Include="Model\PanelLibrary\FloorMounting.cs" />
     <Compile Include="Model\PanelLibrary\FormPanelAkrList.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -10,7 +10,7 @@ using Autodesk.AutoCAD.Geometry;
 namespace AlbumPanelColorTiles.PanelLibrary
 {
    // Этаж - блоки АКР-панелей этажа и связаннный с ним блок монтажки с блоком обозначения стороны фасада
-   public class Floor : IComparable<Floor>
+   public class FloorMounting : IComparable<FloorMounting>
    {
       public List<MountingPanel> AllPanelsSbInFloor { get; private set; }
       public string BlRefName { get; private set; }
@@ -23,10 +23,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public PanelLibraryLoadService LibLoadServ { get; private set; }
       public List<MountingPanel> PanelsSbInFront { get; private set; }
       public Storey Storey { get; private set; }
+      public int Section { get; set; }
       public double XMax { get; private set; }
       public double XMin { get; private set; }
 
-      public Floor(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
+      public FloorMounting(BlockReference blRefMounting, PanelLibraryLoadService libLoadServ)
       {
          IdBtrMounting = blRefMounting.BlockTableRecord;
          PosBlMounting = blRefMounting.Position;
@@ -34,6 +35,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          IdBlRefMounting = blRefMounting.Id;
          BlRefName = blRefMounting.Name;
          Transform = blRefMounting.BlockTransform;
+         definePlanSection(blRefMounting);
 
          //defFloorNameAndNumber(blRefMounting);
 
@@ -46,9 +48,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       /// <summary>
       /// Поиск всех блоков монтажек в модели
       /// </summary>
-      public static List<Floor> GetMountingBlocks(PanelLibraryLoadService libLoadServ)
+      public static List<FloorMounting> GetMountingBlocks(PanelLibraryLoadService libLoadServ)
       {
-         List<Floor> floors = new List<Floor>();
+         List<FloorMounting> floors = new List<FloorMounting>();
          var db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
@@ -75,7 +77,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
                   if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                   {
-                     Floor floor = new Floor(blRefMounting, libLoadServ);
+                     FloorMounting floor = new FloorMounting(blRefMounting, libLoadServ);
                      floor.GetAllPanels();
                      // найти соотв обозн стороны фасада                              
                      var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
@@ -116,7 +118,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          XMax = getXMaxFloor();
       }
 
-      public int CompareTo(Floor other)
+      public int CompareTo(FloorMounting other)
       {
          return Storey.CompareTo(other.Storey);
       }
@@ -194,6 +196,28 @@ namespace AlbumPanelColorTiles.PanelLibrary
             XMax = PanelsSbInFront.Max(p => p.ExtTransToModel.MaxPoint.X);
             XMin = PanelsSbInFront.Min(p => p.ExtTransToModel.MinPoint.X);
          }
+      }
+
+      private void definePlanSection(BlockReference blRefMountPlan)
+      {
+         // Номер плана и номер секции
+         var val = blRefMountPlan.Name.Substring(Settings.Default.BlockPlaneMountingPrefixName.Length);
+         var arrSplit = val.Split('_');
+         string numberPart;
+         if (arrSplit.Length > 1)
+         {
+            int section;
+            string sectionPart = arrSplit[0].Substring(1);
+            if (int.TryParse(sectionPart, out section))
+            {
+               Section = section;
+            }
+            else
+            {
+               Inspector.AddError($"Монтажный план {blRefMountPlan.Name}. Не определен номер секции {sectionPart}.");
+            }
+            numberPart = arrSplit[1];
+         }         
       }
    }
 }

@@ -41,7 +41,7 @@
   <ItemGroup>
     <Reference Include="AcadLib">
       <HintPath>..\..\..\..\AcadLib\AcadLib\bin\Release\AcadLib.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="AcCoreMgd, Version=20.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoCAD.NET.Core.20.1.0\lib\45\AcCoreMgd.dll</HintPath>
@@ -76,6 +76,7 @@
     <Compile Include="CADtestApp.cs" />
     <Compile Include="CADtestRunner.cs" />
     <Compile Include="Model\Base\BaseServiceTests.cs" />
+    <Compile Include="Model\Base\FloorArchitectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
