@@ -442,7 +442,7 @@ namespace AlbumPanelColorTiles
                }
                catch (System.Exception ex)
                {
-                  doc.Editor.WriteMessage(ex.Message);
+                  doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
                   Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
                }
             }
@@ -514,68 +514,67 @@ namespace AlbumPanelColorTiles
             do
             {               
                var optPrompt = new PromptKeywordOptions("Печатать листы текущего чертежа или из папки?");
-               optPrompt.Keywords.Add("Текущего");
-               optPrompt.Keywords.Add("Папки");
+            optPrompt.Keywords.Add("Текущего");
+            optPrompt.Keywords.Add("Папки");
                optPrompt.Keywords.Add("Сортировка");
                optPrompt.Keywords.Default = "Папки";
 
-               var resPrompt = ed.GetKeywords(optPrompt);
-               if (resPrompt.Status == PromptStatus.OK)
+            var resPrompt = ed.GetKeywords(optPrompt);            
+            if (resPrompt.Status == PromptStatus.OK)
+            {
+               if (resPrompt.StringResult == "Текущего")
                {
-                  if (resPrompt.StringResult == "Текущего")
-                  {
                      repeat = false;
-                     Log.Info("Текущего");
+                  Log.Info("Текущего");
+                  try
+                  {
+                     if (!File.Exists(doc.Name))
+                     {
+                        throw new System.Exception("Нужно сохранить текущий чертеж.");
+                     }
+                     string filePdfName = Path.Combine(Path.GetDirectoryName(doc.Name), Path.GetFileNameWithoutExtension(doc.Name) + ".pdf");
+                     AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(new string[] { doc.Name }, filePdfName);
+                        plotter.LayoutSort = layoutSort;
+                     plotter.Plot();
+                  }
+                  catch (System.Exception ex)
+                  {
+                     ed.WriteMessage("\n" + ex.Message);
+                     if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        Log.Error(ex, "plotter.PlotCur(); {0}", doc.Name);
+                     }
+                  }
+               }
+               else if (resPrompt.StringResult == "Папки")
+               {
+                     repeat = false;
+                  Log.Info("Папки");
+                  var dialog = new FileFolderDialog();
+                  dialog.Dialog.Title = "Выбор папки для печати чертежей в PDF (зайти в нужную папку и нажать открыть)";                  
+                  if (_album == null)
+                  {
+                     dialog.Dialog.InitialDirectory = Path.GetDirectoryName(doc.Name);
+                  }
+                  else
+                  {
+                     dialog.Dialog.InitialDirectory = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
+                  }
+                  if (dialog.ShowDialog() == DialogResult.OK)
+                  {
                      try
                      {
-                        if (!File.Exists(doc.Name))
-                        {
-                           throw new System.Exception("Нужно сохранить текущий чертеж.");
-                        }
-                        string filePdfName = Path.Combine(Path.GetDirectoryName(doc.Name), Path.GetFileNameWithoutExtension(doc.Name) + ".pdf");
-                        AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(new string[] { doc.Name }, filePdfName);
-                        plotter.LayoutSort = layoutSort;
+                        AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(dialog.SelectedPath);
+                           plotter.LayoutSort = layoutSort;
                         plotter.Plot();
                      }
                      catch (System.Exception ex)
                      {
-                        ed.WriteMessage("\n" + ex.Message);
-                        if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+                        ed.WriteMessage("\n{0}", ex.Message);
+                        if (!ex.Message.Contains("Отменено пользователем"))
                         {
-                           Log.Error(ex, "plotter.PlotCur(); {0}", doc.Name);
+                           Log.Error(ex, "plotter.PlotDir({0}); {1}", dialog.SelectedPath, doc.Name);
                         }
-                     }
-                  }
-                  else if (resPrompt.StringResult == "Папки")
-                  {
-                     repeat = false;
-                     Log.Info("Папки");
-                     var dialog = new FolderBrowserDialog();
-                     dialog.Description = "Выбор папки для печати чертежов из нее в PDF";
-                     dialog.ShowNewFolderButton = false;
-                     if (_album == null)
-                     {
-                        dialog.SelectedPath = Path.GetDirectoryName(doc.Name);
-                     }
-                     else
-                     {
-                        dialog.SelectedPath = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
-                     }
-                     if (dialog.ShowDialog() == DialogResult.OK)
-                     {
-                        try
-                        {
-                           AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(dialog.SelectedPath);
-                           plotter.LayoutSort = layoutSort;
-                           plotter.Plot();
-                        }
-                        catch (System.Exception ex)
-                        {
-                           ed.WriteMessage("\n{0}", ex.Message);
-                           if (!ex.Message.Contains("Отменено пользователем"))
-                           {
-                              Log.Error(ex, "plotter.PlotDir({0}); {1}", dialog.SelectedPath, doc.Name);
-                           }
                         }
                      }
                   }
@@ -597,10 +596,10 @@ namespace AlbumPanelColorTiles
                         else if (res.StringResult == "Имена")
                         {
                            layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.LayoutNames;
-                        }
                      }
                   }
                }
+            }
             } while (repeat);
          }
       }
