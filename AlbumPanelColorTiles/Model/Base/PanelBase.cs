@@ -8,6 +8,8 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System.Xml.Serialization;
 using AlbumPanelColorTiles.PanelLibrary;
+using AcadLib.Errors;
+using MoreLinq;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
@@ -17,7 +19,7 @@ namespace AlbumPanelColorTiles.Model.Base
       
       public BaseService Service { get; private set; }      
       public string BlNameAkr { get; set; }
-      public string WindowsPrefix { get; set; }
+      public int WindowsIndex { get; set; }
       public List<Extents3d> Openings { get; set; }      
       public ObjectId IdBtrPanel { get; set; }
       public Panel Panel { get; private set; }
@@ -50,7 +52,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public void CreateBlock()
       {         
          Openings = new List<Extents3d>();         
-         Database db = HostApplicationServices.WorkingDatabase;
+         Database db = Service.Db;
          Transaction t = db.TransactionManager.TopTransaction;
          BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable;
          // Имя для блока панели АКР
@@ -101,7 +103,10 @@ namespace AlbumPanelColorTiles.Model.Base
             string cheekPrefix = cheek.Equals("right", StringComparison.OrdinalIgnoreCase) ? "_тп" : "_тл";
             blName += cheekPrefix;
          }
-         blName += WindowsPrefix;
+         if (WindowsIndex >0)
+         {
+            blName += Settings.Default.WindowPanelSuffix + WindowsIndex;
+         }         
 
          return blName;
       }
@@ -126,6 +131,7 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             foreach (var item in Panel.windows.window)
             {
+               // контур окон
                Polyline plWindow = new Polyline();
                plWindow.LayerId = Service.Env.IdLayerContourPanel;
                Point2d ptMinWindow = new Point2d(item.posi.X, item.posi.Y);
@@ -140,22 +146,46 @@ namespace AlbumPanelColorTiles.Model.Base
 
                Openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
 
-               // Поиск соотв марки окна
-               var xCenter = item.posi.X + item.width * 0.5;
-               var winMark = WindowsBase.First(w => (w.Key.X - xCenter) < 500);
-               if (!string.IsNullOrWhiteSpace(winMark.Value))
+               // Вставка окон
+               if (WindowsBase.Count > 0)
                {
-                  DBText dbTextWin = new DBText();
-                  dbTextWin.Position = new Point3d(item.posi.X, item.posi.Y, 0);
-                  dbTextWin.TextString = winMark.Value;
-                  btrPanel.AppendEntity(dbTextWin);
-                  t.AddNewlyCreatedDBObject(dbTextWin, true);
+                  var xCenter = item.posi.X + item.width * 0.5;
+                  var winMarkMin = WindowsBase.Where(w => (w.Key.X - xCenter) < 600);                  
+                  if (winMarkMin.Count()>0)
+                  {
+                     var winMark = winMarkMin.MinBy(g => (g.Key.X - xCenter));
+                     if (string.IsNullOrWhiteSpace(winMark.Value))
+                     {
+                        continue;
+                     }
+
+                     // Точка вставки блока окна
+                     Point3d ptWin = new Point3d(item.posi.X, item.posi.Y, 0);
+                     // Вставка блока окна                  
+                     BlockReference blRefWin = new BlockReference(ptWin, Service.Env.IdBtrWindow);
+                     blRefWin.LayerId = Service.Env.IdLayerWindow;
+                     btrPanel.AppendEntity(blRefWin);
+                     t.AddNewlyCreatedDBObject(blRefWin, true);
+
+                     var resSetDyn = setDynBlWinMark(blRefWin, winMark.Value);
+                     if (!resSetDyn)
+                     {
+                        // Добавление текста марки окна
+                        DBText dbTextWin = new DBText();
+                        dbTextWin.Position = ptWin;
+                        dbTextWin.LayerId = Service.Env.IdLayerWindow;
+                        dbTextWin.TextString = winMark.Value;
+                        dbTextWin.Height = 180;
+                        btrPanel.AppendEntity(dbTextWin);
+                        t.AddNewlyCreatedDBObject(dbTextWin, true);
+                     }                     
+                  }
                }
             }
             // Сортировка окон слева-направо
             Openings.Sort((w1, w2) => w1.MinPoint.X.CompareTo(w2.MinPoint.X));
          }
-      }
+      }      
 
       private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
@@ -181,6 +211,46 @@ namespace AlbumPanelColorTiles.Model.Base
       private bool openingsContainPoint(Point3d pt)
       {
          return Openings.Any(b => b.IsPointInBounds(pt));
+      }
+
+      private void insertWindowBlock(string mark, Point3d pt, BlockTableRecord btrPanel, Transaction t)
+      {
+         // Вставка блока окна                  
+         BlockReference blRefWin = new BlockReference(pt, Service.Env.IdBtrWindow);
+         blRefWin.LayerId = Service.Env.IdLayerWindow;
+         btrPanel.AppendEntity(blRefWin);
+         t.AddNewlyCreatedDBObject(blRefWin, true);
+
+         setDynBlWinMark(blRefWin, mark);
+      }
+
+      private bool setDynBlWinMark(BlockReference blRefWin, string mark)
+      {
+         bool res = false;
+         bool findProp = false;         
+         var dynProps = blRefWin.DynamicBlockReferencePropertyCollection;
+         foreach (DynamicBlockReferenceProperty item in dynProps)
+         {
+            if (item.PropertyName == "Видимость")
+            {
+               findProp = true;
+               var allowedVals = item.GetAllowedValues();
+               if (allowedVals.Contains(mark))
+               {
+                  item.Value = mark;
+                  res = true;
+               }
+               else
+               {
+                  Inspector.AddError($"Блок окна. Отсутствует видимость для марки окна {mark}");                  
+               }               
+            }
+         }
+         if (!findProp)
+         {
+            Inspector.AddError("Блок окна. Не найдено динамическое свойтво блока окна Видимость");
+         }
+         return res;         
       }
    }
 }

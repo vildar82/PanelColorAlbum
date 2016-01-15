@@ -17,13 +17,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
    {
       public List<AttributeRefDetail> AttrDet { get; private set; }
       public Extents3d ExtTransToModel { get; private set; }
-      public ObjectId IdBlRef { get; private set; }      
+      public Extents3d ExtBlRefClean { get; private set; }
+      public ObjectId IdBlRef { get; private set; }
+      public ObjectId IdBtr { get; private set; }
       public string MarkPainting { get; private set; }
       public string MarkSb { get; private set; }
       public string MarkSbWithoutElectric { get; private set; }      
       public PanelAKR PanelAkr { get; set; }
-      public Point3d PtCenterPanelSbInModel { get; private set; }
-      public Point3d PtBlRef { get; private set; }
+      public Point3d PtCenterPanelSbInModel { get; private set; }      
       public Model.Base.PanelBase PanelBase { get; set; }      
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
@@ -37,11 +38,12 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          MarkPainting = painting;
          var extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;         
+         ExtBlRefClean = extBlRefPanel;
          extBlRefPanel.TransformBy(trans);
          ExtTransToModel = extBlRefPanel;         
          IdBlRef = blRefPanelSB.Id;
-         AttrDet = attrsDet;
-         PtBlRef = blRefPanelSB.Position;
+         IdBtr = blRefPanelSB.BlockTableRecord;
+         AttrDet = attrsDet;         
          PtCenterPanelSbInModel = getCenterPanelInModel();
       }      
       

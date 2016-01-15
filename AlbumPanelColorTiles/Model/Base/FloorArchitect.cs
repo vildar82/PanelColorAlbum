@@ -16,10 +16,12 @@ namespace AlbumPanelColorTiles.Model.Base
    {
       public int Section { get; private set; }
       public int Number { get; private set; }
+      public string BlName { get; private set; }
       public Dictionary<Point3d, string> Windows { get; private set; }
 
       public FloorArchitect(BlockReference blRefArPlan)
       {
+         BlName = blRefArPlan.Name;
          // определение параметров плана и окон
          definePlanNumberAndSection(blRefArPlan.Name);
          // определение окон в плане
@@ -111,11 +113,18 @@ namespace AlbumPanelColorTiles.Model.Base
                      }
                      var markNear = markNearKey.First();
                      windows.Add(blRefWindow.Position, markNear.Value);
-                     DBText dbText = new DBText();
-                     dbText.Position = blRefWindow.Position;
-                     dbText.TextString = markNear.Value;
-                     btrArPlan.AppendEntity(dbText);
-                     btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(dbText, true);
+                     //Test Добавить точку окна и найденную марку окна в точку вставки блока окна
+                     {
+                        DBPoint ptWin = new DBPoint(blRefWindow.Position);
+                        btrArPlan.AppendEntity(ptWin);
+                        btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWin, true);
+
+                        DBText dbText = new DBText();
+                        dbText.Position = blRefWindow.Position;
+                        dbText.TextString = markNear.Value;
+                        btrArPlan.AppendEntity(dbText);
+                        btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(dbText, true);
+                     }
                   }
                }
             }

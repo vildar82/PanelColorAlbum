@@ -35,7 +35,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public void InitToCreationPanels(Database db)
       {
          Db = db;
-         Env = new CreatePanelsBtrEnvironment(this); 
+         Env = new CreatePanelsBtrEnvironment(this);
+         Env.LoadAllEnv();
       }
 
       public void ReadPanelsFromBase()
@@ -120,18 +121,29 @@ namespace AlbumPanelColorTiles.Model.Base
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
       {
          // Список создаваемых панелей - уникальные блоки панелей по СБ и Окнам из Архитектуры.
-         var panelsBase = matchingWindow(facadesMounting, floorsAr);         
-         foreach (var panelBase in panelsBase.Values)
+         var panelsBaseGroup = matchingWindow(facadesMounting, floorsAr).Values.GroupBy(p => p.Panel.mark);
+
+         foreach (var itemGroupPanelByMark in panelsBaseGroup)
          {
-            try
-            {  
-               panelBase.CreateBlock();               
-            }
-            catch (Exception ex)
+            // Нумерация индексов окон
+            if (itemGroupPanelByMark.Count()>1)
             {
-               Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
+               // Панели отличающиеся сочетанием окон - пронумеровать индекс окна
+               int index = 1;
+               itemGroupPanelByMark.ForEach(p => p.WindowsIndex = index++);
             }
-         }         
+            foreach (var panelBase in itemGroupPanelByMark)
+            {
+               try
+               {
+                  panelBase.CreateBlock();
+               }
+               catch (Exception ex)
+               {
+                  Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
+               }
+            }            
+         }        
       }
 
       private Dictionary<string, PanelBase> matchingWindow(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
@@ -139,48 +151,79 @@ namespace AlbumPanelColorTiles.Model.Base
          // Определение окон в монтажных планах по архитектурным планам
          var panelsBase = new Dictionary<string, PanelBase>(); // string - ключ - маркаСБ + Марки Окон по порядку.
          // Список монтажных планов - уникальных
-         var floorsMountUniq = facadesMounting.SelectMany(f => f.Floors).DistinctBy(f => f.BlRefName);
-         foreach (var floorMount in floorsMountUniq)
+         var floorsMount = facadesMounting.SelectMany(f => f.Floors);
+         foreach (var floorMount in floorsMount)
          {
             // Найти соотв арх план
             var floorAr = floorsAr.Find(f => (f.Section == floorMount.Section) && (f.Number == floorMount.Storey?.Number));
+
+            //Test Добавить текст имени плана Ар в блок монтажного плана
             if (floorAr != null)
             {
-               // Для каждой панели найти марки окон в арх плане
-               foreach (var panelMount in floorMount.AllPanelsSbInFloor)
+               using (var btrMount = floorMount.IdBtrMounting.GetObject(OpenMode.ForWrite) as BlockTableRecord)
                {
-                  Panel panelXml = GetPanelXml(panelMount.MarkSb);
-                  if (panelXml == null) continue;
-                  PanelBase panelBase = new PanelBase(panelXml, this);
-                  // Определение окон в панели по арх плану
+                  DBText textFindPlanAr = new DBText();
+                  textFindPlanAr.TextString = floorAr.BlName;
+                  btrMount.AppendEntity(textFindPlanAr);
+                  btrMount.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(textFindPlanAr, true);
+               }
+            }
+
+            if (floorAr == null)
+            {
+               Inspector.AddError($"Не найден блок архитектурного плана для соответствующего монтажного плана {floorMount.BlRefName}");
+            }
+
+            foreach (var panelMount in floorMount.PanelsSbInFront)
+            {
+               Panel panelXml = GetPanelXml(panelMount.MarkSb);
+               if (panelXml == null) continue;
+               PanelBase panelBase = new PanelBase(panelXml, this);
+               // Определение окон в панели по арх плану
+               if (floorAr != null)
+               {
                   foreach (var window in panelXml.windows.window)
                   {
                      // Точка окна внутри панели
-                     Point3d ptOpening = new Point3d (window.posi.X + window.width * 0.5, 0, 0);
+                     Point3d ptOpening = new Point3d(window.posi.X + window.width * 0.5, 0, 0);
                      // Точка окна внутри монтажного плана
-                     Point3d ptWindInMountPlan = panelMount.PtBlRef.Add(ptOpening.GetAsVector());
-                     var windowKey = floorAr.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInMountPlan)).MinBy(w=>w.Key);
-                     if (windowKey == null || windowKey.Key>1000)
+                     Point3d ptWindInMountPlan = panelMount.ExtBlRefClean.MinPoint.Add(ptOpening.GetAsVector());
+
+                     // Test Добавление точек окна в блоке монтажки
                      {
-                        Inspector.AddError($"Не найдено соответствующее окно в архитектурном плане.", panelMount.ExtTransToModel, panelMount.IdBlRef);
+                        using (var btrMountPlan = floorMount.IdBtrMounting.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+                        {
+                           DBPoint ptWinInPlan = new DBPoint(ptWindInMountPlan);
+                           btrMountPlan.AppendEntity(ptWinInPlan);
+                           btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInPlan, true);
+                        }
+                     }
+
+                     var windowKey = floorAr.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInMountPlan)).MinBy(w => w.Key);
+                     if (windowKey == null || windowKey.Key > 600)
+                     {
+                        Inspector.AddError(
+                           $"Не найдено соответствующее окно в архитектурном плане. Блок монтажной панели {panelMount.MarkSb}",
+                           panelMount.ExtTransToModel, panelMount.IdBlRef);
                         continue;
                      }
                      panelBase.WindowsBase.Add(ptOpening, windowKey.First().Value);
                   }
-                  // Уникальный ключ панели - МаркаСБ + Марки окон                  
-                  string key = panelBase.MarkWithoutElectric + string.Join(";", panelBase.WindowsBase.Values);
-                  PanelBase panelBaseUniq;
-                  if (!panelsBase.TryGetValue(key, out panelBaseUniq))
-                  {
-                     panelsBase.Add(key, panelBase);
-                     panelBaseUniq = panelBase;
-                  }
-                  panelMount.PanelBase = panelBaseUniq;
                }
-            }
-            else
-            {
-               Inspector.AddError($"Не найден блок архитектурного плана для соответствующего монтажного плана {floorMount.BlRefName}");
+               // Уникальный ключ панели - МаркаСБ + Марки окон                    
+               string key = panelBase.MarkWithoutElectric;
+               if (panelBase.WindowsBase.Count > 0)
+               {
+                  string windowMarks = string.Join(";", panelBase.WindowsBase.Values);
+                  key += windowMarks;
+               }               
+               PanelBase panelBaseUniq;
+               if (!panelsBase.TryGetValue(key, out panelBaseUniq))
+               {
+                  panelsBase.Add(key, panelBase);
+                  panelBaseUniq = panelBase;
+               }
+               panelMount.PanelBase = panelBaseUniq;
             }
          }
          return panelsBase;
