@@ -152,6 +152,9 @@
     </Compile>
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
+    <Compile Include="Model\Lib\FileFolderDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Model\Options\SerializerXml.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
     <Compile Include="Model\PanelLibrary\EntityInfo.cs" />

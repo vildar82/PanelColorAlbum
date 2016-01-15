@@ -442,7 +442,7 @@ namespace AlbumPanelColorTiles
                }
                catch (System.Exception ex)
                {
-                  doc.Editor.WriteMessage(ex.Message);
+                  doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
                   Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
                }
             }
@@ -541,16 +541,15 @@ namespace AlbumPanelColorTiles
                else if (resPrompt.StringResult == "Папки")
                {
                   Log.Info("Папки");
-                  var dialog = new FolderBrowserDialog();
-                  dialog.Description = "Выбор папки для печати чертежов из нее в PDF";
-                  dialog.ShowNewFolderButton = false;
+                  var dialog = new FileFolderDialog();
+                  dialog.Dialog.Title = "Выбор папки для печати чертежей в PDF (зайти в нужную папку и нажать открыть)";                  
                   if (_album == null)
                   {
-                     dialog.SelectedPath = Path.GetDirectoryName(doc.Name);
+                     dialog.Dialog.InitialDirectory = Path.GetDirectoryName(doc.Name);
                   }
                   else
                   {
-                     dialog.SelectedPath = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
+                     dialog.Dialog.InitialDirectory = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
                   }
                   if (dialog.ShowDialog() == DialogResult.OK)
                   {
