@@ -126,7 +126,7 @@
     <Compile Include="Model\Base\DimensionFacade.cs" />
     <Compile Include="Model\Base\DimensionForm.cs" />
     <Compile Include="Model\Base\FloorArchitect.cs" />
-    <Compile Include="Model\Base\Panel.cs" />
+    <Compile Include="Model\Base\PanelBase.cs" />
     <Compile Include="Model\Base\Panels.cs">
       <DependentUpon>Panels.xsd</DependentUpon>
     </Compile>

@@ -23,26 +23,27 @@ namespace TestAKRAutoCAD.Model.Base
          baseService.ReadPanelsFromBase();
          doc = Application.DocumentManager.MdiActiveDocument;
       }
-      
+
       public void CreateFacadeTest()
       {
          Inspector.Clear();
          string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
-         using (var db = new Database(false, true))
-         {
-            db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
-            db.CloseInput(true);
+
+         var docTest = Application.DocumentManager.Open(testFile);
+         using (var ld = docTest.LockDocument())
+         {            
+            var db = docTest.Database;
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
                // Определение фасадов
                List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
                List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db);
-               
+
                // Очиста чертежа от блоков панелей АКР
                baseService.ClearPanelsAkrFromDrawing(db);
 
                using (var t = db.TransactionManager.StartTransaction())
-               {                  
+               {
                   // Создание определений блоков панелей по базе 
                   baseService.InitToCreationPanels(db);
                   baseService.CreateBtrPanels(facadesMounting, floorsAr);
@@ -54,12 +55,13 @@ namespace TestAKRAutoCAD.Model.Base
                }
             }
             db.SaveAs(@"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-CreateFacade.dwg", DwgVersion.Current);
-         }
-         if (Inspector.HasErrors)
-         {
-            Inspector.Show();
-         }
-         doc.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + testFile);
+
+            if (Inspector.HasErrors)
+            {
+               Inspector.Show();
+            }
+            docTest.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + testFile);
+         }                     
       }
    }
 }

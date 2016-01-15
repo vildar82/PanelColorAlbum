@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
 using TestAKRAutoCAD.Model.Base;
 
@@ -12,11 +13,16 @@ namespace TestAKRAutoCAD
 {
    public class CommandsTest
    {
-      [CommandMethod("TestCreateFacade")]
+      [CommandMethod("TestCreateFacade", CommandFlags.Session)]
       public void TestCreateFacade()
       {
-         BaseServiceTests baseTest = new BaseServiceTests();
-         baseTest.CreateFacadeTest();
+         Document doc = Application.DocumentManager.MdiActiveDocument;
+
+         using (var ld = doc.LockDocument())
+         {
+            BaseServiceTests baseTest = new BaseServiceTests();
+            baseTest.CreateFacadeTest();
+         }
       }
    }
 }
