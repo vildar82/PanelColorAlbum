@@ -40,7 +40,9 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
       }
 
       [Test(Description ="Тест создания нескольких блоков панелей АКР")]
-      public void CreateBtrPanelFromBase([Values("3НСг 72.29.32-5", "3НСг 72.29.32-1", "3НСг 72.29.32", "3НСг 72.29.32-16")] string mark)
+      public void CreateBtrPanelFromBase(
+         [Values("3НСг 72.29.32-5", "3НСг 72.29.32-1", "3НСг 72.29.32", "3НСг 72.29.32-16", "3НСг 75.29.32-10БП3")]
+         string mark)
       {
          // Тест создания определения блока панели по описанию в xml базе.                  
          PanelBase panelBase;

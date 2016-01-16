@@ -10,6 +10,7 @@ using System.Xml.Serialization;
 using AlbumPanelColorTiles.PanelLibrary;
 using AcadLib.Errors;
 using MoreLinq;
+using AlbumPanelColorTiles.Model.Base.CreatePanel;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
@@ -55,9 +56,8 @@ namespace AlbumPanelColorTiles.Model.Base
          Database db = Service.Db;
          Transaction t = db.TransactionManager.TopTransaction;
          BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable;
+         
          // Имя для блока панели АКР
-         // Пока без "Щечек" и без окон
-
          BlNameAkr = defineBlockPanelAkrName();
 
          // Ошибка если блок с таким именем уже есть
@@ -76,10 +76,10 @@ namespace AlbumPanelColorTiles.Model.Base
          // Добавление полилинии контура
          Polyline plContour = createContour();         
          btrPanel.AppendEntity(plContour);
-         t.AddNewlyCreatedDBObject(plContour, true);
+         t.AddNewlyCreatedDBObject(plContour, true);        
 
          // Добавление окон
-         addWindows(btrPanel, t);
+         addWindows(btrPanel, t);         
 
          // заполнение плиткой
          addTiles(btrPanel, t);
@@ -90,7 +90,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Образмеривание (в Форме)
          DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
          dimForm.Create();         
-      }
+      }      
 
       private string defineBlockPanelAkrName()
       {
@@ -113,16 +113,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private Polyline createContour()
       {
-         Polyline plContour = new Polyline();
-         plContour.LayerId = Service.Env.IdLayerContourPanel;
-
-         plContour.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
-         plContour.AddVertexAt(0, new Point2d(0, Panel.gab.height), 0, 0, 0);
-         plContour.AddVertexAt(0, new Point2d(Panel.gab.length, Panel.gab.height), 0, 0, 0);
-         plContour.AddVertexAt(0, new Point2d(Panel.gab.length, 0), 0, 0, 0);
-         plContour.Closed= true;
-
-         return plContour;
+         Contour contour = new Contour(this);
+         return contour.Create();         
       }
 
       private void addWindows(BlockTableRecord btrPanel, Transaction t)
@@ -195,7 +187,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Point3d pt = new Point3d(x, y, 0);
 
-               if (!openingsContainPoint(pt))
+               if (!tileInOpenings(pt))
                {
                   BlockReference blRefTile = new BlockReference(pt, Service.Env.IdBtrTile);
                   blRefTile.Layer = "0";
@@ -206,11 +198,13 @@ namespace AlbumPanelColorTiles.Model.Base
                }
             }
          }
-      }
+      }      
 
-      private bool openingsContainPoint(Point3d pt)
+      private bool tileInOpenings(Point3d pt)
       {
-         return Openings.Any(b => b.IsPointInBounds(pt));
+         // Проверка попадаетли точка вставки блока плитки в один из проемов
+         Point3d ptMax = new Point3d(pt.X + 288, pt.Y + 88, 0);         
+         return (Openings.Any(b => b.IsPointInBounds(pt))) || (Openings.Any(b => b.IsPointInBounds(ptMax))); 
       }
 
       private void insertWindowBlock(string mark, Point3d pt, BlockTableRecord btrPanel, Transaction t)
