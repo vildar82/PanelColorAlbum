@@ -24,7 +24,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public BaseService()
       {
-         XmlBasePanelsFile = @"c:\dev\АР\AlbumPanelColorTiles\PanelColorAlbum\AlbumPanelColorTiles\Model\Base\Panels.xml";
+         //XmlBasePanelsFile = @"c:\dev\АР\AlbumPanelColorTiles\PanelColorAlbum\AlbumPanelColorTiles\Model\Base\Panels.xml";
+         XmlBasePanelsFile = @"\\dsk2.picompany.ru\project\CAD_Settings\Settings\dbs\outwalls_base.xml";         
       }
 
       public BaseService(string xmlBasePanelsFile)
