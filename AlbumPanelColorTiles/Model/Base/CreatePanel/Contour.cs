@@ -24,7 +24,7 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
          this.panelBase = panelBase;
       }
 
-      public Polyline Create()
+      public void Create(BlockTableRecord btrPanel, Transaction t)
       {
          Polyline plContour = new Polyline();
          plContour.LayerId = panelBase.Service.Env.IdLayerContourPanel;
@@ -56,7 +56,8 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
          ptsBotSide.ForEach(p => plContour.AddVertexAt(i++, p, 0, 0, 0));
 
          plContour.Closed = true;
-         return plContour;
+         btrPanel.AppendEntity(plContour);
+         t.AddNewlyCreatedDBObject(plContour, true);
       }     
 
       private void definePtsLeftSide()
