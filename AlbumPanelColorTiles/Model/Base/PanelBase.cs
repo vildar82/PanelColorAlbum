@@ -120,10 +120,14 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       private void addWindows(BlockTableRecord btrPanel, Transaction t)
-      {         
-         if (Panel.windows?.window != null)
+      {
+         // все окна и балеоны в панели
+         var windows = Panel.windows?.window?.Select(w => new { posi = w.posi, width = w.width, height = w.height });
+         var balconys = Panel.balconys?.balcony?.Select(b => new { posi = b.posi, width = b.width, height = b.height });
+         var apertures = balconys==null? windows: windows?.Union(balconys);
+         if (apertures != null)
          {
-            foreach (var item in Panel.windows.window)
+            foreach (var item in apertures)
             {
                // контур окон
                Polyline plWindow = new Polyline();
@@ -148,8 +152,8 @@ namespace AlbumPanelColorTiles.Model.Base
                if (WindowsBase.Count > 0)
                {
                   var xCenter = item.posi.X + item.width * 0.5;
-                  var winMarkMin = WindowsBase.Where(w => (w.Key.X - xCenter) < 600);                  
-                  if (winMarkMin.Count()>0)
+                  var winMarkMin = WindowsBase.Where(w => (w.Key.X - xCenter) < 600);
+                  if (winMarkMin.Count() > 0)
                   {
                      var winMark = winMarkMin.MinBy(g => (g.Key.X - xCenter));
                      if (string.IsNullOrWhiteSpace(winMark.Value))
@@ -176,12 +180,12 @@ namespace AlbumPanelColorTiles.Model.Base
                         dbTextWin.Height = 180;
                         btrPanel.AppendEntity(dbTextWin);
                         t.AddNewlyCreatedDBObject(dbTextWin, true);
-                     }                     
+                     }
                   }
                }
+               // Сортировка окон слева-направо
+               Openings.Sort((w1, w2) => w1.MinPoint.X.CompareTo(w2.MinPoint.X));
             }
-            // Сортировка окон слева-направо
-            Openings.Sort((w1, w2) => w1.MinPoint.X.CompareTo(w2.MinPoint.X));
          }
       }      
 

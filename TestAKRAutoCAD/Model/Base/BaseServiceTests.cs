@@ -29,7 +29,7 @@ namespace TestAKRAutoCAD.Model.Base
          Inspector.Clear();
          string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
 
-         var docTest = Application.DocumentManager.Open(testFile);
+         var docTest = Application.DocumentManager.Open(testFile, false);
          using (var ld = docTest.LockDocument())
          {            
             var db = docTest.Database;
