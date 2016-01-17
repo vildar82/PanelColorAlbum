@@ -124,7 +124,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // все окна и балеоны в панели
          var windows = Panel.windows?.window?.Select(w => new { posi = w.posi, width = w.width, height = w.height });
          var balconys = Panel.balconys?.balcony?.Select(b => new { posi = b.posi, width = b.width, height = b.height });
-         var apertures = balconys==null? windows: windows?.Union(balconys);
+         var apertures = balconys==null? windows: windows?.Union(balconys)?? balconys;
          if (apertures != null)
          {
             foreach (var item in apertures)
@@ -214,7 +214,7 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          // Проверка попадаетли точка вставки блока плитки в один из проемов
          Point3d ptMax = new Point3d(pt.X + 288, pt.Y + 88, 0);         
-         return (Openings.Any(b => b.IsPointInBounds(pt))) || (Openings.Any(b => b.IsPointInBounds(ptMax))); 
+         return (Openings.Any(b => b.IsPointInBounds(pt, 4))) || (Openings.Any(b => b.IsPointInBounds(ptMax, 4))); 
       }
 
       private void insertWindowBlock(string mark, Point3d pt, BlockTableRecord btrPanel, Transaction t)

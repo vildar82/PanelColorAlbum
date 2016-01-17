@@ -51,7 +51,7 @@ namespace AlbumPanelColorTiles.Model.Base
          var layer = new LayerInfo(Settings.Default.LayerWindows);
          IdLayerWindow = LayerExt.GetLayerOrCreateNew(layer);
          // Слой размеров на фасаде
-         layer = new LayerInfo(Settings.Default.LayerWindows);
+         layer = new LayerInfo(Settings.Default.LayerDimensionFacade);
          IdLayerDimFacade = LayerExt.GetLayerOrCreateNew(layer);
          // Слой размеров в форме
          layer = new LayerInfo(Settings.Default.LayerDimensionForm);
