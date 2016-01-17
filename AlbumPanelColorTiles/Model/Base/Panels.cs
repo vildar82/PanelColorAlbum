@@ -59,7 +59,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private Windows windowsField;
 
-      private Balcony balconyField;
+      private Balconys balconysField;
 
       private Undercuts undercutsField;
 
@@ -109,15 +109,15 @@ namespace AlbumPanelColorTiles.Model.Base
 
       /// <remarks/>
       [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-      public Balcony balcony
+      public Balconys balconys
       {
          get
          {
-            return this.balconyField;
+            return this.balconysField;
          }
          set
          {
-            this.balconyField = value;
+            this.balconysField = value;
          }
       }
 
@@ -356,6 +356,32 @@ namespace AlbumPanelColorTiles.Model.Base
          set
          {
             this.zField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Balconys
+   {
+
+      private Balcony[] balconyField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute("balcony", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Balcony[] balcony
+      {
+         get
+         {
+            return this.balconyField;
+         }
+         set
+         {
+            this.balconyField = value;
          }
       }
    }

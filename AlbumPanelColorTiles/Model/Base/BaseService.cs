@@ -108,13 +108,20 @@ namespace AlbumPanelColorTiles.Model.Base
          eraseIdsDbo(idsBtrOther);
       }      
 
-      public Panel GetPanelXml(string markSb)
+      public Panel GetPanelXml(string markSb, MountingPanel panelMount = null)
       {
          Panel panel;
          if (!_panelsXML.TryGetValue(markSb.ToUpper(), out panel))
-         {                    
-            // Ошибка - панели с такой маркой нет в базе
-            Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}");
+         {
+            // Ошибка - панели с такой маркой нет в базе     
+            if (panelMount == null)
+            {
+               Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}");
+            }
+            else
+            {
+               Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}", panelMount.ExtTransToModel, panelMount.IdBlRef);
+            }                 
          }
          return panel;
       }
@@ -177,7 +184,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
             foreach (var panelMount in floorMount.PanelsSbInFront)
             {
-               Panel panelXml = GetPanelXml(panelMount.MarkSb);
+               Panel panelXml = GetPanelXml(panelMount.MarkSb, panelMount);
                if (panelXml == null) continue;
                PanelBase panelBase = new PanelBase(panelXml, this);
                // Определение окон в панели по арх плану
