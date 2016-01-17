@@ -18,11 +18,11 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public void Create()
       {
-         double xCenter = panel.Panel.gab.length * 0.5;
+         double xCenter = panelBase.Panel.gab.length * 0.5;
          Matrix3d matrixMirr = Matrix3d.Mirroring(new Line3d(new Point3d(xCenter, 0, 0), new Point3d(xCenter, 1000, 0)));
 
          // Создание определения блока образмеривыания - пустого
-         btrDim = createBtrDim("ОБРФ_", panel.Service.Env.IdLayerDimForm);
+         btrDim = createBtrDim("ОБРФ_", panelBase.Service.Env.IdLayerDimForm);
          // Размеры сверху
          sizesTop(true, matrixMirr);
          // Размеры снизу 

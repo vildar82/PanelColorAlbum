@@ -15,7 +15,7 @@ namespace AlbumPanelColorTiles.Model.Base
    {
       protected BlockTableRecord btrDim;
       protected BlockTableRecord btrPanel;
-      protected PanelBase panel;
+      protected PanelBase panelBase;
       protected Transaction t;
       protected ObjectId idBlRefDim;
 
@@ -23,14 +23,14 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          this.btrPanel = btrPanel;
          this.t = t;
-         this.panel = panel;
+         this.panelBase = panel;
       }
 
       protected BlockTableRecord createBtrDim(string prefix, ObjectId idLayer)
       {
          // Создание определения блока образмеривания
          BlockTableRecord btrDim;
-         string blNameDim = panel.BlNameAkr.Replace(Settings.Default.BlockPanelAkrPrefixName, prefix);
+         string blNameDim = panelBase.BlNameAkr.Replace(Settings.Default.BlockPanelAkrPrefixName, prefix);
          using (var bt = btrPanel.OwnerId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             if (bt.Has(blNameDim))
@@ -58,7 +58,7 @@ namespace AlbumPanelColorTiles.Model.Base
       protected void sizesBot()
       {
          Point3d ptBotLeft = new Point3d(0, 0, 0);
-         Point3d ptBotRight = new Point3d(panel.Panel.gab.length, 0, 0);
+         Point3d ptBotRight = new Point3d(panelBase.Panel.gab.length, 0, 0);
          double yTotal = -250 - 200;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
          createDim(ptBotLeft, ptBotRight, ptDimLineTotal, false, Matrix3d.Identity);
@@ -70,27 +70,30 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       protected void sizesTop(bool doTrans, Matrix3d trans)
-      {         
+      {
+         bool hasInterDim = panelBase.PtsForTopDim.Count > 0;      
+
          // Общий размер
-         Point3d ptTopLeft = new Point3d(0, panel.Panel.gab.height, 0);
-         Point3d ptTopRight = new Point3d(panel.Panel.gab.length, panel.Panel.gab.height, 0);
-         double yTotal = panel.Openings.Count > 0 ? panel.Panel.gab.height + 250 + 200 : panel.Panel.gab.height + 250;
+         Point3d ptTopLeft = new Point3d(0, panelBase.Panel.gab.height, 0);
+         Point3d ptTopRight = new Point3d(panelBase.Panel.gab.length, panelBase.Panel.gab.height, 0);
+         double yTotal = hasInterDim ? panelBase.Panel.gab.height + 250 + 200 : panelBase.Panel.gab.height + 250;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
          createDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans);
 
-         // Если есть окна, то добавление промежуточных размеров
-         if (panel.Openings.Count > 0)
+         // добавление промежуточных размеров
+         if (hasInterDim)
          {
+            panelBase.PtsForTopDim.Sort();
+            AcadLib.Comparers.DoubleEqualityComparer comparer = new AcadLib.Comparers.DoubleEqualityComparer(4);
+            var ptsX = panelBase.PtsForTopDim.GroupBy(p=>p, comparer).Select(g=>g.First());
+
             Point3d ptPrev = ptTopLeft;
             Point3d ptDimLineInter = new Point3d(0, yTotal - 200, 0);
-            foreach (var winItem in panel.Openings)
+            foreach (var x in ptsX)
             {
-               Point3d ptNext = new Point3d(winItem.MinPoint.X, ptPrev.Y, 0);
+               Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
                createDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans);
-               ptPrev = ptNext;
-               ptNext = new Point3d(winItem.MaxPoint.X, ptPrev.Y, 0);
-               createDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans);
-               ptPrev = ptNext;
+               ptPrev = ptNext;               
             }
             // Замыкающий размер
             createDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans);
@@ -106,7 +109,7 @@ namespace AlbumPanelColorTiles.Model.Base
             ptDimLine = ptDimLine.TransformBy(trans);
          }         
 
-         var dim = new RotatedDimension(0, ptPrev, ptNext, ptDimLine, "", panel.Service.Env.IdDimStyle);
+         var dim = new RotatedDimension(0, ptPrev, ptNext, ptDimLine, "", panelBase.Service.Env.IdDimStyle);
          dim.Dimscale = Settings.Default.SheetScale;
          btrDim.AppendEntity(dim);
          t.AddNewlyCreatedDBObject(dim, true);
