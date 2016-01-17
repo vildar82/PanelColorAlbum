@@ -55,7 +55,7 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
          ptsRightSide.ForEach(p => plContour.AddVertexAt(i++, p, 0, 0, 0));
          ptsBotSide.ForEach(p => plContour.AddVertexAt(i++, p, 0, 0, 0));
 
-         //plContour.Closed = true;
+         plContour.Closed = true;
          return plContour;
       }     
 
@@ -86,6 +86,9 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
                ptsTopSide.Add(undercut.MinPoint);
                ptsTopSide.Add(new Point2d(undercut.MaxPoint.X, undercut.MinPoint.Y));
                ptsTopSide.Add(new Point2d (undercut.MaxPoint.X, y));
+
+               panelBase.PtsForTopDim.Add(undercut.MinPoint.X);
+               panelBase.PtsForTopDim.Add(undercut.MaxPoint.X);
             }
          }
       }

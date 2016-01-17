@@ -17,6 +17,8 @@ namespace AlbumPanelColorTiles.Model.Base
    public class PanelBase
    {
       private string _markWithoutElectric;
+
+      public List<double> PtsForTopDim { get; set; } = new List<double>();
       
       public BaseService Service { get; private set; }      
       public string BlNameAkr { get; set; }
@@ -135,6 +137,10 @@ namespace AlbumPanelColorTiles.Model.Base
                plWindow.Closed = true;
                btrPanel.AppendEntity(plWindow);
                t.AddNewlyCreatedDBObject(plWindow, true);
+
+               // добавление точек для верхнего образмеривания.
+               PtsForTopDim.Add(ptMinWindow.X);
+               PtsForTopDim.Add(ptMaxWindow.X);
 
                Openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
 

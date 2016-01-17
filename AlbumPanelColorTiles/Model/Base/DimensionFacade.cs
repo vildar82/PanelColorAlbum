@@ -21,7 +21,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public void Create()
       {
          // Создание определения блока образмеривыания - пустого
-         btrDim = createBtrDim("ОБР_", panel.Service.Env.IdLayerDimFacade);         
+         btrDim = createBtrDim("ОБР_", panelBase.Service.Env.IdLayerDimFacade);         
          // Размеры сверху
          sizesTop(false, Matrix3d.Identity);
          // Размеры снизу 
