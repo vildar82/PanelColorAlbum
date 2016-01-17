@@ -39,10 +39,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public void DefineGeom(ObjectId idBtrPanelAkr)
       {
          string blName;
+         _extentsTiles = new Extents3d();
          using (var btrAkr = idBtrPanelAkr.Open(OpenMode.ForRead) as BlockTableRecord)
          {
-            blName = btrAkr.Name;
-            bool isFirstTile = true;
+            blName = btrAkr.Name;            
             foreach (ObjectId idEnt in btrAkr)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
@@ -51,15 +51,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   {
                      if (string.Equals(blRefTile.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                      {
-                        if (isFirstTile)
-                        {
-                           _extentsTiles = blRefTile.GeometricExtents;
-                           isFirstTile = false;
-                        }
-                        else
-                        {
-                           _extentsTiles.AddExtents(blRefTile.GeometricExtents);
-                        }
+                        _extentsTiles.AddExtents(blRefTile.GeometricExtents);
                      }
                   }
                }
