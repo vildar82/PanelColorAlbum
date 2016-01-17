@@ -17,7 +17,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
    {
       public List<AttributeRefDetail> AttrDet { get; private set; }
       public Extents3d ExtTransToModel { get; private set; }
-      public Extents3d ExtBlRefClean { get; private set; }
+      //public Extents3d ExtBlRefClean { get; private set; }
       public ObjectId IdBlRef { get; private set; }
       public ObjectId IdBtr { get; private set; }
       public string MarkPainting { get; private set; }
@@ -38,7 +38,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          MarkPainting = painting;
          var extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;         
-         ExtBlRefClean = extBlRefPanel;
+         //ExtBlRefClean = extBlRefPanel;
          extBlRefPanel.TransformBy(trans);
          ExtTransToModel = extBlRefPanel;         
          IdBlRef = blRefPanelSB.Id;

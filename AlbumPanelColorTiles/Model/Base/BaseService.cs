@@ -188,26 +188,17 @@ namespace AlbumPanelColorTiles.Model.Base
                if (panelXml == null) continue;
                PanelBase panelBase = new PanelBase(panelXml, this);
                // Определение окон в панели по арх плану
-               if (floorAr != null)
+               if (floorAr != null && panelXml.windows?.window!=null)
                {
                   foreach (var window in panelXml.windows.window)
                   {
-                     // Точка окна внутри панели
-                     Point3d ptOpening = new Point3d(window.posi.X + window.width * 0.5, 0, 0);
+                     // Точка окна внутри панели по XML описанию
+                     Point3d ptOpeningCenter = new Point3d(window.posi.X + window.width * 0.5, 0, 0);
                      // Точка окна внутри монтажного плана
-                     Point3d ptWindInMountPlan = panelMount.ExtBlRefClean.MinPoint.Add(ptOpening.GetAsVector());
+                     Point3d ptWindInModel = panelMount.ExtTransToModel.MinPoint.Add(ptOpeningCenter.GetAsVector());                     
+                     Point3d ptWindInArPlan = ptWindInModel.TransformBy(floorMount.Transform.Inverse());
 
-                     // Test Добавление точек окна в блоке монтажки
-                     {
-                        using (var btrMountPlan = floorMount.IdBtrMounting.GetObject(OpenMode.ForWrite) as BlockTableRecord)
-                        {
-                           DBPoint ptWinInPlan = new DBPoint(ptWindInMountPlan);
-                           btrMountPlan.AppendEntity(ptWinInPlan);
-                           btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInPlan, true);
-                        }
-                     }
-
-                     var windowKey = floorAr.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInMountPlan)).MinBy(w => w.Key);
+                     var windowKey = floorAr.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInArPlan)).MinBy(w => w.Key);
                      if (windowKey == null || windowKey.Key > 600)
                      {
                         Inspector.AddError(
@@ -215,14 +206,38 @@ namespace AlbumPanelColorTiles.Model.Base
                            panelMount.ExtTransToModel, panelMount.IdBlRef);
                         continue;
                      }
-                     panelBase.WindowsBase.Add(ptOpening, windowKey.First().Value);
+                     panelBase.WindowsBaseCenters.Add(ptOpeningCenter, windowKey.First().Value);
+
+                     // Test Добавление точек окна в блоке монтажки
+                     {                        
+                        using (var btrMountPlan = floorMount.IdBtrMounting.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+                        {
+                           DBPoint ptWinInPlan = new DBPoint(ptWindInArPlan);
+                           ptWinInPlan.ColorIndex = 2;
+                           btrMountPlan.AppendEntity(ptWinInPlan);
+                           btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInPlan, true);
+
+                           DBText dbText = new DBText();
+                           dbText.Position = ptWindInArPlan;
+                           dbText.TextString = windowKey.First().Value;
+                           btrMountPlan.AppendEntity(dbText);
+                           btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(dbText, true);
+                        }
+                        using (var btrArPlan = floorAr.IdBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+                        {
+                           DBPoint ptWinInArPlan = new DBPoint(ptWindInArPlan);
+                           ptWinInArPlan.ColorIndex = 1;
+                           btrArPlan.AppendEntity(ptWinInArPlan);
+                           btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInArPlan, true);
+                        }                        
+                     }                     
                   }
                }
                // Уникальный ключ панели - МаркаСБ + Марки окон                    
                string key = panelBase.MarkWithoutElectric;
-               if (panelBase.WindowsBase.Count > 0)
+               if (panelBase.WindowsBaseCenters.Count > 0)
                {
-                  string windowMarks = string.Join(";", panelBase.WindowsBase.Values);
+                  string windowMarks = string.Join(";", panelBase.WindowsBaseCenters.Values);
                   key += windowMarks;
                }               
                PanelBase panelBaseUniq;

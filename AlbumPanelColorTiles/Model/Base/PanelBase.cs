@@ -19,14 +19,17 @@ namespace AlbumPanelColorTiles.Model.Base
       private string _markWithoutElectric;
 
       public List<double> PtsForTopDim { get; set; } = new List<double>();
-      
+      public List<double> PtsForBotDimCheek { get; set; } = new List<double>();
+
       public BaseService Service { get; private set; }      
       public string BlNameAkr { get; set; }
       public int WindowsIndex { get; set; }
       public List<Extents3d> Openings { get; set; }      
       public ObjectId IdBtrPanel { get; set; }
       public Panel Panel { get; private set; }
-      public Dictionary<Point3d, string> WindowsBase { get; set; } = new Dictionary<Point3d, string>();
+      public Dictionary<Point3d, string> WindowsBaseCenters { get; set; } = new Dictionary<Point3d, string>();
+      public bool IsCheekRight { get; private set; }
+      public bool IsCheekLeft { get; private set; }
 
       public PanelBase(Panel panelXml, BaseService service)
       {
@@ -61,13 +64,11 @@ namespace AlbumPanelColorTiles.Model.Base
          
          // Имя для блока панели АКР
          BlNameAkr = defineBlockPanelAkrName();
-
          // Ошибка если блок с таким именем уже есть
          if (bt.Has(BlNameAkr))
          {
-            throw new Autodesk.AutoCAD.Runtime.Exception(
-                           Autodesk.AutoCAD.Runtime.ErrorStatus.DuplicateBlockName, 
-                           $"Блок с именем {BlNameAkr} уже определен в чертеже");
+            Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
+            return;                          
          }
 
          BlockTableRecord btrPanel = new BlockTableRecord();
@@ -76,9 +77,7 @@ namespace AlbumPanelColorTiles.Model.Base
          t.AddNewlyCreatedDBObject(btrPanel, true);    
               
          // Добавление полилинии контура
-         Polyline plContour = createContour();         
-         btrPanel.AppendEntity(plContour);
-         t.AddNewlyCreatedDBObject(plContour, true);        
+         createContour(btrPanel, t);                  
 
          // Добавление окон
          addWindows(btrPanel, t);         
@@ -86,14 +85,17 @@ namespace AlbumPanelColorTiles.Model.Base
          // заполнение плиткой
          addTiles(btrPanel, t);
 
+         // Добавление торцов (Cheek)
+         addCheek(btrPanel, t);
+
          // Образмеривание (на Фасаде)
          DimensionFacade dimFacade = new DimensionFacade(btrPanel, t, this);
          dimFacade.Create();
          // Образмеривание (в Форме)
          DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
          dimForm.Create();         
-      }      
-
+      }
+            
       private string defineBlockPanelAkrName()
       {
          string blName = Settings.Default.BlockPanelAkrPrefixName + MarkWithoutElectric;
@@ -102,7 +104,17 @@ namespace AlbumPanelColorTiles.Model.Base
          string cheek = Panel.cheeks?.cheek;
          if (!string.IsNullOrWhiteSpace(cheek))
          {
-            string cheekPrefix = cheek.Equals("right", StringComparison.OrdinalIgnoreCase) ? "_тп" : "_тл";
+            string cheekPrefix = string.Empty;
+            if (cheek.Equals("right", StringComparison.OrdinalIgnoreCase))
+            {
+               cheekPrefix = "_тл";
+               IsCheekLeft = true;
+            }
+            else
+            {               
+               cheekPrefix = "_тп";
+               IsCheekRight = true;
+            }          
             blName += cheekPrefix;
          }
          if (WindowsIndex >0)
@@ -113,10 +125,10 @@ namespace AlbumPanelColorTiles.Model.Base
          return blName;
       }
 
-      private Polyline createContour()
+      private void createContour(BlockTableRecord btrPanel, Transaction t)
       {
          Contour contour = new Contour(this);
-         return contour.Create();         
+         contour.Create(btrPanel, t);         
       }
 
       private void addWindows(BlockTableRecord btrPanel, Transaction t)
@@ -149,10 +161,10 @@ namespace AlbumPanelColorTiles.Model.Base
                Openings.Add(new Extents3d(ptMinWindow.Convert3d(), ptMaxWindow.Convert3d()));
 
                // Вставка окон
-               if (WindowsBase.Count > 0)
+               if (WindowsBaseCenters.Count > 0)
                {
                   var xCenter = item.posi.X + item.width * 0.5;
-                  var winMarkMin = WindowsBase.Where(w => (w.Key.X - xCenter) < 600);
+                  var winMarkMin = WindowsBaseCenters.Where(w => Math.Abs(w.Key.X - xCenter) < 600);
                   if (winMarkMin.Count() > 0)
                   {
                      var winMark = winMarkMin.MinBy(g => (g.Key.X - xCenter));
@@ -181,6 +193,18 @@ namespace AlbumPanelColorTiles.Model.Base
                         btrPanel.AppendEntity(dbTextWin);
                         t.AddNewlyCreatedDBObject(dbTextWin, true);
                      }
+                     // Test
+                     else
+                     {
+                        // Добавление текста марки окна
+                        DBText dbTextWin = new DBText();
+                        dbTextWin.Position = ptWin;
+                        dbTextWin.LayerId = Service.Env.IdLayerWindow;
+                        dbTextWin.TextString = winMark.Value;
+                        dbTextWin.Height = 180;
+                        btrPanel.AppendEntity(dbTextWin);
+                        t.AddNewlyCreatedDBObject(dbTextWin, true);
+                     }
                   }
                }
                // Сортировка окон слева-направо
@@ -191,24 +215,105 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
-         for (int x = 0; x < Panel.gab.length- Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+ Settings.Default.TileSeam)
+         for (int x = 0; x < Panel.gab.length-Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+Settings.Default.TileSeam)
          {
-            for (int y = 0; y < Panel.gab.height- Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
+            for (int y = 0; y < Panel.gab.height-Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
             {
                Point3d pt = new Point3d(x, y, 0);
 
                if (!tileInOpenings(pt))
                {
-                  BlockReference blRefTile = new BlockReference(pt, Service.Env.IdBtrTile);
-                  blRefTile.Layer = "0";
-                  blRefTile.ColorIndex = 256; // ByLayer
-
-                  btrPanel.AppendEntity(blRefTile);
-                  t.AddNewlyCreatedDBObject(blRefTile, true);
+                  addTile(btrPanel, t, pt);
                }
             }
          }
-      }      
+      }
+
+      private void addTile(BlockTableRecord btrPanel, Transaction t, Point3d pt)
+      {
+         BlockReference blRefTile = new BlockReference(pt, Service.Env.IdBtrTile);
+         blRefTile.Layer = "0";
+         blRefTile.ColorIndex = 256; // ByLayer
+
+         btrPanel.AppendEntity(blRefTile);
+         t.AddNewlyCreatedDBObject(blRefTile, true);
+      }
+
+      private void addCheek(BlockTableRecord btrPanel, Transaction t)
+      {
+         if (IsCheekLeft || IsCheekRight)
+         {
+            int yStep = Settings.Default.TileHeight + Settings.Default.TileSeam;
+            double xTile = 0;
+            List<Point2d> ptsPlContourCheek = new List<Point2d>();
+
+            // Торец слева
+            if (IsCheekLeft)
+            {
+               xTile = -(600 + Settings.Default.TileLenght);
+               // Добавление точек контура в список               
+               Point2d pt = new Point2d(xTile, 0);
+               ptsPlContourCheek.Add(pt);
+               PtsForBotDimCheek.Add(pt.X);
+
+               pt = new Point2d(pt.X + 289, 0);
+               PtsForBotDimCheek.Add(pt.X);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X, Panel.gab.height);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X-30, pt.Y);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X-20, pt.Y+20);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(xTile, pt.Y);
+               ptsPlContourCheek.Add(pt);
+            }
+
+            // Торец справа
+            else if (IsCheekRight)
+            {
+               xTile = Panel.gab.length + 600;
+               // Добавление точек контура в список               
+               Point2d pt = new Point2d(xTile, 0);
+               ptsPlContourCheek.Add(pt);
+               PtsForBotDimCheek.Add(pt.X);
+
+               pt = new Point2d(pt.X + 289, 0);
+               PtsForBotDimCheek.Add(pt.X);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X, Panel.gab.height+20);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X - 240, pt.Y);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X - 20, pt.Y - 20);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(xTile, pt.Y);
+               ptsPlContourCheek.Add(pt);
+            }
+
+            // Заполнение торца плиткой
+            for (int y = 0; y < Panel.gab.height; y += yStep)
+            {
+               Point3d pt = new Point3d(xTile, y, 0);
+               addTile(btrPanel, t, pt);
+            }
+            // Полилиния контура торца
+            Polyline plCheekContour = new Polyline();
+            plCheekContour.LayerId = Service.Env.IdLayerContourPanel;
+            int i = 0;
+            ptsPlContourCheek.ForEach(p => plCheekContour.AddVertexAt(i++, p, 0, 0, 0));
+            btrPanel.AppendEntity(plCheekContour);
+            t.AddNewlyCreatedDBObject(plCheekContour, true);
+         }
+      }
 
       private bool tileInOpenings(Point3d pt)
       {

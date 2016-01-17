@@ -17,10 +17,14 @@ namespace AlbumPanelColorTiles.Model.Base
       public int Section { get; private set; }
       public int Number { get; private set; }
       public string BlName { get; private set; }
+      public ObjectId IdBlRef { get; private set; }
+      public ObjectId IdBtr { get; private set; }
       public Dictionary<Point3d, string> Windows { get; private set; }
 
       public FloorArchitect(BlockReference blRefArPlan)
       {
+         IdBlRef = blRefArPlan.Id;
+         IdBtr = blRefArPlan.BlockTableRecord;
          BlName = blRefArPlan.Name;
          // определение параметров плана и окон
          definePlanNumberAndSection(blRefArPlan.Name);
@@ -115,9 +119,9 @@ namespace AlbumPanelColorTiles.Model.Base
                      windows.Add(blRefWindow.Position, markNear.Value);
                      //Test Добавить точку окна и найденную марку окна в точку вставки блока окна
                      {
-                        DBPoint ptWin = new DBPoint(blRefWindow.Position);
-                        btrArPlan.AppendEntity(ptWin);
-                        btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWin, true);
+                        //DBPoint ptWin = new DBPoint(blRefWindow.Position);
+                        //btrArPlan.AppendEntity(ptWin);
+                        //btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWin, true);
 
                         DBText dbText = new DBText();
                         dbText.Position = blRefWindow.Position;
