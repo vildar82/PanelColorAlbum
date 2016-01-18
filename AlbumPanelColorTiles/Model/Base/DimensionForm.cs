@@ -18,7 +18,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public void Create()
       {
-         double xCenter = panelBase.Panel.gab.length * 0.5;
+         double xCenter = panelBase.Length * 0.5;
          Matrix3d matrixMirr = Matrix3d.Mirroring(new Line3d(new Point3d(xCenter, 0, 0), new Point3d(xCenter, 1000, 0)));
 
          // Создание определения блока образмеривыания - пустого
