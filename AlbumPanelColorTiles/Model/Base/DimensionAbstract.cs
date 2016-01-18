@@ -66,8 +66,12 @@ namespace AlbumPanelColorTiles.Model.Base
          // Промежуточный размер
          Point3d ptDimLineInter = new Point3d(0, yTotal + 215, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
-         createDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
-         createDim(ptNext, ptBotRight, ptDimLineInter, doTrans, trans);
+         var dim = createDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
+         var lenTile = Settings.Default.TileLenght + Settings.Default.TileSeam;
+         var count = Convert.ToInt32(dim.Measurement / lenTile);
+         dim.Prefix = $"({Settings.Default.TileLenght}+{Settings.Default.TileSeam})x{count}=";
+
+         createDim(ptNext, ptBotRight, ptDimLineInter, doTrans, trans);        
 
          // Торец
          if (panelBase.IsCheekRight || panelBase.IsCheekLeft)
