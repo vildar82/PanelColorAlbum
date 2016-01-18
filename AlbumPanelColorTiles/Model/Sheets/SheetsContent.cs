@@ -52,16 +52,16 @@ namespace AlbumPanelColorTiles.Sheets
 
             using (var t = _dbContent.TransactionManager.StartTransaction())
             {
-               int curContentLayout = 1;
+               int curContentLayoutNum = 3;
                Table tableContent;
                BlockReference blRefStamp;
-               CopyContentSheet(t, curContentLayout, out tableContent, out blRefStamp);
+               CopyContentSheet(t, curContentLayoutNum, out tableContent, out blRefStamp);
                // Определение кол-ва марок АР
                int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
                // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
                _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
                // Заполнение штампа на первом листе содержания
-               FillingStampContent(blRefStamp, curContentLayout, t);
+               FillingStampContent(blRefStamp, curContentLayoutNum, t);
                // текущая строка для записи листа
                int row = _firstRowInTableForSheets;
                // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
@@ -98,14 +98,14 @@ namespace AlbumPanelColorTiles.Sheets
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
-                     CheckEndOfTable(t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
+                     CheckEndOfTable(t, ref curContentLayoutNum, ref tableContent, ref blRefStamp, ref row);
 
                      tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки в форме";
                      tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
                      sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
                      tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                      row++;
-                     CheckEndOfTable(t, ref curContentLayout, ref tableContent, ref blRefStamp, ref row);
+                     CheckEndOfTable(t, ref curContentLayoutNum, ref tableContent, ref blRefStamp, ref row);
                   }
                }
                progressMeter.Stop();
@@ -119,8 +119,8 @@ namespace AlbumPanelColorTiles.Sheets
                // Удаление последнего листа содержания (пустой копии)
                HostApplicationServices.WorkingDatabase = _dbContent;
                LayoutManager lm = LayoutManager.Current;
-               string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
-               lm.DeleteLayout(layoutNameToDel);
+               //string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
+               lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForContent);
 
                t.Commit();
             }
@@ -155,19 +155,19 @@ namespace AlbumPanelColorTiles.Sheets
 
       private void CheckEndOfTable(Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
       {
-         if (row == tableContent.Rows.Count)
+         if (row == tableContent.Rows.Count && _countContentSheets > curContentLayout)
          {
             // Новый лист содержания
-            tableContent.RecomputeTableBlock(true);
+            tableContent.RecomputeTableBlock(true);                           
             CopyContentSheet(t, ++curContentLayout, out tableContent, out blRefStamp);
             FillingStampContent(blRefStamp, curContentLayout, t);
             row = _firstRowInTableForSheets;
          }
       }
 
-      private void CopyContentSheet(Transaction t, int curContentLayout, out Table tableContent, out BlockReference blRefStamp)
+      private void CopyContentSheet(Transaction t, int contentLayoutNum, out Table tableContent, out BlockReference blRefStamp)
       {
-         Layout layout = GetCurLayoutContentAndCopyNext(curContentLayout, t);
+         Layout layout = GetCurLayoutContentAndCopyNext(contentLayoutNum, t);
          var btrLayoutContent = t.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          tableContent = FindTableContent(btrLayoutContent, t);
          blRefStamp = FindBlRefStampContent(btrLayoutContent, t);
@@ -240,30 +240,10 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       private Layout GetCurLayoutContentAndCopyNext(int curSheetContentNum, Transaction t)
-      {
-         ObjectId idLayoutContentCur;
-         HostApplicationServices.WorkingDatabase = _dbContent;
-         LayoutManager lm = LayoutManager.Current;
-         string nameLay;
-         string nameCopy;
-         if (curSheetContentNum == 1)
-         {
-            nameLay = Settings.Default.SheetTemplateLayoutNameForContent;
-            nameCopy = (_countSheetsBeforContent + 2).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
-            idLayoutContentCur = lm.GetLayoutId(nameLay);
-            //lm.CopyLayout(nameLay, nameCopy);
-            AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy);
-            lm.RenameLayout(nameLay, (_countSheetsBeforContent + 1).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent);
-         }
-         else
-         {
-            nameLay = (_countSheetsBeforContent + curSheetContentNum).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
-            nameCopy = (_countSheetsBeforContent + (++curSheetContentNum)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
-            idLayoutContentCur = lm.GetLayoutId(nameLay);
-            //lm.CopyLayout(nameLay, nameCopy);
-            AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy);
-         }
-         return t.GetObject(idLayoutContentCur, OpenMode.ForRead) as Layout;         
+      {         
+         string nameLay = Settings.Default.SheetTemplateLayoutNameForContent;
+         string nameCopy = curSheetContentNum.ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
+         return AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy).GetObject( OpenMode.ForRead) as Layout;         
       }
    }
 }
