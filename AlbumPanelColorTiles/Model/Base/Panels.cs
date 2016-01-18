@@ -63,6 +63,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private Undercuts undercutsField;
 
+      private Outsides outsidesField;
+
       private string markField;
 
       /// <remarks/>
@@ -132,6 +134,20 @@ namespace AlbumPanelColorTiles.Model.Base
          set
          {
             this.undercutsField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Outsides outsides
+      {
+         get
+         {
+            return this.outsidesField;
+         }
+         set
+         {
+            this.outsidesField = value;
          }
       }
 
@@ -477,6 +493,90 @@ namespace AlbumPanelColorTiles.Model.Base
    [System.ComponentModel.DesignerCategoryAttribute("code")]
    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
    public partial class Undercut
+   {
+
+      private double widthField;
+
+      private double heightField;
+
+      private Posi posiField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public double width
+      {
+         get
+         {
+            return this.widthField;
+         }
+         set
+         {
+            this.widthField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public double height
+      {
+         get
+         {
+            return this.heightField;
+         }
+         set
+         {
+            this.heightField = value;
+         }
+      }
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Posi posi
+      {
+         get
+         {
+            return this.posiField;
+         }
+         set
+         {
+            this.posiField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Outsides
+   {
+
+      private Outside[] outsideField;
+
+      /// <remarks/>
+      [System.Xml.Serialization.XmlElementAttribute("outside", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+      public Outside[] outside
+      {
+         get
+         {
+            return this.outsideField;
+         }
+         set
+         {
+            this.outsideField = value;
+         }
+      }
+   }
+
+   /// <remarks/>
+   [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+   [System.SerializableAttribute()]
+   [System.Diagnostics.DebuggerStepThroughAttribute()]
+   [System.ComponentModel.DesignerCategoryAttribute("code")]
+   [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
+   public partial class Outside
    {
 
       private double widthField;

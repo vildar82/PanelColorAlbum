@@ -30,12 +30,40 @@ namespace AlbumPanelColorTiles.Model.Base
       public Dictionary<Point3d, string> WindowsBaseCenters { get; set; } = new Dictionary<Point3d, string>();
       public bool IsCheekRight { get; private set; }
       public bool IsCheekLeft { get; private set; }
+      public double Length { get; private set; }
+      public double Height { get; private set; }
+      /// <summary>
+      /// Край контура панели - контур для заполнения плиткой
+      /// </summary>
+      public double XMinContour { get; set; }
+      /// <summary>
+      /// Край контура панели - контур для заполнения плиткой
+      /// </summary>
+      public double XMaxContour { get; set; }
+      /// <summary>
+      /// Край панели - с учетом угловых торцов
+      /// </summary>
+      public double XMinPanel { get; set; }
+      /// <summary>
+      /// Край панели - с учетом угловых торцов
+      /// </summary>
+      public double XMaxPanel { get; set; }
+      public int XStartTile { get; set; }
 
       public PanelBase(Panel panelXml, BaseService service)
       {
          Panel = panelXml;
          Service = service;
-      }
+
+         Length = panelXml.gab.length;
+         Height = panelXml.gab.height;
+
+         XMinContour = 0;
+         XMaxContour = Length;
+
+         XMinPanel = 0;
+         XMaxPanel = Length;
+      }      
 
       public string MarkWithoutElectric
       {
@@ -215,9 +243,9 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
-         for (int x = 0; x < Panel.gab.length-Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+Settings.Default.TileSeam)
+         for (int x = XStartTile; x < XMaxContour -Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+Settings.Default.TileSeam)
          {
-            for (int y = 0; y < Panel.gab.height-Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
+            for (int y = 0; y < Height-Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
             {
                Point3d pt = new Point3d(x, y, 0);
 
@@ -264,7 +292,7 @@ namespace AlbumPanelColorTiles.Model.Base
                PtsForBotDimCheek.Add(pt.X);
                ptsPlContourCheek.Add(pt);
 
-               pt = new Point2d(pt.X, Panel.gab.height);
+               pt = new Point2d(pt.X, Height);
                ptsPlContourCheek.Add(pt);
 
                pt = new Point2d(pt.X-30, pt.Y);
@@ -280,7 +308,7 @@ namespace AlbumPanelColorTiles.Model.Base
             // Торец справа
             else if (IsCheekRight)
             {
-               xTile = Panel.gab.length + 600;
+               xTile = Length + 600;
                // Добавление точек контура в список               
                Point2d pt = new Point2d(xTile, 0);
                ptsPlContourCheek.Add(pt);
@@ -294,7 +322,7 @@ namespace AlbumPanelColorTiles.Model.Base
                PtsForBotDimCheek.Add(pt.X);
                ptsPlContourCheek.Add(pt);
 
-               pt = new Point2d(pt.X, Panel.gab.height+20);
+               pt = new Point2d(pt.X, Height+20);
                ptsPlContourCheek.Add(pt);
 
                pt = new Point2d(pt.X - 240, pt.Y);
@@ -308,7 +336,7 @@ namespace AlbumPanelColorTiles.Model.Base
             }
 
             // Заполнение торца плиткой
-            for (int y = 0; y < Panel.gab.height; y += yStep)
+            for (int y = 0; y < Height; y += yStep)
             {
                Point3d pt = new Point3d(xTile, y, 0);
                addTile(btrPanel, t, pt);

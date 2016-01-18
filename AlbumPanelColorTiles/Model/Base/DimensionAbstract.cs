@@ -58,13 +58,13 @@ namespace AlbumPanelColorTiles.Model.Base
       protected void sizesBot(bool doTrans, Matrix3d trans)
       {
          // Общий размер
-         Point3d ptBotLeft = new Point3d(0, 0, 0);
-         Point3d ptBotRight = new Point3d(panelBase.Panel.gab.length, 0, 0);
-         double yTotal = -250 - 200;
+         Point3d ptBotLeft = new Point3d(panelBase.XMinContour, 0, 0);
+         Point3d ptBotRight = new Point3d(panelBase.XMaxContour, 0, 0);
+         double yTotal = -215 - 215;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
          createDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
          // Промежуточный размер
-         Point3d ptDimLineInter = new Point3d(0, yTotal + 200, 0);
+         Point3d ptDimLineInter = new Point3d(0, yTotal + 215, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
          createDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
          createDim(ptNext, ptBotRight, ptDimLineInter, doTrans, trans);
@@ -166,7 +166,7 @@ namespace AlbumPanelColorTiles.Model.Base
          DBText textView = new DBText();         
          textView.TextString = "Вид А";
          textView.Height = 75;
-         Point3d ptTextPos = new Point3d(xMinCheek, panelBase.Panel.gab.height + 170, 0);
+         Point3d ptTextPos = new Point3d(xMinCheek, panelBase.Height + 170, 0);
          if (doTrans)
          {
             ptTextPos = ptTextPos.TransformBy(trans);
@@ -179,15 +179,14 @@ namespace AlbumPanelColorTiles.Model.Base
 
       protected void sizesTop(bool doTrans, Matrix3d trans)
       {
-         bool hasInterDim = panelBase.PtsForTopDim.Count > 0;      
+         bool hasInterDim = panelBase.PtsForTopDim.Count > 0 || panelBase.XMinPanel<0 || panelBase.XMaxPanel> panelBase.Length;      
 
          // Общий размер
-         Point3d ptTopLeft = new Point3d(0, panelBase.Panel.gab.height, 0);
-         Point3d ptTopRight = new Point3d(panelBase.Panel.gab.length, panelBase.Panel.gab.height, 0);
-         double yTotal = hasInterDim ? panelBase.Panel.gab.height + 250 + 200 : panelBase.Panel.gab.height + 250;
+         Point3d ptTopLeft = new Point3d(panelBase.XMinContour, panelBase.Height, 0);
+         Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
+         double yTotal = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
-         createDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans);
-
+         createDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, true);         
          // добавление промежуточных размеров
          if (hasInterDim)
          {
@@ -196,19 +195,69 @@ namespace AlbumPanelColorTiles.Model.Base
             var ptsX = panelBase.PtsForTopDim.GroupBy(p=>p, comparer).Select(g=>g.First());
 
             Point3d ptPrev = ptTopLeft;
-            Point3d ptDimLineInter = new Point3d(0, yTotal - 200, 0);
+            Point3d ptDimLineInter = new Point3d(0, yTotal - 185, 0);            
             foreach (var x in ptsX)
             {
                Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
-               createDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans);
+               createDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans, true);               
                ptPrev = ptNext;               
             }
             // Замыкающий размер
-            createDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans);
+            createDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans, true);
+            
+
+            //если есть пустые области Outsides, то добавление промежеточных размеров.
+            if (panelBase.XMinPanel < 0)
+            {
+               createDim(new Point3d (panelBase.XMinPanel, ptPrev.Y,0),
+                         new Point3d(panelBase.XMinContour, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
+            }
+            if (panelBase.XMaxPanel > panelBase.Length)
+            {
+               createDim(new Point3d(panelBase.XMaxContour, ptPrev.Y, 0),
+                         new Point3d(panelBase.XMaxPanel, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
+            }            
          }
       }
 
-      protected RotatedDimension createDim(Point3d ptPrev, Point3d ptNext, Point3d ptDimLine, bool doTrans, Matrix3d trans)
+      private string getTextRange(double measurement)
+      {
+         var len = Settings.Default.TileLenght + Settings.Default.TileSeam;
+         var count = Convert.ToInt32(measurement / len);
+         string row = string.Empty;
+         if (count ==1)
+         {
+            return "";
+         }
+         else if (count <5)
+         {
+            row = "ряда";
+         }
+         else if (count < 20)
+         {
+            row = "рядов";
+         }
+         else
+         {
+            var last = count % 10;
+            if (last ==1)
+            {
+               return "ряд";
+            }
+            else if (last<5)
+            {
+               row = "ряда";
+            }
+            else
+            {
+               row = "рядов";
+            }
+         }
+         return $" ({count} {row})";
+      }
+
+      protected RotatedDimension createDim(Point3d ptPrev, Point3d ptNext, Point3d ptDimLine, 
+                                          bool doTrans, Matrix3d trans, bool addTextRangeTile = false)
       {
          if (doTrans)
          {
@@ -218,6 +267,10 @@ namespace AlbumPanelColorTiles.Model.Base
          }         
 
          var dim = new RotatedDimension(0, ptPrev, ptNext, ptDimLine, "", panelBase.Service.Env.IdDimStyle);
+         if (addTextRangeTile)
+         {
+            dim.Suffix = getTextRange(dim.Measurement);
+         }
          dim.Dimscale = Settings.Default.SheetScale;
          btrDim.AppendEntity(dim);
          t.AddNewlyCreatedDBObject(dim, true);
