@@ -256,7 +256,11 @@ namespace AlbumPanelColorTiles.Model.Base
                ptsPlContourCheek.Add(pt);
                PtsForBotDimCheek.Add(pt.X);
 
-               pt = new Point2d(pt.X + 289, 0);
+               pt = new Point2d(pt.X + 277, 0);
+               PtsForBotDimCheek.Add(pt.X);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X + 12, 0);
                PtsForBotDimCheek.Add(pt.X);
                ptsPlContourCheek.Add(pt);
 
@@ -282,7 +286,11 @@ namespace AlbumPanelColorTiles.Model.Base
                ptsPlContourCheek.Add(pt);
                PtsForBotDimCheek.Add(pt.X);
 
-               pt = new Point2d(pt.X + 289, 0);
+               pt = new Point2d(pt.X + 12, 0);
+               PtsForBotDimCheek.Add(pt.X);
+               ptsPlContourCheek.Add(pt);
+
+               pt = new Point2d(pt.X + 277, 0);
                PtsForBotDimCheek.Add(pt.X);
                ptsPlContourCheek.Add(pt);
 
@@ -310,6 +318,7 @@ namespace AlbumPanelColorTiles.Model.Base
             plCheekContour.LayerId = Service.Env.IdLayerContourPanel;
             int i = 0;
             ptsPlContourCheek.ForEach(p => plCheekContour.AddVertexAt(i++, p, 0, 0, 0));
+            plCheekContour.Closed = true;
             btrPanel.AppendEntity(plCheekContour);
             t.AddNewlyCreatedDBObject(plCheekContour, true);
          }

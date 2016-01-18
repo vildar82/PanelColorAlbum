@@ -49,24 +49,132 @@ namespace AlbumPanelColorTiles.Model.Base
          }
          // Добавление ссылки блока в блок панели
          BlockReference blRefDim = new BlockReference(Point3d.Origin, btrDim.Id);
-         blRefDim.LayerId = idLayer;
+         blRefDim.LayerId = idLayer;         
          idBlRefDim = btrPanel.AppendEntity(blRefDim);
          t.AddNewlyCreatedDBObject(blRefDim, true);
          return btrDim;
       }
 
-      protected void sizesBot()
+      protected void sizesBot(bool doTrans, Matrix3d trans)
       {
+         // Общий размер
          Point3d ptBotLeft = new Point3d(0, 0, 0);
          Point3d ptBotRight = new Point3d(panelBase.Panel.gab.length, 0, 0);
          double yTotal = -250 - 200;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
-         createDim(ptBotLeft, ptBotRight, ptDimLineTotal, false, Matrix3d.Identity);
-
+         createDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
+         // Промежуточный размер
          Point3d ptDimLineInter = new Point3d(0, yTotal + 200, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
-         createDim(ptBotLeft, ptNext, ptDimLineInter, false, Matrix3d.Identity);
-         createDim(ptNext, ptBotRight, ptDimLineInter, false, Matrix3d.Identity);
+         createDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
+         createDim(ptNext, ptBotRight, ptDimLineInter, doTrans, trans);
+
+         // Торец
+         if (panelBase.IsCheekRight || panelBase.IsCheekLeft)
+         {
+            sizesCheek(doTrans, trans);
+         }
+      }
+
+      private void sizesCheek(bool doTrans, Matrix3d trans)
+      {
+         double xMinCheek = panelBase.PtsForBotDimCheek.First();
+         Point3d ptDimLineCheek = new Point3d(xMinCheek, -165, 0);
+         Point3d ptFirstCheek = new Point3d(xMinCheek, 0, 0);
+         Point3d ptLastCheek = new Point3d(panelBase.PtsForBotDimCheek.Last(), 0, 0);         
+
+         if (panelBase.IsCheekLeft)
+         {
+            addCheekViewText(doTrans, trans, xMinCheek);
+            addCheekViewBlock(doTrans, trans, xMinCheek+650, true);
+         }
+         if (panelBase.IsCheekRight)
+         {
+            addCheekViewText(doTrans, trans, xMinCheek);
+            addCheekViewBlock(doTrans, trans, xMinCheek - 365, false);
+         }
+
+         Point3d ptPrevCheek = ptFirstCheek;
+         foreach (var ptX in panelBase.PtsForBotDimCheek.Skip(1))
+         {
+            Point3d ptNextCheek = new Point3d(ptX, 0, 0);
+            var dimCheek = createDim(ptPrevCheek, ptNextCheek, ptDimLineCheek, doTrans, trans);
+            // Если размер маленький, то перемещение текста размера
+            if (dimCheek.Measurement < 90)
+            {               
+               double deltaX = panelBase.IsCheekLeft ? 70 : -70;
+               dimCheek.TextPosition = new Point3d(ptPrevCheek.X + deltaX, ptDimLineCheek.Y - 100, 0).TransformBy(trans);
+            }
+            ptPrevCheek = ptNextCheek;
+         }
+         // Общий размер торца
+         createDim(ptFirstCheek, ptLastCheek, new Point3d(0, ptDimLineCheek.Y - 150, 0), doTrans, trans);
+      }
+
+      private void addCheekViewBlock(bool doTrans, Matrix3d trans, double xPosView, bool isLeft)
+      {
+         // Добавление блока вида.
+         // Если блока нет, то выход.
+         if (panelBase.Service.Env.IdBtrView.IsNull)
+         {
+            return;
+         }
+
+         Point3d ptBlView = new Point3d (xPosView, 860,0);
+         if (doTrans)
+         {
+            ptBlView = ptBlView.TransformBy(trans);            
+         }
+         BlockReference blRefView = new BlockReference(ptBlView, panelBase.Service.Env.IdBtrView);
+         var mScale = Matrix3d.Scaling(Settings.Default.SheetScale, ptBlView);
+         blRefView.TransformBy(mScale);
+         blRefView.Layer = "0";
+         blRefView.ColorIndex = 256; // ByLayer                 
+
+         btrDim.AppendEntity(blRefView);
+         t.AddNewlyCreatedDBObject(blRefView, true);
+
+         // атрибут Вида
+         if (!panelBase.Service.Env.IdAttrDefView.IsNull)
+         {
+            using (var attrDefView = panelBase.Service.Env.IdAttrDefView.GetObject(OpenMode.ForRead, false, true) as AttributeDefinition)
+            {
+               var attrRefView = new AttributeReference();
+               attrRefView.SetAttributeFromBlock(attrDefView, blRefView.BlockTransform);
+               attrRefView.TextString = "А";               
+
+               blRefView.AttributeCollection.AppendAttribute(attrRefView);
+               t.AddNewlyCreatedDBObject(attrRefView, true);
+
+               if ((!isLeft || doTrans) && !(!isLeft && doTrans))
+               {
+                  attrRefView.TransformBy(Matrix3d.Mirroring(
+                     new Line3d(attrRefView.AlignmentPoint, new Point3d(attrRefView.AlignmentPoint.X, 0, 0))));                 
+               }
+            }
+         }
+
+         if ((!isLeft || doTrans) && !(!isLeft && doTrans))
+         {
+            blRefView.TransformBy(Matrix3d.Mirroring(new Line3d(ptBlView, new Point3d(ptBlView.X, 0, 0))));
+         }
+      }
+
+      private void addCheekViewText(bool doTrans, Matrix3d trans, double xMinCheek)
+      {
+         // Текст с именем вида
+         DBText textView = new DBText();         
+         textView.TextString = "Вид А";
+         textView.Height = 75;
+         Point3d ptTextPos = new Point3d(xMinCheek, panelBase.Panel.gab.height + 170, 0);
+         if (doTrans)
+         {
+            ptTextPos = ptTextPos.TransformBy(trans);
+            ptTextPos = new Point3d(ptTextPos.X - 290, ptTextPos.Y, 0);
+         }
+         textView.Position = ptTextPos;         
+         btrDim.AppendEntity(textView);
+         t.AddNewlyCreatedDBObject(textView, true);
       }
 
       protected void sizesTop(bool doTrans, Matrix3d trans)
