@@ -26,7 +26,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Размеры сверху
          sizesTop(true, matrixMirr);
          // Размеры снизу 
-         sizesBot();
+         sizesBot(true, matrixMirr);
 
          // Отзеркалить блок размеров в форме
          using (var blRefDim = this.idBlRefDim.GetObject(OpenMode.ForWrite, false, true) as BlockReference)

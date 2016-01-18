@@ -25,7 +25,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Размеры сверху
          sizesTop(false, Matrix3d.Identity);
          // Размеры снизу 
-         sizesBot();         
+         sizesBot(false, Matrix3d.Identity);         
       }                  
    }
 }

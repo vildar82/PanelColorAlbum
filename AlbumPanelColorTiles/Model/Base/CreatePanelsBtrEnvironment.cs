@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AcadLib.Errors;
 using AcadLib.Layers;
 using AlbumPanelColorTiles.Options;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace AlbumPanelColorTiles.Model.Base
@@ -24,6 +25,8 @@ namespace AlbumPanelColorTiles.Model.Base
       // Blocks
       public ObjectId IdBtrTile { get; private set; }
       public ObjectId IdBtrWindow { get; private set; }
+      public ObjectId IdBtrView { get; private set; }
+      public ObjectId IdAttrDefView { get; private set; }      
 
       // DimStyle
       public ObjectId IdDimStyle { get; private set; }
@@ -52,40 +55,67 @@ namespace AlbumPanelColorTiles.Model.Base
          IdLayerWindow = LayerExt.GetLayerOrCreateNew(layer);
          // Слой размеров на фасаде
          layer = new LayerInfo(Settings.Default.LayerDimensionFacade);
+         layer.Color = Color.FromColorIndex(ColorMethod.ByLayer, 192);
          IdLayerDimFacade = LayerExt.GetLayerOrCreateNew(layer);
          // Слой размеров в форме
          layer = new LayerInfo(Settings.Default.LayerDimensionForm);
+         layer.Color = Color.FromColorIndex(ColorMethod.ByLayer, 63);
          IdLayerDimForm = LayerExt.GetLayerOrCreateNew(layer);
       }
 
       private void loadBtr()
       {
          // Имена блоков для копирования из шаблона
-         List<string> blNamesToCopy = new List<string> { Settings.Default.BlockTileName, Settings.Default.BlockWindowName };
+         List<string> blNamesToCopy = new List<string> { Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
+                     Settings.Default.BlockViewName};
          // Копирование блоков
          var blocksCopyed = defineBlockFromTemplate(blNamesToCopy);
 
-         // Определение Блок Плитки
-         ObjectId idBtrTile;
-         if (blocksCopyed.TryGetValue(Settings.Default.BlockTileName, out idBtrTile))
-         {
-            IdBtrTile = idBtrTile;
-         }
-         else
-         {
-            Inspector.AddError($"Не определен блок плитки {Settings.Default.BlockTileName}");
-         }
+         // Блок Плитки
+         IdBtrTile = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockTileName);
+         // Блок Окна
+         IdBtrWindow = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockWindowName);
+         // Блок Вида
+         IdBtrView = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockViewName);
+         // Атрибут блока вида
+         IdAttrDefView = getAttrDefView(IdBtrView);
+      }
 
-         // Определение Блок Окна
-         ObjectId idBtrWin;
-         if (blocksCopyed.TryGetValue(Settings.Default.BlockWindowName, out idBtrWin))
+      private ObjectId getAttrDefView(ObjectId idBtrView)
+      {
+         ObjectId idAttrDefView = ObjectId.Null;
+         if (!idBtrView.IsNull)
          {
-            IdBtrWindow = idBtrWin;
+            using (var btrView = idBtrView.GetObject(OpenMode.ForRead) as BlockTableRecord)
+            {
+               foreach (ObjectId idEnt in btrView)
+               {
+                  if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
+                  {
+                     using (var attrDef = idEnt.GetObject(OpenMode.ForRead, false, true) as AttributeDefinition)
+                     {
+                        if (!attrDef.Constant && attrDef.Tag.Equals("ВИД", StringComparison.OrdinalIgnoreCase))
+                        {
+                           idAttrDefView = idEnt;
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
          }
-         else
+         return idAttrDefView;
+      }
+
+      private ObjectId getIdBtrLoaded(Dictionary<string, ObjectId> blocksCopyed, string blName)
+      {
+         ObjectId idBtr;
+         if (!blocksCopyed.TryGetValue(blName, out idBtr))
          {
-            Inspector.AddError($"Не определен блок плитки {Settings.Default.BlockWindowName}");
+            idBtr = ObjectId.Null;
+            Inspector.AddError($"Не определен блок {blName}");
          }
+         return idBtr;
       }
 
       private Dictionary<string, ObjectId> defineBlockFromTemplate(List<string> blNames)

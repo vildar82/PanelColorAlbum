@@ -32,7 +32,8 @@
       public string BlockPanelAkrPrefixName { get; set; }
       public string BlockSectionName { get; set; }
       public string BlockTileName { get; set; }
-      public string BlockWindowName { get; set; }      
+      public string BlockWindowName { get; set; }
+      public string BlockViewName { get; set; }      
       public int CaptionPanelSecondTextShift { get; set; }
       public int CaptionPanelTextHeight { get; set; }
       public string EndLeftPanelSuffix { get; set; }
@@ -97,6 +98,7 @@
          BlockFacadeName = "АКР_Фасад";
          BlockTileName = "АКР_Плитка";
          BlockWindowName = "АКР_Окно";
+         BlockViewName = "АКР_Вид";
          BlockSectionName = "АКР_Секция";
          AttributePanelSbPaint = "ПОКРАСКА";
          AttributePanelSbMark = "МАРКА";
