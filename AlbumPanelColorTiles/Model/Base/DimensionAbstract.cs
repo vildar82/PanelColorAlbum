@@ -7,6 +7,7 @@ using AcadLib.Blocks;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
@@ -26,7 +27,7 @@ namespace AlbumPanelColorTiles.Model.Base
          this.panelBase = panel;
       }
 
-      protected BlockTableRecord createBtrDim(string prefix, ObjectId idLayer)
+      protected BlockTableRecord CreateBtrDim(string prefix, ObjectId idLayer)
       {
          // Создание определения блока образмеривания
          BlockTableRecord btrDim;
@@ -55,29 +56,94 @@ namespace AlbumPanelColorTiles.Model.Base
          return btrDim;
       }
 
-      protected void sizesBot(bool doTrans, Matrix3d trans)
+      protected void SizesTop(bool doTrans, Matrix3d trans)
+      {
+         bool hasInterDim = panelBase.PtsForTopDim.Count > 0 || panelBase.XMinPanel < 0 || panelBase.XMaxPanel > panelBase.Length;
+
+         // Общий размер
+         Point3d ptTopLeft = new Point3d(panelBase.XMinContour, panelBase.Height, 0);
+         Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
+         double yTotal = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
+         Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
+         CreateDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile: true);
+         // добавление промежуточных размеров
+         if (hasInterDim)
+         {
+            panelBase.PtsForTopDim.Sort();
+            AcadLib.Comparers.DoubleEqualityComparer comparer = new AcadLib.Comparers.DoubleEqualityComparer(4);
+            var ptsX = panelBase.PtsForTopDim.GroupBy(p => p, comparer).Select(g => g.First());
+
+            Point3d ptPrev = ptTopLeft;
+            Point3d ptDimLineInter = new Point3d(0, yTotal - 185, 0);
+            foreach (var x in ptsX)
+            {
+               Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
+               CreateDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans, addTextRangeTile: true);
+               ptPrev = ptNext;
+            }
+            // Замыкающий размер
+            CreateDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans, addTextRangeTile: true);
+
+
+            //если есть пустые области Outsides, то добавление промежеточных размеров.
+            if (panelBase.XMinPanel < 0)
+            {
+               CreateDim(new Point3d(panelBase.XMinPanel, ptPrev.Y, 0),
+                         new Point3d(panelBase.XMinContour, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
+            }
+            if (panelBase.XMaxPanel > panelBase.Length)
+            {
+               CreateDim(new Point3d(panelBase.XMaxContour, ptPrev.Y, 0),
+                         new Point3d(panelBase.XMaxPanel, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
+            }
+         }
+      }
+
+      protected void SizesBot(bool doTrans, Matrix3d trans)
       {
          // Общий размер
          Point3d ptBotLeft = new Point3d(panelBase.XMinContour, 0, 0);
          Point3d ptBotRight = new Point3d(panelBase.XMaxContour, 0, 0);
          double yTotal = -215 - 215;
          Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
-         createDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
+         CreateDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
          // Промежуточный размер
          Point3d ptDimLineInter = new Point3d(0, yTotal + 215, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
-         var dim = createDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
+         var dim = CreateDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
          var lenTile = Settings.Default.TileLenght + Settings.Default.TileSeam;
          var count = Convert.ToInt32(dim.Measurement / lenTile);
          dim.Prefix = $"({Settings.Default.TileLenght}+{Settings.Default.TileSeam})x{count}=";
 
-         createDim(ptNext, ptBotRight, ptDimLineInter, doTrans, trans);        
+         CreateDim(ptNext, ptBotRight, ptDimLineInter, doTrans, trans);        
 
          // Торец
          if (panelBase.IsCheekRight || panelBase.IsCheekLeft)
          {
             sizesCheek(doTrans, trans);
          }
+      }
+
+      protected void SizesLeft(bool doTrans, Matrix3d trans)
+      {
+         var heightTile = Settings.Default.TileHeight + Settings.Default.TileSeam;
+         // y последней плитки
+         var countTile = Convert.ToInt32((panelBase.Height - heightTile) / heightTile);
+         var yLastTile = countTile * heightTile;
+
+         Point3d ptBotLeft = new Point3d(panelBase.XMinPanel, 0, 0);
+         Point3d ptTopLeft = new Point3d(ptBotLeft.X, yLastTile, 0);
+
+         double xIndentdimLine = panelBase.XMinPanel-175;
+         Point3d ptDimLine = new Point3d(xIndentdimLine, 0, 0);
+
+         var dim= CreateDim(ptBotLeft, ptTopLeft, ptDimLine, doTrans, trans, rotation: 90);
+         dim.Prefix = $"({Settings.Default.TileHeight}+{Settings.Default.TileSeam})x{countTile}=";
+
+         Point3d ptLastTile = new Point3d(ptTopLeft.X, ptTopLeft.Y + Settings.Default.TileHeight, 0);
+         dim = CreateDim(ptTopLeft, ptLastTile, ptDimLine, doTrans, trans, rotation:90);
+         Point3d ptText = new Point3d(ptDimLine.X, ptTopLeft.Y - 65, 0);
+         dim.TextPosition = doTrans? ptText.TransformBy(trans): ptText;
       }
 
       private void sizesCheek(bool doTrans, Matrix3d trans)
@@ -102,7 +168,7 @@ namespace AlbumPanelColorTiles.Model.Base
          foreach (var ptX in panelBase.PtsForBotDimCheek.Skip(1))
          {
             Point3d ptNextCheek = new Point3d(ptX, 0, 0);
-            var dimCheek = createDim(ptPrevCheek, ptNextCheek, ptDimLineCheek, doTrans, trans);
+            var dimCheek = CreateDim(ptPrevCheek, ptNextCheek, ptDimLineCheek, doTrans, trans);
             // Если размер маленький, то перемещение текста размера
             if (dimCheek.Measurement < 90)
             {               
@@ -112,7 +178,7 @@ namespace AlbumPanelColorTiles.Model.Base
             ptPrevCheek = ptNextCheek;
          }
          // Общий размер торца
-         createDim(ptFirstCheek, ptLastCheek, new Point3d(0, ptDimLineCheek.Y - 150, 0), doTrans, trans);
+         CreateDim(ptFirstCheek, ptLastCheek, new Point3d(0, ptDimLineCheek.Y - 150, 0), doTrans, trans);
       }
 
       private void addCheekViewBlock(bool doTrans, Matrix3d trans, double xPosView, bool isLeft)
@@ -179,50 +245,7 @@ namespace AlbumPanelColorTiles.Model.Base
          textView.Position = ptTextPos;         
          btrDim.AppendEntity(textView);
          t.AddNewlyCreatedDBObject(textView, true);
-      }
-
-      protected void sizesTop(bool doTrans, Matrix3d trans)
-      {
-         bool hasInterDim = panelBase.PtsForTopDim.Count > 0 || panelBase.XMinPanel<0 || panelBase.XMaxPanel> panelBase.Length;      
-
-         // Общий размер
-         Point3d ptTopLeft = new Point3d(panelBase.XMinContour, panelBase.Height, 0);
-         Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
-         double yTotal = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
-         Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
-         createDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, true);         
-         // добавление промежуточных размеров
-         if (hasInterDim)
-         {
-            panelBase.PtsForTopDim.Sort();
-            AcadLib.Comparers.DoubleEqualityComparer comparer = new AcadLib.Comparers.DoubleEqualityComparer(4);
-            var ptsX = panelBase.PtsForTopDim.GroupBy(p=>p, comparer).Select(g=>g.First());
-
-            Point3d ptPrev = ptTopLeft;
-            Point3d ptDimLineInter = new Point3d(0, yTotal - 185, 0);            
-            foreach (var x in ptsX)
-            {
-               Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
-               createDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans, true);               
-               ptPrev = ptNext;               
-            }
-            // Замыкающий размер
-            createDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans, true);
-            
-
-            //если есть пустые области Outsides, то добавление промежеточных размеров.
-            if (panelBase.XMinPanel < 0)
-            {
-               createDim(new Point3d (panelBase.XMinPanel, ptPrev.Y,0),
-                         new Point3d(panelBase.XMinContour, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
-            }
-            if (panelBase.XMaxPanel > panelBase.Length)
-            {
-               createDim(new Point3d(panelBase.XMaxContour, ptPrev.Y, 0),
-                         new Point3d(panelBase.XMaxPanel, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
-            }            
-         }
-      }
+      }      
 
       private string getTextRange(double measurement)
       {
@@ -260,8 +283,8 @@ namespace AlbumPanelColorTiles.Model.Base
          return $" ({count} {row})";
       }
 
-      protected RotatedDimension createDim(Point3d ptPrev, Point3d ptNext, Point3d ptDimLine, 
-                                          bool doTrans, Matrix3d trans, bool addTextRangeTile = false)
+      protected RotatedDimension CreateDim(Point3d ptPrev, Point3d ptNext, Point3d ptDimLine, 
+                                          bool doTrans, Matrix3d trans, bool addTextRangeTile = false, double rotation = 0)
       {
          if (doTrans)
          {
@@ -270,7 +293,7 @@ namespace AlbumPanelColorTiles.Model.Base
             ptDimLine = ptDimLine.TransformBy(trans);
          }         
 
-         var dim = new RotatedDimension(0, ptPrev, ptNext, ptDimLine, "", panelBase.Service.Env.IdDimStyle);
+         var dim = new RotatedDimension(rotation.ToRadians(), ptPrev, ptNext, ptDimLine, "", panelBase.Service.Env.IdDimStyle);
          if (addTextRangeTile)
          {
             dim.Suffix = getTextRange(dim.Measurement);

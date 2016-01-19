@@ -65,7 +65,7 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
                   pt = new Point2d(outside.posi.X, outside.posi.Y);
                   panelBase.XMinContour = 70;
                   panelBase.XStartTile = 70 + 11;
-                  panelBase.XMinPanel = pt.X - width;
+                  panelBase.XMinPanel = pt.X;
                }               
                else
                {

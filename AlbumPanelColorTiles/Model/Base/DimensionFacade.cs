@@ -21,11 +21,13 @@ namespace AlbumPanelColorTiles.Model.Base
       public void Create()
       {
          // Создание определения блока образмеривыания - пустого
-         btrDim = createBtrDim("ОБР_", panelBase.Service.Env.IdLayerDimFacade);         
+         btrDim = CreateBtrDim("ОБР_", panelBase.Service.Env.IdLayerDimFacade);         
          // Размеры сверху
-         sizesTop(false, Matrix3d.Identity);
+         SizesTop(false, Matrix3d.Identity);
          // Размеры снизу 
-         sizesBot(false, Matrix3d.Identity);         
+         SizesBot(false, Matrix3d.Identity);
+         // Размеры слева
+         SizesLeft(false, Matrix3d.Identity);
       }                  
    }
 }
