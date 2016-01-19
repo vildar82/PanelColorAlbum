@@ -263,7 +263,7 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             ptBlView = ptBlView.TransformBy(trans);
          }
-         BlockReference blRefView = CreateBlRef(ptBlView, panelBase.Service.Env.IdBtrView);
+         BlockReference blRefView = CreateBlRef(ptBlView, panelBase.Service.Env.IdBtrView, Settings.Default.SheetScale);
 
          // атрибут Вида
          if (!panelBase.Service.Env.IdAttrDefView.IsNull)
@@ -365,12 +365,15 @@ namespace AlbumPanelColorTiles.Model.Base
          return dim;
       }
 
-      protected BlockReference CreateBlRef(Point3d ptPos, ObjectId idBtr)
+      protected BlockReference CreateBlRef(Point3d ptPos, ObjectId idBtr, double scale)
       {
          BlockReference blRef = new BlockReference(ptPos, idBtr);
          //var mScale = Matrix3d.Scaling(Settings.Default.SheetScale, ptBlView);
          //blRefView.TransformBy(mScale);
-         blRef.ScaleFactors = new Scale3d(Settings.Default.SheetScale);
+         if (scale != 1)
+         {
+            blRef.ScaleFactors = new Scale3d(scale);
+         }         
          blRef.Layer = "0";
          blRef.ColorIndex = 256; // ByLayer                 
 

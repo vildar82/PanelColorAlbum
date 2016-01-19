@@ -36,16 +36,26 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       private void verticalSection()
-      {
-         bool leftSection = !panelBase.IsCheekLeft;
+      {         
          // Вертикальное сечение
          // вставка блока сечения панели
+         addVerticalPanelSection();
 
          // вставка обозначения вертикального сечения
          addVerticalSectionMark();
          // вставка обозначения горизонтального сечения
          addHorizontalSectionMark();
-      }     
+      }
+
+      private void addVerticalPanelSection()
+      {
+         // Вставка вертикального сечения панели
+         // Ширина блока сечения панели
+         double secThickness = panelBase.Thickness == 320 ? 700 : 800;
+         double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + 700 : xDimLineLeftMin - secThickness;
+
+         Point3d ptPos = new Point3d();
+      }
 
       private void addVerticalSectionMark()
       {
@@ -62,9 +72,9 @@ namespace AlbumPanelColorTiles.Model.Base
          
          Point3d ptTopCross = new Point3d(xSec,yTop,0);
          Point3d ptBotCross = new Point3d(xSec, yBot, 0);
-         BlockReference blRefCrossTop = CreateBlRef(ptTopCross, panelBase.Service.Env.IdBtrCross);
+         BlockReference blRefCrossTop = CreateBlRef(ptTopCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          var attrRefTop = addAttrToBlockCross(blRefCrossTop, "2");
-         BlockReference blRefCrossBot = CreateBlRef(ptBotCross, panelBase.Service.Env.IdBtrCross);
+         BlockReference blRefCrossBot = CreateBlRef(ptBotCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          var attrRefBot = addAttrToBlockCross(blRefCrossBot, "2");         
       }
 
@@ -77,7 +87,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptLeftCross = new Point3d(xLeft, ySec, 0);
          Point3d ptRightCross = new Point3d(xRight, ySec, 0);
 
-         BlockReference blRefCrossLeft = CreateBlRef(ptLeftCross, panelBase.Service.Env.IdBtrCross);
+         BlockReference blRefCrossLeft = CreateBlRef(ptLeftCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          Matrix3d matrixMirrLeftCross = Matrix3d.Mirroring(new Line3d(ptLeftCross, ptRightCross));
          blRefCrossLeft.Rotation = 90d.ToRadians();
          blRefCrossLeft.TransformBy(matrixMirrLeftCross);         
@@ -86,7 +96,7 @@ namespace AlbumPanelColorTiles.Model.Base
                new Point3d(attrRefTop.AlignmentPoint.X+1, attrRefTop.AlignmentPoint.Y, attrRefTop.AlignmentPoint.Z))));
          attrRefTop.Rotation = 0;
 
-         BlockReference blRefCrossRight = CreateBlRef(ptRightCross, panelBase.Service.Env.IdBtrCross);
+         BlockReference blRefCrossRight = CreateBlRef(ptRightCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          blRefCrossRight.Rotation = 270d.ToRadians();
          var attrRefBot = addAttrToBlockCross(blRefCrossRight, "1");
          attrRefBot.Rotation = 0; ;
