@@ -527,6 +527,7 @@ namespace AlbumPanelColorTiles
                      }
                      string filePdfName = Path.Combine(Path.GetDirectoryName(doc.Name), Path.GetFileNameWithoutExtension(doc.Name) + ".pdf");
                      AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(new string[] { doc.Name }, filePdfName);
+                     plotter.LayoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.TabOrder;
                      plotter.Plot();
                   }
                   catch (System.Exception ex)
@@ -557,6 +558,7 @@ namespace AlbumPanelColorTiles
                      try
                      {
                         AcadLib.Plot.PlotDirToPdf plotter = new AcadLib.Plot.PlotDirToPdf(dialog.SelectedPath);
+                        plotter.LayoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.TabOrder;
                         plotter.Plot();
                      }
                      catch (System.Exception ex)
