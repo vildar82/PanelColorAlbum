@@ -22,11 +22,13 @@ namespace AlbumPanelColorTiles.Model.Base
          Matrix3d matrixMirr = Matrix3d.Mirroring(new Line3d(new Point3d(xCenter, 0, 0), new Point3d(xCenter, 1000, 0)));
 
          // Создание определения блока образмеривыания - пустого
-         btrDim = createBtrDim("ОБРФ_", panelBase.Service.Env.IdLayerDimForm);
+         btrDim = CreateBtrDim("ОБРФ_", panelBase.Service.Env.IdLayerDimForm);
          // Размеры сверху
-         sizesTop(true, matrixMirr);
+         SizesTop(true, matrixMirr);
          // Размеры снизу 
-         sizesBot(true, matrixMirr);
+         SizesBot(true, matrixMirr);
+         // Размеры слева
+         SizesLeft(true, matrixMirr);
 
          // Отзеркалить блок размеров в форме
          using (var blRefDim = this.idBlRefDim.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
