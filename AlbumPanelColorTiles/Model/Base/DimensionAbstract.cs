@@ -131,10 +131,10 @@ namespace AlbumPanelColorTiles.Model.Base
          var countTile = Convert.ToInt32((panelBase.Height - heightTile) / heightTile);
          var yLastTile = countTile * heightTile;
 
-         Point3d ptBotLeft = new Point3d(panelBase.XMinPanel, 0, 0);
+         Point3d ptBotLeft = new Point3d(panelBase.IsCheekRight? panelBase.XMaxPanel : panelBase.XMinPanel, 0, 0);
          Point3d ptTopLeft = new Point3d(ptBotLeft.X, yLastTile, 0);
 
-         double xIndentdimLine = panelBase.XMinPanel-175;
+         double xIndentdimLine = panelBase.IsCheekRight ? ptBotLeft.X + 175 : ptBotLeft.X-175;
          Point3d ptDimLine = new Point3d(xIndentdimLine, 0, 0);
 
          var dim= CreateDim(ptBotLeft, ptTopLeft, ptDimLine, doTrans, trans, rotation: 90);
