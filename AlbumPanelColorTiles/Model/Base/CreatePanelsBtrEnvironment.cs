@@ -16,6 +16,7 @@ namespace AlbumPanelColorTiles.Model.Base
    public class CreatePanelsBtrEnvironment
    {
       private BaseService _service;
+      private Dictionary<string, ObjectId> _blocks;
 
       // Layers
       public ObjectId IdLayerContourPanel { get; private set; }
@@ -29,6 +30,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public ObjectId IdAttrDefView { get; private set; }
       public ObjectId IdBtrCross { get; private set; }
       public ObjectId IdAttrDefCross { get; private set; }
+      public List<string> BlNamesVerticalSection { get; private set; }
 
       // DimStyle
       public ObjectId IdDimStyle { get; private set; }
@@ -68,21 +70,32 @@ namespace AlbumPanelColorTiles.Model.Base
       private void loadBtr()
       {
          // Имена блоков для копирования из шаблона
-         List<string> blNamesToCopy = new List<string> { Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
-                     Settings.Default.BlockViewName, Settings.Default.BlockCrossName};
+         BlNamesVerticalSection = new List<string>
+         {
+            "АКР_СечениеПанелиВертик_h2890_t320",
+            "АКР_СечениеПанелиВертик_h2890_t320_w",
+            "АКР_СечениеПанелиВертик_h2890_t420",
+            "АКР_СечениеПанелиВертик_h2890_t420_w"
+         };
+
+         List<string> blNamesToCopy = new List<string> {
+                     Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
+                     Settings.Default.BlockViewName, Settings.Default.BlockCrossName                     
+         };
+         blNamesToCopy.AddRange(BlNamesVerticalSection);
          // Копирование блоков
-         var blocksCopyed = defineBlockFromTemplate(blNamesToCopy);
+         _blocks = defineBlockFromTemplate(blNamesToCopy);
 
          // Блок Плитки
-         IdBtrTile = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockTileName);
+         IdBtrTile = GetIdBtrLoaded( Settings.Default.BlockTileName);
          // Блок Окна
-         IdBtrWindow = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockWindowName);
+         IdBtrWindow = GetIdBtrLoaded( Settings.Default.BlockWindowName);
          // Блок Вида
-         IdBtrView = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockViewName);
+         IdBtrView = GetIdBtrLoaded( Settings.Default.BlockViewName);
          // Атрибут блока вида
          IdAttrDefView = getAttrDef(IdBtrView, "ВИД");
          // Блок Разреза
-         IdBtrCross = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockCrossName);
+         IdBtrCross = GetIdBtrLoaded(Settings.Default.BlockCrossName);
          // Атрибут блока разреза
          IdAttrDefCross = getAttrDef(IdBtrCross, "НОМЕР");
       }
@@ -113,10 +126,10 @@ namespace AlbumPanelColorTiles.Model.Base
          return idAttrDef;
       }
 
-      private ObjectId getIdBtrLoaded(Dictionary<string, ObjectId> blocksCopyed, string blName)
+      public ObjectId GetIdBtrLoaded(string blName)
       {
          ObjectId idBtr;
-         if (!blocksCopyed.TryGetValue(blName, out idBtr))
+         if (!_blocks.TryGetValue(blName, out idBtr))
          {
             idBtr = ObjectId.Null;
             Inspector.AddError($"Не определен блок {blName}");

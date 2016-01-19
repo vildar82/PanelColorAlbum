@@ -32,6 +32,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public bool IsCheekLeft { get; private set; }
       public double Length { get; private set; }
       public double Height { get; private set; }
+      public int Thickness { get; private set; }
       /// <summary>
       /// Край контура панели - контур для заполнения плиткой
       /// </summary>
@@ -63,6 +64,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
          XMinPanel = 0;
          XMaxPanel = Length;
+
+         Thickness = 320;
       }      
 
       public string MarkWithoutElectric
