@@ -131,10 +131,10 @@ namespace AlbumPanelColorTiles.Model.Base
          var countTile = Convert.ToInt32((panelBase.Height - heightTile) / heightTile);
          var yLastTile = countTile * heightTile;
 
-         Point3d ptBotLeft = new Point3d(panelBase.IsCheekRight? panelBase.XMaxPanel : panelBase.XMinPanel, 0, 0);
+         Point3d ptBotLeft = new Point3d(panelBase.XMinPanel, 0, 0);
          Point3d ptTopLeft = new Point3d(ptBotLeft.X, yLastTile, 0);
 
-         double xIndentdimLine = panelBase.IsCheekRight ? ptBotLeft.X + 175 : ptBotLeft.X-175;
+         double xIndentdimLine = ptBotLeft.X-175;
          Point3d ptDimLine = new Point3d(xIndentdimLine, 0, 0);
 
          var dim= CreateDim(ptBotLeft, ptTopLeft, ptDimLine, doTrans, trans, rotation: 90);
@@ -144,6 +144,70 @@ namespace AlbumPanelColorTiles.Model.Base
          dim = CreateDim(ptTopLeft, ptLastTile, ptDimLine, doTrans, trans, rotation:90);
          Point3d ptText = new Point3d(ptDimLine.X, ptTopLeft.Y - 65, 0);
          dim.TextPosition = doTrans? ptText.TransformBy(trans): ptText;
+      }
+
+      protected void SizesRight(bool doTrans, Matrix3d trans)
+      {
+         double yWinMax=0;
+         double yWinMin=0;
+         var win = panelBase.Panel.windows?.window?.First();
+         if (win == null)
+         {
+            var balc = panelBase.Panel.balconys?.balcony?.First();
+            if (balc!=null)
+            {
+               yWinMax = balc.posi.Y + balc.height;
+               yWinMin = balc.posi.Y;
+            }
+         }
+         else
+         {
+            yWinMax = win.posi.Y + win.height;
+            yWinMin = win.posi.Y;
+         }
+
+         var heightTile = Settings.Default.TileHeight + Settings.Default.TileSeam;
+         // y последней плитки
+         var countTile = Convert.ToInt32(panelBase.Height / heightTile);
+         var yLastTile = (countTile * heightTile)-12;
+
+         Point3d ptBotRight = new Point3d(panelBase.XMaxPanel, 0, 0);
+         Point3d ptTopRight = new Point3d(ptBotRight.X, yLastTile, 0);
+
+         bool hasIndentDim = yWinMax > 0;
+         double xTotalDim = hasIndentDim ? ptBotRight.X+250+185 : ptBotRight.X + 250;
+
+         // Общий размер         
+         Point3d ptDimLineTotal = new Point3d(xTotalDim, 0, 0);
+         CreateDim(ptBotRight, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile:true, rotation: 90);
+         // Промежуточные размеры
+         if (hasIndentDim)
+         {
+            Point3d ptDimLineIndent = new Point3d(xTotalDim-185, 0, 0);
+            Point3d ptMinWin= ptBotRight;
+            if (yWinMin>0)
+            {
+               var countTileMinWin = Convert.ToInt32(yWinMin / heightTile);
+               var yTilesMinWin = (countTileMinWin * heightTile) - 12;
+               ptMinWin = new Point3d(ptBotRight.X, yTilesMinWin, 0);
+               CreateDim(ptBotRight, ptMinWin, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+               var ptMinWinSeam = new Point3d(ptMinWin.X, ptMinWin.Y+12, 0);
+               var dimSeamMin= CreateDim(ptMinWin, ptMinWinSeam, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+               Point3d ptTextSeamMin = new Point3d(ptDimLineIndent.X, ptMinWinSeam.Y+65,0);
+               dimSeamMin.TextPosition = doTrans? ptTextSeamMin.TransformBy(trans): ptTextSeamMin;
+               ptMinWin = ptMinWinSeam;
+            }
+            var countTileMaxWin = Convert.ToInt32(yWinMax / heightTile);
+            var yTilesMaxWin = (countTileMaxWin * heightTile) - 12;
+            Point3d ptMaxWin = new Point3d(ptMinWin.X, yTilesMaxWin, 0);
+            CreateDim(ptMinWin, ptMaxWin, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+            Point3d ptMaxWinSeam = new Point3d(ptMaxWin.X, ptMaxWin.Y+12, 0);
+            var dimSeamMax = CreateDim(ptMaxWin, ptMaxWinSeam, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+            Point3d ptTextSeamMax = new Point3d(ptDimLineIndent.X, ptMaxWin.Y - 65, 0);
+            dimSeamMax.TextPosition = doTrans ? ptTextSeamMax.TransformBy(trans) : ptTextSeamMax;
+            // размер до верха плиток
+            CreateDim(ptMaxWinSeam, ptTopRight, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+         }
       }
 
       private void sizesCheek(bool doTrans, Matrix3d trans)
@@ -252,7 +316,7 @@ namespace AlbumPanelColorTiles.Model.Base
          var len = Settings.Default.TileLenght + Settings.Default.TileSeam;
          var count = Convert.ToInt32(measurement / len);
          string row = string.Empty;
-         if (count ==1)
+         if (count <=1)
          {
             return "";
          }
