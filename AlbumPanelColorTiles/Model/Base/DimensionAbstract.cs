@@ -19,8 +19,10 @@ namespace AlbumPanelColorTiles.Model.Base
       protected PanelBase panelBase;
       protected Transaction t;
       protected ObjectId idBlRefDim;
-      protected double yTopDimLineMax;
-      protected double yBotDimLineMin;
+      protected double yDimLineTopMax;
+      protected double yDimLineBotMin;
+      protected double xDimLineLeftMin;
+      protected double xDimLineRightMax;
 
       public DimensionAbstract(BlockTableRecord btrPanel, Transaction t, PanelBase panel)
       {
@@ -65,8 +67,8 @@ namespace AlbumPanelColorTiles.Model.Base
          // Общий размер
          Point3d ptTopLeft = new Point3d(panelBase.XMinContour, panelBase.Height, 0);
          Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
-         yTopDimLineMax = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
-         Point3d ptDimLineTotal = new Point3d(0, yTopDimLineMax, 0);
+         yDimLineTopMax = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
+         Point3d ptDimLineTotal = new Point3d(0, yDimLineTopMax, 0);
          CreateDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile: true);
          // добавление промежуточных размеров
          if (hasInterDim)
@@ -76,7 +78,7 @@ namespace AlbumPanelColorTiles.Model.Base
             var ptsX = panelBase.PtsForTopDim.GroupBy(p => p, comparer).Select(g => g.First());
 
             Point3d ptPrev = ptTopLeft;
-            Point3d ptDimLineInter = new Point3d(0, yTopDimLineMax - 185, 0);
+            Point3d ptDimLineInter = new Point3d(0, yDimLineTopMax - 185, 0);
             foreach (var x in ptsX)
             {
                Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
@@ -106,11 +108,11 @@ namespace AlbumPanelColorTiles.Model.Base
          // Общий размер
          Point3d ptBotLeft = new Point3d(panelBase.XMinContour, 0, 0);
          Point3d ptBotRight = new Point3d(panelBase.XMaxContour, 0, 0);
-         yBotDimLineMin = -215 - 215;
-         Point3d ptDimLineTotal = new Point3d(0, yBotDimLineMin, 0);
+         yDimLineBotMin = -215 - 215;
+         Point3d ptDimLineTotal = new Point3d(0, yDimLineBotMin, 0);
          CreateDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
          // Промежуточный размер
-         Point3d ptDimLineInter = new Point3d(0, yBotDimLineMin + 215, 0);
+         Point3d ptDimLineInter = new Point3d(0, yDimLineBotMin + 215, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
          var dim = CreateDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
          var lenTile = Settings.Default.TileLenght + Settings.Default.TileSeam;
@@ -136,8 +138,8 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptBotLeft = new Point3d(panelBase.XMinPanel, 0, 0);
          Point3d ptTopLeft = new Point3d(ptBotLeft.X, yLastTile, 0);
 
-         double xIndentdimLine = ptBotLeft.X-175;
-         Point3d ptDimLine = new Point3d(xIndentdimLine, 0, 0);
+         xDimLineLeftMin = ptBotLeft.X-175;
+         Point3d ptDimLine = new Point3d(xDimLineLeftMin, 0, 0);
 
          var dim= CreateDim(ptBotLeft, ptTopLeft, ptDimLine, doTrans, trans, rotation: 90);
          dim.Prefix = $"({Settings.Default.TileHeight}+{Settings.Default.TileSeam})x{countTile}=";
@@ -177,15 +179,15 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptTopRight = new Point3d(ptBotRight.X, yLastTile, 0);
 
          bool hasIndentDim = yWinMax > 0;
-         double xTotalDim = hasIndentDim ? ptBotRight.X+250+185 : ptBotRight.X + 250;
+         xDimLineRightMax = hasIndentDim ? ptBotRight.X+250+185 : ptBotRight.X + 250;
 
          // Общий размер         
-         Point3d ptDimLineTotal = new Point3d(xTotalDim, 0, 0);
+         Point3d ptDimLineTotal = new Point3d(xDimLineRightMax, 0, 0);
          CreateDim(ptBotRight, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile:true, rotation: 90);
          // Промежуточные размеры
          if (hasIndentDim)
          {
-            Point3d ptDimLineIndent = new Point3d(xTotalDim-185, 0, 0);
+            Point3d ptDimLineIndent = new Point3d(xDimLineRightMax-185, 0, 0);
             Point3d ptMinWin= ptBotRight;
             if (yWinMin>0)
             {

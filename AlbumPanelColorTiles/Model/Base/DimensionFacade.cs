@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using AcadLib.Blocks;
+using AcadLib;
 using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.Base
@@ -41,16 +42,18 @@ namespace AlbumPanelColorTiles.Model.Base
          // вставка блока сечения панели
 
          // вставка обозначения вертикального сечения
-         addVerticalSectionMark(leftSection);
-      }
+         addVerticalSectionMark();
+         // вставка обозначения горизонтального сечения
+         addHorizontalSectionMark();
+      }     
 
-      private void addVerticalSectionMark(bool leftSection)
+      private void addVerticalSectionMark()
       {
          // Определение X сечения в панели
          // Если есть окно, то сечение по первому окну                  
          double xSec = 750;
-         double yTop = yTopDimLineMax + 120;
-         double yBot = yBotDimLineMin -40;
+         double yTop = yDimLineTopMax + 120;
+         double yBot = yDimLineBotMin -40;
          var win = panelBase.Panel.windows?.window?.First();
          if (win!=null)
          {
@@ -63,6 +66,35 @@ namespace AlbumPanelColorTiles.Model.Base
          var attrRefTop = addAttrToBlockCross(blRefCrossTop, "2");
          BlockReference blRefCrossBot = CreateBlRef(ptBotCross, panelBase.Service.Env.IdBtrCross);
          var attrRefBot = addAttrToBlockCross(blRefCrossBot, "2");         
+      }
+
+      private void addHorizontalSectionMark()
+      {
+         double ySec = panelBase.Height * 70 / 100;
+         double xLeft = xDimLineLeftMin - 160;
+         double xRight = xDimLineRightMax + 180;
+
+         Point3d ptLeftCross = new Point3d(xLeft, ySec, 0);
+         Point3d ptRightCross = new Point3d(xRight, ySec, 0);
+
+         BlockReference blRefCrossLeft = CreateBlRef(ptLeftCross, panelBase.Service.Env.IdBtrCross);
+         Matrix3d matrixMirrLeftCross = Matrix3d.Mirroring(new Line3d(ptLeftCross, ptRightCross));
+         blRefCrossLeft.Rotation = 90d.ToRadians();
+         blRefCrossLeft.TransformBy(matrixMirrLeftCross);         
+         var attrRefTop = addAttrToBlockCross(blRefCrossLeft, "1");                  
+         attrRefTop.TransformBy(Matrix3d.Mirroring(new Line3d(attrRefTop.AlignmentPoint,
+               new Point3d(attrRefTop.AlignmentPoint.X+1, attrRefTop.AlignmentPoint.Y, attrRefTop.AlignmentPoint.Z))));
+         attrRefTop.Rotation = 0;
+
+         BlockReference blRefCrossRight = CreateBlRef(ptRightCross, panelBase.Service.Env.IdBtrCross);
+         blRefCrossRight.Rotation = 270d.ToRadians();
+         var attrRefBot = addAttrToBlockCross(blRefCrossRight, "1");
+         attrRefBot.Rotation = 0; ;
+      }
+
+      private void rotateHorCross(BlockReference blRefCross, AttributeReference attrRef)
+      {
+         blRefCross.Rotation = 90d.ToRadians();         
       }
 
       private AttributeReference addAttrToBlockCross(BlockReference blRefCross, string num)
