@@ -28,6 +28,8 @@ namespace AlbumPanelColorTiles.Model.Base
          SizesBot(false, Matrix3d.Identity);
          // Размеры слева
          SizesLeft(false, Matrix3d.Identity);
+         // Размеры справа
+         SizesRight(false, Matrix3d.Identity);
       }                  
    }
 }
