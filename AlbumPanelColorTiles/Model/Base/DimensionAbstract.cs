@@ -19,6 +19,8 @@ namespace AlbumPanelColorTiles.Model.Base
       protected PanelBase panelBase;
       protected Transaction t;
       protected ObjectId idBlRefDim;
+      protected double yTopDimLineMax;
+      protected double yBotDimLineMin;
 
       public DimensionAbstract(BlockTableRecord btrPanel, Transaction t, PanelBase panel)
       {
@@ -63,8 +65,8 @@ namespace AlbumPanelColorTiles.Model.Base
          // Общий размер
          Point3d ptTopLeft = new Point3d(panelBase.XMinContour, panelBase.Height, 0);
          Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
-         double yTotal = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
-         Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
+         yTopDimLineMax = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
+         Point3d ptDimLineTotal = new Point3d(0, yTopDimLineMax, 0);
          CreateDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile: true);
          // добавление промежуточных размеров
          if (hasInterDim)
@@ -74,7 +76,7 @@ namespace AlbumPanelColorTiles.Model.Base
             var ptsX = panelBase.PtsForTopDim.GroupBy(p => p, comparer).Select(g => g.First());
 
             Point3d ptPrev = ptTopLeft;
-            Point3d ptDimLineInter = new Point3d(0, yTotal - 185, 0);
+            Point3d ptDimLineInter = new Point3d(0, yTopDimLineMax - 185, 0);
             foreach (var x in ptsX)
             {
                Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
@@ -104,11 +106,11 @@ namespace AlbumPanelColorTiles.Model.Base
          // Общий размер
          Point3d ptBotLeft = new Point3d(panelBase.XMinContour, 0, 0);
          Point3d ptBotRight = new Point3d(panelBase.XMaxContour, 0, 0);
-         double yTotal = -215 - 215;
-         Point3d ptDimLineTotal = new Point3d(0, yTotal, 0);
+         yBotDimLineMin = -215 - 215;
+         Point3d ptDimLineTotal = new Point3d(0, yBotDimLineMin, 0);
          CreateDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
          // Промежуточный размер
-         Point3d ptDimLineInter = new Point3d(0, yTotal + 215, 0);
+         Point3d ptDimLineInter = new Point3d(0, yBotDimLineMin + 215, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
          var dim = CreateDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
          var lenTile = Settings.Default.TileLenght + Settings.Default.TileSeam;
@@ -254,19 +256,12 @@ namespace AlbumPanelColorTiles.Model.Base
             return;
          }
 
-         Point3d ptBlView = new Point3d (xPosView, 860,0);
+         Point3d ptBlView = new Point3d(xPosView, 860, 0);
          if (doTrans)
          {
-            ptBlView = ptBlView.TransformBy(trans);            
+            ptBlView = ptBlView.TransformBy(trans);
          }
-         BlockReference blRefView = new BlockReference(ptBlView, panelBase.Service.Env.IdBtrView);
-         var mScale = Matrix3d.Scaling(Settings.Default.SheetScale, ptBlView);
-         blRefView.TransformBy(mScale);
-         blRefView.Layer = "0";
-         blRefView.ColorIndex = 256; // ByLayer                 
-
-         btrDim.AppendEntity(blRefView);
-         t.AddNewlyCreatedDBObject(blRefView, true);
+         BlockReference blRefView = CreateBlRef(ptBlView, panelBase.Service.Env.IdBtrView);
 
          // атрибут Вида
          if (!panelBase.Service.Env.IdAttrDefView.IsNull)
@@ -275,7 +270,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                var attrRefView = new AttributeReference();
                attrRefView.SetAttributeFromBlock(attrDefView, blRefView.BlockTransform);
-               attrRefView.TextString = "А";               
+               attrRefView.TextString = "А";
 
                blRefView.AttributeCollection.AppendAttribute(attrRefView);
                t.AddNewlyCreatedDBObject(attrRefView, true);
@@ -283,7 +278,7 @@ namespace AlbumPanelColorTiles.Model.Base
                if ((!isLeft || doTrans) && !(!isLeft && doTrans))
                {
                   attrRefView.TransformBy(Matrix3d.Mirroring(
-                     new Line3d(attrRefView.AlignmentPoint, new Point3d(attrRefView.AlignmentPoint.X, 0, 0))));                 
+                     new Line3d(attrRefView.AlignmentPoint, new Point3d(attrRefView.AlignmentPoint.X, 0, 0))));
                }
             }
          }
@@ -292,7 +287,7 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             blRefView.TransformBy(Matrix3d.Mirroring(new Line3d(ptBlView, new Point3d(ptBlView.X, 0, 0))));
          }
-      }
+      }      
 
       private void addCheekViewText(bool doTrans, Matrix3d trans, double xMinCheek)
       {
@@ -348,7 +343,7 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       protected RotatedDimension CreateDim(Point3d ptPrev, Point3d ptNext, Point3d ptDimLine, 
-                                          bool doTrans, Matrix3d trans, bool addTextRangeTile = false, double rotation = 0)
+                    bool doTrans, Matrix3d trans, bool addTextRangeTile = false, double rotation = 0)
       {
          if (doTrans)
          {
@@ -366,6 +361,20 @@ namespace AlbumPanelColorTiles.Model.Base
          btrDim.AppendEntity(dim);
          t.AddNewlyCreatedDBObject(dim, true);
          return dim;
+      }
+
+      protected BlockReference CreateBlRef(Point3d ptPos, ObjectId idBtr)
+      {
+         BlockReference blRef = new BlockReference(ptPos, idBtr);
+         //var mScale = Matrix3d.Scaling(Settings.Default.SheetScale, ptBlView);
+         //blRefView.TransformBy(mScale);
+         blRef.ScaleFactors = new Scale3d(Settings.Default.SheetScale);
+         blRef.Layer = "0";
+         blRef.ColorIndex = 256; // ByLayer                 
+
+         btrDim.AppendEntity(blRef);
+         t.AddNewlyCreatedDBObject(blRef, true);
+         return blRef;
       }
    }
 }

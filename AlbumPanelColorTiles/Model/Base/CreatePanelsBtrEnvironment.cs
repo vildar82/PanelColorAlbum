@@ -26,7 +26,9 @@ namespace AlbumPanelColorTiles.Model.Base
       public ObjectId IdBtrTile { get; private set; }
       public ObjectId IdBtrWindow { get; private set; }
       public ObjectId IdBtrView { get; private set; }
-      public ObjectId IdAttrDefView { get; private set; }      
+      public ObjectId IdAttrDefView { get; private set; }
+      public ObjectId IdBtrCross { get; private set; }
+      public ObjectId IdAttrDefCross { get; private set; }
 
       // DimStyle
       public ObjectId IdDimStyle { get; private set; }
@@ -67,7 +69,7 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          // Имена блоков для копирования из шаблона
          List<string> blNamesToCopy = new List<string> { Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
-                     Settings.Default.BlockViewName};
+                     Settings.Default.BlockViewName, Settings.Default.BlockCrossName};
          // Копирование блоков
          var blocksCopyed = defineBlockFromTemplate(blNamesToCopy);
 
@@ -78,25 +80,29 @@ namespace AlbumPanelColorTiles.Model.Base
          // Блок Вида
          IdBtrView = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockViewName);
          // Атрибут блока вида
-         IdAttrDefView = getAttrDefView(IdBtrView);
+         IdAttrDefView = getAttrDef(IdBtrView, "ВИД");
+         // Блок Разреза
+         IdBtrCross = getIdBtrLoaded(blocksCopyed, Settings.Default.BlockCrossName);
+         // Атрибут блока разреза
+         IdAttrDefCross = getAttrDef(IdBtrCross, "НОМЕР");
       }
 
-      private ObjectId getAttrDefView(ObjectId idBtrView)
+      private ObjectId getAttrDef(ObjectId idBtr, string tag)
       {
-         ObjectId idAttrDefView = ObjectId.Null;
-         if (!idBtrView.IsNull)
+         ObjectId idAttrDef = ObjectId.Null;
+         if (!idBtr.IsNull)
          {
-            using (var btrView = idBtrView.GetObject(OpenMode.ForRead) as BlockTableRecord)
+            using (var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord)
             {
-               foreach (ObjectId idEnt in btrView)
+               foreach (ObjectId idEnt in btr)
                {
                   if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
                   {
                      using (var attrDef = idEnt.GetObject(OpenMode.ForRead, false, true) as AttributeDefinition)
                      {
-                        if (!attrDef.Constant && attrDef.Tag.Equals("ВИД", StringComparison.OrdinalIgnoreCase))
+                        if (!attrDef.Constant && attrDef.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
                         {
-                           idAttrDefView = idEnt;
+                           idAttrDef = idEnt;
                            break;
                         }
                      }
@@ -104,7 +110,7 @@ namespace AlbumPanelColorTiles.Model.Base
                }
             }
          }
-         return idAttrDefView;
+         return idAttrDef;
       }
 
       private ObjectId getIdBtrLoaded(Dictionary<string, ObjectId> blocksCopyed, string blName)
