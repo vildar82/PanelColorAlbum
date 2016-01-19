@@ -23,6 +23,8 @@ namespace AlbumPanelColorTiles.Model.Base
       protected double yDimLineBotMin;
       protected double xDimLineLeftMin;
       protected double xDimLineRightMax;
+      protected double indentBetweenDimLine = 160;
+      protected double indentDimLineFromDraw = 180;
 
       public DimensionAbstract(BlockTableRecord btrPanel, Transaction t, PanelBase panel)
       {
@@ -67,7 +69,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Общий размер
          Point3d ptTopLeft = new Point3d(panelBase.XMinContour, panelBase.Height, 0);
          Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
-         yDimLineTopMax = hasInterDim ? panelBase.Height + 185 + 250 : panelBase.Height + 250;
+         yDimLineTopMax = hasInterDim ? panelBase.Height + indentBetweenDimLine + indentDimLineFromDraw : panelBase.Height + indentDimLineFromDraw;
          Point3d ptDimLineTotal = new Point3d(0, yDimLineTopMax, 0);
          CreateDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile: true);
          // добавление промежуточных размеров
@@ -78,7 +80,7 @@ namespace AlbumPanelColorTiles.Model.Base
             var ptsX = panelBase.PtsForTopDim.GroupBy(p => p, comparer).Select(g => g.First());
 
             Point3d ptPrev = ptTopLeft;
-            Point3d ptDimLineInter = new Point3d(0, yDimLineTopMax - 185, 0);
+            Point3d ptDimLineInter = new Point3d(0, yDimLineTopMax - indentBetweenDimLine, 0);
             foreach (var x in ptsX)
             {
                Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
@@ -108,11 +110,11 @@ namespace AlbumPanelColorTiles.Model.Base
          // Общий размер
          Point3d ptBotLeft = new Point3d(panelBase.XMinContour, 0, 0);
          Point3d ptBotRight = new Point3d(panelBase.XMaxContour, 0, 0);
-         yDimLineBotMin = -215 - 215;
+         yDimLineBotMin = -indentDimLineFromDraw -indentBetweenDimLine;
          Point3d ptDimLineTotal = new Point3d(0, yDimLineBotMin, 0);
          CreateDim(ptBotLeft, ptBotRight, ptDimLineTotal, doTrans, trans);
          // Промежуточный размер
-         Point3d ptDimLineInter = new Point3d(0, yDimLineBotMin + 215, 0);
+         Point3d ptDimLineInter = new Point3d(0, yDimLineBotMin + indentBetweenDimLine, 0);
          var ptNext = new Point3d(ptBotRight.X - 288, 0, 0);
          var dim = CreateDim(ptBotLeft, ptNext, ptDimLineInter, doTrans, trans);
          var lenTile = Settings.Default.TileLenght + Settings.Default.TileSeam;
@@ -138,7 +140,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptBotLeft = new Point3d(panelBase.XMinPanel, 0, 0);
          Point3d ptTopLeft = new Point3d(ptBotLeft.X, yLastTile, 0);
 
-         xDimLineLeftMin = ptBotLeft.X-175;
+         xDimLineLeftMin = ptBotLeft.X-indentDimLineFromDraw;
          Point3d ptDimLine = new Point3d(xDimLineLeftMin, 0, 0);
 
          var dim= CreateDim(ptBotLeft, ptTopLeft, ptDimLine, doTrans, trans, rotation: 90);
@@ -147,7 +149,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptLastTile = new Point3d(ptTopLeft.X, ptTopLeft.Y + Settings.Default.TileHeight, 0);
          dim = CreateDim(ptTopLeft, ptLastTile, ptDimLine, doTrans, trans, rotation:90);
          Point3d ptText = new Point3d(ptDimLine.X, ptTopLeft.Y - 65, 0);
-         dim.TextPosition = doTrans? ptText.TransformBy(trans): ptText;
+         dim.TextPosition = doTrans? ptText.TransformBy(trans): ptText;         
       }
 
       protected void SizesRight(bool doTrans, Matrix3d trans)
@@ -179,7 +181,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptTopRight = new Point3d(ptBotRight.X, yLastTile, 0);
 
          bool hasIndentDim = yWinMax > 0;
-         xDimLineRightMax = hasIndentDim ? ptBotRight.X+250+185 : ptBotRight.X + 250;
+         xDimLineRightMax = hasIndentDim ? ptBotRight.X+indentDimLineFromDraw+indentBetweenDimLine : ptBotRight.X + indentDimLineFromDraw;
 
          // Общий размер         
          Point3d ptDimLineTotal = new Point3d(xDimLineRightMax, 0, 0);
@@ -187,7 +189,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Промежуточные размеры
          if (hasIndentDim)
          {
-            Point3d ptDimLineIndent = new Point3d(xDimLineRightMax-185, 0, 0);
+            Point3d ptDimLineIndent = new Point3d(xDimLineRightMax - indentBetweenDimLine, 0, 0);
             Point3d ptMinWin= ptBotRight;
             if (yWinMin>0)
             {
@@ -241,7 +243,8 @@ namespace AlbumPanelColorTiles.Model.Base
             if (dimCheek.Measurement < 90)
             {               
                double deltaX = panelBase.IsCheekLeft ? 70 : -70;
-               dimCheek.TextPosition = new Point3d(ptPrevCheek.X + deltaX, ptDimLineCheek.Y - 100, 0).TransformBy(trans);
+               Point3d ptText = new Point3d(ptPrevCheek.X + deltaX, ptDimLineCheek.Y - 100, 0);
+               dimCheek.TextPosition = doTrans? ptText.TransformBy(trans) : ptText;
             }
             ptPrevCheek = ptNextCheek;
          }

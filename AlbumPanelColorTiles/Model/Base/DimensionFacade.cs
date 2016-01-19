@@ -60,29 +60,32 @@ namespace AlbumPanelColorTiles.Model.Base
       private void addVerticalSectionMark()
       {
          // Определение X сечения в панели
-         // Если есть окно, то сечение по первому окну                  
-         double xSec = 750;
-         double yTop = yDimLineTopMax + 120;
-         double yBot = yDimLineBotMin -40;
+         // Если есть окно, то сечение по первому окну                           
          var win = panelBase.Panel.windows?.window?.First();
-         if (win!=null)
-         {
-            xSec = win.posi.X + 250;
-         }
+         double xSec = (win == null) ? 750 : win.posi.X + 250;
+
+         double yTop = yDimLineTopMax + 230;
+         double yBot = yDimLineBotMin -145;         
          
          Point3d ptTopCross = new Point3d(xSec,yTop,0);
          Point3d ptBotCross = new Point3d(xSec, yBot, 0);
          BlockReference blRefCrossTop = CreateBlRef(ptTopCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          var attrRefTop = addAttrToBlockCross(blRefCrossTop, "2");
+
          BlockReference blRefCrossBot = CreateBlRef(ptBotCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
-         var attrRefBot = addAttrToBlockCross(blRefCrossBot, "2");         
+         Matrix3d matrixMirrBotCross = Matrix3d.Mirroring(new Line3d(ptBotCross,
+                                    new Point3d(ptBotCross.X + 1, ptBotCross.Y, ptBotCross.Z)));
+         blRefCrossBot.TransformBy(matrixMirrBotCross);
+         var attrRefBot = addAttrToBlockCross(blRefCrossBot, "2");
+         attrRefBot.TransformBy(Matrix3d.Mirroring(new Line3d(attrRefBot.AlignmentPoint,
+            new Point3d(attrRefBot.AlignmentPoint.X + 1, attrRefBot.AlignmentPoint.Y, attrRefBot.AlignmentPoint.Z))));
       }
 
       private void addHorizontalSectionMark()
       {
-         double ySec = panelBase.Height * 70 / 100;
+         double ySec = panelBase.Height * 70 / 100; // сечение на высоте 70% от общей высоты панели
          double xLeft = xDimLineLeftMin - 160;
-         double xRight = xDimLineRightMax + 180;
+         double xRight = xDimLineRightMax + 140;
 
          Point3d ptLeftCross = new Point3d(xLeft, ySec, 0);
          Point3d ptRightCross = new Point3d(xRight, ySec, 0);

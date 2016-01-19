@@ -64,9 +64,16 @@ namespace AlbumPanelColorTiles.Sheets
                FillingStampContent(blRefStamp, curContentLayoutNum, t);
                // текущая строка для записи листа
                int row = _firstRowInTableForSheets;
+               
                // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
+               tableContent.Cells[row, 2].TextString = 1.ToString();
+               tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
                tableContent.Cells[row++, 1].TextString = "Обложка";
-               tableContent.Cells[row++, 1].TextString = "Титульный лист";
+
+               tableContent.Cells[row, 2].TextString = 2.ToString();
+               tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
+               tableContent.Cells[row++, 1].TextString = "Титульный лист";               
+
                tableContent.Cells[row, 1].TextString = "Общие данные. Ведомость комплекта чертежей";
                tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets - 1).ToString() : "3";
                tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
