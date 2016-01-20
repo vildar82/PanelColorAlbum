@@ -30,6 +30,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public Dictionary<Point3d, string> WindowsBaseCenters { get; set; } = new Dictionary<Point3d, string>();
       public bool IsCheekRight { get; private set; }
       public bool IsCheekLeft { get; private set; }
+      public bool IsOutsideRight { get; set; }
+      public bool IsOutsideLeft { get; set; }
       public double Length { get; private set; }
       public double Height { get; private set; }
       public int Thickness { get; private set; }

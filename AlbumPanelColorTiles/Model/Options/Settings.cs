@@ -31,11 +31,13 @@
       public string BlockPlaneArchitectPrefixName { get; set; }
       public string BlockPanelAkrPrefixName { get; set; }
       public string BlockPanelSectionVerticalPrefixName { get; set; }
+      public string BlockPanelSectionHorizontalPrefixName { get; set; }      
       public string BlockSectionName { get; set; }
       public string BlockTileName { get; set; }
       public string BlockWindowName { get; set; }
       public string BlockViewName { get; set; }     
-      public string BlockCrossName { get; set; }     
+      public string BlockCrossName { get; set; }
+      public string BlockWindowHorSection { get; set; }      
       public int CaptionPanelSecondTextShift { get; set; }
       public int CaptionPanelTextHeight { get; set; }
       public string EndLeftPanelSuffix { get; set; }
@@ -96,6 +98,7 @@
          BlockTitleName = "АКР_Титульный";
          BlockPanelAkrPrefixName = "АКР_Панель_";
          BlockPanelSectionVerticalPrefixName = "АКР_СечениеПанелиВертик_";
+         BlockPanelSectionHorizontalPrefixName = "АКР_СечениеПанелиГор";
          BlockPlaneMountingPrefixName = "АКР_Монтажка_";
          BlockPlaneArchitectPrefixName = "АКР_Архитектура_";
          BlockFacadeName = "АКР_Фасад";
@@ -103,6 +106,7 @@
          BlockWindowName = "АКР_Окно";
          BlockViewName = "АКР_Вид";
          BlockCrossName = "АКР_Разрез";
+         BlockWindowHorSection = "АКР_ОкноСеченияПанелиГор";
          BlockSectionName = "АКР_Секция";
          AttributePanelSbPaint = "ПОКРАСКА";
          AttributePanelSbMark = "МАРКА";

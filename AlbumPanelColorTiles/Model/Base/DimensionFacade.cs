@@ -39,13 +39,37 @@ namespace AlbumPanelColorTiles.Model.Base
       private void verticalSection()
       {         
          // Вертикальное сечение
-         // вставка блока сечения панели
+         // вставка блока вертикального сечения панели
          addVerticalPanelSection();
+         // вставка блока горизонтального сечения панели
+         addHorizontalPanelSection();
 
          // вставка обозначения вертикального сечения
          addVerticalSectionMark();
          // вставка обозначения горизонтального сечения
-         addHorizontalSectionMark();
+         addHorizontalSectionMark();         
+      }
+
+      private void addHorizontalPanelSection()
+      {         
+         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionHorizontal>().Where(s =>                           
+                           s.IsCheekLeft == panelBase.IsCheekLeft &&
+                           s.IsCheekRight == panelBase.IsCheekRight &&
+                           s.IsOutsideLeft == panelBase.IsOutsideLeft &&
+                           s.IsOutsideRight == panelBase.IsOutsideRight
+                           );
+         if (secBlocks.Count() == 0)
+         {
+            Inspector.AddError($"Не определено горизонтальное сечение для панели {panelBase.Panel.mark}");
+            return;
+         }
+
+         ObjectId idBtrSec = secBlocks.First().IdBtr;
+         double yPt = -1000;
+         Point3d ptPos = new Point3d(0, yPt, 0);
+         var blRefSecHor =  CreateBlRef(ptPos, idBtrSec, 1);
+         // установить дин параметры длины и ширины блока сечения панели
+         // расставить окна.
       }
 
       private void addVerticalPanelSection()
@@ -54,7 +78,8 @@ namespace AlbumPanelColorTiles.Model.Base
          double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + 250 : xDimLineLeftMin - secThickness -250;
 
          // определение блока сечения панели         
-         var secBlocks = panelBase.Service.Env.BlPanelSections.Where(s => s.Thickness == panelBase.Thickness &&
+         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionVertical>().Where(s =>                            
+                           s.Thickness == panelBase.Thickness &&
                            Math.Abs(s.Length - panelBase.Height) < 300);
          if (secBlocks.Count()==0)
          {

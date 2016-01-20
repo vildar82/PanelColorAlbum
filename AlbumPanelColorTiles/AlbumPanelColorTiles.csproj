@@ -121,6 +121,8 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Base\BaseService.cs" />
+    <Compile Include="Model\Base\BlockSectionHorizontal.cs" />
+    <Compile Include="Model\Base\BlockSectionVertical.cs" />
     <Compile Include="Model\Base\CreatePanelsBtrEnvironment.cs" />
     <Compile Include="Model\Base\CreatePanel\Contour.cs" />
     <Compile Include="Model\Base\DimensionAbstract.cs" />
@@ -131,7 +133,7 @@
     <Compile Include="Model\Base\Panels.cs">
       <DependentUpon>Panels.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Model\Base\BlockSection.cs" />
+    <Compile Include="Model\Base\BlockSectionAbstract.cs" />
     <Compile Include="Model\ExportFacade\ContourPanel.cs" />
     <Compile Include="Model\ExportFacade\ConvertCaption.cs" />
     <Compile Include="Model\ExportFacade\ConvertEndsFacade.cs" />

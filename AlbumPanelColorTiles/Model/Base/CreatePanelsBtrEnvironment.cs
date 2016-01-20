@@ -30,7 +30,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public ObjectId IdAttrDefView { get; private set; }
       public ObjectId IdBtrCross { get; private set; }
       public ObjectId IdAttrDefCross { get; private set; }
-      public List<BlockSection> BlPanelSections { get; private set; }
+      public ObjectId IdBtrWindowHorSection { get; private set; }
+      public List<BlockSectionAbstract> BlPanelSections { get; private set; }
 
       // DimStyle
       public ObjectId IdDimStyle { get; private set; }
@@ -71,7 +72,8 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          List<string> blNamesToCopy = new List<string> {
                      Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
-                     Settings.Default.BlockViewName, Settings.Default.BlockCrossName                     
+                     Settings.Default.BlockViewName, Settings.Default.BlockCrossName,
+                     Settings.Default.BlockWindowHorSection
          };         
          // Копирование блоков
          _blocks = defineBlockFromTemplate(blNamesToCopy);
@@ -88,6 +90,8 @@ namespace AlbumPanelColorTiles.Model.Base
          IdBtrCross = GetIdBtrLoaded(Settings.Default.BlockCrossName);
          // Атрибут блока разреза
          IdAttrDefCross = getAttrDef(IdBtrCross, "НОМЕР");
+         // Блок окна для горизонтального сечения
+         IdBtrWindowHorSection = GetIdBtrLoaded(Settings.Default.BlockWindowHorSection);         
       }
 
       private ObjectId getAttrDef(ObjectId idBtr, string tag)
@@ -136,7 +140,7 @@ namespace AlbumPanelColorTiles.Model.Base
             try
             {
                // копирование сечений панелей
-               BlPanelSections = BlockSection.LoadSections(fileBlocksTemplate, _service);
+               BlPanelSections = BlockSectionAbstract.LoadSections(fileBlocksTemplate, _service);
                // копирование остальных блоков
                return AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blNames, fileBlocksTemplate,
                               _service.Db, DuplicateRecordCloning.Replace);               

@@ -66,12 +66,14 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
                   panelBase.XMinContour = 70;
                   panelBase.XStartTile = 70 + 11;
                   panelBase.XMinPanel = pt.X;
+                  panelBase.IsOutsideLeft = true;
                }               
                else
                {
                   pt = new Point2d(outside.posi.X-70, outside.posi.Y);
                   panelBase.XMaxContour += -70;
                   panelBase.XMaxPanel = pt.X + width;
+                  panelBase.IsOutsideRight = true;
                }              
                                
                plOut.AddVertexAt(0, pt, 0, 0, 0);
