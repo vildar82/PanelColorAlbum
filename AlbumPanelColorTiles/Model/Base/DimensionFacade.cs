@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using AcadLib.Blocks;
 using AcadLib;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib.Errors;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
@@ -49,13 +50,21 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addVerticalPanelSection()
       {
-         // Вставка вертикального сечения панели
-         // Ширина блока сечения панели
-         double secThickness = panelBase.Thickness == 320 ? 700 : 800;
-         double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + 700 : xDimLineLeftMin - secThickness;
+         double secThickness = getThicknessVerticalSectionBlock();
+         double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + 250 : xDimLineLeftMin - secThickness -250;
 
-         Point3d ptPos = new Point3d();
-      }
+         // определение блока сечения панели         
+         var secBlocks = panelBase.Service.Env.BlPanelSections.Where(s => s.Thickness == panelBase.Thickness &&
+                           Math.Abs(s.Length - panelBase.Height) < 300);
+         if (secBlocks.Count()==0)
+         {
+            Inspector.AddError($"Не определено вертикальное сечение для панели {panelBase.Panel.mark}");
+            return;
+         }
+         ObjectId idBtrSec = secBlocks.First().IdBtr;
+         Point3d ptPos = new Point3d(xPt, 0,0);
+         CreateBlRef(ptPos, idBtrSec, 1);
+      }     
 
       private void addVerticalSectionMark()
       {
@@ -126,6 +135,19 @@ namespace AlbumPanelColorTiles.Model.Base
             }
          }
          return attrRefCross;
+      }
+
+      private double getThicknessVerticalSectionBlock()
+      {         
+         switch (panelBase.Thickness)
+         {
+            case 320:
+               return 700;
+            case 420:
+               return 800;
+            default:
+               return 700;              
+         }         
       }
    }
 }

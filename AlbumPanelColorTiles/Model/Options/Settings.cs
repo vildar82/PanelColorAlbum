@@ -30,6 +30,7 @@
       public string BlockPlaneMountingPrefixName { get; set; }
       public string BlockPlaneArchitectPrefixName { get; set; }
       public string BlockPanelAkrPrefixName { get; set; }
+      public string BlockPanelSectionVerticalPrefixName { get; set; }
       public string BlockSectionName { get; set; }
       public string BlockTileName { get; set; }
       public string BlockWindowName { get; set; }
@@ -94,6 +95,7 @@
          BlockCoverName = "АКР_Обложка";
          BlockTitleName = "АКР_Титульный";
          BlockPanelAkrPrefixName = "АКР_Панель_";
+         BlockPanelSectionVerticalPrefixName = "АКР_СечениеПанелиВертик_";
          BlockPlaneMountingPrefixName = "АКР_Монтажка_";
          BlockPlaneArchitectPrefixName = "АКР_Архитектура_";
          BlockFacadeName = "АКР_Фасад";

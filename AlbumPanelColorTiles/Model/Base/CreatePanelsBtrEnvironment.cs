@@ -30,7 +30,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public ObjectId IdAttrDefView { get; private set; }
       public ObjectId IdBtrCross { get; private set; }
       public ObjectId IdAttrDefCross { get; private set; }
-      public List<string> BlNamesVerticalSection { get; private set; }
+      public List<BlockSection> BlPanelSections { get; private set; }
 
       // DimStyle
       public ObjectId IdDimStyle { get; private set; }
@@ -69,20 +69,10 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void loadBtr()
       {
-         // Имена блоков для копирования из шаблона
-         BlNamesVerticalSection = new List<string>
-         {
-            "АКР_СечениеПанелиВертик_h2890_t320",
-            "АКР_СечениеПанелиВертик_h2890_t320_w",
-            "АКР_СечениеПанелиВертик_h2890_t420",
-            "АКР_СечениеПанелиВертик_h2890_t420_w"
-         };
-
          List<string> blNamesToCopy = new List<string> {
                      Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
                      Settings.Default.BlockViewName, Settings.Default.BlockCrossName                     
-         };
-         blNamesToCopy.AddRange(BlNamesVerticalSection);
+         };         
          // Копирование блоков
          _blocks = defineBlockFromTemplate(blNamesToCopy);
 
@@ -145,8 +135,11 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             try
             {
+               // копирование сечений панелей
+               BlPanelSections = BlockSection.LoadSections(fileBlocksTemplate, _service);
+               // копирование остальных блоков
                return AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blNames, fileBlocksTemplate,
-                              _service.Db, DuplicateRecordCloning.Replace);
+                              _service.Db, DuplicateRecordCloning.Replace);               
             }
             catch (Exception ex)
             {

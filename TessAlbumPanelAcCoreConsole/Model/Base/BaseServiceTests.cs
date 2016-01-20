@@ -62,6 +62,14 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
                   Panel panelXml = baseService.GetPanelXml(mark);
                   panelBase = new PanelBase(panelXml, baseService);
                   panelBase.CreateBlock();
+
+                  if (!panelBase.IdBtrPanel.IsNull)
+                  {
+                     var blRefPanel = new BlockReference(Point3d.Origin, panelBase.IdBtrPanel);
+                     var ms = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+                     ms.AppendEntity(blRefPanel);
+                     t.AddNewlyCreatedDBObject(blRefPanel, true);
+                  }
                   t.Commit();
                }
             }

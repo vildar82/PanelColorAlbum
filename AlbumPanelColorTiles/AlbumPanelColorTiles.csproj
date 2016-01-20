@@ -131,6 +131,7 @@
     <Compile Include="Model\Base\Panels.cs">
       <DependentUpon>Panels.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Model\Base\BlockSection.cs" />
     <Compile Include="Model\ExportFacade\ContourPanel.cs" />
     <Compile Include="Model\ExportFacade\ConvertCaption.cs" />
     <Compile Include="Model\ExportFacade\ConvertEndsFacade.cs" />
@@ -153,9 +154,6 @@
     </Compile>
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
-    <Compile Include="Model\Lib\FileFolderDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Model\Options\SerializerXml.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
     <Compile Include="Model\PanelLibrary\EntityInfo.cs" />
