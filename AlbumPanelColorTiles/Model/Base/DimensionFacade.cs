@@ -32,13 +32,7 @@ namespace AlbumPanelColorTiles.Model.Base
          SizesLeft(false, Matrix3d.Identity);
          // Размеры справа
          SizesRight(false, Matrix3d.Identity);
-         // Сечение боковое
-         verticalSection();
-      }
-
-      private void verticalSection()
-      {         
-         // Вертикальное сечение
+         
          // вставка блока вертикального сечения панели
          addVerticalPanelSection();
          // вставка блока горизонтального сечения панели
@@ -47,8 +41,8 @@ namespace AlbumPanelColorTiles.Model.Base
          // вставка обозначения вертикального сечения
          addVerticalSectionMark();
          // вставка обозначения горизонтального сечения
-         addHorizontalSectionMark();         
-      }
+         addHorizontalSectionMark();
+      }     
 
       private void addHorizontalPanelSection()
       {         
@@ -65,11 +59,107 @@ namespace AlbumPanelColorTiles.Model.Base
          }
 
          ObjectId idBtrSec = secBlocks.First().IdBtr;
-         double yPt = -1000;
+         double yPt = yDimLineBotMin -200;
          Point3d ptPos = new Point3d(0, yPt, 0);
          var blRefSecHor =  CreateBlRef(ptPos, idBtrSec, 1);
          // установить дин параметры длины и ширины блока сечения панели
+         var resSetDynParam = setDynParam(blRefSecHor, new List<KeyValuePair<string, object>>
+                                 {
+                                    new KeyValuePair<string, object> ("Толщина", panelBase.Thickness),
+                                    new KeyValuePair<string, object> ("Длина", panelBase.Length)
+                                 });
+         if (resSetDynParam.Success)
+         {
+            using (var btrSecHor = idBtrSec.GetObject( OpenMode.ForRead) as BlockTableRecord)
+            {
+               btrSecHor.UpdateAnonymousBlocks();
+            }
+         }
+         else
+         {
+            Inspector.AddError(resSetDynParam.Error);
+         }
          // расставить окна.
+         if (panelBase.Panel.windows?.window?.Count()>0)
+         {
+            foreach (var window in panelBase.Panel.windows.window)
+            {
+               var blRefWin = CreateBlRef(new Point3d(window.posi.X, ptPos.Y, 0), panelBase.Service.Env.IdBtrWindowHorSection, 1);
+               // Уст дин парам окна
+               var resSetDynParamWin = setDynParam(blRefWin, new List<KeyValuePair<string, object>>
+                                 {
+                                    new KeyValuePair<string, object> ("Толщина", panelBase.Thickness),
+                                    new KeyValuePair<string, object> ("Длина", window.width)
+                                 });
+               if (resSetDynParamWin.Failure)
+               {
+                  Inspector.AddError(resSetDynParamWin.Error);
+               }               
+            }                        
+         }
+      }
+
+      private Result setDynParam(BlockReference blRefSecHor, List<KeyValuePair<string, object>> values)
+      {
+         string err = string.Empty;             
+         Dictionary<string, DynamicBlockReferenceProperty> dictProps = new Dictionary<string, DynamicBlockReferenceProperty>();
+         foreach (DynamicBlockReferenceProperty prop in blRefSecHor.DynamicBlockReferencePropertyCollection)
+         {
+            if (!prop.ReadOnly)
+            {
+               dictProps.Add(prop.PropertyName.ToLower(), prop);
+            }            
+         }
+         foreach (var value in values)
+         {
+            DynamicBlockReferenceProperty prop;
+            if (dictProps.TryGetValue(value.Key.ToLower(), out prop))
+            {
+               try
+               {
+                  var valueDwg = TryCastValueDynType(prop.UnitsType, value.Value);
+                  prop.Value = valueDwg.Value;
+
+               }
+               catch (Exception ex)
+               {
+                  err += $"Ошибка при установке значения дин параметра {value.Key} = {value.Value} в блоке сечения {blRefSecHor.Name}: {ex.Message}. ";
+               }
+            }
+            else
+            {
+               err += $"В блоке сечения {blRefSecHor.Name} не найден динамический параметр {value.Key}. ";
+            }
+         }
+         if (string.IsNullOrEmpty(err))
+         {
+            return Result.Ok();
+         }
+         else
+         {
+            return Result.Fail(err);
+         }
+      }
+
+      private Result<object> TryCastValueDynType(DynamicBlockReferencePropertyUnitsType unitsType, object value)
+      {         
+         try
+         {
+            switch (unitsType)
+            {
+               case DynamicBlockReferencePropertyUnitsType.NoUnits:
+                  return Result.Ok<object>(Convert.ToString(value));
+               case DynamicBlockReferencePropertyUnitsType.Angular:                  
+               case DynamicBlockReferencePropertyUnitsType.Distance:                  
+               case DynamicBlockReferencePropertyUnitsType.Area:
+                  return Result.Ok<object>(Convert.ToDouble(value));               
+            }
+         }
+         catch (Exception ex)
+         {
+            return Result.Fail<object>(ex.Message);
+         }
+         return Result.Fail<object>("Не найдено соответствие типа параметра.");
       }
 
       private void addVerticalPanelSection()
