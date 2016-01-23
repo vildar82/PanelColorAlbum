@@ -27,10 +27,11 @@ namespace TestAKRAutoCAD.Model.Base
       public void CreateFacadeTest()
       {
          Inspector.Clear();
-         string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
-         var docTest = Application.DocumentManager.Open(testFile, false);
-         using (var ld = docTest.LockDocument())
-         {
+         //string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
+         var docTest = Application.DocumentManager.MdiActiveDocument;
+         //var docTest = Application.DocumentManager.Open(testFile, false);
+         //using (var ld = docTest.LockDocument())
+         //{
             var db = docTest.Database;
 
             // Определение фасадов
@@ -62,7 +63,7 @@ namespace TestAKRAutoCAD.Model.Base
                Inspector.Show();
             }
             docTest.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + saveFile);
-         }
+         //}
       }
    }
 }

@@ -149,7 +149,13 @@ namespace AlbumPanelColorTiles.Model.Base
                {
                   Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
                }
-            }            
+            }
+            //// Обновление дин блоков гормз сечений
+            //foreach (var blSecHor               in Env.BlPanelSections.OfType<BlockSectionHorizontal>())
+            //{
+            //   var btrSecHor = blSecHor.IdBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
+            //   btrSecHor.UpdateAnonymousBlocks();
+            //} 
          }        
       }
 

@@ -70,6 +70,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            blRefPanelAkr.Layer = floor.Storey.Layer;
                            ms.AppendEntity(blRefPanelAkr);
                            t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                           //blRefPanelAkr.RecordGraphicsModified(true);
                            //blRefPanelAkr.Draw();
                         }
                      }

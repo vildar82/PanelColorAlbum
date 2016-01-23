@@ -61,10 +61,10 @@ namespace AlbumPanelColorTiles.Model.Base
          ObjectId idBtrSec = secBlocks.First().IdBtr;
          double yPt = yDimLineBotMin -600;
          Point3d ptPos = new Point3d(0, yPt, 0);
-         var blRefSecHor =  CreateBlRef(ptPos, idBtrSec, 1);
+         var blRefSecHor =  CreateBlRef(ptPos, idBtrSec, 1);         
          // установить дин параметры длины и ширины блока сечения панели
          var res = setDynParam(blRefSecHor, "Толщина", panelBase.Thickness);
-         res = setDynParam(blRefSecHor, "Длина", panelBase.Length);
+         res = setDynParam(blRefSecHor, "Длина", panelBase.Length);                  
 
          // расставить окна.
          if (panelBase.Panel.windows?.window?.Count() > 0)
