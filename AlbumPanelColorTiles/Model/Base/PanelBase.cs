@@ -89,25 +89,30 @@ namespace AlbumPanelColorTiles.Model.Base
       /// <exception cref="Autodesk.AutoCAD.Runtime.Exception">DuplicateBlockName</exception>
       /// <returns>ObjectId созданного определения блока в текущей базе.</returns>            
       public void CreateBlock()
-      {         
-         Openings = new List<Extents3d>();         
-         Database db = Service.Db;
-         Transaction t = db.TransactionManager.TopTransaction;
-         BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable;
-         
+      {
          // Имя для блока панели АКР
          BlNameAkr = defineBlockPanelAkrName();
-         // Ошибка если блок с таким именем уже есть
-         if (bt.Has(BlNameAkr))
-         {
-            Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
-            return;                          
-         }
 
-         BlockTableRecord btrPanel = new BlockTableRecord();
-         btrPanel.Name = BlNameAkr;
-         IdBtrPanel = bt.Add(btrPanel);
-         t.AddNewlyCreatedDBObject(btrPanel, true);    
+         Openings = new List<Extents3d>();
+
+         Database db = Service.Db;
+         Transaction t = db.TransactionManager.TopTransaction;
+
+         BlockTableRecord btrPanel;
+         using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable)
+         {
+            // Ошибка если блок с таким именем уже есть
+            if (bt.Has(BlNameAkr))
+            {
+               Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
+               return;
+            }
+            btrPanel = new BlockTableRecord();
+            btrPanel.Name = BlNameAkr;
+            IdBtrPanel = bt.Add(btrPanel);
+            t.AddNewlyCreatedDBObject(btrPanel, true);
+         }            
+         
               
          // Добавление полилинии контура
          createContour(btrPanel, t);                  

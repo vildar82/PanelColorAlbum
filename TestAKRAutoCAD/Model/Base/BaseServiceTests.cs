@@ -28,40 +28,41 @@ namespace TestAKRAutoCAD.Model.Base
       {
          Inspector.Clear();
          string testFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада.dwg";
-
          var docTest = Application.DocumentManager.Open(testFile, false);
          using (var ld = docTest.LockDocument())
-         {            
+         {
             var db = docTest.Database;
-            using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
+
+            // Определение фасадов
+            List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
+            List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db);
+
+            // Очиста чертежа от блоков панелей АКР
+            baseService.ClearPanelsAkrFromDrawing(db);
+
+            using (var t = db.TransactionManager.StartTransaction())
             {
-               // Определение фасадов
-               List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
-               List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db);
-
-               // Очиста чертежа от блоков панелей АКР
-               baseService.ClearPanelsAkrFromDrawing(db);
-
-               using (var t = db.TransactionManager.StartTransaction())
-               {
-                  // Создание определений блоков панелей по базе 
-                  baseService.InitToCreationPanels(db);
-                  baseService.CreateBtrPanels(facadesMounting, floorsAr);
-
-                  // Создание фасадов
-                  FacadeMounting.CreateFacades(facadesMounting);
-
-                  t.Commit();
-               }
+               baseService.InitToCreationPanels(db);
+               t.Commit();
             }
-            db.SaveAs(@"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-CreateFacade.dwg", DwgVersion.Current);
+            using (var t = db.TransactionManager.StartTransaction())
+            {
+               // Создание определений блоков панелей по базе                
+               baseService.CreateBtrPanels(facadesMounting, floorsAr);
+               t.Commit();
+            }
+            // Создание фасадов
+            FacadeMounting.CreateFacades(facadesMounting);
+
+            var saveFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-CreateFacade.dwg";
+            db.SaveAs(saveFile, DwgVersion.Current);
 
             if (Inspector.HasErrors)
             {
                Inspector.Show();
             }
-            docTest.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + testFile);
-         }                     
+            docTest.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + saveFile);
+         }
       }
    }
 }

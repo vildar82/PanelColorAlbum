@@ -127,8 +127,7 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
-      {
-         // Список создаваемых панелей - уникальные блоки панелей по СБ и Окнам из Архитектуры.
+      {         
          var panelsBaseGroup = matchingWindow(facadesMounting, floorsAr).Values.GroupBy(p => p.Panel.mark);
 
          foreach (var itemGroupPanelByMark in panelsBaseGroup)

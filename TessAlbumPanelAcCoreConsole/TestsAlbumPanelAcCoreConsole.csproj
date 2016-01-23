@@ -77,6 +77,7 @@
     <Compile Include="CADtestRunner.cs" />
     <Compile Include="Model\Base\BaseServiceTests.cs" />
     <Compile Include="Model\Base\FloorArchitectTests.cs" />
+    <Compile Include="Model\Base\TestDynBlockSec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

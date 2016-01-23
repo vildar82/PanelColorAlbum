@@ -38,6 +38,7 @@ namespace AlbumPanelColorTiles.Model.Base
          // Создание определения блока образмеривания
          BlockTableRecord btrDim;
          string blNameDim = panelBase.BlNameAkr.Replace(Settings.Default.BlockPanelAkrPrefixName, prefix);
+
          using (var bt = btrPanel.OwnerId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             if (bt.Has(blNameDim))
