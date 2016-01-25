@@ -14,7 +14,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public int Thickness { get; private set; }
       public bool Window { get; private set; }
 
-      public BlockSectionVertical(string blName) : base(blName)
+      public BlockSectionVertical(string blName, BaseService service) : base(blName, service)
       {         
          
       }

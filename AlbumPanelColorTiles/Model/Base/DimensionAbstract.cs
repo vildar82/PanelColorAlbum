@@ -39,7 +39,7 @@ namespace AlbumPanelColorTiles.Model.Base
          BlockTableRecord btrDim;
          string blNameDim = panelBase.BlNameAkr.Replace(Settings.Default.BlockPanelAkrPrefixName, prefix);
 
-         using (var bt = btrPanel.OwnerId.GetObject(OpenMode.ForRead) as BlockTable)
+         using (var bt = panelBase.Service.Db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             if (bt.Has(blNameDim))
             {
@@ -55,7 +55,7 @@ namespace AlbumPanelColorTiles.Model.Base
                t.AddNewlyCreatedDBObject(btrDim, true);
             }
          }
-         // Добавление ссылки блока в блок панели
+         // Добавление ссылки блока обр в блок панели
          BlockReference blRefDim = new BlockReference(Point3d.Origin, btrDim.Id);
          blRefDim.LayerId = idLayer;         
          idBlRefDim = btrPanel.AppendEntity(blRefDim);
@@ -267,7 +267,7 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             ptBlView = ptBlView.TransformBy(trans);
          }
-         BlockReference blRefView = CreateBlRef(ptBlView, panelBase.Service.Env.IdBtrView, Settings.Default.SheetScale);
+         BlockReference blRefView = CreateBlRefInBtrDim(ptBlView, panelBase.Service.Env.IdBtrView, Settings.Default.SheetScale);
 
          // атрибут Вида
          if (!panelBase.Service.Env.IdAttrDefView.IsNull)
@@ -369,7 +369,7 @@ namespace AlbumPanelColorTiles.Model.Base
          return dim;
       }
 
-      protected BlockReference CreateBlRef(Point3d ptPos, ObjectId idBtr, double scale)
+      protected BlockReference CreateBlRefInBtrDim(Point3d ptPos, ObjectId idBtr, double scale)
       {
          BlockReference blRef = new BlockReference(ptPos, idBtr);
          //var mScale = Matrix3d.Scaling(Settings.Default.SheetScale, ptBlView);

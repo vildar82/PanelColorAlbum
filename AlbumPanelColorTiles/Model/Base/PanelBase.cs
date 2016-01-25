@@ -88,7 +88,7 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       /// <exception cref="Autodesk.AutoCAD.Runtime.Exception">DuplicateBlockName</exception>
       /// <returns>ObjectId созданного определения блока в текущей базе.</returns>            
-      public void CreateBlock()
+      public void CreateBlock(Transaction t)
       {
          // Имя для блока панели АКР
          BlNameAkr = defineBlockPanelAkrName();
@@ -96,7 +96,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Openings = new List<Extents3d>();
 
          Database db = Service.Db;
-         Transaction t = db.TransactionManager.TopTransaction;
+         //Transaction t = db.TransactionManager.TopTransaction;
 
          BlockTableRecord btrPanel;
          using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable)
@@ -111,8 +111,7 @@ namespace AlbumPanelColorTiles.Model.Base
             btrPanel.Name = BlNameAkr;
             IdBtrPanel = bt.Add(btrPanel);
             t.AddNewlyCreatedDBObject(btrPanel, true);
-         }            
-         
+         }                     
               
          // Добавление полилинии контура
          createContour(btrPanel, t);                  
@@ -231,6 +230,7 @@ namespace AlbumPanelColorTiles.Model.Base
                         btrPanel.AppendEntity(dbTextWin);
                         t.AddNewlyCreatedDBObject(dbTextWin, true);
                      }
+#if Test
                      // Test
                      else
                      {
@@ -243,6 +243,7 @@ namespace AlbumPanelColorTiles.Model.Base
                         btrPanel.AppendEntity(dbTextWin);
                         t.AddNewlyCreatedDBObject(dbTextWin, true);
                      }
+#endif
                   }
                }
                // Сортировка окон слева-направо

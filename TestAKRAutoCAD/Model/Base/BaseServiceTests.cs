@@ -32,37 +32,47 @@ namespace TestAKRAutoCAD.Model.Base
          //var docTest = Application.DocumentManager.Open(testFile, false);
          //using (var ld = docTest.LockDocument())
          //{
-            var db = docTest.Database;
+         var db = docTest.Database;
+         using (new AcadLib.WorkingDatabaseSwitcher(db))
+         {
+            // Очиста чертежа от блоков панелей АКР
+            baseService.ClearPanelsAkrFromDrawing(db);
+            // Подготовка - копирование блоков, слоев, стилей, и т.п.
+            baseService.InitToCreationPanels(db);
 
             // Определение фасадов
             List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
-            List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db);
+            List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);            
 
-            // Очиста чертежа от блоков панелей АКР
-            baseService.ClearPanelsAkrFromDrawing(db);
-
-            using (var t = db.TransactionManager.StartTransaction())
-            {
-               baseService.InitToCreationPanels(db);
-               t.Commit();
-            }
             using (var t = db.TransactionManager.StartTransaction())
             {
                // Создание определений блоков панелей по базе                
                baseService.CreateBtrPanels(facadesMounting, floorsAr);
-               t.Commit();
+            t.Commit();
             }
-            // Создание фасадов
+            //Создание фасадов
             FacadeMounting.CreateFacades(facadesMounting);
 
-            var saveFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-CreateFacade.dwg";
-            db.SaveAs(saveFile, DwgVersion.Current);
+            //using (var t = db.TransactionManager.StartTransaction())
+            //{
+            //   var secBlocks = baseService.Env.BlPanelSections.OfType<BlockSectionHorizontal>();
+            //   foreach (var item in secBlocks)
+            //   {
+            //      item.ReplaceAssociateHatch();
+            //   }
+            //   t.Commit();
+            //}
+         }
 
-            if (Inspector.HasErrors)
-            {
-               Inspector.Show();
-            }
-            docTest.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + saveFile);
+         var saveFile = @"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-CreateFacade.dwg";
+         db.SaveAs(saveFile, DwgVersion.Current);
+
+         if (Inspector.HasErrors)
+         {
+            Inspector.Show();
+         }
+         docTest.Editor.WriteMessage("\nCreateFacadeTest - Ок. см файл " + saveFile);
+
          //}
       }
    }

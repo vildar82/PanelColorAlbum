@@ -9,6 +9,7 @@ using AcadLib.Layers;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 
 namespace AlbumPanelColorTiles.Model.Base
 {
@@ -26,6 +27,7 @@ namespace AlbumPanelColorTiles.Model.Base
       // Blocks
       public ObjectId IdBtrTile { get; private set; }
       public ObjectId IdBtrWindow { get; private set; }
+      public List<string> WindowMarks { get; private set; }
       public ObjectId IdBtrView { get; private set; }
       public ObjectId IdAttrDefView { get; private set; }
       public ObjectId IdBtrCross { get; private set; }
@@ -82,6 +84,7 @@ namespace AlbumPanelColorTiles.Model.Base
          IdBtrTile = GetIdBtrLoaded( Settings.Default.BlockTileName);
          // Блок Окна
          IdBtrWindow = GetIdBtrLoaded( Settings.Default.BlockWindowName);
+         WindowMarks = getWindowMarks(IdBtrWindow);
          // Блок Вида
          IdBtrView = GetIdBtrLoaded( Settings.Default.BlockViewName);
          // Атрибут блока вида
@@ -92,20 +95,20 @@ namespace AlbumPanelColorTiles.Model.Base
          IdAttrDefCross = getAttrDef(IdBtrCross, "НОМЕР");
          // Блок окна для горизонтального сечения
          IdBtrWindowHorSection = GetIdBtrLoaded(Settings.Default.BlockWindowHorSection);         
-      }
+      }     
 
       private ObjectId getAttrDef(ObjectId idBtr, string tag)
       {
          ObjectId idAttrDef = ObjectId.Null;
          if (!idBtr.IsNull)
          {
-            using (var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord)
+            using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
             {
                foreach (ObjectId idEnt in btr)
                {
                   if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
                   {
-                     using (var attrDef = idEnt.GetObject(OpenMode.ForRead, false, true) as AttributeDefinition)
+                     using (var attrDef = idEnt.Open(OpenMode.ForRead, false, true) as AttributeDefinition)
                      {
                         if (!attrDef.Constant && attrDef.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
                         {
@@ -155,6 +158,25 @@ namespace AlbumPanelColorTiles.Model.Base
             Inspector.AddError($"Не найден файл шаблона блоков АКР - {fileBlocksTemplate}");            
          }
          return new Dictionary<string, ObjectId>();
+      }
+
+      private List<string> getWindowMarks(ObjectId idBtrWindow)
+      {
+         List<string> marks = new List<string>();
+         var blRef = new BlockReference(Point3d.Origin, idBtrWindow);
+         var dynParams = blRef.DynamicBlockReferencePropertyCollection;
+         if (dynParams != null)
+         {
+            foreach (DynamicBlockReferenceProperty param in dynParams)
+            {
+               if (param.PropertyName == "Видимость")
+               {
+                  marks = param.GetAllowedValues().Cast<string>().ToList();
+                  break;
+               }
+            }
+         }
+         return marks;
       }
    }
 }

@@ -41,8 +41,8 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
 
       [Test(Description ="Тест создания нескольких блоков панелей АКР")]
       public void CreateBtrPanelFromBase(
-         [Values("3НСг 72.29.32-5", "3НСг 75.29.32-10БП3", "3НСг 73.29.32-4Б", 
-                 "3НСг 37.29.32-5", "3НСг 75.29.32-27П3", "3НСНг 30.29.42-5")] string mark)
+         [Values("3НСг 37.29.32-5", "3НСг 72.29.32-5", "3НСг 75.29.32-10БП3", "3НСг 73.29.32-4Б", 
+                 "3НСг 75.29.32-27П3", "3НСНг 30.29.42-5")] string mark)
          {
          // Тест создания определения блока панели по описанию в xml базе.                  
          PanelBase panelBase;
@@ -56,12 +56,12 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
             db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
+               baseService.InitToCreationPanels(db);
                using (var t = db.TransactionManager.StartTransaction())
-               {
-                  baseService.InitToCreationPanels(db);
+               {                  
                   Panel panelXml = baseService.GetPanelXml(mark);
                   panelBase = new PanelBase(panelXml, baseService);
-                  panelBase.CreateBlock();
+                  panelBase.CreateBlock(t);
 
                   if (!panelBase.IdBtrPanel.IsNull)
                   {

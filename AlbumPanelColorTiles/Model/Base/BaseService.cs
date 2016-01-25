@@ -33,6 +33,11 @@ namespace AlbumPanelColorTiles.Model.Base
          XmlBasePanelsFile = xmlBasePanelsFile;
       }      
 
+      /// <summary>
+      /// Подготовка к построению блоков панелей - копирование вспом блоков.
+      /// Транзакция не нужна!
+      /// </summary>
+      /// <param name="db"></param>
       public void InitToCreationPanels(Database db)
       {
          Db = db;
@@ -124,7 +129,7 @@ namespace AlbumPanelColorTiles.Model.Base
             }                 
          }
          return panel;
-      }
+      }       
 
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
       {         
@@ -133,36 +138,36 @@ namespace AlbumPanelColorTiles.Model.Base
          foreach (var itemGroupPanelByMark in panelsBaseGroup)
          {
             // Нумерация индексов окон
-            if (itemGroupPanelByMark.Count()>1)
+            if (itemGroupPanelByMark.Count() > 1)
             {
                // Панели отличающиеся сочетанием окон - пронумеровать индекс окна
                int index = 1;
                itemGroupPanelByMark.ForEach(p => p.WindowsIndex = index++);
             }
-            foreach (var panelBase in itemGroupPanelByMark)
+            using (var t = Db.TransactionManager.StartTransaction())
             {
-               try
+               foreach (var panelBase in itemGroupPanelByMark)
                {
-                  panelBase.CreateBlock();
+                  try
+                  {
+                     panelBase.CreateBlock(t);
+
+                  }
+                  catch (Exception ex)
+                  {
+                     Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
+                  }
                }
-               catch (Exception ex)
-               {
-                  Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
-               }
+               t.Commit();
             }
-            //// Обновление дин блоков гормз сечений
-            //foreach (var blSecHor               in Env.BlPanelSections.OfType<BlockSectionHorizontal>())
-            //{
-            //   var btrSecHor = blSecHor.IdBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
-            //   btrSecHor.UpdateAnonymousBlocks();
-            //} 
-         }        
+         }
       }
 
       private Dictionary<string, PanelBase> matchingWindow(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
       {
          // Определение окон в монтажных планах по архитектурным планам
          var panelsBase = new Dictionary<string, PanelBase>(); // string - ключ - маркаСБ + Марки Окон по порядку.
+         
          // Список монтажных планов - уникальных
          var floorsMount = facadesMounting.SelectMany(f => f.Floors);
          foreach (var floorMount in floorsMount)
@@ -171,16 +176,20 @@ namespace AlbumPanelColorTiles.Model.Base
             var floorAr = floorsAr.Find(f => (f.Section == floorMount.Section) && (f.Number == floorMount.Storey?.Number));
 
             //Test Добавить текст имени плана Ар в блок монтажного плана
-            if (floorAr != null)
+#if Test
             {
-               using (var btrMount = floorMount.IdBtrMounting.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+               if (floorAr != null)
                {
-                  DBText textFindPlanAr = new DBText();
-                  textFindPlanAr.TextString = floorAr.BlName;
-                  btrMount.AppendEntity(textFindPlanAr);
-                  btrMount.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(textFindPlanAr, true);
+                  using (var btrMount = floorMount.IdBtrMounting.Open(OpenMode.ForWrite) as BlockTableRecord)
+                  {
+                     DBText textFindPlanAr = new DBText();
+                     textFindPlanAr.TextString = floorAr.BlName;
+                     btrMount.AppendEntity(textFindPlanAr);
+                     //btrMount.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(textFindPlanAr, true);
+                  }
                }
             }
+#endif
 
             if (floorAr == null)
             {
@@ -193,14 +202,14 @@ namespace AlbumPanelColorTiles.Model.Base
                if (panelXml == null) continue;
                PanelBase panelBase = new PanelBase(panelXml, this);
                // Определение окон в панели по арх плану
-               if (floorAr != null && panelXml.windows?.window!=null)
+               if (floorAr != null && panelXml.windows?.window != null)
                {
                   foreach (var window in panelXml.windows.window)
                   {
                      // Точка окна внутри панели по XML описанию
                      Point3d ptOpeningCenter = new Point3d(window.posi.X + window.width * 0.5, 0, 0);
                      // Точка окна внутри монтажного плана
-                     Point3d ptWindInModel = panelMount.ExtTransToModel.MinPoint.Add(ptOpeningCenter.GetAsVector());                     
+                     Point3d ptWindInModel = panelMount.ExtTransToModel.MinPoint.Add(ptOpeningCenter.GetAsVector());
                      Point3d ptWindInArPlan = ptWindInModel.TransformBy(floorMount.Transform.Inverse());
 
                      var windowKey = floorAr.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInArPlan)).MinBy(w => w.Key);
@@ -214,28 +223,36 @@ namespace AlbumPanelColorTiles.Model.Base
                      panelBase.WindowsBaseCenters.Add(ptOpeningCenter, windowKey.First().Value);
 
                      // Test Добавление точек окна в блоке монтажки
-                     {                        
-                        using (var btrMountPlan = floorMount.IdBtrMounting.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+#if Test
+                     {
+                        using (var btrMountPlan = floorMount.IdBtrMounting.Open(OpenMode.ForWrite) as BlockTableRecord)
                         {
-                           DBPoint ptWinInPlan = new DBPoint(ptWindInArPlan);
-                           ptWinInPlan.ColorIndex = 2;
-                           btrMountPlan.AppendEntity(ptWinInPlan);
-                           btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInPlan, true);
+                           using (DBPoint ptWinInPlan = new DBPoint(ptWindInArPlan))
+                           {
+                              ptWinInPlan.ColorIndex = 2;
+                              btrMountPlan.AppendEntity(ptWinInPlan);
+                              //btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInPlan, true);
+                           }
 
-                           DBText dbText = new DBText();
-                           dbText.Position = ptWindInArPlan;
-                           dbText.TextString = windowKey.First().Value;
-                           btrMountPlan.AppendEntity(dbText);
-                           btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(dbText, true);
+                           using (DBText dbText = new DBText())
+                           {
+                              dbText.Position = ptWindInArPlan;
+                              dbText.TextString = windowKey.First().Value;
+                              btrMountPlan.AppendEntity(dbText);
+                              //btrMountPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(dbText, true);
+                           }
                         }
-                        using (var btrArPlan = floorAr.IdBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord)
+                        using (var btrArPlan = floorAr.IdBtr.Open(OpenMode.ForWrite) as BlockTableRecord)
                         {
-                           DBPoint ptWinInArPlan = new DBPoint(ptWindInArPlan);
-                           ptWinInArPlan.ColorIndex = 1;
-                           btrArPlan.AppendEntity(ptWinInArPlan);
-                           btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInArPlan, true);
-                        }                        
-                     }                     
+                           using (DBPoint ptWinInArPlan = new DBPoint(ptWindInArPlan))
+                           {
+                              ptWinInArPlan.ColorIndex = 1;
+                              btrArPlan.AppendEntity(ptWinInArPlan);
+                              //btrArPlan.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ptWinInArPlan, true);
+                           }
+                        }
+                     }
+#endif
                   }
                }
                // Уникальный ключ панели - МаркаСБ + Марки окон                    
@@ -244,7 +261,7 @@ namespace AlbumPanelColorTiles.Model.Base
                {
                   string windowMarks = string.Join(";", panelBase.WindowsBaseCenters.Values);
                   key += windowMarks;
-               }               
+               }
                PanelBase panelBaseUniq;
                if (!panelsBase.TryGetValue(key, out panelBaseUniq))
                {

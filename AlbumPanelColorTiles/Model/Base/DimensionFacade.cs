@@ -45,8 +45,8 @@ namespace AlbumPanelColorTiles.Model.Base
       }     
 
       private void addHorizontalPanelSection()
-      {         
-         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionHorizontal>().Where(s =>                           
+      {
+         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionHorizontal>().Where(s =>
                            s.IsCheekLeft == panelBase.IsCheekLeft &&
                            s.IsCheekRight == panelBase.IsCheekRight &&
                            s.IsOutsideLeft == panelBase.IsOutsideLeft &&
@@ -59,19 +59,24 @@ namespace AlbumPanelColorTiles.Model.Base
          }
 
          ObjectId idBtrSec = secBlocks.First().IdBtr;
-         double yPt = yDimLineBotMin -600;
+         var file = idBtrSec.Database.Filename;
+         double yPt = yDimLineBotMin - 700;
+
+         // Тескт сечения
+         AddText(@"%%U2-2", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
+
          Point3d ptPos = new Point3d(0, yPt, 0);
-         var blRefSecHor =  CreateBlRef(ptPos, idBtrSec, 1);         
-         // установить дин параметры длины и ширины блока сечения панели
+         var blRefSecHor = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
+         // установить дин параметры длины и ширины блока сечения панели         
          var res = setDynParam(blRefSecHor, "Толщина", panelBase.Thickness);
-         res = setDynParam(blRefSecHor, "Длина", panelBase.Length);                  
+         res = setDynParam(blRefSecHor, "Длина", panelBase.Length);
 
          // расставить окна.
          if (panelBase.Panel.windows?.window?.Count() > 0)
          {
             foreach (var window in panelBase.Panel.windows.window)
             {
-               var blRefWin = CreateBlRef(new Point3d(window.posi.X, ptPos.Y, 0), panelBase.Service.Env.IdBtrWindowHorSection, 1);
+               var blRefWin = CreateBlRefInBtrDim(new Point3d(window.posi.X, ptPos.Y, 0), panelBase.Service.Env.IdBtrWindowHorSection, 1);
                // Уст дин парам окна
                res = setDynParam(blRefWin, "Толщина", panelBase.Thickness);
                res = setDynParam(blRefWin, "Длина", window.width);
@@ -108,7 +113,7 @@ namespace AlbumPanelColorTiles.Model.Base
          }
          ObjectId idBtrSec = secBlocks.First().IdBtr;
          Point3d ptPos = new Point3d(xPt, 0,0);
-         CreateBlRef(ptPos, idBtrSec, 1);
+         CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
       }     
 
       private void addVerticalSectionMark()
@@ -123,10 +128,10 @@ namespace AlbumPanelColorTiles.Model.Base
          
          Point3d ptTopCross = new Point3d(xSec,yTop,0);
          Point3d ptBotCross = new Point3d(xSec, yBot, 0);
-         BlockReference blRefCrossTop = CreateBlRef(ptTopCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         BlockReference blRefCrossTop = CreateBlRefInBtrDim(ptTopCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          var attrRefTop = addAttrToBlockCross(blRefCrossTop, "2");
 
-         BlockReference blRefCrossBot = CreateBlRef(ptBotCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         BlockReference blRefCrossBot = CreateBlRefInBtrDim(ptBotCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          Matrix3d matrixMirrBotCross = Matrix3d.Mirroring(new Line3d(ptBotCross,
                                     new Point3d(ptBotCross.X + 1, ptBotCross.Y, ptBotCross.Z)));
          blRefCrossBot.TransformBy(matrixMirrBotCross);
@@ -144,7 +149,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptLeftCross = new Point3d(xLeft, ySec, 0);
          Point3d ptRightCross = new Point3d(xRight, ySec, 0);
 
-         BlockReference blRefCrossLeft = CreateBlRef(ptLeftCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         BlockReference blRefCrossLeft = CreateBlRefInBtrDim(ptLeftCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          Matrix3d matrixMirrLeftCross = Matrix3d.Mirroring(new Line3d(ptLeftCross, ptRightCross));
          blRefCrossLeft.Rotation = 90d.ToRadians();
          blRefCrossLeft.TransformBy(matrixMirrLeftCross);         
@@ -153,7 +158,7 @@ namespace AlbumPanelColorTiles.Model.Base
                new Point3d(attrRefTop.AlignmentPoint.X+1, attrRefTop.AlignmentPoint.Y, attrRefTop.AlignmentPoint.Z))));
          attrRefTop.Rotation = 0;
 
-         BlockReference blRefCrossRight = CreateBlRef(ptRightCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         BlockReference blRefCrossRight = CreateBlRefInBtrDim(ptRightCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          blRefCrossRight.Rotation = 270d.ToRadians();
          var attrRefBot = addAttrToBlockCross(blRefCrossRight, "1");
          attrRefBot.Rotation = 0; ;
@@ -193,6 +198,21 @@ namespace AlbumPanelColorTiles.Model.Base
             default:
                return 700;              
          }         
+      }
+
+      private void AddText(string val, Point3d pt, double height)
+      {
+         try
+         {
+            DBText text = new DBText();
+            text.Position = pt;
+            text.TextStyleId = panelBase.Service.Db.GetTextStylePIK();
+            text.TextString = val;
+            text.Height = height;            
+            btrDim.AppendEntity(text);
+            t.AddNewlyCreatedDBObject(text, true);
+         }
+         catch { }
       }
    }
 }

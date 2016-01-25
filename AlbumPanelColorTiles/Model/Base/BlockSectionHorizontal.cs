@@ -16,7 +16,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public bool IsOutsideRight { get; private set; }
       public bool IsOutsideLeft { get; private set; }
 
-      public BlockSectionHorizontal(string blName) : base(blName)
+      public BlockSectionHorizontal(string blName, BaseService service) : base(blName, service)
       {
 
       }

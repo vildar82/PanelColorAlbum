@@ -24,7 +24,10 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
             db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
-               floorsAr = FloorArchitect.GetAllPlanes(db);               
+               BaseService baseService = new BaseService();
+               baseService.InitToCreationPanels(db);
+
+               floorsAr = FloorArchitect.GetAllPlanes(db, baseService);               
             }
             db.SaveAs(@"c:\temp\test\АКР\Base\Tests\Тест-ПостроениеФасада-WindowMarks.dwg", DwgVersion.Current);
          }

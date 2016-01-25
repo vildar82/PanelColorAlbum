@@ -16,7 +16,7 @@ namespace TessAlbumPanelAcCoreConsole.Model.Base
    [TestFixture]
    public class TestDynBlockSec
    {
-      [Test()]
+      [Test]
       public void TestDynBlSec()
       {
          string testFile = @"c:\temp\test\АКР\Base\Tests\TestDynBlSec.dwg";         
@@ -75,7 +75,8 @@ namespace TessAlbumPanelAcCoreConsole.Model.Base
                   t.Commit();
                }
             }
-            db.SaveAs(testFile, DwgVersion.Current);
+            string saveFile = @"c:\temp\test\АКР\Base\Tests\TestDynBlSec-TestSaved.dwg";
+            db.SaveAs(saveFile, DwgVersion.Current);
          }         
       }
 
