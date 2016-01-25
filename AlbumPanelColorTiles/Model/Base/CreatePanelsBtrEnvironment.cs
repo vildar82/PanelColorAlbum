@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AcadLib.Errors;
 using AcadLib.Layers;
 using AlbumPanelColorTiles.Options;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -51,6 +52,13 @@ namespace AlbumPanelColorTiles.Model.Base
          loadBtr();
          // Размерный Стиль
          IdDimStyle = _service.Db.GetDimStylePIK();
+
+         // Отключение контура маскировки
+         try
+         {
+            Application.SetSystemVariable("FRAME", 0);
+         }
+         catch { }
       }     
 
       private void loadLayers()

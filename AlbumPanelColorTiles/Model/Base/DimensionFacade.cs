@@ -71,16 +71,62 @@ namespace AlbumPanelColorTiles.Model.Base
          var res = setDynParam(blRefSecHor, "Толщина", panelBase.Thickness);
          res = setDynParam(blRefSecHor, "Длина", panelBase.Length);
 
-         // расставить окна.
+         // расставить окна и размеры
+         Point3d ptDimLine = new Point3d(0, yPt - indentDimLineFromDraw, 0);
          if (panelBase.Panel.windows?.window?.Count() > 0)
          {
+            // Первая точка - левая контура ? наверно нужно всей панели c outside
+            Point3d ptPrev = new Point3d(panelBase.XMinContour, ptPos.Y, 0);
+            
+            // Первое окно
+            var winFirst = panelBase.Panel.windows.window.First();
+
+            // Если есть место - то добавление размера одной плитеки и шва
+            if ((winFirst.posi.X - panelBase.XMinContour)>300)
+            {
+               Point3d pt288 = new Point3d(ptPrev.X + 288, ptPrev.Y, 0);
+               CreateDim(ptPrev, pt288, ptDimLine, false, Matrix3d.Identity);
+               ptPrev = pt288;
+               Point3d pt12 = new Point3d(ptPrev.X + Settings.Default.TileSeam, ptPrev.Y, 0);
+               CreateDim(ptPrev, pt12, ptDimLine, false, Matrix3d.Identity);
+               ptPrev = pt12;
+            }            
+
             foreach (var window in panelBase.Panel.windows.window)
             {
-               var blRefWin = CreateBlRefInBtrDim(new Point3d(window.posi.X, ptPos.Y, 0), panelBase.Service.Env.IdBtrWindowHorSection, 1);
+               Point3d ptWin = new Point3d(window.posi.X, ptPos.Y, 0);
+               var blRefWin = CreateBlRefInBtrDim(ptWin, panelBase.Service.Env.IdBtrWindowHorSection, 1);
                // Уст дин парам окна
                res = setDynParam(blRefWin, "Толщина", panelBase.Thickness);
                res = setDynParam(blRefWin, "Длина", window.width);
+
+               // размер до зазора от плитки до окна 6 мм
+               Point3d pt6 = new Point3d(ptWin.X - 6, ptWin.Y, 0);
+               CreateDim(ptPrev, pt6, ptDimLine, false, Matrix3d.Identity);
+               ptPrev = pt6;
+               // Зазор от конца плитки до начала окна
+               pt6 = new Point3d(ptPrev.X + 6, ptPrev.Y, 0);
+               CreateDim(ptPrev, pt6, ptDimLine, false, Matrix3d.Identity);
+               ptPrev = pt6;
+               // Размер окна
+               Point3d ptNext = new Point3d(ptWin.X+ window.width, ptWin.Y, 0);
+               CreateDim(ptPrev, ptNext, ptDimLine, false, Matrix3d.Identity);
+               ptPrev = ptNext;
+               // Зазор от конца плитки до начала окна
+               pt6 = new Point3d(ptPrev.X + 6, ptPrev.Y, 0);
+               CreateDim(ptPrev, pt6, ptDimLine, false, Matrix3d.Identity);
+               ptPrev = pt6;
             }
+
+            // Последний размер от последнего окна
+            var winLast = panelBase.Panel.windows.window.Last();
+            Point3d ptWinLast = new Point3d(winLast.posi.X+winLast.width, ptPos.Y, 0);
+            Point3d ptLeftPanel = new Point3d(panelBase.XMaxContour, ptPos.Y, 0);
+            CreateDim(ptWinLast, ptLeftPanel, ptDimLine, false, Matrix3d.Identity);
+         }
+         else
+         {
+
          }
       }
 

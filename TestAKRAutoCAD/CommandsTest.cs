@@ -13,7 +13,7 @@ namespace TestAKRAutoCAD
 {
    public class CommandsTest
    {
-      [CommandMethod("TestCreateFacade")]
+      [CommandMethod("TestCreateFacade", CommandFlags.Session)]
       public void TestCreateFacade()
       {
          Document doc = Application.DocumentManager.MdiActiveDocument;

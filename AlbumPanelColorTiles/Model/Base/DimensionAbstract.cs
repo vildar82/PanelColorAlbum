@@ -19,9 +19,13 @@ namespace AlbumPanelColorTiles.Model.Base
       protected PanelBase panelBase;
       protected Transaction t;
       protected ObjectId idBlRefDim;
+      // Максимальная отметка линии размера в верхней части панели
       protected double yDimLineTopMax;
+      // Минимальная отметка линии размера в нижней части панели
       protected double yDimLineBotMin;
+      // Минимальная координата x линии размера слева
       protected double xDimLineLeftMin;
+      // Максимальная координата x линии размера справа
       protected double xDimLineRightMax;
       protected double indentBetweenDimLine = 160;
       protected double indentDimLineFromDraw = 180;
