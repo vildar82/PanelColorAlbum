@@ -294,5 +294,25 @@ namespace AlbumPanelColorTiles.Model.Base
             }
          }
       }
+
+      /// <summary>
+      /// Заморозка слоев образмеривания панелей
+      /// Должна быть запущена транзакция
+      /// </summary>
+      public void FreezeDimLayers()
+      {
+         var layerDimFacade = Env.IdLayerDimFacade.GetObject(OpenMode.ForRead) as LayerTableRecord;
+         if (!layerDimFacade.IsFrozen)
+         {
+            layerDimFacade.UpgradeOpen();
+            layerDimFacade.IsFrozen = true;
+         }
+         var layerDimForm = Env.IdLayerDimForm.GetObject(OpenMode.ForRead) as LayerTableRecord;
+         if (!layerDimForm.IsFrozen)
+         {
+            layerDimForm.UpgradeOpen();
+            layerDimForm.IsFrozen = true;
+         }
+      }
    }
 }

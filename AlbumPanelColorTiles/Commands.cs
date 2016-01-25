@@ -16,7 +16,6 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.PanelLibrary.LibEditor;
 using AlbumPanelColorTiles.Panels;
-using AlbumPanelColorTiles.Plot;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -458,7 +457,6 @@ namespace AlbumPanelColorTiles
                return;
             }
          }
-
          Log.Info("Start Command: AKR-PaintPanels");
 
          using (var DocLock = doc.LockDocument())
@@ -698,6 +696,67 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      [CommandMethod("PIK", "AKR-CreateFacade", CommandFlags.Modal)]
+      public void CreateFacade()
+      {
+         Document doc = AcAp.DocumentManager.MdiActiveDocument;
+         if (doc == null) return;         
+         Database db = doc.Database;
+
+         try
+         {
+            Inspector.Clear();
+            BaseService baseService = new BaseService();
+            baseService.ReadPanelsFromBase();
+
+            // Очиста чертежа от блоков панелей АКР
+            baseService.ClearPanelsAkrFromDrawing(db);
+            // Подготовка - копирование блоков, слоев, стилей, и т.п.
+            baseService.InitToCreationPanels(db);
+
+            // Определение фасадов
+            List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
+            List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);
+
+            using (var t = db.TransactionManager.StartTransaction())
+            {
+               // Создание определений блоков панелей по базе                
+               baseService.CreateBtrPanels(facadesMounting, floorsAr);
+
+               // Заморозка слоев образмеривания панелей
+               baseService.FreezeDimLayers();
+
+               t.Commit();
+            }            
+
+            //Создание фасадов
+            FacadeMounting.CreateFacades(facadesMounting);
+
+            //using (var t = db.TransactionManager.StartTransaction())
+            //{
+            //   var secBlocks = baseService.Env.BlPanelSections.OfType<BlockSectionHorizontal>();
+            //   foreach (var item in secBlocks)
+            //   {
+            //      item.ReplaceAssociateHatch();
+            //   }
+            //   t.Commit();
+            //}  
+
+            if (Inspector.HasErrors)
+            {
+               Inspector.Show();
+            }
+         }
+         catch (System.Exception  ex)
+         {
+            doc.Editor.WriteMessage($"\nНе удалось выполнить построение фасада. {ex.Message}");
+            if (!ex.Message.Contains("Отменено пользователем"))
+            {
+               Log.Error(ex, $"Command: AKR-CreateFacade. {doc.Name}");
+            }
+         }
+      }   
+
       [CommandMethod("PIK", "AKR-SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
       public void SelectPanelsCommand()
       {
@@ -753,36 +812,36 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("PIK", "AKR-RemoveWindowSuffixFromMountingPanels", CommandFlags.Modal)]
-      public void RemoveWindowSuffixFromMountingPanelsCommands()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         Editor ed = doc.Editor;
-         Database db = doc.Database;
+      //[CommandMethod("PIK", "AKR-RemoveWindowSuffixFromMountingPanels", CommandFlags.Modal)]
+      //public void RemoveWindowSuffixFromMountingPanelsCommands()
+      //{
+      //   Document doc = AcAp.DocumentManager.MdiActiveDocument;
+      //   Editor ed = doc.Editor;
+      //   Database db = doc.Database;
 
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            // Все монтажные блоки панелей в модели
-            var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForRead) as BlockTableRecord;
-            var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null);
-            mountingsPanelsInMs.ForEach(p => p.RemoveWindowSuffix());
-            foreach (ObjectId idEnt in ms)
-            {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-               {
-                  var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;                  
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
-                  {
-                     var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
-                     var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform , null);
-                     mountingsPanels.ForEach(p => p.RemoveWindowSuffix());
-                  }
-               }
-            }
-            t.Commit();
-         }
-         ed.Regen();
-      }
+      //   using (var t = db.TransactionManager.StartTransaction())
+      //   {
+      //      // Все монтажные блоки панелей в модели
+      //      var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForRead) as BlockTableRecord;
+      //      var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null);
+      //      mountingsPanelsInMs.ForEach(p => p.RemoveWindowSuffix());
+      //      foreach (ObjectId idEnt in ms)
+      //      {
+      //         if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+      //         {
+      //            var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;                  
+      //            if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
+      //            {
+      //               var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
+      //               var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform , null);
+      //               mountingsPanels.ForEach(p => p.RemoveWindowSuffix());
+      //            }
+      //         }
+      //      }
+      //      t.Commit();
+      //   }
+      //   ed.Regen();
+      //}
 
       [CommandMethod("PIK", "AKR-RemoveMarkPaintingFromMountingPanels", CommandFlags.Modal)]
       public void RemoveMarkPaintingFromMountingPanels()
@@ -896,17 +955,6 @@ namespace AlbumPanelColorTiles
          // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
          UtilsRemoveDash testRemoveDash = new UtilsRemoveDash();
          testRemoveDash.RemoveDashAKR();
-      }    
-
-      [CommandMethod("PIK", "TestBase", CommandFlags.Modal)]
-      public void TestBase()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         Editor ed = doc.Editor;
-         Database db = doc.Database;
-
-         BaseService baseService = new BaseService();
-         //baseService.LoadPanels();
-      }      
+      }         
    }
 }
