@@ -73,16 +73,23 @@ namespace AlbumPanelColorTiles.Model.Base
 
          // расставить окна и размеры
          Point3d ptDimLine = new Point3d(0, yPt - indentDimLineFromDraw, 0);
-         if (panelBase.Panel.windows?.window?.Count() > 0)
-         {
-            // Первая точка - левая контура ? наверно нужно всей панели c outside
-            Point3d ptPrev = new Point3d(panelBase.XMinContour, ptPos.Y, 0);
-            
+         // Первая точка - левая контура ? наверно нужно всей панели c outside
+         Point3d ptPanelRight = new Point3d(panelBase.XMinContour, ptPos.Y, 0);
+         Point3d ptPanelLeft = new Point3d(panelBase.XMaxContour, ptPos.Y, 0);
+
+         var windows = panelBase.Panel.windows?.window?.Select(w => new { posi = w.posi, width = w.width, height = w.height });
+         var balconys = panelBase.Panel.balconys?.balcony?.Select(b => new { posi = b.posi, width = b.width, height = b.height });
+         var apertures = balconys == null ? windows : windows?.Union(balconys) ?? balconys;
+         apertures = apertures.OrderBy(a => a.posi.X);
+         if (apertures != null && apertures.Count()>0)            
+         {  
             // Первое окно
-            var winFirst = panelBase.Panel.windows.window.First();
+            var apertureFirst = apertures.First();
+
+            Point3d ptPrev = ptPanelRight;
 
             // Если есть место - то добавление размера одной плитеки и шва
-            if ((winFirst.posi.X - panelBase.XMinContour)>300)
+            if ((apertureFirst.posi.X - panelBase.XMinContour)>300)
             {
                Point3d pt288 = new Point3d(ptPrev.X + 288, ptPrev.Y, 0);
                CreateDim(ptPrev, pt288, ptDimLine, false, Matrix3d.Identity);
@@ -90,18 +97,18 @@ namespace AlbumPanelColorTiles.Model.Base
                Point3d pt12 = new Point3d(ptPrev.X + Settings.Default.TileSeam, ptPrev.Y, 0);
                CreateDim(ptPrev, pt12, ptDimLine, false, Matrix3d.Identity);
                ptPrev = pt12;
-            }            
+            }
 
-            foreach (var window in panelBase.Panel.windows.window)
+            foreach (var aperture in apertures)
             {
-               Point3d ptWin = new Point3d(window.posi.X, ptPos.Y, 0);
-               var blRefWin = CreateBlRefInBtrDim(ptWin, panelBase.Service.Env.IdBtrWindowHorSection, 1);
+               Point3d ptAperture = new Point3d(aperture.posi.X, ptPos.Y, 0);
+               var blRefWin = CreateBlRefInBtrDim(ptAperture, panelBase.Service.Env.IdBtrWindowHorSection, 1);
                // Уст дин парам окна
                res = setDynParam(blRefWin, "Толщина", panelBase.Thickness);
-               res = setDynParam(blRefWin, "Длина", window.width);
+               res = setDynParam(blRefWin, "Длина", aperture.width);
 
                // размер до зазора от плитки до окна 6 мм
-               Point3d pt6 = new Point3d(ptWin.X - 6, ptWin.Y, 0);
+               Point3d pt6 = new Point3d(ptAperture.X - 6, ptAperture.Y, 0);
                CreateDim(ptPrev, pt6, ptDimLine, false, Matrix3d.Identity);
                ptPrev = pt6;
                // Зазор от конца плитки до начала окна
@@ -109,7 +116,7 @@ namespace AlbumPanelColorTiles.Model.Base
                CreateDim(ptPrev, pt6, ptDimLine, false, Matrix3d.Identity);
                ptPrev = pt6;
                // Размер окна
-               Point3d ptNext = new Point3d(ptWin.X+ window.width, ptWin.Y, 0);
+               Point3d ptNext = new Point3d(ptAperture.X + aperture.width, ptAperture.Y, 0);
                CreateDim(ptPrev, ptNext, ptDimLine, false, Matrix3d.Identity);
                ptPrev = ptNext;
                // Зазор от конца плитки до начала окна
@@ -119,14 +126,16 @@ namespace AlbumPanelColorTiles.Model.Base
             }
 
             // Последний размер от последнего окна
-            var winLast = panelBase.Panel.windows.window.Last();
-            Point3d ptWinLast = new Point3d(winLast.posi.X+winLast.width, ptPos.Y, 0);
-            Point3d ptLeftPanel = new Point3d(panelBase.XMaxContour, ptPos.Y, 0);
-            CreateDim(ptWinLast, ptLeftPanel, ptDimLine, false, Matrix3d.Identity);
+            var apertureLast = apertures.Last();
+            Point3d ptApertureLast = new Point3d(apertureLast.posi.X+apertureLast.width, ptPos.Y, 0);
+            
+            CreateDim(ptApertureLast, ptPanelLeft, ptDimLine, false, Matrix3d.Identity);
          }
+         // Панель без окон и дверей
          else
          {
-
+            // Один общий розмер
+            CreateDim(ptPanelRight, ptPanelLeft, ptDimLine, false, Matrix3d.Identity);
          }
       }
 
