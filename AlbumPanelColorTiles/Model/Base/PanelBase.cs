@@ -88,7 +88,7 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       /// <exception cref="Autodesk.AutoCAD.Runtime.Exception">DuplicateBlockName</exception>
       /// <returns>ObjectId созданного определения блока в текущей базе.</returns>            
-      public void CreateBlock(Transaction t)
+      public void CreateBlock()
       {
          // Имя для блока панели АКР
          BlNameAkr = defineBlockPanelAkrName();
@@ -96,7 +96,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Openings = new List<Extents3d>();
 
          Database db = Service.Db;
-         //Transaction t = db.TransactionManager.TopTransaction;
+         Transaction t = db.TransactionManager.TopTransaction;
 
          BlockTableRecord btrPanel;
          using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable)

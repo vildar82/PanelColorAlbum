@@ -61,7 +61,7 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
                {                  
                   Panel panelXml = baseService.GetPanelXml(mark);
                   panelBase = new PanelBase(panelXml, baseService);
-                  panelBase.CreateBlock(t);
+                  panelBase.CreateBlock();
 
                   if (!panelBase.IdBtrPanel.IsNull)
                   {

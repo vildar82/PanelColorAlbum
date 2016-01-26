@@ -149,13 +149,13 @@ namespace AlbumPanelColorTiles.Model.Base
                int index = 1;
                itemGroupPanelByMark.ForEach(p => p.WindowsIndex = index++);
             }
-            using (var t = Db.TransactionManager.StartTransaction())
-            {
+            //using (var t = Db.TransactionManager.StartTransaction())
+            //{
                foreach (var panelBase in itemGroupPanelByMark)
                {
                   try
                   {
-                     panelBase.CreateBlock(t);
+                     panelBase.CreateBlock();
 
                   }
                   catch (Exception ex)
@@ -163,8 +163,8 @@ namespace AlbumPanelColorTiles.Model.Base
                      Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
                   }
                }
-               t.Commit();
-            }
+            //   t.Commit();
+            //}
          }
       }
 
