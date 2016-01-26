@@ -155,15 +155,36 @@ namespace AlbumPanelColorTiles.Model.Base
          Dictionary<Point3d, string> marks = new Dictionary<Point3d, string>();
          foreach (ObjectId idEnt in btrArPlan)
          {
+            bool isFound = false;
+
+            Point3d ptTextPos = Point3d.Origin;
+            string textMark = string.Empty;
+
             if (idEnt.ObjectClass.Name == "AcDbMText")
             {
-               // МТекст на слое A-GLAZ - IDEN
+               // МТекст на слое A-GLAZ - IDEN               
                var markText = idEnt.GetObject(OpenMode.ForRead, false, true) as MText;
                //if (markText.Layer.Equals("A-GLAZ-IDEN", StringComparison.OrdinalIgnoreCase))
                if (Service.Env.WindowMarks.Contains(markText.Text, StringComparer.OrdinalIgnoreCase))
                {
-                  marks.Add(markText.Location, markText.Text);
+                  isFound = true;
+                  ptTextPos = markText.Location;
+                  textMark = markText.Text;
                }
+            }
+            if (idEnt.ObjectClass.Name == "AcDbText")
+            {               
+               var markText = idEnt.GetObject(OpenMode.ForRead, false, true) as DBText;             
+               if (Service.Env.WindowMarks.Contains(markText.TextString, StringComparer.OrdinalIgnoreCase))
+               {
+                  isFound = true;
+                  ptTextPos = markText.Position;
+                  textMark = markText.TextString;
+               }
+            }
+            if (isFound)
+            {
+               marks.Add(ptTextPos, textMark);
             }
          }         
          return marks;

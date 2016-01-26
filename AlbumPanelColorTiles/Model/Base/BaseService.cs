@@ -137,6 +137,11 @@ namespace AlbumPanelColorTiles.Model.Base
 
          foreach (var itemGroupPanelByMark in panelsBaseGroup)
          {
+            if (HostApplicationServices.Current.UserBreak())
+            {
+               throw new Exception("Отменено пользователем.");
+            }
+
             // Нумерация индексов окон
             if (itemGroupPanelByMark.Count() > 1)
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -51,37 +52,39 @@ namespace AlbumPanelColorTiles.Sheets
          // Создание листов Марок АР
          using (Database dbMarkSB = new Database(false, true))
          {
-            Database dbOrig = _markSB.IdBtr.Database;
+            //Database dbOrig = _markSB.IdBtr.Database;
             dbMarkSB.ReadDwgFile(_fileMarkSB, FileShare.ReadWrite, false, "");
             dbMarkSB.CloseInput(true);
 
-            // Замена блока рамки
-            sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB);            
-
-            // Копирование всех определений блоков марки АР в файл Марки СБ
-            CopyBtrMarksARToSheetMarkSB(dbMarkSB);
-
-            // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
-            // А так же включение и разморозка всех слоев.
-            List<ObjectId> layersToFreezeOnFacadeSheet;
-            List<ObjectId> layersToFreezeOnFormSheet;
-            GetLayersToFreezeOnSheetsPanel(dbMarkSB, out layersToFreezeOnFacadeSheet, out layersToFreezeOnFormSheet);
-
-            // Создание листов Марок АР
-            Point3d pt = Point3d.Origin;
-            foreach (var sheetMarkAR in _sheetsMarkAR)
+            using (new AcadLib.WorkingDatabaseSwitcher(dbMarkSB))
             {
-               sheetMarkAR.CreateLayout(dbMarkSB, pt, layersToFreezeOnFacadeSheet, layersToFreezeOnFormSheet);
-               // Точка для вставки следующего блока Марки АР
-               pt = new Point3d(pt.X + 15000, pt.Y, 0);
+               // Замена блока рамки
+               sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB);
+
+               // Копирование всех определений блоков марки АР в файл Марки СБ
+               CopyBtrMarksARToSheetMarkSB(dbMarkSB);
+
+               // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
+               // А так же включение и разморозка всех слоев.
+               List<ObjectId> layersToFreezeOnFacadeSheet;
+               List<ObjectId> layersToFreezeOnFormSheet;
+               GetLayersToFreezeOnSheetsPanel(dbMarkSB, out layersToFreezeOnFacadeSheet, out layersToFreezeOnFormSheet);
+
+               // Создание листов Марок АР
+               Point3d pt = Point3d.Origin;
+               foreach (var sheetMarkAR in _sheetsMarkAR)
+               {
+                  sheetMarkAR.CreateLayout(dbMarkSB, pt, layersToFreezeOnFacadeSheet, layersToFreezeOnFormSheet);
+                  // Точка для вставки следующего блока Марки АР
+                  pt = new Point3d(pt.X + 15000, pt.Y, 0);
+               }
+
+               //// Удаление шаблона листа из фала Марки СБ
+               //HostApplicationServices.WorkingDatabase = dbMarkSB;
+               LayoutManager lm = LayoutManager.Current;
+               lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForMarkAR);
             }
-
-            //// Удаление шаблона листа из фала Марки СБ
-            HostApplicationServices.WorkingDatabase = dbMarkSB;
-            LayoutManager lm = LayoutManager.Current;
-            lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForMarkAR);
-
-            HostApplicationServices.WorkingDatabase = dbOrig;
+            //HostApplicationServices.WorkingDatabase = dbOrig;
             dbMarkSB.SaveAs(_fileMarkSB, DwgVersion.Current);
          }
       }

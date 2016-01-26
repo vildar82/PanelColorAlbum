@@ -63,7 +63,7 @@ namespace AlbumPanelColorTiles.Model.Base
          double yPt = yDimLineBotMin - 700;
 
          // Тескт сечения
-         AddText(@"%%U2-2", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
+         AddText(@"%%U1-1", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
 
          Point3d ptPos = new Point3d(0, yPt, 0);
          var blRefSecHor = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
