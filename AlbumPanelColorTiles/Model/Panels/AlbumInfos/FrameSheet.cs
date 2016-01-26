@@ -11,7 +11,7 @@ namespace AlbumPanelColorTiles.Panels
    // Блок рамки со штампом
    public class FrameSheet
    {
-      private Dictionary<string, string> _attrs;      
+      private Dictionary<string, string> _attrs;  // key - Tag, value - ObjectId AtrRef.    
       private Database _db;
       private ObjectId _idBtrFrame;      
       public bool IsOk { get; private set; }
@@ -42,7 +42,16 @@ namespace AlbumPanelColorTiles.Panels
                   string key = atrRef.Tag.ToUpper();
                   if (!_attrs.ContainsKey(key))
                   {
-                     _attrs.Add(key, atrRef.TextString);
+                     string text;
+                     if (atrRef.IsMTextAttribute)
+                     {
+                        text = atrRef.MTextAttribute.Contents;
+                     }
+                     else
+                     {
+                        text = atrRef.TextString;
+                     }
+                     _attrs.Add(key, text);
                   }
                }
             }
@@ -62,7 +71,7 @@ namespace AlbumPanelColorTiles.Panels
             }
             if (!string.IsNullOrEmpty(errMsg))
             {
-               Inspector.AddError("Ошибки в блоке {0}: {1}".f(Settings.Default.BlockFrameName, errMsg), blRefFrame);
+               Inspector.AddError($"Ошибки в блоке {Settings.Default.BlockFrameName}: {blRefFrame}");
             }
             else
             {
@@ -71,7 +80,7 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
-      public void ChangeBlockFrame(Database db)
+      public void ChangeBlockFrame(Database db, bool insertDescription)
       {
          // Замена блока рамки если он есть в чертеже фасада
          if (IsOk)
@@ -81,7 +90,7 @@ namespace AlbumPanelColorTiles.Panels
             ids.Add(_idBtrFrame);
             db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
             // Запись атрибутов (Наименование, и другие если есть)
-            changeBlkRefFrame(db, Settings.Default.BlockFrameName);
+            changeBlkRefFrame(db, Settings.Default.BlockFrameName, insertDescription);
          }
       }
 
@@ -123,7 +132,7 @@ namespace AlbumPanelColorTiles.Panels
       //   }
       //}    
 
-      private void changeBlkRefFrame(Database db, string blName)
+      private void changeBlkRefFrame(Database db, string blName, bool insertDescription)
       {
          // Обновление блока рамки
          using (var t = db.TransactionManager.StartTransaction())
@@ -151,7 +160,7 @@ namespace AlbumPanelColorTiles.Panels
                         var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                         if (string.Equals(blRef.GetEffectiveName(),blName, StringComparison.CurrentCultureIgnoreCase))
                         {
-                           updateBlRefFrame(blRef, btrFrame, t);
+                           updateBlRefFrame(blRef, btrFrame, t, insertDescription);
                         }
                      }
                   }
@@ -229,7 +238,7 @@ namespace AlbumPanelColorTiles.Panels
       //   return res;
       //}
 
-      private void updateBlRefFrame(BlockReference blRef, BlockTableRecord btrFrame, Transaction t)
+      private void updateBlRefFrame(BlockReference blRef, BlockTableRecord btrFrame, Transaction t, bool insertDescription)
       {
          // Обновление вхождения блока рамки
          if (!IsOk)
@@ -250,11 +259,22 @@ namespace AlbumPanelColorTiles.Panels
                var atrDef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as AttributeDefinition;
                if (!atrDef.Constant)
                {
+                  if (!insertDescription && atrDef.Tag.Equals("ПРИМЕЧАНИЕ", StringComparison.OrdinalIgnoreCase))
+                  {
+                     continue;
+                  }
                   using (var atrRef = new AttributeReference())
                   {
                      atrRef.SetAttributeFromBlock(atrDef, blRef.BlockTransform);
                      string key = atrDef.Tag.ToUpper();
-                     atrRef.TextString = _attrs.ContainsKey(key) ? _attrs[key] : atrDef.TextString;
+                     if (_attrs.ContainsKey(key))
+                     {
+                        atrRef.TextString = _attrs[key];
+                     }
+                     else
+                     {
+                        atrRef.TextString = atrDef.TextString;
+                     }                          
                      blRef.AttributeCollection.AppendAttribute(atrRef);
                      t.AddNewlyCreatedDBObject(atrRef, true);
                   }

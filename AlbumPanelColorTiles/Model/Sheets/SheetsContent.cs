@@ -47,7 +47,7 @@ namespace AlbumPanelColorTiles.Sheets
             _dbContent.CloseInput(true);
 
             // Замена блока рамки из чертежа фасада, если он есть
-            _album.AlbumInfo?.Frame?.ChangeBlockFrame(_dbContent);
+            _album.AlbumInfo?.Frame?.ChangeBlockFrame(_dbContent, false);
             _album?.AlbumInfo?.CoverTitle?.ChangeCoverAndTitle(_dbContent);
 
             using (var t = _dbContent.TransactionManager.StartTransaction())

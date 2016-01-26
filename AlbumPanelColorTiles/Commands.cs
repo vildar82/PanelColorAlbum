@@ -699,6 +699,7 @@ namespace AlbumPanelColorTiles
       [CommandMethod("PIK", "AKR-CreateFacade", CommandFlags.Modal)]
       public void CreateFacade()
       {
+         Log.Info("Start Command: AKR-CreateFacade");
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;         
          Database db = doc.Database;

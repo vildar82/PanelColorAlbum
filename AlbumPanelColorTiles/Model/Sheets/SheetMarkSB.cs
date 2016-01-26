@@ -59,7 +59,7 @@ namespace AlbumPanelColorTiles.Sheets
             using (new AcadLib.WorkingDatabaseSwitcher(dbMarkSB))
             {
                // Замена блока рамки
-               sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB);
+               sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB, true);
 
                // Копирование всех определений блоков марки АР в файл Марки СБ
                CopyBtrMarksARToSheetMarkSB(dbMarkSB);
