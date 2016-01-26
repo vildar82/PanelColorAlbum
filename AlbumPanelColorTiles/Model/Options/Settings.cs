@@ -77,6 +77,7 @@
       public int TileHeight { get; set; }
       public int TileLenght { get; set; }
       public int TileSeam { get; set; }
+      public int TileThickness { get; set; }
       public string WindowPanelSuffix { get; set; }
 
       private static Settings loadSettings()
@@ -131,6 +132,7 @@
          TileHeight = 88;
          TileLenght = 288;
          TileSeam = 12;
+         TileThickness = 8;
          CaptionPanelTextHeight = 180;
          CaptionPanelSecondTextShift = 250;
          ImagePaintSpotLength = 300;

@@ -61,16 +61,20 @@ namespace AlbumPanelColorTiles.Sheets
             {
                using (var t = dbMarkSB.TransactionManager.StartTransaction())
                {
-
-
-
                   // Для нового режима работы - добавление описания панели
                   // Пока оно одинаковое для всех листов с одной маркой СБ
                   // Поэтому добавлю текст описания на первый лист, потом лист будет копироваться уже вместе с этим тестом.
                   if (_markSB.Album.StartOptions.NewMode)
                   {
                      PanelDescription panelDesc = new PanelDescription(_markSB, dbMarkSB);
-                     panelDesc.CreateDescription();
+                     try
+                     {
+                        panelDesc.CreateDescription();
+                     }
+                     catch (Exception ex)
+                     {
+                        Log.Error(ex, "panelDesc.CreateDescription();");
+                     }                     
                   }
 
                   // Замена блока рамки

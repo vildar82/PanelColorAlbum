@@ -62,7 +62,7 @@ namespace AlbumPanelColorTiles.Panels
          _colorAreas = ColorArea.GetColorAreas(_idBtr, album);
          _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
          // Список плиток (в определении блока марки СБ)
-         GetTiles();
+         IterateBtrEnt();
          // Центр панели
          _centerPanel = GetCenterPanel(_tiles);
       }
@@ -520,7 +520,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       // Получение списка плиток в определении блока
-      private void GetTiles()
+      private void IterateBtrEnt()
       {
          _tiles = new List<Tile>();
          _paints = new List<Paint>();
@@ -532,6 +532,7 @@ namespace AlbumPanelColorTiles.Panels
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  // Плитка
                   if (blRefTile.GetEffectiveName() == Settings.Default.BlockTileName)
                   {
                      Tile tile = new Tile(blRefTile);
@@ -540,6 +541,8 @@ namespace AlbumPanelColorTiles.Panels
                      _tiles.Add(tile);
                      _paints.Add(paint);
                   }
+                  // Окна
+                  ...
                }
             }
             t.Commit();
