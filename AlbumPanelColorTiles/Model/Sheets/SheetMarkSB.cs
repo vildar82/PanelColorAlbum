@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -58,25 +59,41 @@ namespace AlbumPanelColorTiles.Sheets
 
             using (new AcadLib.WorkingDatabaseSwitcher(dbMarkSB))
             {
-               // Замена блока рамки
-               sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB, true);
-
-               // Копирование всех определений блоков марки АР в файл Марки СБ
-               CopyBtrMarksARToSheetMarkSB(dbMarkSB);
-
-               // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
-               // А так же включение и разморозка всех слоев.
-               List<ObjectId> layersToFreezeOnFacadeSheet;
-               List<ObjectId> layersToFreezeOnFormSheet;
-               GetLayersToFreezeOnSheetsPanel(dbMarkSB, out layersToFreezeOnFacadeSheet, out layersToFreezeOnFormSheet);
-
-               // Создание листов Марок АР
-               Point3d pt = Point3d.Origin;
-               foreach (var sheetMarkAR in _sheetsMarkAR)
+               using (var t = dbMarkSB.TransactionManager.StartTransaction())
                {
-                  sheetMarkAR.CreateLayout(dbMarkSB, pt, layersToFreezeOnFacadeSheet, layersToFreezeOnFormSheet);
-                  // Точка для вставки следующего блока Марки АР
-                  pt = new Point3d(pt.X + 15000, pt.Y, 0);
+
+
+
+                  // Для нового режима работы - добавление описания панели
+                  // Пока оно одинаковое для всех листов с одной маркой СБ
+                  // Поэтому добавлю текст описания на первый лист, потом лист будет копироваться уже вместе с этим тестом.
+                  if (_markSB.Album.StartOptions.NewMode)
+                  {
+                     PanelDescription panelDesc = new PanelDescription(_markSB, dbMarkSB);
+                     panelDesc.CreateDescription();
+                  }
+
+                  // Замена блока рамки
+                  sheetSet?.Album?.AlbumInfo?.Frame?.ChangeBlockFrame(dbMarkSB, true);
+
+                  // Копирование всех определений блоков марки АР в файл Марки СБ
+                  CopyBtrMarksARToSheetMarkSB(dbMarkSB);
+
+                  // Слои для заморозки на видовых экранах панелей (Окна, Размеры в форме и на фасаде)
+                  // А так же включение и разморозка всех слоев.
+                  List<ObjectId> layersToFreezeOnFacadeSheet;
+                  List<ObjectId> layersToFreezeOnFormSheet;
+                  GetLayersToFreezeOnSheetsPanel(dbMarkSB, out layersToFreezeOnFacadeSheet, out layersToFreezeOnFormSheet);
+
+                  // Создание листов Марок АР
+                  Point3d pt = Point3d.Origin;
+                  foreach (var sheetMarkAR in _sheetsMarkAR)
+                  {
+                     sheetMarkAR.CreateLayout(dbMarkSB, pt, layersToFreezeOnFacadeSheet, layersToFreezeOnFormSheet);
+                     // Точка для вставки следующего блока Марки АР
+                     pt = new Point3d(pt.X + 15000, pt.Y, 0);
+                  }
+                  t.Commit();
                }
 
                //// Удаление шаблона листа из фала Марки СБ

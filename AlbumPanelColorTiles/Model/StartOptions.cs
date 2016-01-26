@@ -33,12 +33,19 @@ namespace AlbumPanelColorTiles.Model
       [DefaultValue(true)]
       [TypeConverter(typeof(BooleanTypeConverter))]
       public bool SortPanels { get; set; }
+      
+      [Category("Важно")]
+      [DisplayName("Способ построения панелей")]
+      [Description("Новый - это автоматически создаваемые панели. Старый - ручной и по библиотеке блоков панелей.")]
+      [DefaultValue(false)]      
+      [TypeConverter(typeof(BooleanNewModeConverter))]
+      public bool NewMode { get; set; }
 
       [Category("Не важно")]
       [DisplayName("Номер первого листа в альбоме")]
       [Description("Начальный номер для листов панелей в альбоме. Если 0, то этот параметр не учитывается.")]
       [DefaultValue(0)]      
-      public int NumberFirstSheet { get; set; }
+      public int NumberFirstSheet { get; set; }      
 
       public void LoadDefault()
       {         
@@ -48,6 +55,7 @@ namespace AlbumPanelColorTiles.Model
             Abbr = loadAbbreviateName();// "Н47Г";                     
          }
          CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING, false);
+         NewMode = DictNOD.LoadBool(Album.KEYNAMENEWMODE, false);
          NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
          NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
          SortPanels = DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
@@ -70,6 +78,7 @@ namespace AlbumPanelColorTiles.Model
             saveNumberToDict(resVal.NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
             DictNOD.SaveBool(resVal.CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
             DictNOD.SaveBool(resVal.SortPanels, Album.KEYNAMESORTPANELS);
+            DictNOD.SaveBool(resVal.NewMode, Album.KEYNAMENEWMODE);
          }
          catch (Exception ex)
          {
@@ -135,7 +144,7 @@ namespace AlbumPanelColorTiles.Model
       }
    }
 
-   internal class BooleanTypeConverter : BooleanConverter
+   public class BooleanTypeConverter : BooleanConverter
    {
       public override object ConvertFrom(ITypeDescriptorContext context,
         CultureInfo culture,
@@ -151,6 +160,25 @@ namespace AlbumPanelColorTiles.Model
       {
          return (bool)value ?
            "Да" : "Нет";
+      }
+   }
+
+   public class BooleanNewModeConverter : BooleanConverter
+   {
+      public override object ConvertFrom(ITypeDescriptorContext context,
+        CultureInfo culture,
+        object value)
+      {
+         return (string)value == "Новый";
+      }
+
+      public override object ConvertTo(ITypeDescriptorContext context,
+              CultureInfo culture,
+        object value,
+        Type destType)
+      {
+         return (bool)value ?
+           "Новый" : "Старый";
       }
    }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
 using AlbumPanelColorTiles.Model;
+using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Model.Select;
 using AlbumPanelColorTiles.Options;
@@ -23,6 +24,7 @@ namespace AlbumPanelColorTiles
    public class Album
    {
       public const string KEYNAMECHECKMARKPAINTING = "CheckMarkPainting";
+      public const string KEYNAMENEWMODE = "NEWMODE";
       public const string KEYNAMESORTPANELS = "SortPanels";
       public const string KEYNAMENUMBERFIRSTFLOOR = "NumberFirstFloor";
       public const string KEYNAMENUMBERFIRSTSHEET = "NumberFirstSheet";
@@ -71,6 +73,7 @@ namespace AlbumPanelColorTiles
       public StartOption StartOptions { get; private set; }
       public AlbumInfo AlbumInfo { get; set; }
       public List<Storey> Storeys { get { return _storeys; } }
+      public BaseService BaseService { get; private set; }
 
       /// <summary>
       /// Общий расход плитки на альбом.
@@ -212,6 +215,12 @@ namespace AlbumPanelColorTiles
       // Создание альбома панелей
       public void CreateAlbum()
       {
+         if (StartOptions.NewMode)
+         {
+            BaseService = new BaseService();
+            BaseService.ReadPanelsFromBase();
+         }
+
          // Подсчет общего кол плитки на альбом
          TotalTilesCalc = TileCalc.CalcAlbum(this);
 

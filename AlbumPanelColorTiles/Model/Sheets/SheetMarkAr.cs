@@ -65,24 +65,25 @@ namespace AlbumPanelColorTiles.Sheets
       // Создание листа в файле марки СБ.
       public void CreateLayout(Database dbMarkSB, Point3d pt, List<ObjectId> layersToFreezeOnFacadeSheet, List<ObjectId> layersToFreezeOnFormSheet)
       {
+         Transaction t = dbMarkSB.TransactionManager.TopTransaction;
          _ptInsertBlRefMarkAR = pt;
          // Определения блоков марок АР уже скопированы.
 
-         using (var t = dbMarkSB.TransactionManager.StartTransaction())
-         {
+         //using (var t = dbMarkSB.TransactionManager.StartTransaction())
+         //{
             //
             //Создание листа для Марки АР ("на Фасаде").
             //
             //var idLayoutMarkAR = AcadLib.Blocks.Block.CopyLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
             var idLayoutMarkAR = AcadLib.Blocks.Block.CloneLayout(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
-            // Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
-            if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary).Count == 3)
-            {
-               Block.ConvertLayoutNames(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
-               HostApplicationServices.WorkingDatabase = dbMarkSB;
-               LayoutManager lm = LayoutManager.Current;
-               idLayoutMarkAR = lm.GetLayoutId(LayoutName);
-            }
+            //// Для первого листа марки АР нужно поменять местами имена листов шаблона и Марки АР (чтобы удалить потом лист шаблона)
+            //if ((t.GetObject(dbMarkSB.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary).Count == 3)
+            //{
+            //   Block.ConvertLayoutNames(dbMarkSB, Settings.Default.SheetTemplateLayoutNameForMarkAR, LayoutName);
+            //   HostApplicationServices.WorkingDatabase = dbMarkSB;
+            //   LayoutManager lm = LayoutManager.Current;
+            //   idLayoutMarkAR = lm.GetLayoutId(LayoutName);
+            //}
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);
             // Направение видового экрана на блок марки АР.
@@ -115,8 +116,8 @@ namespace AlbumPanelColorTiles.Sheets
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkArForm, false);
 
-            t.Commit();
-         }
+         //   t.Commit();
+         //}
       }
 
       private void CheckTableExtents(Extents3d extentsViewPort, ObjectId idTable)

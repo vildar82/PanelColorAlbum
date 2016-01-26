@@ -90,11 +90,11 @@ namespace AlbumPanelColorTiles
             }
             return _msgHelp;
          }
-      }
+      }      
 
       // Создание альбома колористических решений панелей (Альбома панелей).
       [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.Session | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
-      public void AlbumPanelsCommand()
+      public void AlbumPanels()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
@@ -137,7 +137,7 @@ namespace AlbumPanelColorTiles
                   // Переименование марок пользователем.
                   // Вывод списка панелей для возможности переименования марок АР пользователем
                   FormRenameMarkAR formRenameMarkAR = new FormRenameMarkAR(_album);
-                  if (Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
+                  if (AcAp.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
                   {
                      var renamedMarksAR = formRenameMarkAR.RenamedMarksAr();
                      // сохранить в словарь
@@ -431,7 +431,7 @@ namespace AlbumPanelColorTiles
          // Принудительное сохранение файла
          if (File.Exists(doc.Name))
          {
-            object obj = Autodesk.AutoCAD.ApplicationServices.Application.GetSystemVariable("DBMOD");
+            object obj = AcAp.GetSystemVariable("DBMOD");
             // Проверка значения системной переменной DBMOD. Если 0 - значит чертёж не был изменён
             if (Convert.ToInt16(obj) != 0)
             {
@@ -940,7 +940,6 @@ namespace AlbumPanelColorTiles
             t.Commit();
          }
       }
-
       
       [CommandMethod("PIK", "TestReplaceWindows", CommandFlags.Modal)]
       public void TestReplaceWindows()

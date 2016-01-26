@@ -68,6 +68,7 @@ namespace AlbumPanelColorTiles.Sheets
             if (HostApplicationServices.Current.UserBreak())
                throw new System.Exception("Отменено пользователем.");
             progressMeter.MeterProgress();
+
             sheetMarkSB.CreateSheetMarkSB(this, countMarkSB++);
          }
          progressMeter.Stop();

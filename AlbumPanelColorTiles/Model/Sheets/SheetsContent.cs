@@ -17,7 +17,7 @@ namespace AlbumPanelColorTiles.Sheets
       // кол листов до содержания
       private readonly int _firstRowInTableForSheets = 2;
 
-      private Album _album;      
+      private Album _album;
       private int _countContentSheets;
       private Database _dbContent;
       private Database _dbFacade;
@@ -28,7 +28,7 @@ namespace AlbumPanelColorTiles.Sheets
       {
          _sheetsSet = sheetsSet;
          _album = sheetsSet.Album;
-         _sheetsMarkSB = sheetsSet.SheetsMarkSB;         
+         _sheetsMarkSB = sheetsSet.SheetsMarkSB;
       }
 
       // Содержание тома (Общие данные. Ведомость комплекта чертежей.)
@@ -39,102 +39,106 @@ namespace AlbumPanelColorTiles.Sheets
          File.Copy(_sheetsSet.SheetTemplateFileContent, fileContent);
 
          // Кол листов содержания = Суммарное кол лисчтов панелей / на кол строк в таблице на одном листе
-         // Но на первом листе содержания первые 5 строк заняты (обложка, тит, общие данные, наруж стен панели, том1).
-         _dbFacade = HostApplicationServices.WorkingDatabase;
+         // Но на первом листе содержания первые 5 строк заняты (обложка, тит, общие данные, наруж стен панели, том1).         
+         //_dbFacade = HostApplicationServices.WorkingDatabase;
          using (_dbContent = new Database(false, true))
          {
             _dbContent.ReadDwgFile(fileContent, FileShare.ReadWrite, false, "");
             _dbContent.CloseInput(true);
 
-            // Замена блока рамки из чертежа фасада, если он есть
-            _album.AlbumInfo?.Frame?.ChangeBlockFrame(_dbContent, false);
-            _album?.AlbumInfo?.CoverTitle?.ChangeCoverAndTitle(_dbContent);
-
-            using (var t = _dbContent.TransactionManager.StartTransaction())
+            using (new AcadLib.WorkingDatabaseSwitcher(_dbContent))
             {
-               int curContentLayoutNum = 3;
-               Table tableContent;
-               BlockReference blRefStamp;
-               CopyContentSheet(t, curContentLayoutNum, out tableContent, out blRefStamp);
-               // Определение кол-ва марок АР
-               int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
-               // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
-               _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
-               // Заполнение штампа на первом листе содержания
-               FillingStampContent(blRefStamp, curContentLayoutNum, t);
-               // текущая строка для записи листа
-               int row = _firstRowInTableForSheets;
-               
-               // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
-               tableContent.Cells[row, 2].TextString = 1.ToString();
-               tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
-               tableContent.Cells[row++, 1].TextString = "Обложка";
+               // Замена блока рамки из чертежа фасада, если он есть
+               _album.AlbumInfo?.Frame?.ChangeBlockFrame(_dbContent, false);
+               _album?.AlbumInfo?.CoverTitle?.ChangeCoverAndTitle(_dbContent);
 
-               tableContent.Cells[row, 2].TextString = 2.ToString();
-               tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
-               tableContent.Cells[row++, 1].TextString = "Титульный лист";               
-
-               tableContent.Cells[row, 1].TextString = "Общие данные. Ведомость комплекта чертежей";
-               tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets - 1).ToString() : "3";
-               tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
-               row++;
-               tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
-               tableContent.Cells[row++, 1].TextString = "ТОМ";
-
-               int curSheetArNum;
-               if (_album.StartOptions.NumberFirstSheet == 0)
+               using (var t = _dbContent.TransactionManager.StartTransaction())
                {
-                  curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
-               }
-               else
-               {
-                  curSheetArNum = _album.StartOptions.NumberFirstSheet - 1;
-               }
+                  int curContentLayoutNum = _countSheetsBeforContent+1;
+                  Table tableContent;
+                  BlockReference blRefStamp;
+                  CopyContentSheet(t, curContentLayoutNum, out tableContent, out blRefStamp);
+                  // Определение кол-ва марок АР
+                  int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
+                  // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
+                  _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
+                  // Заполнение штампа на первом листе содержания
+                  FillingStampContent(blRefStamp, curContentLayoutNum- _countSheetsBeforContent, t);
+                  // текущая строка для записи листа
+                  int row = _firstRowInTableForSheets;
 
-               ProgressMeter progressMeter = new ProgressMeter();
-               progressMeter.SetLimit(_sheetsMarkSB.Count);
-               progressMeter.Start("Создание содержания ");
+                  // На первом листе содержания заполняем строки для Обложки, Тит, Общ дан, НСП, Том1.
+                  tableContent.Cells[row, 2].TextString = 1.ToString();
+                  tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
+                  tableContent.Cells[row++, 1].TextString = "Обложка";
 
-               foreach (var sheetMarkSB in _sheetsMarkSB)
-               {
-                  progressMeter.MeterProgress();
-                  foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
+                  tableContent.Cells[row, 2].TextString = 2.ToString();
+                  tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
+                  tableContent.Cells[row++, 1].TextString = "Титульный лист";
+
+                  tableContent.Cells[row, 1].TextString = "Общие данные. Ведомость комплекта чертежей";
+                  tableContent.Cells[row, 2].TextString = _countContentSheets > 1 ? "3-" + (3 + _countContentSheets - 1).ToString() : "3";
+                  tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
+                  row++;
+                  tableContent.Cells[row++, 1].TextString = "Наружные стеновые панели";
+                  tableContent.Cells[row++, 1].TextString = "ТОМ";
+
+                  int curSheetArNum;
+                  if (_album.StartOptions.NumberFirstSheet == 0)
                   {
-                     tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки на фасаде";
-                     sheetMarkAR.SheetNumber = ++curSheetArNum;
-                     tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
-                     tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
-                     row++;
-                     CheckEndOfTable(t, ref curContentLayoutNum, ref tableContent, ref blRefStamp, ref row);
-
-                     tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки в форме";
-                     tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
-                     sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
-                     tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
-                     row++;
-                     CheckEndOfTable(t, ref curContentLayoutNum, ref tableContent, ref blRefStamp, ref row);
+                     curSheetArNum = _countContentSheets + _countSheetsBeforContent;// номер для первого листа Марки АР
                   }
+                  else
+                  {
+                     curSheetArNum = _album.StartOptions.NumberFirstSheet - 1;
+                  }
+
+                  ProgressMeter progressMeter = new ProgressMeter();
+                  progressMeter.SetLimit(_sheetsMarkSB.Count);
+                  progressMeter.Start("Создание содержания ");
+
+                  foreach (var sheetMarkSB in _sheetsMarkSB)
+                  {
+                     progressMeter.MeterProgress();
+                     foreach (var sheetMarkAR in sheetMarkSB.SheetsMarkAR)
+                     {
+                        tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки на фасаде";
+                        sheetMarkAR.SheetNumber = ++curSheetArNum;
+                        tableContent.Cells[row, 2].TextString = curSheetArNum.ToString();
+                        tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
+                        row++;
+                        CheckEndOfTable(t, ref curContentLayoutNum, ref tableContent, ref blRefStamp, ref row);
+
+                        tableContent.Cells[row, 1].TextString = sheetMarkAR.MarkArFullName + ". Раскладка плитки в форме";
+                        tableContent.Cells[row, 2].TextString = curSheetArNum.ToString() + ".1";
+                        sheetMarkAR.SheetNumberInForm = curSheetArNum.ToString() + ".1";
+                        tableContent.Cells[row, 2].Alignment = CellAlignment.MiddleCenter;
+                        row++;
+                        CheckEndOfTable(t, ref curContentLayoutNum, ref tableContent, ref blRefStamp, ref row);
+                     }
+                  }
+                  progressMeter.Stop();
+
+                  //Удаление пустых строк в таблице содержания
+                  if (tableContent.Rows.Count > row + 1)
+                  {
+                     tableContent.DeleteRows(row, tableContent.Rows.Count - row);
+                  }
+
+                  // Удаление последнего листа содержания (пустой копии)
+                  //HostApplicationServices.WorkingDatabase = _dbContent;
+                  LayoutManager lm = LayoutManager.Current;
+                  //string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
+                  lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForContent);
+
+                  t.Commit();
                }
-               progressMeter.Stop();
-
-               //Удаление пустых строк в таблице содержания
-               if (tableContent.Rows.Count > row + 1)
-               {
-                  tableContent.DeleteRows(row, tableContent.Rows.Count - row);
-               }
-
-               // Удаление последнего листа содержания (пустой копии)
-               HostApplicationServices.WorkingDatabase = _dbContent;
-               LayoutManager lm = LayoutManager.Current;
-               //string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
-               lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForContent);
-
-               t.Commit();
+               //HostApplicationServices.WorkingDatabase = _dbFacade;               
             }
-            HostApplicationServices.WorkingDatabase = _dbFacade;
             _dbContent.SaveAs(fileContent, DwgVersion.Current);
-         }
+         }         
       }
+   
 
       // Определение кол листов содержания по кол марок Ар и кол строк в таблице содержания на одном листе.
       private static int CalcSheetsContentNumber(int rowsTable, int marksAr)
@@ -160,14 +164,14 @@ namespace AlbumPanelColorTiles.Sheets
          return marksSB.Sum(sb => sb.SheetsMarkAR.Count);
       }
 
-      private void CheckEndOfTable(Transaction t, ref int curContentLayout, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
+      private void CheckEndOfTable(Transaction t, ref int curContentLayoutNum, ref Table tableContent, ref BlockReference blRefStamp, ref int row)
       {
-         if (row == tableContent.Rows.Count && _countContentSheets > curContentLayout)
+         if (row == tableContent.Rows.Count && _countContentSheets > (curContentLayoutNum- _countSheetsBeforContent))
          {
             // Новый лист содержания
             tableContent.RecomputeTableBlock(true);                           
-            CopyContentSheet(t, ++curContentLayout, out tableContent, out blRefStamp);
-            FillingStampContent(blRefStamp, curContentLayout, t);
+            CopyContentSheet(t, ++curContentLayoutNum, out tableContent, out blRefStamp);
+            FillingStampContent(blRefStamp, curContentLayoutNum- _countSheetsBeforContent, t);
             row = _firstRowInTableForSheets;
          }
       }
