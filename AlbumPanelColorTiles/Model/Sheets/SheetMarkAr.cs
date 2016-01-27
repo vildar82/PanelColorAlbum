@@ -160,17 +160,24 @@ namespace AlbumPanelColorTiles.Sheets
             if (idAtrRef.IsErased) continue;
             var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference;
             string text = string.Empty;
-            if (atrRef.Tag.Equals("Наименование", StringComparison.OrdinalIgnoreCase))
+            if (atrRef.Tag.Equals("НАИМЕНОВАНИЕ", StringComparison.OrdinalIgnoreCase))
             {
                text = _sheetName;
             }
-            else if (atrRef.Tag.Equals("Лист", StringComparison.OrdinalIgnoreCase))
+            else if (atrRef.Tag.Equals("ЛИСТ", StringComparison.OrdinalIgnoreCase))
             {
                text = textNumber;
             }
-            else if (atrRef.Tag.Equals("Вид", StringComparison.OrdinalIgnoreCase))
+            else if (atrRef.Tag.Equals("ВИД", StringComparison.OrdinalIgnoreCase))
             {
                text = textView;
+            }
+            else if (atrRef.Tag.Equals("ПРИМЕЧАНИЕ", StringComparison.OrdinalIgnoreCase))
+            {
+               if (!isFacadeView)
+               {
+                  text = "  ";
+               }
             }
             if (text != string.Empty)
             {
