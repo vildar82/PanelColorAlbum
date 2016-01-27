@@ -73,7 +73,7 @@ namespace AlbumPanelColorTiles
       public StartOption StartOptions { get; private set; }
       public AlbumInfo AlbumInfo { get; set; }
       public List<Storey> Storeys { get { return _storeys; } }
-      public BaseService BaseService { get; private set; }
+      //public BaseService BasePanelsService { get; private set; }
 
       /// <summary>
       /// Общий расход плитки на альбом.
@@ -215,11 +215,12 @@ namespace AlbumPanelColorTiles
       // Создание альбома панелей
       public void CreateAlbum()
       {
-         if (StartOptions.NewMode)
-         {
-            BaseService = new BaseService();
-            BaseService.ReadPanelsFromBase();
-         }
+         // Пока не нужны XML панели для создания альбома.
+         //if (StartOptions.NewMode)
+         //{
+         //   BasePanelsService = new BaseService();
+         //   BasePanelsService.ReadPanelsFromBase();
+         //}
 
          // Подсчет общего кол плитки на альбом
          TotalTilesCalc = TileCalc.CalcAlbum(this);

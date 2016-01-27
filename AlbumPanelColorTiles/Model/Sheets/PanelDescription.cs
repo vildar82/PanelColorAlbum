@@ -116,7 +116,7 @@ namespace AlbumPanelColorTiles.Sheets
             return null;
          }
 
-         double xTable = ptMtextCenter.X - 38;
+         double xTable = ptMtextCenter.X - 35;
          Point3d ptTable;
          if (mtext != null)
          {

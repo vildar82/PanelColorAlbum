@@ -89,9 +89,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
                                     //Проверка индекса окна
-                                    if (markSbAkr.WindowSuffix !=0 && 
-                                       !string.Equals(mountingPanelSb.WindowSuffix, "ок" + markSbAkr.WindowSuffix,
-                                                                        StringComparison.CurrentCultureIgnoreCase))
+                                    if (!album.StartOptions.NewMode &&
+                                        markSbAkr.WindowSuffix !=0 && 
+                                        !string.Equals(mountingPanelSb.WindowSuffix, "ок" + markSbAkr.WindowSuffix,
+                                                       StringComparison.CurrentCultureIgnoreCase)
+                                       )
                                     {
                                        Inspector.AddError(
                                            "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}".f(
