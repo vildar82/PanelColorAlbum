@@ -279,11 +279,15 @@ namespace AlbumPanelColorTiles.Sheets
          var btrLayout = t.GetObject(layoutMarkAR.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          foreach (ObjectId idEnt in btrLayout)
          {
-            if (idEnt.ObjectClass.Name != "AcDbViewport") continue;
-            var vp = t.GetObject(idEnt, OpenMode.ForRead, false, true) as Viewport;
-            if (vp.Layer != "АР_Видовые экраны") continue;
-            idVp = idEnt;
-            break;
+            if (idEnt.ObjectClass.Name == "AcDbViewport")
+            {
+               var vp = t.GetObject(idEnt, OpenMode.ForRead, false, true) as Viewport;
+               if (vp.Layer.Equals("АР_Видовые экраны", StringComparison.OrdinalIgnoreCase))
+               {
+                  idVp = idEnt;
+                  break;
+               }               
+            }
          }
          return idVp;
       }
