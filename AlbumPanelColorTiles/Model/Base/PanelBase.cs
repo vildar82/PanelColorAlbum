@@ -52,8 +52,9 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       public double XMaxPanel { get; set; }
       public int XStartTile { get; set; }
+      public MountingPanel PanelMount { get; private set; }
 
-      public PanelBase(Panel panelXml, BaseService service)
+      public PanelBase(Panel panelXml, BaseService service, MountingPanel panelMount = null)
       {
          Panel = panelXml;
          Service = service;
@@ -67,8 +68,24 @@ namespace AlbumPanelColorTiles.Model.Base
          XMinPanel = 0;
          XMaxPanel = Length;
 
-         Thickness = 320;
-      }      
+         Thickness = getThickness (panelXml, panelMount);
+      }
+
+      private int getThickness(Panel panelXml, MountingPanel panelMount = null)
+      {
+         int resVal = 0;
+         if (panelMount !=null && panelMount.Thickness >0)
+         {
+            // Может быть неточная.
+            resVal = panelMount.Thickness;
+         }
+         else
+         {
+            // Пока задам по-умолчанию 320. В описании панели в xml должна скоро появиться толщина
+            resVal = 320;
+         }
+         return resVal;
+      }
 
       public string MarkWithoutElectric
       {

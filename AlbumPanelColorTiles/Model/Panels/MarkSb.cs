@@ -541,8 +541,7 @@ namespace AlbumPanelColorTiles.Panels
                      _tiles.Add(tile);
                      _paints.Add(paint);
                   }
-                  // Окна
-                  ...
+                  // Окна                  
                }
             }
             t.Commit();

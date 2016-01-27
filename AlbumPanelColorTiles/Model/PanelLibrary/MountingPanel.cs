@@ -25,7 +25,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public string MarkSbWithoutElectric { get; private set; }      
       public PanelAKR PanelAkr { get; set; }
       public Point3d PtCenterPanelSbInModel { get; private set; }      
-      public Model.Base.PanelBase PanelBase { get; set; }      
+      public Model.Base.PanelBase PanelBase { get; set; }
+      public string WindowSuffix { get; private set; }
+      public int Thickness { get; private set; }  
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
@@ -38,6 +40,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          MarkPainting = painting;
          var extBlRefPanel = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;         
+         Thickness = getThickness(extBlRefPanel);
          //ExtBlRefClean = extBlRefPanel;
          extBlRefPanel.TransformBy(trans);
          ExtTransToModel = extBlRefPanel;         
@@ -45,10 +48,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          IdBtr = blRefPanelSB.BlockTableRecord;
          AttrDet = attrsDet;         
          PtCenterPanelSbInModel = getCenterPanelInModel();
-      }      
-      
-      public string WindowSuffix { get; private set; }      
-      
+      }           
 
       public static string GetMarkWithoutWindowsSuffix(string markSB, out string windowSuffix)
       {
@@ -243,6 +243,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
             var atrRef = atrMarkPaintInfo.IdAtrRef.GetObject(OpenMode.ForWrite, false, true) as AttributeReference;
             atrRef.TextString = ""; 
          }
+      }
+
+      private int getThickness(Extents3d extBlRefPanel)
+      {
+         var lenX = Convert.ToInt32(extBlRefPanel.MaxPoint.X - extBlRefPanel.MinPoint.X);
+         var lenY = Convert.ToInt32(extBlRefPanel.MaxPoint.Y - extBlRefPanel.MinPoint.Y);
+         return (lenX > lenY) ? roundTo10(lenY) : roundTo10(lenX);
+      }
+      private static int roundTo10(int i)
+      {         
+         if (i % 10 != 0)
+         {
+            i = ((i + 5) / 10) * 10;
+         }
+         return i;
       }
    }
 }

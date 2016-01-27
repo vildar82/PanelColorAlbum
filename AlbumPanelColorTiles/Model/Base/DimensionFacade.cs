@@ -60,7 +60,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
          ObjectId idBtrSec = secBlocks.First().IdBtr;
          var file = idBtrSec.Database.Filename;
-         double yPt = yDimLineBotMin - 700;
+         double yPt = yDimLineBotMin - 800;
 
          // Тескт сечения
          AddText(@"%%U1-1", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
