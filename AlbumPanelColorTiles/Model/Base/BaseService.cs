@@ -131,6 +131,10 @@ namespace AlbumPanelColorTiles.Model.Base
          return panel;
       }       
 
+      /// <summary>
+      /// Создание панелей
+      /// Не нужна транзакция!!!
+      /// </summary>      
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
       {         
          var panelsBaseGroup = matchingWindow(facadesMounting, floorsAr).Values.GroupBy(p => p.Panel.mark);
@@ -302,21 +306,24 @@ namespace AlbumPanelColorTiles.Model.Base
 
       /// <summary>
       /// Заморозка слоев образмеривания панелей
-      /// Должна быть запущена транзакция
       /// </summary>
       public void FreezeDimLayers()
       {
-         var layerDimFacade = Env.IdLayerDimFacade.GetObject(OpenMode.ForRead) as LayerTableRecord;
-         if (!layerDimFacade.IsFrozen)
+         using (var layerDimFacade = Env.IdLayerDimFacade.Open(OpenMode.ForRead) as LayerTableRecord)
          {
-            layerDimFacade.UpgradeOpen();
-            layerDimFacade.IsFrozen = true;
+            if (!layerDimFacade.IsFrozen)
+            {
+               layerDimFacade.UpgradeOpen();
+               layerDimFacade.IsFrozen = true;
+            }
          }
-         var layerDimForm = Env.IdLayerDimForm.GetObject(OpenMode.ForRead) as LayerTableRecord;
-         if (!layerDimForm.IsFrozen)
+         using (var layerDimForm = Env.IdLayerDimForm.Open(OpenMode.ForRead) as LayerTableRecord)
          {
-            layerDimForm.UpgradeOpen();
-            layerDimForm.IsFrozen = true;
+            if (!layerDimForm.IsFrozen)
+            {
+               layerDimForm.UpgradeOpen();
+               layerDimForm.IsFrozen = true;
+            }
          }
       }
    }

@@ -113,43 +113,47 @@ namespace AlbumPanelColorTiles.Model.Base
          Openings = new List<Extents3d>();
 
          Database db = Service.Db;
-         Transaction t = db.TransactionManager.TopTransaction;
-
-         BlockTableRecord btrPanel;
-         using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
+         //Transaction t = db.TransactionManager.TopTransaction;
+         using (var t = db.TransactionManager.StartTransaction())
          {
-            // Ошибка если блок с таким именем уже есть
-            if (bt.Has(BlNameAkr))
+            BlockTableRecord btrPanel;
+            using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
             {
-               IdBtrPanel = bt[BlNameAkr];
-               Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
-               return;
+               // Ошибка если блок с таким именем уже есть
+               if (bt.Has(BlNameAkr))
+               {
+                  IdBtrPanel = bt[BlNameAkr];
+                  Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
+                  return;
+               }
+               btrPanel = new BlockTableRecord();
+               btrPanel.Name = BlNameAkr;
+               bt.UpgradeOpen();
+               IdBtrPanel = bt.Add(btrPanel);
+               t.AddNewlyCreatedDBObject(btrPanel, true);
             }
-            btrPanel = new BlockTableRecord();
-            btrPanel.Name = BlNameAkr;
-            bt.UpgradeOpen();
-            IdBtrPanel = bt.Add(btrPanel);
-            t.AddNewlyCreatedDBObject(btrPanel, true);
+
+            // Добавление полилинии контура
+            createContour(btrPanel, t);
+
+            // Добавление окон
+            addWindows(btrPanel, t);
+
+            // заполнение плиткой
+            addTiles(btrPanel, t);
+
+            // Добавление торцов (Cheek)
+            addCheek(btrPanel, t);
+
+            // Образмеривание (на Фасаде)
+            DimensionFacade dimFacade = new DimensionFacade(btrPanel, t, this);
+            dimFacade.Create();
+            // Образмеривание (в Форме)
+            DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
+            dimForm.Create();
+
+            t.Commit();
          }
-
-         // Добавление полилинии контура
-         createContour(btrPanel, t);
-
-         // Добавление окон
-         addWindows(btrPanel, t);
-
-         // заполнение плиткой
-         addTiles(btrPanel, t);
-
-         // Добавление торцов (Cheek)
-         addCheek(btrPanel, t);
-
-         // Образмеривание (на Фасаде)
-         DimensionFacade dimFacade = new DimensionFacade(btrPanel, t, this);
-         dimFacade.Create();
-         // Образмеривание (в Форме)
-         DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
-         dimForm.Create();
       }
             
       private string defineBlockPanelAkrName()
@@ -207,6 +211,7 @@ namespace AlbumPanelColorTiles.Model.Base
                plWindow.AddVertexAt(0, ptMaxWindow, 0, 0, 0);
                plWindow.AddVertexAt(0, new Point2d(ptMinWindow.X + item.width, ptMinWindow.Y), 0, 0, 0);
                plWindow.Closed = true;
+
                btrPanel.AppendEntity(plWindow);
                t.AddNewlyCreatedDBObject(plWindow, true);
 

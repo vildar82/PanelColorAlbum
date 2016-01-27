@@ -703,56 +703,63 @@ namespace AlbumPanelColorTiles
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;         
          Database db = doc.Database;
-
          try
          {
-            Inspector.Clear();
-            BaseService baseService = new BaseService();
-            baseService.ReadPanelsFromBase();
-
-            // Очиста чертежа от блоков панелей АКР
-            try
+            using (new WorkingDatabaseSwitcher(db))
             {
-               baseService.ClearPanelsAkrFromDrawing(db);
-            }
-            catch (System.Exception ex)
-            {
-               Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
-            }            
-            // Подготовка - копирование блоков, слоев, стилей, и т.п.
-            baseService.InitToCreationPanels(db);
+               Inspector.Clear();
 
-            // Определение фасадов
-            List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
-            List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);
+               // Определение фасадов
+               List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
 
-            using (var t = db.TransactionManager.StartTransaction())
-            {
-               // Создание определений блоков панелей по базе                
-               baseService.CreateBtrPanels(facadesMounting, floorsAr);
+               if (facadesMounting.Count == 0)
+               {
+                  Inspector.AddError("Не определены фасады в чертеже - по монтажным планам.");
+                  throw new System.Exception("Отменено пользователем");
+               }
 
-               // Заморозка слоев образмеривания панелей
-               baseService.FreezeDimLayers();
+               // Загрузка базы панелей из XML
+               BaseService baseService = new BaseService();
+               baseService.ReadPanelsFromBase();
 
-               t.Commit();
-            }            
+               // Определение арх планов
+               List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);                              
 
-            //Создание фасадов
-            FacadeMounting.CreateFacades(facadesMounting);
+               // Очиста чертежа от блоков панелей АКР
+               try
+               {
+                  baseService.ClearPanelsAkrFromDrawing(db);
+               }
+               catch (System.Exception ex)
+               {
+                  Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
+               }
+               // Подготовка - копирование блоков, слоев, стилей, и т.п.
+               baseService.InitToCreationPanels(db);               
 
-            //using (var t = db.TransactionManager.StartTransaction())
-            //{
-            //   var secBlocks = baseService.Env.BlPanelSections.OfType<BlockSectionHorizontal>();
-            //   foreach (var item in secBlocks)
-            //   {
-            //      item.ReplaceAssociateHatch();
-            //   }
-            //   t.Commit();
-            //}  
+               //using (var t = db.TransactionManager.StartTransaction())
+               //{
+                  // Создание определений блоков панелей по базе                
+                  baseService.CreateBtrPanels(facadesMounting, floorsAr);
 
-            if (Inspector.HasErrors)
-            {
-               Inspector.Show();
+                  // Заморозка слоев образмеривания панелей
+                  baseService.FreezeDimLayers();
+
+               //   t.Commit();
+               //}
+
+               //Создание фасадов
+               FacadeMounting.CreateFacades(facadesMounting);
+
+               //using (var t = db.TransactionManager.StartTransaction())
+               //{
+               //   var secBlocks = baseService.Env.BlPanelSections.OfType<BlockSectionHorizontal>();
+               //   foreach (var item in secBlocks)
+               //   {
+               //      item.ReplaceAssociateHatch();
+               //   }
+               //   t.Commit();
+               //}                 
             }
          }
          catch (System.Exception  ex)
@@ -762,6 +769,10 @@ namespace AlbumPanelColorTiles
             {
                Log.Error(ex, $"Command: AKR-CreateFacade. {doc.Name}");
             }
+         }
+         if (Inspector.HasErrors)
+         {
+            Inspector.Show();
          }
       }   
 
