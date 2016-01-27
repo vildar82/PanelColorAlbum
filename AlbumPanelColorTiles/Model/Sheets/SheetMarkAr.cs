@@ -375,7 +375,7 @@ namespace AlbumPanelColorTiles.Sheets
                                     blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
          }
          ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
-         vp.Dispose();
+         //vp.Dispose();
          return idBtrLayout;
       }
    }
