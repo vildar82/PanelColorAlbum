@@ -66,10 +66,10 @@ namespace AlbumPanelColorTiles.Sheets
                   // Поэтому добавлю текст описания на первый лист, потом лист будет копироваться уже вместе с этим тестом.
                   if (_markSB.Album.StartOptions.NewMode)
                   {
-                     PanelDescription panelDesc = new PanelDescription(_markSB, dbMarkSB);
+                     var panelDesc = new PanelDescription(_markSB, dbMarkSB);
                      try
                      {
-                        panelDesc.CreateDescription();
+                        panelDesc.CreateDescription(t);
                      }
                      catch (Exception ex)
                      {

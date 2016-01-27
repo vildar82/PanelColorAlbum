@@ -235,7 +235,7 @@ namespace AlbumPanelColorTiles.Model.Base
                      btrPanel.AppendEntity(blRefWin);
                      t.AddNewlyCreatedDBObject(blRefWin, true);
 
-                     var resSetDyn = setDynBlWinMark(blRefWin, winMark.Value);
+                     var resSetDyn = BlockWindow.SetDynBlWinMark(blRefWin, winMark.Value);
                      if (!resSetDyn)
                      {
                         // Добавление текста марки окна
@@ -395,36 +395,7 @@ namespace AlbumPanelColorTiles.Model.Base
          btrPanel.AppendEntity(blRefWin);
          t.AddNewlyCreatedDBObject(blRefWin, true);
 
-         setDynBlWinMark(blRefWin, mark);
-      }
-
-      private bool setDynBlWinMark(BlockReference blRefWin, string mark)
-      {
-         bool res = false;
-         bool findProp = false;         
-         var dynProps = blRefWin.DynamicBlockReferencePropertyCollection;
-         foreach (DynamicBlockReferenceProperty item in dynProps)
-         {
-            if (item.PropertyName == "Видимость")
-            {
-               findProp = true;
-               var allowedVals = item.GetAllowedValues();
-               if (allowedVals.Contains(mark))
-               {
-                  item.Value = mark;
-                  res = true;
-               }
-               else
-               {
-                  Inspector.AddError($"Блок окна. Отсутствует видимость для марки окна {mark}");                  
-               }               
-            }
-         }
-         if (!findProp)
-         {
-            Inspector.AddError("Блок окна. Не найдено динамическое свойтво блока окна Видимость");
-         }
-         return res;         
+         BlockWindow.SetDynBlWinMark(blRefWin, mark);
       }
    }
 }

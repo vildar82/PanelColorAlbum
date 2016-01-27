@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -24,8 +25,7 @@ namespace AlbumPanelColorTiles.Panels
 
       private double _heightPanelByTile;
       private ObjectId _idBtr;
-
-      // Высота панели по плитке
+      
       private bool _isEndLeftPanel;
 
       private bool _isEndRightPanel;
@@ -105,6 +105,9 @@ namespace AlbumPanelColorTiles.Panels
 
       // Свойства
       public List<Tile> Tiles { get { return _tiles; } }
+
+      // Окна
+      public List<BlockWindow> Windows { get; private set; } = new List<BlockWindow>();
 
       // Суммарная площадь плитки на панель (расход м2 на панель).
       public double TotalAreaTiles
@@ -531,17 +534,23 @@ namespace AlbumPanelColorTiles.Panels
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
-                  var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  string blName = blRef.GetEffectiveName();
                   // Плитка
-                  if (blRefTile.GetEffectiveName() == Settings.Default.BlockTileName)
+                  if (blName.Equals(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
                   {
-                     Tile tile = new Tile(blRefTile);
+                     Tile tile = new Tile(blRef);
                      //Определение покраски плитки
                      Paint paint = ColorArea.GetPaint(tile.CenterTile, _rtreeColorArea);
                      _tiles.Add(tile);
                      _paints.Add(paint);
                   }
                   // Окна                  
+                  else if (blName.Equals(Settings.Default.BlockWindowName, StringComparison.OrdinalIgnoreCase))
+                  {
+                     BlockWindow window = new BlockWindow(blRef, blName);
+                     Windows.Add(window);
+                  }
                }
             }
             t.Commit();

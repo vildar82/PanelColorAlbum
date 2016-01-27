@@ -92,7 +92,7 @@ namespace AlbumPanelColorTiles.Model.Base
          IdBtrTile = GetIdBtrLoaded( Settings.Default.BlockTileName);
          // Блок Окна
          IdBtrWindow = GetIdBtrLoaded( Settings.Default.BlockWindowName);
-         WindowMarks = getWindowMarks(IdBtrWindow);
+         WindowMarks = BlockWindow.GetMarks(IdBtrWindow);
          // Блок Вида
          IdBtrView = GetIdBtrLoaded( Settings.Default.BlockViewName);
          // Атрибут блока вида
@@ -166,25 +166,6 @@ namespace AlbumPanelColorTiles.Model.Base
             Inspector.AddError($"Не найден файл шаблона блоков АКР - {fileBlocksTemplate}");            
          }
          return new Dictionary<string, ObjectId>();
-      }
-
-      private List<string> getWindowMarks(ObjectId idBtrWindow)
-      {
-         List<string> marks = new List<string>();
-         var blRef = new BlockReference(Point3d.Origin, idBtrWindow);
-         var dynParams = blRef.DynamicBlockReferencePropertyCollection;
-         if (dynParams != null)
-         {
-            foreach (DynamicBlockReferenceProperty param in dynParams)
-            {
-               if (param.PropertyName == "Видимость")
-               {
-                  marks = param.GetAllowedValues().Cast<string>().ToList();
-                  break;
-               }
-            }
-         }
-         return marks;
       }
    }
 }

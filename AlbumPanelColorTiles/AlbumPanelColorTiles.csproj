@@ -95,6 +95,7 @@
     <Compile Include="Model\Base\BaseService.cs" />
     <Compile Include="Model\Base\BlockSectionHorizontal.cs" />
     <Compile Include="Model\Base\BlockSectionVertical.cs" />
+    <Compile Include="Model\Base\BlockWindow.cs" />
     <Compile Include="Model\Base\CreatePanelsBtrEnvironment.cs" />
     <Compile Include="Model\Base\CreatePanel\Contour.cs" />
     <Compile Include="Model\Base\DimensionAbstract.cs" />
