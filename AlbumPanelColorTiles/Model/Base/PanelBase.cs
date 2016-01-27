@@ -116,25 +116,27 @@ namespace AlbumPanelColorTiles.Model.Base
          Transaction t = db.TransactionManager.TopTransaction;
 
          BlockTableRecord btrPanel;
-         using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForWrite) as BlockTable)
+         using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
          {
             // Ошибка если блок с таким именем уже есть
             if (bt.Has(BlNameAkr))
             {
+               IdBtrPanel = bt[BlNameAkr];
                Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
                return;
             }
             btrPanel = new BlockTableRecord();
             btrPanel.Name = BlNameAkr;
+            bt.UpgradeOpen();
             IdBtrPanel = bt.Add(btrPanel);
             t.AddNewlyCreatedDBObject(btrPanel, true);
-         }                     
-              
+         }
+
          // Добавление полилинии контура
-         createContour(btrPanel, t);                  
+         createContour(btrPanel, t);
 
          // Добавление окон
-         addWindows(btrPanel, t);         
+         addWindows(btrPanel, t);
 
          // заполнение плиткой
          addTiles(btrPanel, t);
@@ -147,7 +149,7 @@ namespace AlbumPanelColorTiles.Model.Base
          dimFacade.Create();
          // Образмеривание (в Форме)
          DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
-         dimForm.Create();         
+         dimForm.Create();
       }
             
       private string defineBlockPanelAkrName()

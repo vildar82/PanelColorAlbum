@@ -182,8 +182,8 @@ namespace AlbumPanelColorTiles.Model.Base
                   textMark = markText.TextString;
                }
             }
-            if (isFound)
-            {
+            if (isFound && !marks.ContainsKey(ptTextPos))
+            {              
                marks.Add(ptTextPos, textMark);
             }
          }         

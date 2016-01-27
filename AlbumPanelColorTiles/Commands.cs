@@ -711,7 +711,14 @@ namespace AlbumPanelColorTiles
             baseService.ReadPanelsFromBase();
 
             // Очиста чертежа от блоков панелей АКР
-            baseService.ClearPanelsAkrFromDrawing(db);
+            try
+            {
+               baseService.ClearPanelsAkrFromDrawing(db);
+            }
+            catch (System.Exception ex)
+            {
+               Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
+            }            
             // Подготовка - копирование блоков, слоев, стилей, и т.п.
             baseService.InitToCreationPanels(db);
 

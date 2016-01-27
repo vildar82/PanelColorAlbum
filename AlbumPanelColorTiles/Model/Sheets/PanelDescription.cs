@@ -79,6 +79,16 @@ namespace AlbumPanelColorTiles.Sheets
                        $"швы горизонтальные {Settings.Default.TileSeam} мм, \n\n" +
                        $"Расход плитки: {Settings.Default.TileLenght}x{Settings.Default.TileHeight}x{Settings.Default.TileThickness} - \n" +
                        $"{tileCount} шт ({tileTotalArea} м\\U+00B2)";
+         if (markSB.Windows.Count()>0)
+         {
+            text += "\n\nОконные блоки в панели:";
+            var wins = markSB.Windows.GroupBy(w => w.Mark).OrderBy(w => w.Key);
+            foreach (var win in wins)
+            {
+               text += $"\n{win.Key} - {win.Count()}шт";
+            }
+         }
+
          mtext.Contents = text;
          return mtext;
       }
@@ -106,7 +116,7 @@ namespace AlbumPanelColorTiles.Sheets
             return null;
          }
 
-         double xTable = ptMtextCenter.X - 35;
+         double xTable = ptMtextCenter.X - 38;
          Point3d ptTable;
          if (mtext != null)
          {
