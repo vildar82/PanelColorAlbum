@@ -216,6 +216,7 @@
     <Compile Include="Model\Panels\Tile.cs" />
     <Compile Include="Model\Panels\TileCalc.cs" />
     <Compile Include="Model\Sheets\TotalTileTable.cs" />
+    <Compile Include="Model\Sheets\ViewporPanel.cs" />
     <Compile Include="Model\StartOptions.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\UtilsReplaceWindows.cs" />

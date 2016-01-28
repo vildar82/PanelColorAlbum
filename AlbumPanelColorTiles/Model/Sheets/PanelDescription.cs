@@ -109,7 +109,7 @@ namespace AlbumPanelColorTiles.Sheets
          else if (markSB.MarkSbName.StartsWith("ОЛ", StringComparison.OrdinalIgnoreCase))
          {
             // Длина панели ???
-            lenProfile = Math.Round(( markSB.ExtentsTiles.MaxPoint.X - markSB.ExtentsTiles.MinPoint.X) * 0.001, 1);
+            lenProfile = Math.Round(( markSB.ExtentsTiles.MaxPoint.X - markSB.ExtentsTiles.MinPoint.X) * 0.001, 1)*2;
          }
          else
          {

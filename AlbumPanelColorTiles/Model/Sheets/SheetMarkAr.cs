@@ -86,16 +86,15 @@ namespace AlbumPanelColorTiles.Sheets
             //}
             // Вставка блока Марки АР.
             var idBlRefMarkAR = InsertBlRefMarkAR(dbMarkSB, _ptInsertBlRefMarkAR);
-            // Направение видового экрана на блок марки АР.
-            Extents3d extentsViewPort;
+            // Направение видового экрана на блок марки АР.            
             var idBtrLayoutMarkAR = ViewPortSettings(idLayoutMarkAR, idBlRefMarkAR, t,
-                              dbMarkSB, layersToFreezeOnFacadeSheet, null, true, out extentsViewPort);
+                              dbMarkSB, layersToFreezeOnFacadeSheet, null, true);
             // Заполнение таблицы
             ObjectId idTable;
             FillTableTiles(idBtrLayoutMarkAR, out idTable);
 
             // Проверка расположения таблицы
-            CheckTableExtents(extentsViewPort, idTable);
+            CheckTableExtents(idTable);
 
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkAR, true);
@@ -112,7 +111,7 @@ namespace AlbumPanelColorTiles.Sheets
             var idLayoutMarkArForm = AcadLib.Blocks.Block.CloneLayout(dbMarkSB, LayoutName, LayoutName + ".1");
             // Направение видового экрана на блок марки АР(з).
             var idBtrLayoutMarkArForm = ViewPortSettings(idLayoutMarkArForm, idBlRefMarkArForm, t,
-                           dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false, out extentsViewPort);
+                           dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false);
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkArForm, false);
 
@@ -120,19 +119,19 @@ namespace AlbumPanelColorTiles.Sheets
          //}
       }
 
-      private void CheckTableExtents(Extents3d extentsViewPort, ObjectId idTable)
+      private void CheckTableExtents(ObjectId idTable)
       {
          // Таблица выходит за границы видового экрана. (Видовой экран, как ориентир)
          using (var table = idTable.GetObject(OpenMode.ForRead, false, true) as Table)
          {
-            var extTable = table.GeometricExtents;
-            if (!extentsViewPort.IsPointInBounds(extTable.MinPoint))
+            //var extTable = table.GeometricExtents;
+            double yBotTable = table.Position.Y - table.Height;
+            if (yBotTable!= 5)
             {
-               Point3d newPt = new Point3d(table.Position.X,
-                  extentsViewPort.MinPoint.Y + (extTable.MaxPoint.Y - extTable.MinPoint.Y), 0);
+               Point3d newPt = new Point3d(table.Position.X, table.Height+5, 0);
                table.UpgradeOpen();
                table.Position = newPt;
-            }
+            }            
          }
       }
 
@@ -263,13 +262,7 @@ namespace AlbumPanelColorTiles.Sheets
             }
          }
          throw new Exception("Не найдена заготовка таблицы на листе в файле шаблона Марки СБ.");
-      }
-
-      // Определение границ блока
-      private Extents3d GetBoundsBlRefMarkAR(BlockReference blRef)
-      {
-         return blRef.Bounds.Value;
-      }
+      }      
 
       // Поиск видового экрана на листе
       private ObjectId GetViewport(ObjectId idLayoutMarkAR, Transaction t)
@@ -312,9 +305,9 @@ namespace AlbumPanelColorTiles.Sheets
       {
          using (var blRefMarkArMirr = idBlRefMarkArForm.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
          {
-            var boundsBlRef = blRefMarkArMirr.Bounds.Value;
-            Point3d ptCentreX = new Point3d((boundsBlRef.MinPoint.X + boundsBlRef.MaxPoint.X) * 0.5, 0, 0);
-            Line3d lineMirr = new Line3d(ptCentreX, new Point3d(ptCentreX.X, 1000, 0));
+            var extBlRef = blRefMarkArMirr.GeometricExtents;
+            Point3d ptCentreX = new Point3d((extBlRef.MinPoint.X + extBlRef.MaxPoint.X) * 0.5, 0, 0);
+            Line3d lineMirr = new Line3d(ptCentreX, new Point3d(ptCentreX.X, 1, 0));
             blRefMarkArMirr.TransformBy(Matrix3d.Mirroring(lineMirr));
          }
       }
@@ -328,19 +321,17 @@ namespace AlbumPanelColorTiles.Sheets
          //ObjectContextManager ocm = dbMarkSB.ObjectContextManager;
          //ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
          //vp.AnnotationScale = (AnnotationScale)occ.GetContext("1:25");
-         vp.CustomScale = 1d / Settings.Default.SheetScale; // 0.04; // SheetScale
+         //vp.CustomScale = 1d / Settings.Default.SheetScale; // 0.04; // SheetScale
       }
 
       // Направление видового экрана на блок Марки АР
-      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR,
-         Transaction t, Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw, bool isFacadeView, out Extents3d extentsViewPort)
+      private ObjectId ViewPortSettings(ObjectId idLayoutMarkAR, ObjectId idBlRefMarkAR, Transaction t,
+            Database dbMarkSB, List<ObjectId> layersToFreeze, List<ObjectId> layersToThaw, bool isFacadeView)
       {
          ObjectId idBtrLayout = ObjectId.Null;
          // Поиск видового экрана
          var idVP = GetViewport(idLayoutMarkAR, t);
          var vp = t.GetObject(idVP, OpenMode.ForWrite, false, true) as Viewport;
-
-         extentsViewPort = vp.GeometricExtents;
 
          // Отключение слоя на видовом экране
          if (layersToFreeze != null && layersToFreeze.Count > 0)
@@ -354,28 +345,37 @@ namespace AlbumPanelColorTiles.Sheets
 
          idBtrLayout = vp.OwnerId;
          var blRefMarkAr = t.GetObject(idBlRefMarkAR, OpenMode.ForRead, false, true) as BlockReference;
-         // Определение границ блока
-         Point2d ptCenterMarkAR;
-         if (isFacadeView)
+
+         if (this.MarkAR.MarkSB.Album.StartOptions.NewMode)
          {
-            if (_markAR.MarkSB.IsEndLeftPanel && !_markAR.MarkSB.IsEndRightPanel)
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X + Settings.Default.SheetPanelEndShift,
-                                            blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
-            else if (_markAR.MarkSB.IsEndRightPanel && !_markAR.MarkSB.IsEndLeftPanel)
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - Settings.Default.SheetPanelEndShift,
-                                            blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
-            else
-               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X,
-                                             blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            var vpPanel = new ViewportPanel(vp, blRefMarkAr, isFacadeView);
+            vpPanel.Setup();
          }
          else
          {
-            // Диман гоаорит не нужно сдвигать торцевые панели в форме.
-            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X,
-                                    blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            // Определение границ блока
+            Point2d ptCenterMarkAR;
+            if (isFacadeView)
+            {
+               if (_markAR.MarkSB.IsEndLeftPanel && !_markAR.MarkSB.IsEndRightPanel)
+                  ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X + Settings.Default.SheetPanelEndShift,
+                                               blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+               else if (_markAR.MarkSB.IsEndRightPanel && !_markAR.MarkSB.IsEndLeftPanel)
+                  ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - Settings.Default.SheetPanelEndShift,
+                                               blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+               else
+                  ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X,
+                                                blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            }
+            else
+            {
+               // Диман гоаорит не нужно сдвигать торцевые панели в форме.
+               ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X,
+                                       blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            }
+            ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
+            //vp.Dispose();
          }
-         ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
-         //vp.Dispose();
          return idBtrLayout;
       }
    }
