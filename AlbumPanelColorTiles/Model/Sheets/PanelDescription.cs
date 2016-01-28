@@ -18,7 +18,7 @@ namespace AlbumPanelColorTiles.Sheets
    {
       private Database db;
       private MarkSb markSB;
-      private static Point3d ptMtextCenter = new Point3d(180.0, 45.0, 0.0);
+      private static Point3d ptMtextCenter = new Point3d(180.0, 55.0, 0.0);
       
       public PanelDescription(MarkSb markSB, Database db)
       {
@@ -120,16 +120,17 @@ namespace AlbumPanelColorTiles.Sheets
          Point3d ptTable;
          if (mtext != null)
          {
-            // Определение границ тексчта
-            try
-            {
-               var extMText = mtext.GeometricExtents;
-               ptTable = new Point3d(xTable, extMText.MinPoint.Y-15, 0.0);
-            }
-            catch
-            {
-               ptTable = new Point3d(xTable, 22.0, 0.0);
-            }        
+            ptTable = new Point3d(xTable, 28.0, 0.0);
+            //// Определение границ тексчта
+            //try
+            //{
+            //   var extMText = mtext.GeometricExtents;               
+            //   ptTable = new Point3d(xTable, extMText.MinPoint.Y-15, 0.0);
+            //}
+            //catch
+            //{
+            //   ptTable = new Point3d(xTable, 28.0, 0.0);
+            //}        
          }
          else
          {
@@ -161,6 +162,8 @@ namespace AlbumPanelColorTiles.Sheets
          table.Cells[1, 0].TextString = "АА-1347";         
          table.Cells[1, 1].TextString = "RAL-7044";
          table.Cells[1, 2].TextString = lenProfile.ToString();
+
+         table.Rows[1].Borders.Bottom.LineWeight = LineWeight.LineWeight030;
 
          return table;
       }

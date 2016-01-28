@@ -14,6 +14,8 @@ namespace AlbumPanelColorTiles.Model.Base
    // Общее образмеривание для Фасада и Формы
    public abstract class DimensionAbstract
    {
+      protected int rangeSizeVertic = Settings.Default.TileHeight + Settings.Default.TileSeam;
+      protected int rangeSizeHor = Settings.Default.TileLenght + Settings.Default.TileSeam;
       protected BlockTableRecord btrDim;
       protected BlockTableRecord btrPanel;
       protected PanelBase panelBase;
@@ -76,7 +78,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptTopRight = new Point3d(panelBase.XMaxContour, panelBase.Height, 0);
          yDimLineTopMax = hasInterDim ? panelBase.Height + indentBetweenDimLine + indentDimLineFromDraw : panelBase.Height + indentDimLineFromDraw;
          Point3d ptDimLineTotal = new Point3d(0, yDimLineTopMax, 0);
-         CreateDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile: true);
+         CreateDim(ptTopLeft, ptTopRight, ptDimLineTotal, doTrans, trans, rangeSize: rangeSizeHor);
          // добавление промежуточных размеров
          if (hasInterDim)
          {
@@ -89,11 +91,11 @@ namespace AlbumPanelColorTiles.Model.Base
             foreach (var x in ptsX)
             {
                Point3d ptNext = new Point3d(x, ptPrev.Y, 0);
-               CreateDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans, addTextRangeTile: true);
+               CreateDim(ptPrev, ptNext, ptDimLineInter, doTrans, trans, rangeSize: rangeSizeHor);
                ptPrev = ptNext;
             }
             // Замыкающий размер
-            CreateDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans, addTextRangeTile: true);
+            CreateDim(ptPrev, ptTopRight, ptDimLineInter, doTrans, trans, rangeSize: rangeSizeHor);
 
 
             //если есть пустые области Outsides, то добавление промежеточных размеров.
@@ -188,9 +190,9 @@ namespace AlbumPanelColorTiles.Model.Base
          bool hasIndentDim = yWinMax > 0;
          xDimLineRightMax = hasIndentDim ? ptBotRight.X+indentDimLineFromDraw+indentBetweenDimLine : ptBotRight.X + indentDimLineFromDraw;
 
-         // Общий размер         
+         // Общий размер                
          Point3d ptDimLineTotal = new Point3d(xDimLineRightMax, 0, 0);
-         CreateDim(ptBotRight, ptTopRight, ptDimLineTotal, doTrans, trans, addTextRangeTile:true, rotation: 90);
+         CreateDim(ptBotRight, ptTopRight, ptDimLineTotal, doTrans, trans, rangeSize: rangeSizeVertic, rotation: 90);
          // Промежуточные размеры
          if (hasIndentDim)
          {
@@ -201,9 +203,9 @@ namespace AlbumPanelColorTiles.Model.Base
                var countTileMinWin = Convert.ToInt32(yWinMin / heightTile);
                var yTilesMinWin = (countTileMinWin * heightTile) - 12;
                ptMinWin = new Point3d(ptBotRight.X, yTilesMinWin, 0);
-               CreateDim(ptBotRight, ptMinWin, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+               CreateDim(ptBotRight, ptMinWin, ptDimLineIndent, doTrans, trans, rangeSize: rangeSizeVertic, rotation: 90, interlineText:true);
                var ptMinWinSeam = new Point3d(ptMinWin.X, ptMinWin.Y+12, 0);
-               var dimSeamMin= CreateDim(ptMinWin, ptMinWinSeam, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+               var dimSeamMin= CreateDim(ptMinWin, ptMinWinSeam, ptDimLineIndent, doTrans, trans, rotation: 90);
                Point3d ptTextSeamMin = new Point3d(ptDimLineIndent.X, ptMinWinSeam.Y+65,0);
                dimSeamMin.TextPosition = doTrans? ptTextSeamMin.TransformBy(trans): ptTextSeamMin;
                ptMinWin = ptMinWinSeam;
@@ -211,13 +213,13 @@ namespace AlbumPanelColorTiles.Model.Base
             var countTileMaxWin = Convert.ToInt32(yWinMax / heightTile);
             var yTilesMaxWin = (countTileMaxWin * heightTile) - 12;
             Point3d ptMaxWin = new Point3d(ptMinWin.X, yTilesMaxWin, 0);
-            CreateDim(ptMinWin, ptMaxWin, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+            CreateDim(ptMinWin, ptMaxWin, ptDimLineIndent, doTrans, trans, rangeSize: rangeSizeVertic, rotation: 90, interlineText: true);
             Point3d ptMaxWinSeam = new Point3d(ptMaxWin.X, ptMaxWin.Y+12, 0);
-            var dimSeamMax = CreateDim(ptMaxWin, ptMaxWinSeam, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+            var dimSeamMax = CreateDim(ptMaxWin, ptMaxWinSeam, ptDimLineIndent, doTrans, trans, rotation: 90);
             Point3d ptTextSeamMax = new Point3d(ptDimLineIndent.X, ptMaxWin.Y - 65, 0);
             dimSeamMax.TextPosition = doTrans ? ptTextSeamMax.TransformBy(trans) : ptTextSeamMax;
             // размер до верха плиток
-            CreateDim(ptMaxWinSeam, ptTopRight, ptDimLineIndent, doTrans, trans, addTextRangeTile: true, rotation: 90);
+            CreateDim(ptMaxWinSeam, ptTopRight, ptDimLineIndent, doTrans, trans, rangeSize: rangeSizeVertic, rotation: 90, interlineText: true);
          }
       }
 
@@ -316,10 +318,10 @@ namespace AlbumPanelColorTiles.Model.Base
          t.AddNewlyCreatedDBObject(textView, true);
       }      
 
-      private string getTextRange(double measurement)
+      private string getTextRange(double measurement, int rangeSize)
       {
-         var len = Settings.Default.TileLenght + Settings.Default.TileSeam;
-         var count = Convert.ToInt32(measurement / len);
+         //var len = Settings.Default.TileLenght + Settings.Default.TileSeam;
+         var count = Convert.ToInt32(measurement / rangeSize);
          string row = string.Empty;
          if (count <=1)
          {
@@ -353,7 +355,7 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       protected RotatedDimension CreateDim(Point3d ptPrev, Point3d ptNext, Point3d ptDimLine, 
-                    bool doTrans, Matrix3d trans, bool addTextRangeTile = false, double rotation = 0)
+                    bool doTrans, Matrix3d trans, int rangeSize = 0, double rotation = 0, bool interlineText = false)
       {
          if (doTrans)
          {
@@ -363,9 +365,14 @@ namespace AlbumPanelColorTiles.Model.Base
          }         
 
          var dim = new RotatedDimension(rotation.ToRadians(), ptPrev, ptNext, ptDimLine, "", panelBase.Service.Env.IdDimStyle);
-         if (addTextRangeTile)
+         if (rangeSize>0)
          {
-            dim.Suffix = getTextRange(dim.Measurement);
+            dim.Suffix = getTextRange(dim.Measurement, rangeSize);            
+         }
+         if (interlineText)
+         {
+            dim.Dimtmove = 0;
+            dim.Dimtix = true;
          }
          dim.Dimscale = Settings.Default.SheetScale;
          btrDim.AppendEntity(dim);

@@ -722,9 +722,6 @@ namespace AlbumPanelColorTiles
                BaseService baseService = new BaseService();
                baseService.ReadPanelsFromBase();
 
-               // Определение арх планов
-               List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);                              
-
                // Очиста чертежа от блоков панелей АКР
                try
                {
@@ -735,7 +732,10 @@ namespace AlbumPanelColorTiles
                   Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
                }
                // Подготовка - копирование блоков, слоев, стилей, и т.п.
-               baseService.InitToCreationPanels(db);               
+               baseService.InitToCreationPanels(db);
+
+               // Определение арх планов
+               List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);                                                          
 
                //using (var t = db.TransactionManager.StartTransaction())
                //{
