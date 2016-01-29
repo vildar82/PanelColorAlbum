@@ -10,8 +10,8 @@ namespace AlbumPanelColorTiles.Model.Base
 {
    public class BlockSectionVertical : BlockSectionAbstract
    {
-      public int Length { get; private set; }
-      public int Thickness { get; private set; }
+      public int Height { get; private set; }
+      //public int Thickness { get; private set; }
       public bool Window { get; private set; }
 
       public BlockSectionVertical(string blName, BaseService service) : base(blName, service)
@@ -24,7 +24,7 @@ namespace AlbumPanelColorTiles.Model.Base
          var ending = BlName.Substring(Settings.Default.BlockPanelSectionVerticalPrefixName.Length);
          if (string.IsNullOrEmpty(ending))
          {  
-            return Result.Fail("В имени блока не найдены параметры высоты, толщины и наличия окна");            
+            return Result.Fail("В имени блока не найдены параметры высоты и наличия окна");            
          }
          var options = ending.ToLower().Split('_');
 
@@ -37,11 +37,11 @@ namespace AlbumPanelColorTiles.Model.Base
             switch (opt.First())
             {
                case 'h':
-                  Length = getValue(opt.Substring(1));
+                  Height = getValue(opt.Substring(1));
                   break;
-               case 't':
-                  Thickness = getValue(opt.Substring(1));
-                  break;
+               //case 't':
+               //   Thickness = getValue(opt.Substring(1));
+               //   break;
                case 'w':
                   Window = true;
                   break;
@@ -55,14 +55,14 @@ namespace AlbumPanelColorTiles.Model.Base
       private Result checkParamVerticalSec()
       {
          string err = string.Empty;
-         if (Length <= 0)
+         if (Height <= 0)
          {
             err += "Не определена длина панели для блока сечения.";
          }
-         if (Thickness <= 0)
-         {
-            err += "Не определена ширина панели для блока сечения.";
-         }
+         //if (Thickness <= 0)
+         //{
+         //   err += "Не определена ширина панели для блока сечения.";
+         //}
          if (!string.IsNullOrEmpty(err))
          {
             return Result.Fail(err);

@@ -760,6 +760,7 @@ namespace AlbumPanelColorTiles
                //   }
                //   t.Commit();
                //}                 
+               doc.Editor.WriteMessage("\nПостроение фасада завершено.");
             }
          }
          catch (System.Exception  ex)

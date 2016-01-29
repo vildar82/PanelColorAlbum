@@ -154,13 +154,12 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addVerticalPanelSection()
       {
-         double secThickness = getThicknessVerticalSectionBlock();
-         double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + 250 : xDimLineLeftMin - secThickness -250;
-
+         //double secThickness = getThicknessVerticalSectionBlock();
+         double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + panelBase.Thickness+250 : xDimLineLeftMin -370 - 250;
          // определение блока сечения панели         
          var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionVertical>().Where(s =>                            
-                           s.Thickness == panelBase.Thickness &&
-                           Math.Abs(s.Length - panelBase.Height) < 300);
+                           //s.Thickness == panelBase.Thickness &&
+                           Math.Abs(s.Height - panelBase.Height) < 300);
          if (secBlocks.Count()==0)
          {
             Inspector.AddError($"Не определено вертикальное сечение для панели {panelBase.Panel.mark}");
@@ -168,7 +167,8 @@ namespace AlbumPanelColorTiles.Model.Base
          }
          ObjectId idBtrSec = secBlocks.First().IdBtr;
          Point3d ptPos = new Point3d(xPt, 0,0);
-         CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
+         var blRefSecVertic = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
+         var res = setDynParam(blRefSecVertic, "Толщина", panelBase.Thickness);
       }     
 
       private void addVerticalSectionMark()
@@ -242,18 +242,18 @@ namespace AlbumPanelColorTiles.Model.Base
          return attrRefCross;
       }
 
-      private double getThicknessVerticalSectionBlock()
-      {         
-         switch (panelBase.Thickness)
-         {
-            case 320:
-               return 700;
-            case 420:
-               return 800;
-            default:
-               return 700;              
-         }         
-      }
+      //private double getThicknessVerticalSectionBlock()
+      //{         
+      //   switch (panelBase.Thickness)
+      //   {
+      //      case 320:
+      //         return 700;
+      //      case 420:
+      //         return 800;
+      //      default:
+      //         return 700;              
+      //   }         
+      //}
 
       private void AddText(string val, Point3d pt, double height)
       {
