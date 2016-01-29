@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using AlbumPanelColorTiles.Model.Panels;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
@@ -119,15 +120,35 @@ namespace AlbumPanelColorTiles.Sheets
       }
 
       // Создание папки Альбома панелей
-      private void CreateAlbumFolder()
+      private void CreateAlbumFolder(string dir = "")
       {
          // Папка альбома панелей
-         string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension(Album.DwgFacade);
-         string curDwgFacadeFolder = Path.GetDirectoryName(Album.DwgFacade);
-         Album.AlbumDir = Path.Combine(curDwgFacadeFolder, albumFolderName);
+         if (string.IsNullOrEmpty(dir))
+         {
+            string albumFolderName = "АКР_" + Path.GetFileNameWithoutExtension(Album.DwgFacade);
+            string curDwgFacadeFolder = Path.GetDirectoryName(Album.DwgFacade);
+            dir = Path.Combine(curDwgFacadeFolder, albumFolderName);
+         }         
+         Album.AlbumDir = dir;
          if (Directory.Exists(Album.AlbumDir))
          {
-            Directory.Delete(Album.AlbumDir, true);
+            try
+            {
+               Directory.Delete(Album.AlbumDir, true);
+            }
+            catch (IOException ex)
+            {
+               string msg = $"{ex.Message}\n\nЗакройте все файлы из папки {dir} и нажмите OK для продолжения.";
+               var res = MessageBox.Show(msg, "АКР. Ошибка.", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.OK);
+               if (res == MessageBoxResult.OK)
+               {
+                  CreateAlbumFolder(dir);
+               }
+               else
+               {
+                  throw ex;
+               }
+            }                        
          }
          Directory.CreateDirectory(Album.AlbumDir);
       }
