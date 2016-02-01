@@ -126,8 +126,9 @@ namespace AlbumPanelColorTiles.Sheets
                   }
 
                   // Удаление последнего листа содержания (пустой копии)
-                  //HostApplicationServices.WorkingDatabase = _dbContent;
+                  HostApplicationServices.WorkingDatabase = _dbContent;
                   LayoutManager lm = LayoutManager.Current;
+                  //lm.CurrentLayout = getLayoutContentName(_countSheetsBeforContent + 1);
                   //string layoutNameToDel = (_countSheetsBeforContent + (++_countContentSheets)).ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
                   lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForContent);
 
@@ -178,7 +179,7 @@ namespace AlbumPanelColorTiles.Sheets
 
       private void CopyContentSheet(Transaction t, int contentLayoutNum, out Table tableContent, out BlockReference blRefStamp)
       {
-         Layout layout = GetCurLayoutContentAndCopyNext(contentLayoutNum, t);
+         Layout layout = GetCurLayoutContentAndCopyNext(contentLayoutNum);
          var btrLayoutContent = t.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
          tableContent = FindTableContent(btrLayoutContent, t);
          blRefStamp = FindBlRefStampContent(btrLayoutContent, t);
@@ -250,11 +251,16 @@ namespace AlbumPanelColorTiles.Sheets
          throw new System.Exception("Не найдена заготовка таблицы в шаблоне содержания.");
       }
 
-      private Layout GetCurLayoutContentAndCopyNext(int curSheetContentNum, Transaction t)
-      {         
+      private Layout GetCurLayoutContentAndCopyNext(int curSheetContentNum)
+      {
          string nameLay = Settings.Default.SheetTemplateLayoutNameForContent;
-         string nameCopy = curSheetContentNum.ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
-         return AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy).GetObject( OpenMode.ForRead) as Layout;         
+         string nameCopy = getLayoutContentName(curSheetContentNum);
+         return AcadLib.Blocks.Block.CloneLayout(_dbContent, nameLay, nameCopy).GetObject(OpenMode.ForRead) as Layout;
+      }
+
+      private static string getLayoutContentName(int curSheetContentNum)
+      {
+         return curSheetContentNum.ToString("00") + "_" + Settings.Default.SheetTemplateLayoutNameForContent;
       }
    }
 }

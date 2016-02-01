@@ -83,7 +83,7 @@ namespace AlbumPanelColorTiles.Sheets
          catch (Exception ex)
          {
             string errMsg = "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);";
-            Album.Doc.Editor.WriteMessage("\n{0} - {1}", errMsg, ex.ToString());
+            Album.Doc.Editor.WriteMessage($"\n{errMsg} - {ex.Message}");
             Log.Error(ex, errMsg);
          }
 

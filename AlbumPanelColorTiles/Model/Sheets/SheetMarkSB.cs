@@ -100,9 +100,11 @@ namespace AlbumPanelColorTiles.Sheets
                   t.Commit();
                }
 
-               //// Удаление шаблона листа из фала Марки СБ
-               //HostApplicationServices.WorkingDatabase = dbMarkSB;
+               ////// Удаление шаблона листа из фала Марки СБ
+               HostApplicationServices.WorkingDatabase = dbMarkSB;
                LayoutManager lm = LayoutManager.Current;
+               //lm.CurrentLayout = _sheetsMarkAR[0].LayoutName;
+               //lm.CurrentLayout = Settings.Default.SheetTemplateLayoutNameForMarkAR;
                lm.DeleteLayout(Settings.Default.SheetTemplateLayoutNameForMarkAR);
             }
             //HostApplicationServices.WorkingDatabase = dbOrig;
