@@ -17,6 +17,7 @@ namespace TessAlbumPanelAcCoreConsole.Model.Base
    public class TestDynBlockSec
    {
       [Test]
+      [Ignore("Пока не нужен")]
       public void TestDynBlSec()
       {
          string testFile = @"c:\temp\test\АКР\Base\Tests\TestDynBlSec.dwg";         

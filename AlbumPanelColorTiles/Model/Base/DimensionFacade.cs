@@ -46,7 +46,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addHorizontalPanelSection()
       {
-         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionHorizontal>().Where(s =>
+            var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionHorizontal>().Where(s =>
+                           s.NLayerPanel == panelBase.NLayerPanel &&                                       
                            s.IsCheekLeft == panelBase.IsCheekLeft &&
                            s.IsCheekRight == panelBase.IsCheekRight &&
                            s.IsOutsideLeft == panelBase.IsOutsideLeft &&
@@ -80,7 +81,7 @@ namespace AlbumPanelColorTiles.Model.Base
          var windows = panelBase.Panel.windows?.window?.Select(w => new { posi = w.posi, width = w.width, height = w.height });
          var balconys = panelBase.Panel.balconys?.balcony?.Select(b => new { posi = b.posi, width = b.width, height = b.height });
          var apertures = balconys == null ? windows : windows?.Union(balconys) ?? balconys;
-         apertures = apertures.OrderBy(a => a.posi.X);
+         apertures = apertures?.OrderBy(a => a.posi.X);
          if (apertures != null && apertures.Count()>0)            
          {  
             // Первое окно
@@ -157,14 +158,26 @@ namespace AlbumPanelColorTiles.Model.Base
          //double secThickness = getThicknessVerticalSectionBlock();
          double xPt = panelBase.IsCheekLeft ? xDimLineRightMax + panelBase.Thickness+250 : xDimLineLeftMin -370 - 250;
          // определение блока сечения панели         
-         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionVertical>().Where(s =>                            
+         var secBlocks = panelBase.Service.Env.BlPanelSections.OfType<BlockSectionVertical>().Where(s =>
                            //s.Thickness == panelBase.Thickness &&
-                           Math.Abs(s.Height - panelBase.Height) < 300);
-         if (secBlocks.Count()==0)
+                           //Math.Abs(s.Height - panelBase.Height) < 300
+                           s.NLayerPanel == panelBase.NLayerPanel &&
+                           s.IsOL == panelBase.IsOL &&
+                           s.IsUpperStoreyPanel == panelBase.IsUpperStoreyPanel &&
+                           s.Window == (panelBase.WindowsBaseCenters.Count>0)
+                           );
+         // для 3-слойной панели проверить высоту, если это не чердачная панель
+         if (panelBase.NLayerPanel == 3 && !panelBase.IsUpperStoreyPanel)
+         {
+            secBlocks = secBlocks.Where(s => Math.Abs(s.Height - panelBase.Height) < 300);
+         }
+
+         if (secBlocks.Count() == 0)
          {
             Inspector.AddError($"Не определено вертикальное сечение для панели {panelBase.Panel.mark}");
             return;
          }
+
          ObjectId idBtrSec = secBlocks.First().IdBtr;
          Point3d ptPos = new Point3d(xPt, 0,0);
          var blRefSecVertic = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);

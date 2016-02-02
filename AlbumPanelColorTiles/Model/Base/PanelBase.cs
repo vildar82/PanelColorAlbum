@@ -32,6 +32,18 @@ namespace AlbumPanelColorTiles.Model.Base
       public bool IsCheekLeft { get; private set; }
       public bool IsOutsideRight { get; set; }
       public bool IsOutsideLeft { get; set; }
+      /// <summary>
+      /// Панель ОЛ - ограждение лоджии
+      /// </summary>
+      public bool IsOL { get; set; }
+      /// <summary>
+      /// Панель чердака - ?? как определять
+      /// </summary>
+      public bool IsUpperStoreyPanel { get; set; }      
+      /// <summary>
+      /// Скольки слойная стеновая панель (1, 3)
+      /// </summary>
+      public int NLayerPanel { get; set; }
       public double Length { get; private set; }
       public double Height { get; private set; }
       public int Thickness { get; private set; }
@@ -69,7 +81,13 @@ namespace AlbumPanelColorTiles.Model.Base
          XMaxPanel = Length;
 
          Thickness = getThickness (panelXml, panelMount);
+
+         setNLayerPanel();
+         IsOL = Panel.mark.StartsWith("ол", StringComparison.OrdinalIgnoreCase);
+         IsUpperStoreyPanel = defineIsUpperStoreyPanel();
       }
+
+      
 
       private int getThickness(Panel panelXml, MountingPanel panelMount = null)
       {
@@ -403,6 +421,26 @@ namespace AlbumPanelColorTiles.Model.Base
          t.AddNewlyCreatedDBObject(blRefWin, true);
 
          BlockWindow.SetDynBlWinMark(blRefWin, mark);
+      }
+
+      private void setNLayerPanel()
+      {
+         int n = (int)Char.GetNumericValue(Panel.mark.First());
+         if (n>0)
+         {
+            NLayerPanel = n;
+         }
+      }
+      
+      private bool defineIsUpperStoreyPanel()
+      {
+         var splits = Panel.mark.Split(' ');
+         if (splits.Count() > 1)
+         {
+            string shortGost = splits[0];
+            return shortGost.IndexOf("ч", StringComparison.OrdinalIgnoreCase) > 0;
+         }
+         return false;
       }
    }
 }

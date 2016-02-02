@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcadLib;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 
 namespace AlbumPanelColorTiles.Model.Base
@@ -13,6 +14,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public int Height { get; private set; }
       //public int Thickness { get; private set; }
       public bool Window { get; private set; }
+      public bool IsOL { get; private set; }
 
       public BlockSectionVertical(string blName, BaseService service) : base(blName, service)
       {         
@@ -23,10 +25,11 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          var ending = BlName.Substring(Settings.Default.BlockPanelSectionVerticalPrefixName.Length);
          if (string.IsNullOrEmpty(ending))
-         {  
-            return Result.Fail("В имени блока не найдены параметры высоты и наличия окна");            
+         {
+            return Result.Ok();
+            //return Result.Fail("В имени блока не найдены параметры высоты и наличия окна");            
          }
-         var options = ending.ToLower().Split('_');
+         var options = ending.Split('_');
 
          foreach (var opt in options)
          {
@@ -34,19 +37,46 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                continue;
             }
-            switch (opt.First())
+            // Кол слоев панели 1-слойная(бетон), 3-слойная(несущий, утеплитель, внешний)
+            if (opt.Equals("сл", StringComparison.OrdinalIgnoreCase))
             {
-               case 'h':
-                  Height = getValue(opt.Substring(1));
-                  break;
-               //case 't':
-               //   Thickness = getValue(opt.Substring(1));
-               //   break;
-               case 'w':
-                  Window = true;
-                  break;
-               default:
-                  break;
+               int n;
+               if (int.TryParse(opt.Substring("сл".Length), out n))
+               {
+                  NLayerPanel = n;
+               }
+               else
+               {
+                  Inspector.AddError($"В блоке сечения {BlName} не определено количество слоев по префиксу 'сл'");
+               }
+            }
+            // Высота сечения
+            else if (opt.Equals("h", StringComparison.OrdinalIgnoreCase))
+            {
+               int h;
+               if (int.TryParse(opt.Substring(1), out h))
+               {
+                  Height = h;
+               }
+               else
+               {
+                  Inspector.AddError($"В блоке сечения {BlName} не определена высота сечения по префиксу 'h'");
+               }               
+            }
+            // Наличие окна в сечении
+            else if (opt.Equals("w", StringComparison.OrdinalIgnoreCase))
+            {
+               Window = true;
+            }
+            // Сечение для чердачной панели
+            else if (opt.Equals("ч", StringComparison.OrdinalIgnoreCase))
+            {
+               IsUpperStoreyPanel = true;
+            }
+            // Сечение для ОЛ панели
+            else if (opt.Equals("ол", StringComparison.OrdinalIgnoreCase))
+            {
+               IsOL = true;
             }
          }
          return checkParamVerticalSec();
@@ -69,13 +99,6 @@ namespace AlbumPanelColorTiles.Model.Base
             //throw new Exception(err);
          }
          return Result.Ok();
-      }
-
-      private int getValue(string v)
-      {
-         int res;
-         int.TryParse(v, out res);
-         return res;
-      }    
+      }      
    }
 }
