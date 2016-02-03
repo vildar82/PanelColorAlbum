@@ -182,6 +182,7 @@ namespace AlbumPanelColorTiles.Model.Base
                Panel.gab.length += delta;
                Length += delta;
                XMaxContour = Length;
+               XMaxPanel = Length;
                LengthByTiles -= 70; 
                Panel.balconys?.balcony?.ForEach(b => b.posi.X += delta);
                Panel.outsides?.outside?.ForEach(o => o.posi.X += delta);

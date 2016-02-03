@@ -99,12 +99,12 @@ namespace AlbumPanelColorTiles.Model.Base
 
 
             //если есть пустые области Outsides, то добавление промежеточных размеров.
-            if (panelBase.XMinPanel < 0)
+            if (Math.Abs(panelBase.XMinPanel - panelBase.XMinContour)>100)
             {
                CreateDim(new Point3d(panelBase.XMinPanel, ptPrev.Y, 0),
                          new Point3d(panelBase.XMinContour, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
             }
-            if (panelBase.XMaxPanel > panelBase.Length)
+            if (Math.Abs(panelBase.XMaxPanel - panelBase.XMaxContour) > 100)
             {
                CreateDim(new Point3d(panelBase.XMaxContour, ptPrev.Y, 0),
                          new Point3d(panelBase.XMaxPanel, ptPrev.Y, 0), ptDimLineInter, doTrans, trans);
