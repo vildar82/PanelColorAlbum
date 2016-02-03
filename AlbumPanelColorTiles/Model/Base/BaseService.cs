@@ -118,7 +118,20 @@ namespace AlbumPanelColorTiles.Model.Base
          Panel panel;
          if (!_panelsXML.TryGetValue(markSb.ToUpper(), out panel))
          {
-            // Ошибка - панели с такой маркой нет в базе     
+            // Если это панель с классом бетона 2, то найти панель без индекса класса (3НСНг2 75.29.42-6 - 3НСНг 75.29.42-6 - геометрически одинаковые)            
+            int indexConcreteClass = panelMount != null ? panelMount.IndexConcreteClass : MountingPanel.DefineIndexConcreteClass(markSb);
+            if (indexConcreteClass > 0)
+            {
+               string markSbWoConcreteClass = MountingPanel.GetMarkWoConcreteClass(markSb);
+               panel = GetPanelXml(markSbWoConcreteClass, panelMount);
+               if (panel !=null)
+               {
+                  panel.mark = markSb;
+               }
+               return panel;           
+            }            
+
+            // Ошибка - панели с такой маркой нет в базе                 
             if (panelMount == null)
             {
                Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}");

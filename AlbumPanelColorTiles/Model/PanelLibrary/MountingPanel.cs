@@ -27,7 +27,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public Point3d PtCenterPanelSbInModel { get; private set; }      
       public Model.Base.PanelBase PanelBase { get; set; }
       public string WindowSuffix { get; private set; }
-      public int Thickness { get; private set; }  
+      public int Thickness { get; private set; }
+      /// <summary>
+      /// Индекс класса бетона панели (определяется по приставке цифры к короткому имени марки панелои 3НСНг2 - индекс =2, 3НСНг = 0)
+      /// </summary>
+      public int IndexConcreteClass { get; private set; }
 
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
@@ -48,7 +52,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          IdBtr = blRefPanelSB.BlockTableRecord;
          AttrDet = attrsDet;         
          PtCenterPanelSbInModel = getCenterPanelInModel();
-      }           
+
+         IndexConcreteClass = DefineIndexConcreteClass(MarkSb);
+      }      
 
       public static string GetMarkWithoutWindowsSuffix(string markSB, out string windowSuffix)
       {
@@ -258,6 +264,39 @@ namespace AlbumPanelColorTiles.PanelLibrary
             i = ((i + 5) / 10) * 10;
          }
          return i;
+      }
+
+      public static int DefineIndexConcreteClass(string markSb)
+      {
+         var splits = markSb.Split(' ');
+         if (splits.Count() > 1)
+         {
+            int r = (int)char.GetNumericValue(splits[0].Last());
+            if (r > 0)
+            {
+               return r;
+            }
+         }
+         return 0;
+      }
+
+      /// <summary>
+      /// Возвращает марку без индекса класса бетона. Для '3НСНг2 75.29.42-6' вернет '3НСНг 75.29.42-6'
+      /// 
+      /// </summary>      
+      public static string GetMarkWoConcreteClass(string markSb)
+      {
+         var splits = markSb.Split(' ');
+         if (splits.Count() > 1)
+         {
+            string shortGost = splits[0];
+            int r = (int)char.GetNumericValue(shortGost.Last());
+            if (r > 0)
+            {
+               return markSb.Remove(shortGost.Length - 1, 1);
+            }
+         }
+         return markSb;
       }
    }
 }

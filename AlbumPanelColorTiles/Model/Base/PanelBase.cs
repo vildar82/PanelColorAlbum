@@ -16,7 +16,7 @@ namespace AlbumPanelColorTiles.Model.Base
 {
    public class PanelBase
    {
-      private string _markWithoutElectric;
+      public string MarkWithoutElectric { get; private set; }
 
       public List<double> PtsForTopDim { get; set; } = new List<double>();
       public List<double> PtsForBotDimCheek { get; set; } = new List<double>();
@@ -71,6 +71,8 @@ namespace AlbumPanelColorTiles.Model.Base
          Panel = panelXml;
          Service = service;
 
+         MarkWithoutElectric = MountingPanel.GetMarkWithoutElectric(Panel.mark);
+
          Length = panelXml.gab.length;
          Height = panelXml.gab.height;
 
@@ -103,19 +105,7 @@ namespace AlbumPanelColorTiles.Model.Base
             resVal = 320;
          }
          return resVal;
-      }
-
-      public string MarkWithoutElectric
-      {
-         get
-         {
-            if (string.IsNullOrEmpty(_markWithoutElectric))
-            {
-               _markWithoutElectric = MountingPanel.GetMarkWithoutElectric(Panel.mark);
-            }
-            return _markWithoutElectric;
-         }
-      }
+      }      
 
       /// <summary>
       /// Создание определения блока панели по описанию из базы XML от конструкторов.
