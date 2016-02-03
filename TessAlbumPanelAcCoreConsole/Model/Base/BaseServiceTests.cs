@@ -12,7 +12,7 @@ using System.IO;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
-
+using AcadLib.Errors;
 
 [assembly: CommandClass(typeof(AlbumPanelColorTiles.Model.Base.Tests.BaseServiceTests))]
 
@@ -43,12 +43,14 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
       [TestCase(5, new string[] {  "3НСг 40.29.32-3", "3НСг 37.29.32-5", "3НСг 72.29.32-5", "3НСг 75.29.32-10БП3",
                            "3НСг 73.29.32-4Б", "3НСг 75.29.32-27П3", "3НСНг 30.29.42-5"})]
       public void CreateBtrPanelFromBase(int i, string[] marks)
-         {         
-         // Тест создания определения блока панели по описанию в xml базе.                  
+         {
+         // Тест создания определения блока панели по описанию в xml базе.                
          PanelBase panelBase;         
 
          string testFile = @"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\TestCreatePanels.dwg";
          File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
+
+         Inspector.Clear();
 
          using (var db = new Database(false, true))
          {
@@ -79,6 +81,11 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
                }
             }
             db.SaveAs(testFile, DwgVersion.Current);
+         }
+
+         if (Inspector.HasErrors)
+         {
+            Inspector.LogErrors();
          }         
       }       
    }

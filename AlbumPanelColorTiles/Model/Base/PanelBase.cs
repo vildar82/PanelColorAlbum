@@ -45,6 +45,10 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       public int NLayerPanel { get; set; }
       public double Length { get; private set; }
+      /// <summary>
+      /// Длина по плитке
+      /// </summary>
+      public double LengthByTiles { get; private set; }
       public double Height { get; private set; }
       public int Thickness { get; private set; }
       /// <summary>
@@ -63,7 +67,7 @@ namespace AlbumPanelColorTiles.Model.Base
       /// Край панели - с учетом угловых торцов
       /// </summary>
       public double XMaxPanel { get; set; }
-      public int XStartTile { get; set; }
+      public double XStartTile { get; set; }
       public MountingPanel PanelMount { get; private set; }
 
       public PanelBase(Panel panelXml, BaseService service, MountingPanel panelMount = null)
@@ -81,15 +85,14 @@ namespace AlbumPanelColorTiles.Model.Base
 
          XMinPanel = 0;
          XMaxPanel = Length;
+         LengthByTiles = Length;
 
          Thickness = getThickness (panelXml, panelMount);
 
          setNLayerPanel();
          IsOL = Panel.mark.StartsWith("ол", StringComparison.OrdinalIgnoreCase);
          IsUpperStoreyPanel = defineIsUpperStoreyPanel();
-      }
-
-      
+      }     
 
       private int getThickness(Panel panelXml, MountingPanel panelMount = null)
       {
@@ -141,6 +144,9 @@ namespace AlbumPanelColorTiles.Model.Base
                t.AddNewlyCreatedDBObject(btrPanel, true);
             }
 
+            //корректировка точки отсчета панели
+            correctStartPointCoordinatesPanel();
+
             // Добавление полилинии контура
             createContour(btrPanel, t);
 
@@ -163,7 +169,28 @@ namespace AlbumPanelColorTiles.Model.Base
             t.Commit();
          }
       }
-            
+
+      private void correctStartPointCoordinatesPanel()
+      {
+         // если это панель с левым примыканием (Outside), то изменение точки отсчета координат в панели на величину примыкания
+         if (Panel.outsides?.outside?.Count()>0)
+         {
+            var outsideLeft = Panel.outsides.outside.Where(o => o.posi.X < 0).FirstOrDefault();            
+            if (outsideLeft !=null)
+            {
+               var delta = Math.Abs(outsideLeft.posi.X);
+               Panel.gab.length += delta;
+               Length += delta;
+               XMaxContour = Length;
+               LengthByTiles -= 70; 
+               Panel.balconys?.balcony?.ForEach(b => b.posi.X += delta);
+               Panel.outsides?.outside?.ForEach(o => o.posi.X += delta);
+               Panel.undercuts?.undercut?.ForEach(u => u.posi.X += delta);
+               Panel.windows?.window?.ForEach(w => w.posi.X += delta);
+            }
+         }
+      }
+
       private string defineBlockPanelAkrName()
       {
          string blName = Settings.Default.BlockPanelAkrPrefixName + MarkWithoutElectric;
@@ -286,9 +313,9 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
-         for (int x = XStartTile; x < XMaxContour -Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+Settings.Default.TileSeam)
+         for (double x = XStartTile; x < XMaxContour -Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+Settings.Default.TileSeam)
          {
-            for (int y = 0; y < Height-Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
+            for (double y = 0; y < Height-Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
             {
                Point3d pt = new Point3d(x, y, 0);
 

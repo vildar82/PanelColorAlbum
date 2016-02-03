@@ -66,11 +66,11 @@ namespace AlbumPanelColorTiles.Model.Base
          // Тескт сечения
          AddText(@"%%U1-1", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
 
-         Point3d ptPos = new Point3d(0, yPt, 0);
+         Point3d ptPos = new Point3d(panelBase.XMinPanel, yPt, 0);
          var blRefSecHor = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
          // установить дин параметры длины и ширины блока сечения панели         
          var res = setDynParam(blRefSecHor, "Толщина", panelBase.Thickness);
-         res = setDynParam(blRefSecHor, "Длина", panelBase.Length);
+         res = setDynParam(blRefSecHor, "Длина", panelBase.LengthByTiles);
 
          // расставить окна и размеры
          Point3d ptDimLine = new Point3d(0, yPt - indentDimLineFromDraw, 0);

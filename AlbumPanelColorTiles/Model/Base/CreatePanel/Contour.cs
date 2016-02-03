@@ -58,14 +58,15 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
             foreach (var outside in panelBase.Panel.outsides.outside)
             {
                Polyline plOut = new Polyline();
-               Point2d pt;
-               double width = Math.Abs(outside.width) + 70;
-               if (outside.posi.X<0)
-               {
+               Point2d pt;// =new Point2d(outside.posi.X, outside.posi.Y);
+               double width = Math.Abs(outside.width)+70;
+               // Если это левое примыкание Outside
+               if (Math.Abs(outside.posi.X)<10)
+               {                  
                   pt = new Point2d(outside.posi.X, outside.posi.Y);
-                  panelBase.XMinContour = 70;
-                  panelBase.XStartTile = 70 + 11;
-                  panelBase.XMinPanel = pt.X;
+                  panelBase.XMinContour = width;
+                  panelBase.XStartTile = width+11;
+                  //panelBase.XMinPanel = pt.X;
                   panelBase.IsOutsideLeft = true;
                }               
                else
@@ -73,7 +74,7 @@ namespace AlbumPanelColorTiles.Model.Base.CreatePanel
                   pt = new Point2d(outside.posi.X-70, outside.posi.Y);
                   panelBase.XMaxContour += -70;
                   panelBase.XMaxPanel = pt.X + width;
-                  panelBase.IsOutsideRight = true;
+                  panelBase.IsOutsideRight = true;                  
                }              
                                
                plOut.AddVertexAt(0, pt, 0, 0, 0);
