@@ -37,17 +37,17 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          int expectedCount = baseService.CountPanelsInBase;
          // Кол панелей в базе не должно быть равно нулю.
          Assert.AreNotEqual(expectedCount, 0);
-      }
+      }      
 
       [Test(Description ="Тест создания нескольких блоков панелей АКР")]
-      public void CreateBtrPanelFromBase(
-         [Values("3НСг 40.29.32-3", "3НСг 37.29.32-5", "3НСг 72.29.32-5", "3НСг 75.29.32-10БП3", "3НСг 73.29.32-4Б", 
-                 "3НСг 75.29.32-27П3", "3НСНг 30.29.42-5")] string mark)
-         {
+      [TestCase(5, new string[] {  "3НСг 40.29.32-3", "3НСг 37.29.32-5", "3НСг 72.29.32-5", "3НСг 75.29.32-10БП3",
+                           "3НСг 73.29.32-4Б", "3НСг 75.29.32-27П3", "3НСНг 30.29.42-5"})]
+      public void CreateBtrPanelFromBase(int i, string[] marks)
+         {         
          // Тест создания определения блока панели по описанию в xml базе.                  
-         PanelBase panelBase;
+         PanelBase panelBase;         
 
-         string testFile = @"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\" + mark + ".dwg";
+         string testFile = @"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\TestCreatePanels.dwg";
          File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
 
          using (var db = new Database(false, true))
@@ -58,24 +58,28 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
             {
                baseService.InitToCreationPanels(db);
                using (var t = db.TransactionManager.StartTransaction())
-               {                  
-                  Panel panelXml = baseService.GetPanelXml(mark);
-                  panelBase = new PanelBase(panelXml, baseService);
-                  panelBase.CreateBlock();
-
-                  if (!panelBase.IdBtrPanel.IsNull)
+               {
+                  Point3d pt = Point3d.Origin;
+                  foreach (var mark in marks)
                   {
-                     var blRefPanel = new BlockReference(Point3d.Origin, panelBase.IdBtrPanel);
-                     var ms = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
-                     ms.AppendEntity(blRefPanel);
-                     t.AddNewlyCreatedDBObject(blRefPanel, true);
+                     Panel panelXml = baseService.GetPanelXml(mark);
+                     panelBase = new PanelBase(panelXml, baseService);
+                     panelBase.CreateBlock();
+
+                     if (!panelBase.IdBtrPanel.IsNull)
+                     {                        
+                        var blRefPanel = new BlockReference(pt, panelBase.IdBtrPanel);
+                        var ms = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+                        ms.AppendEntity(blRefPanel);
+                        t.AddNewlyCreatedDBObject(blRefPanel, true);
+                        pt = new Point3d(0, pt.Y + 10000, 0);
+                     }
                   }
                   t.Commit();
                }
             }
             db.SaveAs(testFile, DwgVersion.Current);
-         }
-         Assert.AreNotEqual(panelBase.IdBtrPanel, ObjectId.Null);
+         }         
       }       
    }
 }

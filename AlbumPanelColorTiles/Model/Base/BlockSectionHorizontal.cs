@@ -39,7 +39,7 @@ namespace AlbumPanelColorTiles.Model.Base
                continue;
             }
             // Кол слоев в панели (1 или 3 слойная стеновая панель)
-            if (opt.Equals("сл", StringComparison.OrdinalIgnoreCase))
+            if (opt.StartsWith("сл", StringComparison.OrdinalIgnoreCase))
             {
                int n;
                if (int.TryParse(opt.Substring("сл".Length), out n))
@@ -70,7 +70,7 @@ namespace AlbumPanelColorTiles.Model.Base
             // Примыкание слева (Outside)
             else if (opt.Equals("пл", StringComparison.OrdinalIgnoreCase))
             {
-               IsOutsideRight = true;
+               IsOutsideLeft = true;
             }
          }         
          return Result.Ok();

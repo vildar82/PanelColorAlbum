@@ -38,7 +38,7 @@ namespace AlbumPanelColorTiles.Model.Base
                continue;
             }
             // Кол слоев панели 1-слойная(бетон), 3-слойная(несущий, утеплитель, внешний)
-            if (opt.Equals("сл", StringComparison.OrdinalIgnoreCase))
+            if (opt.StartsWith("сл", StringComparison.OrdinalIgnoreCase))
             {
                int n;
                if (int.TryParse(opt.Substring("сл".Length), out n))
@@ -51,7 +51,7 @@ namespace AlbumPanelColorTiles.Model.Base
                }
             }
             // Высота сечения
-            else if (opt.Equals("h", StringComparison.OrdinalIgnoreCase))
+            else if (opt.StartsWith("h", StringComparison.OrdinalIgnoreCase))
             {
                int h;
                if (int.TryParse(opt.Substring(1), out h))
