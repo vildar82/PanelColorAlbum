@@ -325,7 +325,7 @@ namespace AlbumPanelColorTiles.Model.Base
       /// <summary>
       /// Вставка блока профиля и стрелок к местам установки профиля на стыке плиток в торце панели
       /// </summary>
-      protected void addProfileTile()
+      protected void addProfileTile(bool doTrans, Matrix3d trans)
       {
          double xPtProfile = 0;
          double yPtProfile = 0;
@@ -361,8 +361,14 @@ namespace AlbumPanelColorTiles.Model.Base
          ObjectId idBtrProfile = biProfile.IdBtr;
          // Точка вставки блока профиля
          ptPosProfile = new Point3d(xPtProfile, yPtProfile, 0);
+         Point3d ptBlrefProfile = ptPosProfile;
+         if (doTrans)
+         {
+            ptBlrefProfile = ptPosProfile.TransformBy(trans);
+         }
+
          // Вставка блока профиля - название и марка
-         var blRefProfile = CreateBlRefInBtrDim(ptPosProfile, idBtrProfile, Settings.Default.SheetScale);
+         var blRefProfile = CreateBlRefInBtrDim(ptBlrefProfile, idBtrProfile, Settings.Default.SheetScale);
          // Добавление атрибутов Названия и марки
          // Атрибут Названия - из вхождения атрибута
          var atrRefName = biProfile.AttrsRef.FirstOrDefault(a => a.Tag.Equals("НАЗВАНИЕ"));
@@ -392,6 +398,11 @@ namespace AlbumPanelColorTiles.Model.Base
          {  
             Point3d ptArrowPos = new Point3d(xPtProfile, yPtProfile+4*Settings.Default.SheetScale, 0);
             Point3d ptArrowDirect = new Point3d(xPtArrowDirect, 0, 0);
+            if (doTrans)
+            {
+               ptArrowPos = ptArrowPos.TransformBy(trans);
+               ptArrowDirect = ptArrowDirect.TransformBy(trans);
+            }
             // вставка блока стрелки
             var blRefArrow = CreateBlRefInBtrDim(ptArrowPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
             // поворот стрелки и установка длины

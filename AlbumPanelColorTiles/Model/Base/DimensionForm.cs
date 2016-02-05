@@ -32,6 +32,9 @@ namespace AlbumPanelColorTiles.Model.Base
          // Размеры справа
          SizesRight(true, matrixMirr);
 
+         // общая для фасада и формы - блок и стрелка к углу панели
+         addProfileTile(true, matrixMirr);
+
          // Отзеркалить блок размеров в форме
          using (var blRefDim = this.idBlRefDim.GetObject(OpenMode.ForWrite, false, true) as BlockReference)
          {

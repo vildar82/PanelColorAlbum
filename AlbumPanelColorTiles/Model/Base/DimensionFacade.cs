@@ -50,7 +50,7 @@ namespace AlbumPanelColorTiles.Model.Base
       private void addProfileTileFacade()
       {
          // общая для фасада и формы - блок и стрелка к углу панели
-         addProfileTile();
+         addProfileTile(false, Matrix3d.Identity);
 
          // для фасада нужно добавить стрелку от блока профиля к углу торца в сечении панели         
          if (!panelBase.Service.Env.IdBtrArrow.IsNull)
