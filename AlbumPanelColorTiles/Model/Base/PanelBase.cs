@@ -71,6 +71,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public double XStartTile { get; set; }
       public MountingPanel PanelMount { get; private set; }
 
+      
+
       public PanelBase(Panel panelXml, BaseService service, MountingPanel panelMount = null)
       {
          Panel = panelXml;

@@ -35,6 +35,8 @@ namespace AlbumPanelColorTiles.Model.Base
       public ObjectId IdAttrDefCross { get; private set; }
       public ObjectId IdBtrWindowHorSection { get; private set; }
       public List<BlockSectionAbstract> BlPanelSections { get; private set; }
+      public ObjectId IdBtrArrow { get; private set; }      
+      public List<BlockInfo> BlocksInFacade { get; private set; }
 
       // DimStyle
       public ObjectId IdDimStyle { get; private set; }
@@ -83,13 +85,17 @@ namespace AlbumPanelColorTiles.Model.Base
          List<string> blNamesToCopy = new List<string> {
                      Settings.Default.BlockTileName, Settings.Default.BlockWindowName,
                      Settings.Default.BlockViewName, Settings.Default.BlockCrossName,
-                     Settings.Default.BlockWindowHorSection
-         };         
+                     Settings.Default.BlockWindowHorSection, Settings.Default.BlockArrow
+         };
+
+         // Поиск блоков в файле фасада 
+         BlocksInFacade = findBlocksInFacade(new List<string> { Settings.Default.BlockProfileTile });         
+
          // Копирование блоков
          _blocks = defineBlockFromTemplate(blNamesToCopy);
 
          // Блок Плитки
-         IdBtrTile = GetIdBtrLoaded( Settings.Default.BlockTileName);
+         IdBtrTile = GetIdBtrLoaded(Settings.Default.BlockTileName);
          // Блок Окна
          IdBtrWindow = GetIdBtrLoaded( Settings.Default.BlockWindowName);
          WindowMarks = BlockWindow.GetMarks(IdBtrWindow);
@@ -102,8 +108,57 @@ namespace AlbumPanelColorTiles.Model.Base
          // Атрибут блока разреза
          IdAttrDefCross = getAttrDef(IdBtrCross, "НОМЕР");
          // Блок окна для горизонтального сечения
-         IdBtrWindowHorSection = GetIdBtrLoaded(Settings.Default.BlockWindowHorSection);         
-      }     
+         IdBtrWindowHorSection = GetIdBtrLoaded(Settings.Default.BlockWindowHorSection);
+         // Блок стрелки
+         IdBtrArrow = GetIdBtrLoaded(Settings.Default.BlockArrow);         
+      }
+
+      /// <summary>
+      /// Поиск первых вхождения блоков в Модели в файле Фасада АКР _service.Db
+      /// </summary>
+      /// <param name="blNames"></param>
+      /// <returns></returns>
+      private List<BlockInfo> findBlocksInFacade(List<string> blNames)
+      {
+         Dictionary<string, BlockInfo> resVal = new Dictionary<string, BlockInfo>();
+         List<string> notFoundBlocks = blNames.ToList();
+         // Поиск блоков в чертеже фасада
+         using (var bt = _service.Db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
+         {
+            using (var ms = bt[BlockTableRecord.ModelSpace].Open( OpenMode.ForRead) as BlockTableRecord)
+            {
+               foreach (var idEnt in ms)
+               {
+                  using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
+                  {
+                     if (blRef !=null)
+                     {
+                        var blName = blRef.GetEffectiveName();
+                        if (resVal.ContainsKey(blName))
+                        {
+                           //Добавляем только первое вхождение блока
+                           continue;
+                        }
+                        var name = blNames.Find(n => n.Equals(blName, StringComparison.OrdinalIgnoreCase));
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                           BlockInfo bi = new BlockInfo(blRef, blName);
+                           resVal.Add(blName, bi);
+                           notFoundBlocks.Remove(name);
+                        }                        
+                     }
+                  }
+               }
+            }
+         }
+         // Добавление ошибок для ненайденых блоков
+         foreach (var blNameNotFound in notFoundBlocks)
+         {
+            Inspector.AddError($"В файле фасада не найден требуемый блок {blNameNotFound} для создания альбома панелей.");
+         }
+
+         return resVal.Values.ToList();
+      }
 
       private ObjectId getAttrDef(ObjectId idBtr, string tag)
       {

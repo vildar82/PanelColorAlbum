@@ -121,6 +121,7 @@
     <Compile Include="Log.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Base\BaseService.cs" />
+    <Compile Include="Model\Base\BlockInfo.cs" />
     <Compile Include="Model\Base\BlockSectionHorizontal.cs" />
     <Compile Include="Model\Base\BlockSectionVertical.cs" />
     <Compile Include="Model\Base\BlockWindow.cs" />

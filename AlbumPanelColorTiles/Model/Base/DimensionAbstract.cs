@@ -32,6 +32,10 @@ namespace AlbumPanelColorTiles.Model.Base
       protected double indentBetweenDimLine = 160;
       protected double indentDimLineFromDraw = 180;
 
+      protected Point3d ptPosHorizontalPanelSection;
+      protected Point3d ptPosProfile;
+      protected Point3d ptPosArrowToHorSec;
+
       public DimensionAbstract(BlockTableRecord btrPanel, Transaction t, PanelBase panel)
       {
          this.btrPanel = btrPanel;
@@ -316,7 +320,87 @@ namespace AlbumPanelColorTiles.Model.Base
          textView.Position = ptTextPos;         
          btrDim.AppendEntity(textView);
          t.AddNewlyCreatedDBObject(textView, true);
-      }      
+      }
+
+      /// <summary>
+      /// Вставка блока профиля и стрелок к местам установки профиля на стыке плиток в торце панели
+      /// </summary>
+      protected void addProfileTile()
+      {
+         double xPtProfile = 0;
+         double yPtProfile = 0;
+         double xPtArrowDirect = 0;
+         if (panelBase.IsCheekLeft)
+         {
+            // Для торца слева - профиль вставляется в одну и туже точку (-400,-600)
+            xPtProfile = -400;
+            yPtProfile = -600;
+            ptPosArrowToHorSec = ptPosHorizontalPanelSection;
+         }
+         else if (panelBase.IsCheekRight)
+         {
+            // Для торца справа - на раст (400,600) от нижнего правого края последней плитки
+            xPtProfile = panelBase.XMaxContour + 400;
+            yPtProfile = -600;
+            xPtArrowDirect = panelBase.XMaxContour;
+            ptPosArrowToHorSec = new Point3d(panelBase.XMaxContour, ptPosHorizontalPanelSection.Y, 0);
+         }
+         else
+         {
+            // Не нужен профиль для панелей без торцов (Cheek)
+            return;
+         }
+
+         // Поиск блока профиля в инвенторе
+         BlockInfo biProfile = panelBase.Service.Env.BlocksInFacade.FirstOrDefault(b => b.BlName.Equals(Settings.Default.BlockProfileTile));
+         if (biProfile == null)
+         {
+            return;
+         }
+
+         ObjectId idBtrProfile = biProfile.IdBtr;
+         // Точка вставки блока профиля
+         ptPosProfile = new Point3d(xPtProfile, yPtProfile, 0);
+         // Вставка блока профиля - название и марка
+         var blRefProfile = CreateBlRefInBtrDim(ptPosProfile, idBtrProfile, Settings.Default.SheetScale);
+         // Добавление атрибутов Названия и марки
+         // Атрибут Названия - из вхождения атрибута
+         var atrRefName = biProfile.AttrsRef.FirstOrDefault(a => a.Tag.Equals("НАЗВАНИЕ"));
+         if (atrRefName != null)
+         {
+            // определение атрибута
+            var atrDefName = biProfile.AttrsDef.FirstOrDefault(a => a.Tag.Equals("НАЗВАНИЕ"));
+            if (atrDefName != null)
+            {
+               AddAttrToBlockRef(blRefProfile, atrDefName.IdAtr, atrRefName.Text);
+            }
+         }
+         // Атрибут Марки - из вхождения атрибута
+         var atrRefMark = biProfile.AttrsRef.FirstOrDefault(a => a.Tag.Equals("МАРКА"));
+         if (atrRefMark != null)
+         {
+            // определение атрибута
+            var atrDefMark = biProfile.AttrsDef.FirstOrDefault(a => a.Tag.Equals("МАРКА"));
+            if (atrDefMark != null)
+            {
+               AddAttrToBlockRef(blRefProfile, atrDefMark.IdAtr, atrRefMark.Text);
+            }
+         }
+
+         // Вставка стрелки до угла панели
+         if (!panelBase.Service.Env.IdBtrArrow.IsNull)
+         {  
+            Point3d ptArrowPos = new Point3d(xPtProfile, yPtProfile+4*Settings.Default.SheetScale, 0);
+            Point3d ptArrowDirect = new Point3d(xPtArrowDirect, 0, 0);
+            // вставка блока стрелки
+            var blRefArrow = CreateBlRefInBtrDim(ptArrowPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
+            // поворот стрелки и установка длины
+            Vector2d vecArrow = ptArrowDirect.Convert2d() - ptArrowPos.Convert2d();
+            blRefArrow.Rotation = vecArrow.Angle;
+            // длина стрелки
+            setDynParam(blRefArrow, "Длина", vecArrow.Length);
+         }
+      }
 
       private string getTextRange(double measurement, int rangeSize)
       {
@@ -395,6 +479,33 @@ namespace AlbumPanelColorTiles.Model.Base
          btrDim.AppendEntity(blRef);
          t.AddNewlyCreatedDBObject(blRef, true);
          return blRef;
+      }
+
+      protected AttributeReference AddAttrToBlockRef(BlockReference blRef, ObjectId idAttrDef, string textString)
+      {
+         using (var attrDef = idAttrDef.GetObject(OpenMode.ForRead, false, true) as AttributeDefinition)
+         {
+            var attrRef = new AttributeReference();
+            attrRef.SetAttributeFromBlock(attrDef, blRef.BlockTransform);
+            attrRef.TextString = textString;
+
+            blRef.AttributeCollection.AppendAttribute(attrRef);
+            t.AddNewlyCreatedDBObject(attrRef, true);
+            return attrRef;            
+         }
+      }
+
+      protected Result setDynParam(BlockReference blRef, string propName, double value)
+      {
+         foreach (DynamicBlockReferenceProperty prop in blRef.DynamicBlockReferencePropertyCollection)
+         {
+            if (!prop.ReadOnly && prop.PropertyName.Equals(propName, StringComparison.OrdinalIgnoreCase))
+            {
+               prop.Value = value;
+               return Result.Ok();
+            }
+         }
+         return Result.Fail($"Не найден динамический параметр {propName}");
       }
    }
 }

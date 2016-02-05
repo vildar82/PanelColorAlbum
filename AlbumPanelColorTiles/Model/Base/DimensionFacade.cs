@@ -42,7 +42,30 @@ namespace AlbumPanelColorTiles.Model.Base
          addVerticalSectionMark();
          // вставка обозначения горизонтального сечения
          addHorizontalSectionMark();
-      }     
+
+         // Для панелей с торцом вставка блока профиля для плитки (Профиль алюминиевый)
+         addProfileTileFacade();
+      }
+
+      private void addProfileTileFacade()
+      {
+         // общая для фасада и формы - блок и стрелка к углу панели
+         addProfileTile();
+
+         // для фасада нужно добавить стрелку от блока профиля к углу торца в сечении панели         
+         if (!panelBase.Service.Env.IdBtrArrow.IsNull)
+         {
+            Point3d ptArrowPos = new Point3d(ptPosProfile.X, ptPosProfile.Y - 4 * Settings.Default.SheetScale, 0);
+            Point3d ptArrowDirect = ptPosArrowToHorSec;
+            // вставка блока стрелки
+            var blRefArrow = CreateBlRefInBtrDim(ptArrowPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
+            // поворот стрелки и установка длины
+            Vector2d vecArrow = ptArrowDirect.Convert2d() - ptArrowPos.Convert2d();
+            blRefArrow.Rotation = vecArrow.Angle;
+            // длина стрелки
+            setDynParam(blRefArrow, "Длина", vecArrow.Length);
+         }
+      }
 
       private void addHorizontalPanelSection()
       {
@@ -66,8 +89,8 @@ namespace AlbumPanelColorTiles.Model.Base
          // Тескт сечения
          AddText(@"%%U1-1", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
 
-         Point3d ptPos = new Point3d(panelBase.XMinPanel, yPt, 0);
-         var blRefSecHor = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
+         ptPosHorizontalPanelSection = new Point3d(panelBase.XMinPanel, yPt, 0);
+         var blRefSecHor = CreateBlRefInBtrDim(ptPosHorizontalPanelSection, idBtrSec, 1);
          // установить дин параметры длины и ширины блока сечения панели         
          var res = setDynParam(blRefSecHor, "Толщина", panelBase.Thickness);
          res = setDynParam(blRefSecHor, "Длина", panelBase.LengthByTiles);
@@ -75,8 +98,8 @@ namespace AlbumPanelColorTiles.Model.Base
          // расставить окна и размеры
          Point3d ptDimLine = new Point3d(0, yPt - indentDimLineFromDraw, 0);
          // Первая точка - левая контура ? наверно нужно всей панели c outside
-         Point3d ptPanelRight = new Point3d(panelBase.XMinContour, ptPos.Y, 0);
-         Point3d ptPanelLeft = new Point3d(panelBase.XMaxContour, ptPos.Y, 0);
+         Point3d ptPanelRight = new Point3d(panelBase.XMinContour, ptPosHorizontalPanelSection.Y, 0);
+         Point3d ptPanelLeft = new Point3d(panelBase.XMaxContour, ptPosHorizontalPanelSection.Y, 0);
 
          var windows = panelBase.Panel.windows?.window?.Select(w => new { posi = w.posi, width = w.width, height = w.height });
          var balconys = panelBase.Panel.balconys?.balcony?.Select(b => new { posi = b.posi, width = b.width, height = b.height });
@@ -102,7 +125,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
             foreach (var aperture in apertures)
             {
-               Point3d ptAperture = new Point3d(aperture.posi.X, ptPos.Y, 0);
+               Point3d ptAperture = new Point3d(aperture.posi.X, ptPosHorizontalPanelSection.Y, 0);
                var blRefWin = CreateBlRefInBtrDim(ptAperture, panelBase.Service.Env.IdBtrWindowHorSection, 1);
                // Уст дин парам окна
                res = setDynParam(blRefWin, "Толщина", panelBase.Thickness);
@@ -128,7 +151,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
             // Последний размер от последнего окна
             var apertureLast = apertures.Last();
-            Point3d ptApertureLast = new Point3d(apertureLast.posi.X+apertureLast.width, ptPos.Y, 0);
+            Point3d ptApertureLast = new Point3d(apertureLast.posi.X+apertureLast.width, ptPosHorizontalPanelSection.Y, 0);
             
             CreateDim(ptApertureLast, ptPanelLeft, ptDimLine, false, Matrix3d.Identity);
          }
@@ -138,19 +161,6 @@ namespace AlbumPanelColorTiles.Model.Base
             // Один общий розмер
             CreateDim(ptPanelRight, ptPanelLeft, ptDimLine, false, Matrix3d.Identity);
          }
-      }
-
-      private Result setDynParam(BlockReference blRefSecHor, string propName, double value)
-      {         
-         foreach (DynamicBlockReferenceProperty prop in blRefSecHor.DynamicBlockReferencePropertyCollection)
-         {
-            if (!prop.ReadOnly && prop.PropertyName.Equals(propName, StringComparison.OrdinalIgnoreCase))
-            {
-               prop.Value = value;
-               return Result.Ok();
-            }            
-         }
-         return Result.Fail($"Не найден динамический параметр {propName}");
       }      
 
       private void addVerticalPanelSection()
@@ -253,20 +263,7 @@ namespace AlbumPanelColorTiles.Model.Base
             }
          }
          return attrRefCross;
-      }
-
-      //private double getThicknessVerticalSectionBlock()
-      //{         
-      //   switch (panelBase.Thickness)
-      //   {
-      //      case 320:
-      //         return 700;
-      //      case 420:
-      //         return 800;
-      //      default:
-      //         return 700;              
-      //   }         
-      //}
+      }     
 
       private void AddText(string val, Point3d pt, double height)
       {

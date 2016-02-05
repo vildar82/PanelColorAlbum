@@ -37,6 +37,8 @@
       public string BlockWindowName { get; set; }
       public string BlockViewName { get; set; }     
       public string BlockCrossName { get; set; }
+      public string BlockProfileTile { get; set; }
+      public string BlockArrow { get; set; }      
       public string BlockWindowHorSection { get; set; }      
       public int CaptionPanelSecondTextShift { get; set; }
       public int CaptionPanelTextHeight { get; set; }
@@ -107,6 +109,8 @@
          BlockWindowName = "АКР_Окно";
          BlockViewName = "АКР_Вид";
          BlockCrossName = "АКР_Разрез";
+         BlockProfileTile = "АКР_Профиль_плитки";
+         BlockArrow = "АКР_Стрелка";
          BlockWindowHorSection = "АКР_ОкноСеченияПанелиГор";
          BlockSectionName = "АКР_Секция";
          AttributePanelSbPaint = "ПОКРАСКА";

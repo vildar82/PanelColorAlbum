@@ -48,44 +48,48 @@ namespace AlbumPanelColorTiles.Model.Base.Tests
          PanelBase panelBase;         
 
          string testFile = @"c:\temp\test\АКР\Base\Tests\CreateBlockPanelTest\TestCreatePanels.dwg";
-         File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
-
-         Inspector.Clear();
-
+         //File.Copy(@"c:\Autodesk\AutoCAD\Pik\Settings\Template\АР\АР.dwt", testFile, true);
+                  
          using (var db = new Database(false, true))
          {
             db.ReadDwgFile(testFile, FileOpenMode.OpenForReadAndAllShare, false, "");
             db.CloseInput(true);
             using (AcadLib.WorkingDatabaseSwitcher dbSwitcher = new AcadLib.WorkingDatabaseSwitcher(db))
             {
+               baseService.ClearPanelsAkrFromDrawing(db);
                baseService.InitToCreationPanels(db);
+               
+               Point3d pt = Point3d.Origin;
+               List<ObjectId> idsBtrPanels = new List<ObjectId>();
+
+               // Создание определениц блоков панелей
+               foreach (var mark in marks)
+               {
+                  Panel panelXml = baseService.GetPanelXml(mark);
+                  panelBase = new PanelBase(panelXml, baseService);
+                  panelBase.CreateBlock();
+
+                  if (!panelBase.IdBtrPanel.IsNull)
+                  {
+                     idsBtrPanels.Add(panelBase.IdBtrPanel);
+                  }
+               }
+
+               // Вставка вхождениц блоков панелей в модель
                using (var t = db.TransactionManager.StartTransaction())
                {
-                  Point3d pt = Point3d.Origin;
-                  foreach (var mark in marks)
+                  foreach (var idBtrPanel in idsBtrPanels)
                   {
-                     Panel panelXml = baseService.GetPanelXml(mark);
-                     panelBase = new PanelBase(panelXml, baseService);
-                     panelBase.CreateBlock();
-
-                     if (!panelBase.IdBtrPanel.IsNull)
-                     {                        
-                        var blRefPanel = new BlockReference(pt, panelBase.IdBtrPanel);
-                        var ms = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
-                        ms.AppendEntity(blRefPanel);
-                        t.AddNewlyCreatedDBObject(blRefPanel, true);
-                        pt = new Point3d(0, pt.Y + 10000, 0);
-                     }
+                     var blRefPanel = new BlockReference(pt, idBtrPanel);
+                     var ms = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+                     ms.AppendEntity(blRefPanel);
+                     t.AddNewlyCreatedDBObject(blRefPanel, true);
+                     pt = new Point3d(0, pt.Y + 10000, 0);
                   }
                   t.Commit();
                }
             }
             db.SaveAs(testFile, DwgVersion.Current);
-         }
-
-         if (Inspector.HasErrors)
-         {
-            Inspector.LogErrors();
          }         
       }       
    }
