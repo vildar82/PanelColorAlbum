@@ -10,6 +10,7 @@ using AlbumPanelColorTiles.Model.Select;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
 using MoreLinq;
 
 namespace AlbumPanelColorTiles.Model.Base
@@ -152,11 +153,15 @@ namespace AlbumPanelColorTiles.Model.Base
       {         
          var panelsBaseGroup = matchingWindow(facadesMounting, floorsAr).Values.GroupBy(p => p.Panel.mark);
 
+         ProgressMeter progressMeter = new ProgressMeter();
+         progressMeter.SetLimit(panelsBaseGroup.Sum(g=>g.Count()));
+         progressMeter.Start("Создание блоков панелей");
+
          foreach (var itemGroupPanelByMark in panelsBaseGroup)
          {
             if (HostApplicationServices.Current.UserBreak())
             {
-               throw new Exception("Отменено пользователем.");
+               throw new System.Exception("Отменено пользователем.");
             }
 
             // Нумерация индексов окон
@@ -168,21 +173,24 @@ namespace AlbumPanelColorTiles.Model.Base
             }
             //using (var t = Db.TransactionManager.StartTransaction())
             //{
-               foreach (var panelBase in itemGroupPanelByMark)
-               {
-                  try
-                  {
-                     panelBase.CreateBlock();
+            
 
-                  }
-                  catch (Exception ex)
-                  {
-                     Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
-                  }
+            foreach (var panelBase in itemGroupPanelByMark)
+            {
+               try
+               {
+                  panelBase.CreateBlock();
+                  progressMeter.MeterProgress();
                }
+               catch (System.Exception ex)
+               {
+                  Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
+               }
+            }
             //   t.Commit();
-            //}
+            //}            
          }
+         progressMeter.Stop();
       }
 
       private Dictionary<string, PanelBase> matchingWindow(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)

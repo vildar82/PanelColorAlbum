@@ -32,6 +32,7 @@ namespace AlbumPanelColorTiles.Model.Base
       public bool IsCheekLeft { get; private set; }
       public bool IsOutsideRight { get; set; }
       public bool IsOutsideLeft { get; set; }
+      public bool HasWindows { get; set; }
       /// <summary>
       /// Панель ОЛ - ограждение лоджии
       /// </summary>
@@ -92,6 +93,8 @@ namespace AlbumPanelColorTiles.Model.Base
          setNLayerPanel();
          IsOL = Panel.mark.StartsWith("ол", StringComparison.OrdinalIgnoreCase);
          IsUpperStoreyPanel = defineIsUpperStoreyPanel();
+
+         HasWindows = Panel.windows?.window?.Count() > 0;
       }     
 
       private int getThickness(Panel panelXml, MountingPanel panelMount = null)

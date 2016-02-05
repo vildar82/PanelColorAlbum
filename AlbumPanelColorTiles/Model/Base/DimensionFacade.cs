@@ -164,7 +164,7 @@ namespace AlbumPanelColorTiles.Model.Base
                            s.NLayerPanel == panelBase.NLayerPanel &&
                            s.IsOL == panelBase.IsOL &&
                            s.IsUpperStoreyPanel == panelBase.IsUpperStoreyPanel &&
-                           s.Window == (panelBase.WindowsBaseCenters.Count>0)
+                           s.Window == (panelBase.HasWindows)
                            );
          // для 3-слойной панели проверить высоту, если это не чердачная панель
          if (panelBase.NLayerPanel == 3 && !panelBase.IsUpperStoreyPanel)
