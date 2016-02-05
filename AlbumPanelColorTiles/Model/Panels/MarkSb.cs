@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AcadLib.Blocks;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Model.Base;
 using AlbumPanelColorTiles.Options;
@@ -118,7 +119,7 @@ namespace AlbumPanelColorTiles.Panels
          }
       }
 
-      public int WindowSuffix { get { return _windowSuffix; } }
+      public int WindowSuffix { get { return _windowSuffix; } }      
 
       // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
       public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
@@ -550,7 +551,7 @@ namespace AlbumPanelColorTiles.Panels
                   {
                      BlockWindow window = new BlockWindow(blRef, blName);
                      Windows.Add(window);
-                  }
+                  }                  
                }
             }
             t.Commit();

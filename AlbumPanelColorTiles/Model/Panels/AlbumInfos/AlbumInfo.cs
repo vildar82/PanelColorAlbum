@@ -19,6 +19,7 @@ namespace AlbumPanelColorTiles.Model.Panels
 
       public FrameSheet Frame { get; set; } // Основная рамка
       public CoverAndTitle CoverTitle { get; set; } // Обложка и тит блок
+      public ProfileTile ProfileTile { get; set;} // Профиль для плитки в торцах
 
       public AlbumInfo ()
       {
@@ -35,6 +36,7 @@ namespace AlbumPanelColorTiles.Model.Panels
             ObjectId idBtrFrame = getBtr(Settings.Default.BlockFrameName, bt);
             ObjectId idBtrCover = getBtr(Settings.Default.BlockCoverName, bt);
             ObjectId idBtrTitle = getBtr(Settings.Default.BlockTitleName, bt);
+            ObjectId idBtrProfileTile = getBtr(Settings.Default.BlockProfileTile, bt);
             ObjectId msId = bt[BlockTableRecord.ModelSpace];
 
             // Рамка
@@ -56,6 +58,12 @@ namespace AlbumPanelColorTiles.Model.Panels
             {
                ObjectId idBlRefTitle = getFirstBlRefInModel(idBtrTitle, msId);
                CoverTitle.CheckTitle(idBlRefTitle);
+            }
+            // Профиль для торцов плитки
+            if (!idBtrProfileTile.IsNull)
+            {
+               ObjectId idBlRefProfileTile = getFirstBlRefInModel(idBtrProfileTile, msId);
+               ProfileTile = new ProfileTile(idBlRefProfileTile);
             }
          }
       }      

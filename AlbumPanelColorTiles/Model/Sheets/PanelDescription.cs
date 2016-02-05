@@ -159,8 +159,8 @@ namespace AlbumPanelColorTiles.Sheets
          table.Cells[0, 1].TextString = "Цвет";
          table.Cells[0, 2].TextString = "Кол-во, м.п.";
 
-         table.Cells[1, 0].TextString = "АА-1347";         
-         table.Cells[1, 1].TextString = "RAL-7044";
+         table.Cells[1, 0].TextString = markSB.Album.AlbumInfo?.ProfileTile?.ProfileTileName;// "АА-1347";         
+         table.Cells[1, 1].TextString = markSB.Album.AlbumInfo?.ProfileTile?.ProfileTileMark;// "RAL-7044";
          table.Cells[1, 2].TextString = lenProfile.ToString();
 
          table.Rows[1].Borders.Bottom.LineWeight = LineWeight.LineWeight030;

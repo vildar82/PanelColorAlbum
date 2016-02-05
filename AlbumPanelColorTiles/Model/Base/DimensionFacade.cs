@@ -53,18 +53,9 @@ namespace AlbumPanelColorTiles.Model.Base
          addProfileTile(false, Matrix3d.Identity);
 
          // для фасада нужно добавить стрелку от блока профиля к углу торца в сечении панели         
-         if (!panelBase.Service.Env.IdBtrArrow.IsNull)
-         {
-            Point3d ptArrowPos = new Point3d(ptPosProfile.X, ptPosProfile.Y - 4 * Settings.Default.SheetScale, 0);
-            Point3d ptArrowDirect = ptPosArrowToHorSec;
-            // вставка блока стрелки
-            var blRefArrow = CreateBlRefInBtrDim(ptArrowPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
-            // поворот стрелки и установка длины
-            Vector2d vecArrow = ptArrowDirect.Convert2d() - ptArrowPos.Convert2d();
-            blRefArrow.Rotation = vecArrow.Angle;
-            // длина стрелки
-            setDynParam(blRefArrow, "Длина", vecArrow.Length);
-         }
+         Point3d ptArrowPos = new Point3d(ptPosProfile.X, ptPosProfile.Y - 4 * Settings.Default.SheetScale, 0);
+         Point3d ptArrowDirect = ptPosArrowToHorSec;
+         InsertArrowBlRef(ptArrowPos, ptArrowDirect, false, Matrix3d.Identity);         
       }
 
       private void addHorizontalPanelSection()

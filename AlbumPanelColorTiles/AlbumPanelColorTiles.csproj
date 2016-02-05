@@ -160,6 +160,7 @@
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
     <Compile Include="Model\Options\SerializerXml.cs" />
+    <Compile Include="Model\Panels\AlbumInfos\ProfileTile.cs" />
     <Compile Include="Model\Sheets\PanelDescription.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
     <Compile Include="Model\PanelLibrary\EntityInfo.cs" />

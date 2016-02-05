@@ -377,7 +377,7 @@ namespace AlbumPanelColorTiles.Model.Base
             // определение атрибута
             var atrDefName = biProfile.AttrsDef.FirstOrDefault(a => a.Tag.Equals("НАЗВАНИЕ"));
             if (atrDefName != null)
-            {
+            {               
                AddAttrToBlockRef(blRefProfile, atrDefName.IdAtr, atrRefName.Text);
             }
          }
@@ -388,25 +388,31 @@ namespace AlbumPanelColorTiles.Model.Base
             // определение атрибута
             var atrDefMark = biProfile.AttrsDef.FirstOrDefault(a => a.Tag.Equals("МАРКА"));
             if (atrDefMark != null)
-            {
+            {               
                AddAttrToBlockRef(blRefProfile, atrDefMark.IdAtr, atrRefMark.Text);
             }
          }
 
          // Вставка стрелки до угла панели
+         Point3d ptArrowPos = new Point3d(xPtProfile, yPtProfile + 4 * Settings.Default.SheetScale, 0);
+         Point3d ptArrowDirect = new Point3d(xPtArrowDirect, 0, 0);
+         InsertArrowBlRef(ptArrowPos, ptArrowDirect, doTrans, trans);         
+      }
+
+      protected void InsertArrowBlRef (Point3d ptArrowBlPos, Point3d ptArrowDirect, bool doTrans, Matrix3d trans)
+      {
+         // Вставка стрелки и направление ее на указанную точку
          if (!panelBase.Service.Env.IdBtrArrow.IsNull)
-         {  
-            Point3d ptArrowPos = new Point3d(xPtProfile, yPtProfile+4*Settings.Default.SheetScale, 0);
-            Point3d ptArrowDirect = new Point3d(xPtArrowDirect, 0, 0);
+         {            
             if (doTrans)
             {
-               ptArrowPos = ptArrowPos.TransformBy(trans);
+               ptArrowBlPos = ptArrowBlPos.TransformBy(trans);
                ptArrowDirect = ptArrowDirect.TransformBy(trans);
             }
             // вставка блока стрелки
-            var blRefArrow = CreateBlRefInBtrDim(ptArrowPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
+            var blRefArrow = CreateBlRefInBtrDim(ptArrowBlPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
             // поворот стрелки и установка длины
-            Vector2d vecArrow = ptArrowDirect.Convert2d() - ptArrowPos.Convert2d();
+            Vector2d vecArrow = ptArrowDirect.Convert2d() - ptArrowBlPos.Convert2d();
             blRefArrow.Rotation = vecArrow.Angle;
             // длина стрелки
             setDynParam(blRefArrow, "Длина", vecArrow.Length);

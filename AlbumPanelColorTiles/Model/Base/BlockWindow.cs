@@ -47,8 +47,7 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       public static bool SetDynBlWinMark(BlockReference blRefWin, string mark)
-      {
-         bool res = false;
+      {         
          bool findProp = false;
          var dynProps = blRefWin.DynamicBlockReferencePropertyCollection;
          foreach (DynamicBlockReferenceProperty item in dynProps)
@@ -60,11 +59,12 @@ namespace AlbumPanelColorTiles.Model.Base
                if (allowedVals.Contains(mark))
                {
                   item.Value = mark;
-                  res = true;
+                  return true;               
                }
                else
                {
                   Inspector.AddError($"Блок окна. Отсутствует видимость для марки окна {mark}");
+                  return false;
                }
             }
          }
@@ -72,7 +72,7 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             Inspector.AddError("Блок окна. Не найдено динамическое свойтво блока окна Видимость");
          }
-         return res;
+         return false;
       }
 
       public static List<string> GetMarks(ObjectId idBtrWindow)

@@ -768,6 +768,7 @@ namespace AlbumPanelColorTiles
                //   t.Commit();
                //}                 
                doc.Editor.WriteMessage("\nПостроение фасада завершено.");
+               doc.Editor.WriteMessage("\nНеобходимо выполнить проверку чертежа с исправлением ошибок!");
             }
          }
          catch (System.Exception  ex)
