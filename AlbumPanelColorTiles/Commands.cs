@@ -99,6 +99,13 @@ namespace AlbumPanelColorTiles
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
 
+         var minVer = new Version(20, 1);
+         if (Autodesk.AutoCAD.ApplicationServices.Application.Version < minVer)
+         {
+            doc.Editor.WriteMessage("\nКоманда создания альбома временно не работает на версиях ниже 2016 sp1.");
+            return;
+         }
+
          string commandName = "AlbumPanels";
          if (string.Equals(_lastStartCommandName, commandName))
          {
