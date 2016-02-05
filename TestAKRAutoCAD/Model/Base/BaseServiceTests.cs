@@ -33,7 +33,6 @@ namespace TestAKRAutoCAD.Model.Base
          var db = docTest.Database;
          using (var ld = docTest.LockDocument())
          {
-
             using (new AcadLib.WorkingDatabaseSwitcher(db))
             {
                // Очиста чертежа от блоков панелей АКР

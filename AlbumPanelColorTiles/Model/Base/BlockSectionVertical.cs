@@ -85,10 +85,10 @@ namespace AlbumPanelColorTiles.Model.Base
       private Result checkParamVerticalSec()
       {
          string err = string.Empty;
-         if (Height <= 0)
-         {
-            err += "Не определена длина панели для блока сечения.";
-         }
+         //if (Height <= 0)
+         //{
+         //   err += "Не определена длина панели для блока сечения.";
+         //}
          //if (Thickness <= 0)
          //{
          //   err += "Не определена ширина панели для блока сечения.";
