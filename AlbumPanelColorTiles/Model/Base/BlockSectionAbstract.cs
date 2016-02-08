@@ -86,7 +86,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                ObjectIdCollection ids = new ObjectIdCollection(blSecToCopy.Keys.ToArray());
                IdMapping map = new IdMapping();
-               dbBlocks.WblockCloneObjects(ids, service.Db.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+               service.Db.WblockCloneObjects(ids, service.Db.BlockTableId, map, DuplicateRecordCloning.Replace, false);
                foreach (var item in blSecToCopy)
                {
                   item.Value.IdBtr = map[item.Key].Value;

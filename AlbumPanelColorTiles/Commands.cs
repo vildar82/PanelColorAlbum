@@ -708,8 +708,8 @@ namespace AlbumPanelColorTiles
          Database db = doc.Database;
          try
          {
-            using (new WorkingDatabaseSwitcher(db))
-            {
+            //using (new WorkingDatabaseSwitcher(db))
+            //{
                Inspector.Clear();
 
                // Определение фасадов
@@ -765,7 +765,7 @@ namespace AlbumPanelColorTiles
                //}                 
                doc.Editor.WriteMessage("\nПостроение фасада завершено.");
                doc.Editor.WriteMessage("\nНеобходимо выполнить проверку чертежа с исправлением ошибок!");
-            }
+            //}
          }
          catch (System.Exception  ex)
          {
