@@ -131,23 +131,21 @@ namespace AlbumPanelColorTiles.Model.Base
          Database db = Service.Db;
          //Transaction t = db.TransactionManager.TopTransaction;
          using (var t = db.TransactionManager.StartTransaction())
-         {
-            BlockTableRecord btrPanel;
-            using (BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
+         {            
+            BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+            // Ошибка если блок с таким именем уже есть
+            if (bt.Has(BlNameAkr))
             {
-               // Ошибка если блок с таким именем уже есть
-               if (bt.Has(BlNameAkr))
-               {
-                  IdBtrPanel = bt[BlNameAkr];
-                  Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
-                  return;
-               }
-               btrPanel = new BlockTableRecord();
-               btrPanel.Name = BlNameAkr;
-               bt.UpgradeOpen();
-               IdBtrPanel = bt.Add(btrPanel);
-               t.AddNewlyCreatedDBObject(btrPanel, true);
+               IdBtrPanel = bt[BlNameAkr];
+               Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
+               return;
             }
+            BlockTableRecord btrPanel = new BlockTableRecord();
+            btrPanel.Name = BlNameAkr;
+            bt.UpgradeOpen();
+            IdBtrPanel = bt.Add(btrPanel);
+            bt.DowngradeOpen();
+            t.AddNewlyCreatedDBObject(btrPanel, true);
 
             //корректировка точки отсчета панели
             correctStartPointCoordinatesPanel();
@@ -315,13 +313,13 @@ namespace AlbumPanelColorTiles.Model.Base
                Openings.Sort((w1, w2) => w1.MinPoint.X.CompareTo(w2.MinPoint.X));
             }
          }
-      }      
+      }
 
       private void addTiles(BlockTableRecord btrPanel, Transaction t)
       {
-         for (double x = XStartTile; x < XMaxContour -Settings.Default.TileLenght*0.5; x+=Settings.Default.TileLenght+Settings.Default.TileSeam)
+         for (double x = XStartTile; x < XMaxContour - Settings.Default.TileLenght * 0.5; x += Settings.Default.TileLenght + Settings.Default.TileSeam)
          {
-            for (double y = 0; y < Height-Settings.Default.TileHeight*0.5; y+=Settings.Default.TileHeight+Settings.Default.TileSeam)
+            for (double y = 0; y < Height - Settings.Default.TileHeight * 0.5; y += Settings.Default.TileHeight + Settings.Default.TileSeam)
             {
                Point3d pt = new Point3d(x, y, 0);
 

@@ -46,7 +46,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
       // мин значение х среди всех границ блоков панелей внктри этажа
 
       /// <summary>
-      /// Поиск всех блоков монтажек в модели
+      /// Поиск всех блоков монтажек в модели в WorkingDatabase
+      /// Запускается транзакция
       /// </summary>
       public static List<FloorMounting> GetMountingBlocks(PanelLibraryLoadService libLoadServ)
       {
@@ -54,7 +55,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject( OpenMode.ForRead) as BlockTableRecord;
             // Найдем все блоки обозначения фасада
             List<FacadeFrontBlock> facadeFrontBlocks = FacadeFrontBlock.GetFacadeFrontBlocks(ms);
             // Дерево прямоугольников от блоков обозначений сторон фасада, для поиска пересечений с
@@ -70,35 +71,33 @@ namespace AlbumPanelColorTiles.PanelLibrary
             //libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
             foreach (ObjectId idEnt in ms)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               var blRefMounting = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
+               if (blRefMounting == null) continue;
+
+               // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
+               if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                {
-                  var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
+                  FloorMounting floor = new FloorMounting(blRefMounting, libLoadServ);
+                  floor.GetAllPanels();
+                  // найти соотв обозн стороны фасада                              
+                  var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
 
-                  // Если это блок монтажного плана - имя блока начинается с АКР_Монтажка_
-                  if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
+                  // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в
+                  // фасады, просто так вставлен
+                  if (frontsIntersects.Count == 0)
                   {
-                     FloorMounting floor = new FloorMounting(blRefMounting, libLoadServ);
-                     floor.GetAllPanels();
-                     // найти соотв обозн стороны фасада                              
-                     var frontsIntersects = rtreeFront.Intersects(ColorArea.GetRectangleRTree(blRefMounting.GeometricExtents));
-
-                     // если нет пересечений фасадов - пропускаем блок монтажки - он не входит в
-                     // фасады, просто так вставлен
-                     if (frontsIntersects.Count == 0)
-                     {
-                        continue;
-                     }
-                     // если больше одного пересечения с фасадами, то это ошибка, на одной монтажке
-                     // должен быть один блок обозначения стороны фасада
-                     else if (frontsIntersects.Count > 1)
-                     {
-                        Inspector.AddError("На монтажном плане не должно быть больше одного блока обозначения фасада.", blRefMounting);
-                     }
-                     else
-                     {
-                        floor.SetFacadeFrontBlock(frontsIntersects[0]);
-                        floors.Add(floor);
-                     }
+                     continue;
+                  }
+                  // если больше одного пересечения с фасадами, то это ошибка, на одной монтажке
+                  // должен быть один блок обозначения стороны фасада
+                  else if (frontsIntersects.Count > 1)
+                  {
+                     Inspector.AddError("На монтажном плане не должно быть больше одного блока обозначения фасада.", blRefMounting);
+                  }
+                  else
+                  {
+                     floor.SetFacadeFrontBlock(frontsIntersects[0]);
+                     floors.Add(floor);
                   }
                }
             }

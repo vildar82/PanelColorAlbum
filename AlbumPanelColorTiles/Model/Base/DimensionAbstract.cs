@@ -49,25 +49,26 @@ namespace AlbumPanelColorTiles.Model.Base
          BlockTableRecord btrDim;
          string blNameDim = panelBase.BlNameAkr.Replace(Settings.Default.BlockPanelAkrPrefixName, prefix);
 
-         using (var bt = panelBase.Service.Db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
+         var bt = panelBase.Service.Db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+
+         if (bt.Has(blNameDim))
          {
-            if (bt.Has(blNameDim))
-            {
-               btrDim = bt[blNameDim].GetObject(OpenMode.ForWrite) as BlockTableRecord;
-               btrDim.ClearEntity();
-            }
-            else
-            {
-               btrDim = new BlockTableRecord();
-               btrDim.Name = blNameDim;
-               bt.UpgradeOpen();
-               bt.Add(btrDim);
-               t.AddNewlyCreatedDBObject(btrDim, true);
-            }
+            btrDim = bt[blNameDim].GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            btrDim.ClearEntity();
          }
+         else
+         {
+            btrDim = new BlockTableRecord();
+            btrDim.Name = blNameDim;
+            bt.UpgradeOpen();
+            bt.Add(btrDim);
+            bt.DowngradeOpen();
+            t.AddNewlyCreatedDBObject(btrDim, true);
+         }
+
          // Добавление ссылки блока обр в блок панели
          BlockReference blRefDim = new BlockReference(Point3d.Origin, btrDim.Id);
-         blRefDim.LayerId = idLayer;         
+         blRefDim.LayerId = idLayer;
          idBlRefDim = btrPanel.AppendEntity(blRefDim);
          t.AddNewlyCreatedDBObject(blRefDim, true);
          return btrDim;

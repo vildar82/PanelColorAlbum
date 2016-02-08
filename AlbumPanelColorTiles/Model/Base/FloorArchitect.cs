@@ -45,18 +45,16 @@ namespace AlbumPanelColorTiles.Model.Base
 
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
-
+            var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject( OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in ms)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               var blRefArPlan = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
+               if (blRefArPlan == null) continue;               
+
+               if (blRefArPlan.Name.StartsWith(Settings.Default.BlockPlaneArchitectPrefixName, StringComparison.CurrentCultureIgnoreCase))
                {
-                  var blRefArPlan = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;                  
-                  if (blRefArPlan.Name.StartsWith(Settings.Default.BlockPlaneArchitectPrefixName, StringComparison.CurrentCultureIgnoreCase))
-                  {
-                     FloorArchitect floorAr = new FloorArchitect(blRefArPlan, service);
-                     floorsAr.Add(floorAr);
-                  }
+                  FloorArchitect floorAr = new FloorArchitect(blRefArPlan, service);
+                  floorsAr.Add(floorAr);
                }
             }
             t.Commit();
@@ -102,30 +100,29 @@ namespace AlbumPanelColorTiles.Model.Base
       private Dictionary<Point3d, string> defineWindows(BlockReference blRefArPlan)
       {
          var windows = new Dictionary<Point3d, string>();
-         using (var btrArPlan = blRefArPlan.BlockTableRecord.Open(OpenMode.ForWrite) as BlockTableRecord)
-         {
-            Dictionary<Point3d, string> marks = getAllMarks(btrArPlan);            
+         var btrArPlan = blRefArPlan.BlockTableRecord.GetObject(OpenMode.ForWrite) as BlockTableRecord;
 
-            foreach (ObjectId idEnt in btrArPlan)
+         Dictionary<Point3d, string> marks = getAllMarks(btrArPlan);
+
+         foreach (ObjectId idEnt in btrArPlan)
+         {
+            var blRefWindow = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
+            if (blRefWindow == null) continue;
+
+            // Если это блок окна - имя начинается с WNW, на слое A-GLAZ
+            //if (blRefWindow.Name.StartsWith("WNW", StringComparison.OrdinalIgnoreCase) &&
+            //   blRefWindow.Layer.Equals("A-GLAZ", StringComparison.OrdinalIgnoreCase))
+            if (Regex.IsMatch(blRefWindow.Name, "окно", RegexOptions.IgnoreCase))
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               // Найти рядом текст марки окна - в радиусе 1000 
+               var markNearKey = marks.GroupBy(m => m.Key.DistanceTo(blRefWindow.Position)).MinBy(m => m.Key);
+               if (markNearKey == null || markNearKey.Key > 1000)
                {
-                  using (var blRefWindow = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
-                  {
-                     // Если это блок окна - имя начинается с WNW, на слое A-GLAZ
-                     //if (blRefWindow.Name.StartsWith("WNW", StringComparison.OrdinalIgnoreCase) &&
-                     //   blRefWindow.Layer.Equals("A-GLAZ", StringComparison.OrdinalIgnoreCase))
-                     if (Regex.IsMatch(blRefWindow.Name, ".окно", RegexOptions.IgnoreCase))                          
-                     {
-                        // Найти рядом текст марки окна - в радиусе 1000 
-                        var markNearKey = marks.GroupBy(m => m.Key.DistanceTo(blRefWindow.Position)).MinBy(m => m.Key);
-                        if (markNearKey == null || markNearKey.Key > 1000)
-                        {
-                           Inspector.AddError($"Архитектурный план {blRefArPlan.Name}. Не определена марка окна около блока окна с координатами {blRefWindow.Position}.");
-                           continue;
-                        }
-                        var markNear = markNearKey.First();
-                        windows.Add(blRefWindow.Position, markNear.Value);
+                  Inspector.AddError($"Архитектурный план {blRefArPlan.Name}. Не определена марка окна около блока окна с координатами {blRefWindow.Position}.");
+                  continue;
+               }
+               var markNear = markNearKey.First();
+               windows.Add(blRefWindow.Position, markNear.Value);
 #if Test
                         //Test Добавить точку окна и найденную марку окна в точку вставки блока окна
                         {
@@ -142,9 +139,6 @@ namespace AlbumPanelColorTiles.Model.Base
                            }
                         }
 #endif
-                     }
-                  }
-               }
             }
          }
          return windows;

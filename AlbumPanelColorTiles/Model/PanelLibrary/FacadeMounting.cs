@@ -33,53 +33,52 @@ namespace AlbumPanelColorTiles.PanelLibrary
          checkLayers(db);
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForWrite) as BlockTableRecord;
+            var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForWrite) as BlockTableRecord;
             double yFirstFloor = getFirstFloorY(facades); // Y для первых этажей всех фасадов
 
-            using (ProgressMeter progress = new ProgressMeter())
-            {
-               progress.SetLimit(facades.SelectMany(f => f.Floors).Count());
-               progress.Start("Создание фасадов");
+            ProgressMeter progress = new ProgressMeter();
 
-               foreach (var facade in facades)
+            progress.SetLimit(facades.SelectMany(f => f.Floors).Count());
+            progress.Start("Создание фасадов");
+
+            foreach (var facade in facades)
+            {
+               double yFloor = yFirstFloor;
+               foreach (var floor in facade.Floors)
                {
-                  double yFloor = yFirstFloor;
-                  foreach (var floor in facade.Floors)
+                  yFloor = floor.Storey.Y + yFirstFloor;
+                  // Подпись номера этажа
+                  captionFloor(facade.XMin, yFloor, floor, ms, t);
+                  foreach (var panelSb in floor.PanelsSbInFront)
                   {
-                     yFloor = floor.Storey.Y + yFirstFloor;
-                     // Подпись номера этажа
-                     captionFloor(facade.XMin, yFloor, floor, ms, t);
-                     foreach (var panelSb in floor.PanelsSbInFront)
+                     if (panelSb.PanelAkr != null || panelSb.PanelBase != null)
                      {
-                        if (panelSb.PanelAkr != null || panelSb.PanelBase !=null)
+                        Point3d ptPanelAkr = new Point3d(panelSb.ExtTransToModel.MinPoint.X, yFloor, 0);
+                        //testGeom(panelSb, facade, floor, yFloor, t, ms);
+                        ObjectId idBtrPanelAkr;
+                        if (panelSb.PanelBase != null)
                         {
-                           Point3d ptPanelAkr = new Point3d(panelSb.ExtTransToModel.MinPoint.X, yFloor, 0);
-                           //testGeom(panelSb, facade, floor, yFloor, t, ms);
-                           ObjectId idBtrPanelAkr;
-                           if (panelSb.PanelBase != null)
-                           {
-                              if (panelSb.PanelBase.IdBtrPanel.IsNull) continue;                              
-                              idBtrPanelAkr = panelSb.PanelBase.IdBtrPanel;
-                           }
-                           else
-                           {
-                              idBtrPanelAkr = panelSb.PanelAkr.IdBtrPanelAkrInFacade;
-                           }
-                           
-                           var blRefPanelAkr = new BlockReference(ptPanelAkr, idBtrPanelAkr);
-                           blRefPanelAkr.Layer = floor.Storey.Layer;
-                           ms.AppendEntity(blRefPanelAkr);
-                           t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
-                           //blRefPanelAkr.RecordGraphicsModified(true);
-                           //blRefPanelAkr.Draw();
+                           if (panelSb.PanelBase.IdBtrPanel.IsNull) continue;
+                           idBtrPanelAkr = panelSb.PanelBase.IdBtrPanel;
                         }
+                        else
+                        {
+                           idBtrPanelAkr = panelSb.PanelAkr.IdBtrPanelAkrInFacade;
+                        }
+
+                        var blRefPanelAkr = new BlockReference(ptPanelAkr, idBtrPanelAkr);
+                        blRefPanelAkr.Layer = floor.Storey.Layer;
+                        ms.AppendEntity(blRefPanelAkr);
+                        t.AddNewlyCreatedDBObject(blRefPanelAkr, true);
+                        //blRefPanelAkr.RecordGraphicsModified(true);
+                        //blRefPanelAkr.Draw();
                      }
-                     progress.MeterProgress();
                   }
+                  progress.MeterProgress();
                }
-               t.Commit();
-               progress.Stop();
             }
+            t.Commit();
+            progress.Stop();
          }
       }
 

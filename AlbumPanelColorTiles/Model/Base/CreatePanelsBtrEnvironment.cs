@@ -169,15 +169,13 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                foreach (ObjectId idEnt in btr)
                {
-                  if (idEnt.ObjectClass.Name == "AcDbAttributeDefinition")
+                  using (var attrDef = idEnt.Open(OpenMode.ForRead, false, true) as AttributeDefinition)
                   {
-                     using (var attrDef = idEnt.Open(OpenMode.ForRead, false, true) as AttributeDefinition)
+                     if (attrDef == null) continue;
+                     if (!attrDef.Constant && attrDef.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
                      {
-                        if (!attrDef.Constant && attrDef.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
-                        {
-                           idAttrDef = idEnt;
-                           break;
-                        }
+                        idAttrDef = idEnt;
+                        break;
                      }
                   }
                }

@@ -90,10 +90,10 @@ namespace AlbumPanelColorTiles
             }
             return _msgHelp;
          }
-      }      
+      }
 
       // Создание альбома колористических решений панелей (Альбома панелей).
-      [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.Session | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
+      [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
       public void AlbumPanels()
       {
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -124,58 +124,56 @@ namespace AlbumPanelColorTiles
 
          Log.Info("Start Command: AKR-AlbumPanels");
 
-         using (var DocLock = doc.LockDocument())
+
+         if (_album == null)
          {
-            if (_album == null)
+            doc.Editor.WriteMessage("\nСначала нужно выполнить команду PaintPanels для покраски плитки.");
+         }
+         else
+         {
+            try
             {
-               doc.Editor.WriteMessage("\nСначала нужно выполнить команду PaintPanels для покраски плитки.");
-            }
-            else
-            {
-               try
+               Inspector.Clear();
+               _album.ChecksBeforeCreateAlbum();
+               // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
+               // Нужно или выполнить перекраску панелей перед созданием альбома
+               // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.
+               _album.CheckPanelsInDrawingAndMemory();
+
+               // Переименование марок пользователем.
+               // Вывод списка панелей для возможности переименования марок АР пользователем
+               FormRenameMarkAR formRenameMarkAR = new FormRenameMarkAR(_album);
+               if (AcAp.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
                {
-                  Inspector.Clear();
-                  _album.ChecksBeforeCreateAlbum();
-                  // После покраски панелей, пользователь мог изменить панели на чертеже, а в альбом это не попадет.
-                  // Нужно или выполнить перекраску панелей перед созданием альбома
-                  // Или проверить список панелей в _albom и список панелей на чертеже, и выдать сообщение если есть изменения.
-                  _album.CheckPanelsInDrawingAndMemory();
+                  var renamedMarksAR = formRenameMarkAR.RenamedMarksAr();
+                  // сохранить в словарь
+                  Lib.DictNOD.SaveRenamedMarkArToDict(renamedMarksAR);
 
-                  // Переименование марок пользователем.
-                  // Вывод списка панелей для возможности переименования марок АР пользователем
-                  FormRenameMarkAR formRenameMarkAR = new FormRenameMarkAR(_album);
-                  if (AcAp.ShowModalDialog(formRenameMarkAR) == DialogResult.OK)
+                  // Переименовать марки АР
+                  renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
+
+                  // Создание альбома
+                  _album.CreateAlbum();
+
+                  if (Inspector.HasErrors)
                   {
-                     var renamedMarksAR = formRenameMarkAR.RenamedMarksAr();
-                     // сохранить в словарь
-                     Lib.DictNOD.SaveRenamedMarkArToDict(renamedMarksAR);
-
-                     // Переименовать марки АР
-                     renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
-
-                     // Создание альбома
-                     _album.CreateAlbum();
-
-                     if (Inspector.HasErrors)
-                     {
-                        Inspector.Show();
-                     }
-                     doc.Editor.Regen();
-                     doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
-                     Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
+                     Inspector.Show();
                   }
-                  else
-                  {
-                     doc.Editor.WriteMessage("\nОтменено пользователем.");
-                  }
+                  doc.Editor.Regen();
+                  doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
+                  Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
                }
-               catch (System.Exception ex)
+               else
                {
-                  doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. {0}", ex.Message);
-                  if (!ex.Message.Contains("Отменено пользователем"))
-                  {
-                     Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
-                  }
+                  doc.Editor.WriteMessage("\nОтменено пользователем.");
+               }
+            }
+            catch (System.Exception ex)
+            {
+               doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. {0}", ex.Message);
+               if (!ex.Message.Contains("Отменено пользователем"))
+               {
+                  Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
                }
             }
          }
@@ -466,39 +464,37 @@ namespace AlbumPanelColorTiles
          }
          Log.Info("Start Command: AKR-PaintPanels");
 
-         using (var DocLock = doc.LockDocument())
+
+         try
          {
-            try
+            Inspector.Clear();
+            if (_album == null)
             {
-               Inspector.Clear();
-               if (_album == null)
-               {
-                  _album = new Album();
-               }
-               else
-               {
-                  // Повторный запуск программы покраски панелей.
-                  // Сброс данных
-                  _album.ResetData();
-               }
-               _album.PaintPanels();
-               doc.Editor.Regen();
-               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-               //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
-               Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
+               _album = new Album();
             }
-            catch (System.Exception ex)
+            else
             {
-               doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
-               if (!ex.Message.Contains("Отменено пользователем"))
-               {
-                  Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
-               }
+               // Повторный запуск программы покраски панелей.
+               // Сброс данных
+               _album.ResetData();
             }
-            if (Inspector.HasErrors)
+            _album.PaintPanels();
+            doc.Editor.Regen();
+            doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+            //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+            Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
+         }
+         catch (System.Exception ex)
+         {
+            doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
+            if (!ex.Message.Contains("Отменено пользователем"))
             {
-               Inspector.Show();
+               Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
             }
+         }
+         if (Inspector.HasErrors)
+         {
+            Inspector.Show();
          }
          _lastStartCommandName = commandName;
          _lastStartCommandDateTime = DateTime.Now;

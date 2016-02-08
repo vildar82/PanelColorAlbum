@@ -230,7 +230,7 @@ namespace AlbumPanelColorTiles.Model.Base
          BlockReference blRefCrossRight = CreateBlRefInBtrDim(ptRightCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
          blRefCrossRight.Rotation = 270d.ToRadians();
          var attrRefBot = addAttrToBlockCross(blRefCrossRight, "1");
-         attrRefBot.Rotation = 0; ;
+         attrRefBot.Rotation = 0;
       }
 
       private void rotateHorCross(BlockReference blRefCross, AttributeReference attrRef)

@@ -99,12 +99,10 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                foreach (ObjectId idEnt in btrPanel)
                {
-                  if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                  using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                   {
-                     using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
-                     {
-                        idsBtrOther.Add(blRef.BlockTableRecord);
-                     }
+                     if (blRef == null) continue;
+                     idsBtrOther.Add(blRef.BlockTableRecord);
                   }
                }
             }
@@ -171,10 +169,9 @@ namespace AlbumPanelColorTiles.Model.Base
                int index = 1;
                itemGroupPanelByMark.ForEach(p => p.WindowsIndex = index++);
             }
-            //using (var t = Db.TransactionManager.StartTransaction())
-            //{
-            
 
+            //using (var t = Db.TransactionManager.StartTransaction())
+            //{           
             foreach (var panelBase in itemGroupPanelByMark)
             {
                try

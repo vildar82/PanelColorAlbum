@@ -64,20 +64,18 @@ namespace AlbumPanelColorTiles.Model.Select
          {
             foreach (ObjectId idEnt in bt)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockTableRecord")
+               using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
                {
-                  using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
+                  if (btr == null) continue;
+                  if (MarkSb.IsBlockNamePanel(btr.Name))
                   {
-                     if (MarkSb.IsBlockNamePanel(btr.Name))
+                     if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
                      {
-                        if (MarkSb.IsBlockNamePanelMarkAr(btr.Name))
-                        {
-                           IdsBtrPanelAr.Add(idEnt);
-                        }
-                        else
-                        {
-                           IdsBtrPanelSb.Add(idEnt);
-                        }
+                        IdsBtrPanelAr.Add(idEnt);
+                     }
+                     else
+                     {
+                        IdsBtrPanelSb.Add(idEnt);
                      }
                   }
                }
@@ -101,36 +99,34 @@ namespace AlbumPanelColorTiles.Model.Select
          {
             foreach (ObjectId idEnt in ms)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                {
-                  using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
+                  if (blRef == null) continue;
+                  // Блоки АКР-Панелей
+                  if (MarkSb.IsBlockNamePanel(blRef.Name))
                   {
-                     // Блоки АКР-Панелей
-                     if (MarkSb.IsBlockNamePanel(blRef.Name))
+                     if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
                      {
-                        if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
-                        {
-                           listPtsIdsBlRefMarkAr.Add(new KeyValuePair<Point3d, ObjectId>( blRef.Position, idEnt));
-                        }
-                        else
-                        {
-                           listPtsIdsBlRefMarkSb.Add(new KeyValuePair<Point3d, ObjectId>(blRef.Position, idEnt));
-                        }
-                        continue;
+                        listPtsIdsBlRefMarkAr.Add(new KeyValuePair<Point3d, ObjectId>(blRef.Position, idEnt));
                      }
-                     if (blRef.IsDynamicBlock)
+                     else
                      {
-                        // Блоки Секций
-                        var blNameEff = blRef.GetEffectiveName();
-                        if (string.Equals(blNameEff, Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                           SectionsBlRefs.Add(idEnt);
-                        }
-                        // Блоки Фасадов
-                        else if (string.Equals(blNameEff, Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                           FacadeBlRefs.Add(idEnt);
-                        }
+                        listPtsIdsBlRefMarkSb.Add(new KeyValuePair<Point3d, ObjectId>(blRef.Position, idEnt));
+                     }
+                     continue;
+                  }
+                  if (blRef.IsDynamicBlock)
+                  {
+                     // Блоки Секций
+                     var blNameEff = blRef.GetEffectiveName();
+                     if (string.Equals(blNameEff, Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        SectionsBlRefs.Add(idEnt);
+                     }
+                     // Блоки Фасадов
+                     else if (string.Equals(blNameEff, Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
+                     {
+                        FacadeBlRefs.Add(idEnt);
                      }
                   }
                }
@@ -165,14 +161,12 @@ namespace AlbumPanelColorTiles.Model.Select
          {
             foreach (ObjectId idEnt in ms)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                {
-                  using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
+                  if (blRef == null) continue;
+                  if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
                   {
-                     if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockSectionName, StringComparison.CurrentCultureIgnoreCase))
-                     {
-                        SectionsBlRefs.Add(idEnt);
-                     }
+                     SectionsBlRefs.Add(idEnt);
                   }
                }
             }

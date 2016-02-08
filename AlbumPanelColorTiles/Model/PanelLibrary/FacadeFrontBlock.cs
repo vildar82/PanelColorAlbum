@@ -29,22 +29,18 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public static List<FacadeFrontBlock> GetFacadeFrontBlocks(BlockTableRecord ms)
       {
-         List<FacadeFrontBlock> facadeFrontBlocks = new List<FacadeFrontBlock>();         
+         List<FacadeFrontBlock> facadeFrontBlocks = new List<FacadeFrontBlock>();
 
          foreach (ObjectId idEnt in ms)
          {
-            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
+            if (blRef == null) { continue; }
+            // Если это блок обозначения стороны фасада - по имени блока
+            if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
             {
-               var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
-               {
-                  // Если это блок обозначения стороны фасада - по имени блока
-                  if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
-                  {
-                     FacadeFrontBlock front = new FacadeFrontBlock(blRef);
-                     facadeFrontBlocks.Add(front);
-                  }
-               }
-            }            
+               FacadeFrontBlock front = new FacadeFrontBlock(blRef);
+               facadeFrontBlocks.Add(front);
+            }
          }
          return facadeFrontBlocks;
       }

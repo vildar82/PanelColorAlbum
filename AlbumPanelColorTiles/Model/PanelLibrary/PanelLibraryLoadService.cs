@@ -85,7 +85,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                               foreach (var mountingPanelSb in mountingsPanelSb)
                               {
                                  string markSbWithoutWhite = mountingPanelSb.MarkSbWithoutElectric.Replace(' ', '-');
-                                 string markAkrWithoutWhite = markSbAkr.MarkSbClean.Replace(' ', '-');
+                                 string markAkrWithoutWhite = MountingPanel.GetMarkWithoutElectric(markSbAkr.MarkSbClean).Replace(' ', '-');
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
                                     //Проверка индекса окна

@@ -54,7 +54,7 @@ namespace AlbumPanelColorTiles.Panels
       {
          Album = album;
          _abbr = album.StartOptions.Abbr;
-         _markSb = markSbName;
+         _markSb = markSbName;         
          _idBtr = idBtrMarkSb;
          _markSbBlockName = markSbBlockName;
          defineStoreyTypePanel(blRefPanel);
@@ -206,8 +206,8 @@ namespace AlbumPanelColorTiles.Panels
          using (var t = db.TransactionManager.StartTransaction())
          {
             // Перебор всех блоков в модели и составление списка блоков марок и панелей.
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+            var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+            var ms = bt[BlockTableRecord.ModelSpace].GetObject(OpenMode.ForRead) as BlockTableRecord;
 
             ProgressMeter progressMeter = new ProgressMeter();
             progressMeter.SetLimit(idsBlRefPanels.Count);
@@ -222,7 +222,7 @@ namespace AlbumPanelColorTiles.Panels
                }
                progressMeter.MeterProgress();
 
-               var blRefPanel = t.GetObject(idBlRefPanelMarkSb, OpenMode.ForRead, false, true) as BlockReference;
+               var blRefPanel = idBlRefPanelMarkSb.GetObject( OpenMode.ForRead, false, true) as BlockReference;
                // Определение Марки СБ панели. Если ее еще нет, то она создается и добавляется в список _marks.
                MarkSb markSb = GetMarkSb(blRefPanel, marksSb, bt, album);
                if (markSb == null)
@@ -528,33 +528,30 @@ namespace AlbumPanelColorTiles.Panels
       {
          _tiles = new List<Tile>();
          _paints = new List<Paint>();
-         using (var t = _idBtr.Database.TransactionManager.StartTransaction())
+         
+            var btrMarkSb = _idBtr.GetObject( OpenMode.ForRead) as BlockTableRecord;
+         foreach (ObjectId idEnt in btrMarkSb)
          {
-            var btrMarkSb = t.GetObject(_idBtr, OpenMode.ForRead) as BlockTableRecord;
-            foreach (ObjectId idEnt in btrMarkSb)
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               var blRef = idEnt.GetObject( OpenMode.ForRead, false, true) as BlockReference;
+               string blName = blRef.GetEffectiveName();
+               // Плитка
+               if (blName.Equals(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
                {
-                  var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  string blName = blRef.GetEffectiveName();
-                  // Плитка
-                  if (blName.Equals(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
-                  {
-                     Tile tile = new Tile(blRef);
-                     //Определение покраски плитки
-                     Paint paint = ColorArea.GetPaint(tile.CenterTile, _rtreeColorArea);
-                     _tiles.Add(tile);
-                     _paints.Add(paint);
-                  }
-                  // Окна                  
-                  else if (blName.Equals(Settings.Default.BlockWindowName, StringComparison.OrdinalIgnoreCase))
-                  {
-                     BlockWindow window = new BlockWindow(blRef, blName);
-                     Windows.Add(window);
-                  }                  
+                  Tile tile = new Tile(blRef);
+                  //Определение покраски плитки
+                  Paint paint = ColorArea.GetPaint(tile.CenterTile, _rtreeColorArea);
+                  _tiles.Add(tile);
+                  _paints.Add(paint);
+               }
+               // Окна                  
+               else if (blName.Equals(Settings.Default.BlockWindowName, StringComparison.OrdinalIgnoreCase))
+               {
+                  BlockWindow window = new BlockWindow(blRef, blName);
+                  Windows.Add(window);
                }
             }
-            t.Commit();
          }
       }
 
