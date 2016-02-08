@@ -707,67 +707,61 @@ namespace AlbumPanelColorTiles
          if (doc == null) return;         
          Database db = doc.Database;
          try
-         {
-            //using (new WorkingDatabaseSwitcher(db))
-            //{
-               Inspector.Clear();
+         {            
+            Inspector.Clear();
 
-               // Определение фасадов
-               List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
+            // Определение фасадов
+            List<FacadeMounting> facadesMounting = FacadeMounting.GetFacadesFromMountingPlans();
 
-               if (facadesMounting.Count == 0)
+            if (facadesMounting.Count == 0)
+            {
+               Inspector.AddError("Не определены фасады в чертеже - по монтажным планам.");
+               throw new System.Exception("Отменено пользователем");
+            }
+
+            // Загрузка базы панелей из XML
+            BaseService baseService = new BaseService();
+            baseService.ReadPanelsFromBase();
+
+            // Очиста чертежа от блоков панелей АКР
+            try
+            {
+               baseService.ClearPanelsAkrFromDrawing(db);
+            }
+            catch (System.Exception ex)
+            {
+               Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
+            }
+            // Подготовка - копирование блоков, слоев, стилей, и т.п.
+            baseService.InitToCreationPanels(db);
+
+            // Определение арх планов
+            List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);
+                        
+            // Создание определений блоков панелей по базе                
+            baseService.CreateBtrPanels(facadesMounting, floorsAr);
+
+            // Заморозка слоев образмеривания панелей
+            baseService.FreezeDimLayers();            
+
+            //Создание фасадов
+            FacadeMounting.CreateFacades(facadesMounting);
+
+            // Замена ассоциативных штриховок к блоках сечений
+            using (var t = db.TransactionManager.StartTransaction())
+            {
+               var secBlocks = baseService.Env.BlPanelSections;
+               foreach (var item in secBlocks)
                {
-                  Inspector.AddError("Не определены фасады в чертеже - по монтажным планам.");
-                  throw new System.Exception("Отменено пользователем");
+                  item.ReplaceAssociateHatch();
                }
+               t.Commit();
+            }
 
-               // Загрузка базы панелей из XML
-               BaseService baseService = new BaseService();
-               baseService.ReadPanelsFromBase();
-
-               // Очиста чертежа от блоков панелей АКР
-               try
-               {
-                  baseService.ClearPanelsAkrFromDrawing(db);
-               }
-               catch (System.Exception ex)
-               {
-                  Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
-               }
-               // Подготовка - копирование блоков, слоев, стилей, и т.п.
-               baseService.InitToCreationPanels(db);
-
-               // Определение арх планов
-               List<FloorArchitect> floorsAr = FloorArchitect.GetAllPlanes(db, baseService);                                                          
-
-               //using (var t = db.TransactionManager.StartTransaction())
-               //{
-                  // Создание определений блоков панелей по базе                
-                  baseService.CreateBtrPanels(facadesMounting, floorsAr);
-
-                  // Заморозка слоев образмеривания панелей
-                  baseService.FreezeDimLayers();
-
-               //   t.Commit();
-               //}
-
-               //Создание фасадов
-               FacadeMounting.CreateFacades(facadesMounting);
-
-               //using (var t = db.TransactionManager.StartTransaction())
-               //{
-               //   var secBlocks = baseService.Env.BlPanelSections.OfType<BlockSectionHorizontal>();
-               //   foreach (var item in secBlocks)
-               //   {
-               //      item.ReplaceAssociateHatch();
-               //   }
-               //   t.Commit();
-               //}                 
-               doc.Editor.WriteMessage("\nПостроение фасада завершено.");
-               doc.Editor.WriteMessage("\nНеобходимо выполнить проверку чертежа с исправлением ошибок!");
-            //}
+            doc.Editor.WriteMessage("\nПостроение фасада завершено.");
+            doc.Editor.WriteMessage("\nНеобходимо выполнить проверку чертежа с исправлением ошибок!");            
          }
-         catch (System.Exception  ex)
+         catch (System.Exception ex)
          {
             doc.Editor.WriteMessage($"\nНе удалось выполнить построение фасада. {ex.Message}");
             if (!ex.Message.Contains("Отменено пользователем"))
