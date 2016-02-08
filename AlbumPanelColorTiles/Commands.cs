@@ -148,7 +148,7 @@ namespace AlbumPanelColorTiles
                   {
                      var renamedMarksAR = formRenameMarkAR.RenamedMarksAr();
                      // сохранить в словарь
-                     DictNOD.SaveRenamedMarkArToDict(renamedMarksAR);
+                     Lib.DictNOD.SaveRenamedMarkArToDict(renamedMarksAR);
 
                      // Переименовать марки АР
                      renamedMarksAR.ForEach(r => r.MarkAR.MarkPainting = r.MarkPainting);
@@ -210,7 +210,7 @@ namespace AlbumPanelColorTiles
                      {
                         using (var lockItemDoc = itemDoc.LockDocument())
                         {
-                           DictNOD.CopyDict(itemDoc.Database);
+                           Lib.DictNOD.CopyDict(itemDoc.Database);
                         }
                      }
                   }
