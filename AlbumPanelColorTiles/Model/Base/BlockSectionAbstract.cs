@@ -27,8 +27,8 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>
       public bool IsUpperStoreyPanel { get; set; }
 
-      //private Dictionary<ObjectId, HatchInfo> _hatchsAssociatedIdsDictInTemplate;
-      //private Dictionary<ObjectId, HatchInfo> _hatchsAssociatedIdsDictInFacade;
+      private Dictionary<ObjectId/*Штриховка*/, HatchInfo/*Описание штриховки*/> _hatchsAssociatedIdsDictInTemplate;
+      private Dictionary<ObjectId, HatchInfo> _hatchsAssociatedIdsDictInFacade;
 
       public BlockSectionAbstract(string blName, BaseService service)
       {
@@ -68,11 +68,7 @@ namespace AlbumPanelColorTiles.Model.Base
                         {
                            blSecToCopy.Add(idBtr, blSec);
                            //Определение ассоциативных штриховок и объектов с которыми они связаны
-                           //var hatchAssDict = getHatchAssociateIds(btr);
-                           //if (hatchAssDict.Count > 0)
-                           //{
-                           //   blSec._hatchsAssociatedIdsDictInTemplate = hatchAssDict;
-                           //}
+                           blSec.getHatchAssociateIds(btr);                           
                         }
                         else
                         {
@@ -90,11 +86,11 @@ namespace AlbumPanelColorTiles.Model.Base
                foreach (var item in blSecToCopy)
                {
                   item.Value.IdBtr = map[item.Key].Value;
-                  //if (item.Value._hatchsAssociatedIdsDictInTemplate != null)
-                  //{
-                  //   item.Value.SetHatchIdsMapping(map);
-                  //   //item.Value.ReplaceAssociateHatch();
-                  //}
+                  if (item.Value._hatchsAssociatedIdsDictInTemplate != null)
+                  {
+                     item.Value.setHatchIdsMapping(map);
+                     //item.Value.ReplaceAssociateHatch();
+                  }
                }               
             }
             else
@@ -105,60 +101,53 @@ namespace AlbumPanelColorTiles.Model.Base
             }
          }
          return blSecToCopy.Values.ToList();         
-      }     
+      }
 
-      //private static Dictionary<ObjectId, HatchInfo> getHatchAssociateIds(BlockTableRecord btr)
-      //{
-      //   Dictionary<ObjectId, HatchInfo> idsHatchAssociates = new Dictionary<ObjectId, HatchInfo>();
-      //   foreach (ObjectId idEnt in btr)
-      //   {
-      //      if (idEnt.ObjectClass.Name == "AcDbHatch")
-      //      {
-      //         using (var h = idEnt.Open(OpenMode.ForRead, false, true) as Hatch)
-      //         {
-      //            if (h.Associative)
-      //            {                     
-      //               idsHatchAssociates.Add(h.Id, new HatchInfo(h));
-      //            }
-      //         }
-      //      }
-      //   }
-      //   return idsHatchAssociates;
-      //}
+      private void getHatchAssociateIds(BlockTableRecord btr)
+      {
+         _hatchsAssociatedIdsDictInTemplate = new Dictionary<ObjectId, HatchInfo>();
+         foreach (ObjectId idEnt in btr)
+         {
+            using (var h = idEnt.Open(OpenMode.ForRead, false, true) as Hatch)
+            {
+               if (h == null) continue;
+               if (h.Associative)
+               {
+                  _hatchsAssociatedIdsDictInTemplate.Add(h.Id, new HatchInfo(h));
+               }
+            }
+         }         
+      }
 
-      //private void SetHatchIdsMapping(IdMapping map)
-      //{
-      //   _hatchsAssociatedIdsDictInFacade = new Dictionary<ObjectId, HatchInfo>();
-      //   foreach (var itemDict in _hatchsAssociatedIdsDictInTemplate)
-      //   {
-      //      ObjectIdCollection idsAssFacade = new ObjectIdCollection();
-      //      foreach (ObjectId idVal in itemDict.Value.IdsAssociate)
-      //      {
-      //         idsAssFacade.Add(map[idVal].Value);
-      //      }
-      //      itemDict.Value.IdsAssociate = idsAssFacade;
-      //      itemDict.Value.Id = map[itemDict.Key].Value;
-      //      _hatchsAssociatedIdsDictInFacade.Add(itemDict.Value.Id, itemDict.Value);
-      //   }
-      //}
+      private void setHatchIdsMapping(IdMapping map)
+      {
+         _hatchsAssociatedIdsDictInFacade = new Dictionary<ObjectId, HatchInfo>();
+         foreach (var itemDict in _hatchsAssociatedIdsDictInTemplate)
+         {
+            ObjectIdCollection idsAssFacade = new ObjectIdCollection();
+            foreach (ObjectId idVal in itemDict.Value.IdsAssociate)
+            {
+               idsAssFacade.Add(map[idVal].Value);
+            }
+            itemDict.Value.IdsAssociate = idsAssFacade;
+            itemDict.Value.Id = map[itemDict.Key].Value;
+            _hatchsAssociatedIdsDictInFacade.Add(itemDict.Value.Id, itemDict.Value);
+         }
+      }
 
-      //public  void ReplaceAssociateHatch()
-      //{
-      //   if (_hatchsAssociatedIdsDictInFacade != null)
-      //   {
-      //      using (var btr = IdBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord)
-      //      {
-      //         foreach (var itemDict in _hatchsAssociatedIdsDictInFacade)
-      //         {
-      //            using (var hErase = itemDict.Key.GetObject(OpenMode.ForWrite, false, true) as Hatch)
-      //            {
-      //               hErase.Erase();
-      //            }                     
-      //            itemDict.Value.CreateNewHatch(btr);
-      //         }
-      //         btr.UpdateAnonymousBlocks();
-      //      }
-      //   }
-      //}
+      public void ReplaceAssociateHatch()
+      {
+         if (_hatchsAssociatedIdsDictInFacade != null)
+         {
+            var btr = IdBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            foreach (var itemDict in _hatchsAssociatedIdsDictInFacade)
+            {
+               var hErase = itemDict.Key.GetObject(OpenMode.ForWrite, false, true) as Hatch;
+               hErase.Erase();
+               itemDict.Value.CreateNewHatch(btr);
+            }
+            btr.UpdateAnonymousBlocks();            
+         }
+      }
    }
 }

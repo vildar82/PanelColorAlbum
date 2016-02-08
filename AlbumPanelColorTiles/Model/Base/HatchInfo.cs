@@ -13,6 +13,9 @@ namespace AlbumPanelColorTiles.Model.Base
    /// </summary>
    public class HatchInfo
    {
+      /// <summary>
+      /// Объекты с которыми штриховка ассоциирована
+      /// </summary>
       public ObjectIdCollection IdsAssociate { get; set; }
       public ObjectId Id { get; set; }
       public string PatternName { get; private set; }
@@ -41,24 +44,25 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public void CreateNewHatch(BlockTableRecord btr)
       {
-         using (var h = new Hatch())
+         var h = new Hatch();
+
+         h.Annotative = AnnotativeStates.False;
+         h.Layer = Layer;
+         h.Color = Color;
+         h.LineWeight = Lineweight;
+         h.SetHatchPattern(PatternType, PatternName);
+         h.PatternAngle = PatternAngle;
+         h.PatternScale = PatternScale;
+         h.SetHatchPattern(PatternType, PatternName);         
+
+         Id = btr.AppendEntity(h);
+         btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(h, true);         
+
+         if (IdsAssociate != null && IdsAssociate.Count > 0)
          {
-            h.Layer = Layer;
-            h.Color = Color;
-            h.LineWeight = Lineweight;
-            h.SetHatchPattern(PatternType, PatternName);
-            h.PatternAngle = PatternAngle;
-            h.PatternScale = PatternScale;
-
-            Id = btr.AppendEntity(h);
-            //t.AddNewlyCreatedDBObject(h, true);
-
-            if (IdsAssociate != null && IdsAssociate.Count > 0)
-            {
-               h.Associative = true;
-               h.AppendLoop(HatchLoopTypes.Default, IdsAssociate);
-               h.EvaluateHatch(true);
-            }
+            h.Associative = true;
+            h.AppendLoop(HatchLoopTypes.Default, IdsAssociate);
+            h.EvaluateHatch(false);
          }
       }
    }
