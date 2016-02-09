@@ -355,7 +355,7 @@ namespace AlbumPanelColorTiles.Panels
                {
                   //TODO: Ошибка в чертеже. Блок с Маркой АР есть, а блока Марки СБ нет. Добавить в колекцию блоков с ошибками.
                   //???
-                  Inspector.AddError(string.Format("Блок марки АР есть, а блока марки СБ нет. - {0}", blRefPanelSb.Name), blRefPanelSb);
+                  Inspector.AddError($"Блок марки АР есть, а блока марки СБ нет - {blRefPanelSb.Name}", blRefPanelSb, icon: System.Drawing.SystemIcons.Error);
                }
             }
          }
@@ -397,18 +397,18 @@ namespace AlbumPanelColorTiles.Panels
                {
                   if (_windowSuffix == 0)
                   {
-                     Inspector.Errors.Add(new Error(string.Format("Индекс окна не может быть равен 0 в блоке панели {0}", blRefPanel.Name), blRefPanel));
+                     Inspector.AddError($"Индекс окна не может быть равен 0 в блоке панели {blRefPanel.Name}", blRefPanel, icon: System.Drawing.SystemIcons.Error);
                   }
                }
                else
                {
-                  Inspector.Errors.Add(new Error(string.Format("Не определен индекс окна в блоке панели {0}", blRefPanel.Name), blRefPanel));
+                  Inspector.AddError($"Не определен индекс окна в блоке панели {blRefPanel.Name}", blRefPanel, icon: System.Drawing.SystemIcons.Error);
                }
             }
             catch (System.Exception ex)
             {
                // Неверный индекс окна в имени блока панели
-               Inspector.Errors.Add(new Error(string.Format("Не определен индекс окна в блоке панели {0}", blRefPanel.Name), blRefPanel));
+               Inspector.AddError($"Не определен индекс окна в блоке панели {blRefPanel.Name}",blRefPanel, icon: System.Drawing.SystemIcons.Error);
             }
          }
       }
@@ -428,10 +428,10 @@ namespace AlbumPanelColorTiles.Panels
             string markPaint;
             var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
             string floor = String.Join(",", floors);
-            markPaint = string.Format("{0}{1}{2}", Settings.Default.PaintIndexStorey, floor, endIndex); // Э2,3,4ТП
+            markPaint = $"{Settings.Default.PaintIndexStorey}{floor}{endIndex}"; // Э2,3,4ТП
             if (marksArArchitectIndex.ContainsKey(markPaint))
             {
-               markPaint = string.Format("{0}-{1}", markPaint, i++);
+               markPaint = $"{markPaint}-{i++}";
             }
             marksArArchitectIndex.Add(markPaint, markAR);
             if (markAR.MarkSB.WindowSuffix > 0)
@@ -465,10 +465,10 @@ namespace AlbumPanelColorTiles.Panels
             string markPaint;
             var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
             string floor = String.Join(",", floors);
-            markPaint = string.Format("{0}{1}", Settings.Default.PaintIndexStorey, floor);//Э2,5,8
+            markPaint = $"{Settings.Default.PaintIndexStorey}{floor}";//Э2,5,8
             if (marksArArchitectIndex.ContainsKey(markPaint))
             {
-               markPaint = string.Format("{0}-{1}", markPaint, i++);
+               markPaint = $"{markPaint}-{i++}";
             }
             marksArArchitectIndex.Add(markPaint, markAR);
             if (markAR.MarkSB.WindowSuffix > 0)
@@ -500,7 +500,7 @@ namespace AlbumPanelColorTiles.Panels
             int i = 1;
             foreach (var markAR in MarksAR)
             {
-               string markPaint = string.Format("{0}{1}-{2}", Settings.Default.PaintIndexStorey, index, i++); // ЭЧ-1
+               string markPaint = $"{Settings.Default.PaintIndexStorey}{index}-{i++}"; // ЭЧ-1
                marksArArchitectIndex.Add(markPaint, markAR);
                if (markAR.MarkSB.WindowSuffix > 0)
                {

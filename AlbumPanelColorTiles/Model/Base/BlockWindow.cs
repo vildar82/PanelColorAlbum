@@ -27,7 +27,7 @@ namespace AlbumPanelColorTiles.Model.Base
       {
          if (string.IsNullOrEmpty(Mark) )
          {
-            Inspector.AddError($"Не определена марка окна {BlName}");
+            Inspector.AddError($"Не определена марка окна {BlName}", icon: System.Drawing.SystemIcons.Error);
          }
       }
 
@@ -63,14 +63,14 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                else
                {
-                  Inspector.AddError($"Блок окна. Отсутствует видимость для марки окна {mark}");
+                  Inspector.AddError($"Блок окна. Отсутствует видимость для марки окна {mark}", icon: System.Drawing.SystemIcons.Error);
                   return false;
                }
             }
          }
          if (!findProp)
          {
-            Inspector.AddError("Блок окна. Не найдено динамическое свойтво блока окна Видимость");
+            Inspector.AddError("Блок окна. Не найдено динамическое свойтво блока окна Видимость", icon: System.Drawing.SystemIcons.Error);
          }
          return false;
       }

@@ -78,7 +78,8 @@ namespace AlbumPanelColorTiles.Model.Base
             }
             else
             {
-               Inspector.AddError($"Архитектурный план {blPlanArName}. Не определен номер секции {sectionPart}.");
+               Inspector.AddError($"Архитектурный план {blPlanArName}. Не определен номер секции {sectionPart}.", 
+                  icon: System.Drawing.SystemIcons.Error);
             }            
             numberPart = arrSplit[1];
          }
@@ -93,7 +94,8 @@ namespace AlbumPanelColorTiles.Model.Base
          }
          else
          {
-            Inspector.AddError($"Архитектурный план {blPlanArName}. Не определен номер этажа {numberPart}.");
+            Inspector.AddError($"Архитектурный план {blPlanArName}. Не определен номер этажа {numberPart}.", 
+               icon: System.Drawing.SystemIcons.Error);
          }
       }
 
@@ -118,7 +120,9 @@ namespace AlbumPanelColorTiles.Model.Base
                var markNearKey = marks.GroupBy(m => m.Key.DistanceTo(blRefWindow.Position)).MinBy(m => m.Key);
                if (markNearKey == null || markNearKey.Key > 1000)
                {
-                  Inspector.AddError($"Архитектурный план {blRefArPlan.Name}. Не определена марка окна около блока окна с координатами {blRefWindow.Position}.");
+                  Inspector.AddError($"Архитектурный план {blRefArPlan.Name}. " + 
+                     $"Не определена марка окна около блока окна с координатами {blRefWindow.Position}.", 
+                     icon: System.Drawing.SystemIcons.Error);
                   continue;
                }
                var markNear = markNearKey.First();

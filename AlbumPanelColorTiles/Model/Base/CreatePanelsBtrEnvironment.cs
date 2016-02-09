@@ -154,7 +154,8 @@ namespace AlbumPanelColorTiles.Model.Base
          // Добавление ошибок для ненайденых блоков
          foreach (var blNameNotFound in notFoundBlocks)
          {
-            Inspector.AddError($"В файле фасада не найден требуемый блок {blNameNotFound} для создания альбома панелей.");
+            Inspector.AddError($"В файле фасада не найден требуемый блок {blNameNotFound} для создания альбома панелей.",
+               icon: System.Drawing.SystemIcons.Error);
          }
 
          return resVal.Values.ToList();
@@ -190,7 +191,7 @@ namespace AlbumPanelColorTiles.Model.Base
          if (!_blocks.TryGetValue(blName, out idBtr))
          {
             idBtr = ObjectId.Null;
-            Inspector.AddError($"Не определен блок {blName}");
+            Inspector.AddError($"Не определен блок {blName}", icon: System.Drawing.SystemIcons.Error);
          }
          return idBtr;
       }
@@ -216,7 +217,7 @@ namespace AlbumPanelColorTiles.Model.Base
          }
          else
          {
-            Inspector.AddError($"Не найден файл шаблона блоков АКР - {fileBlocksTemplate}");            
+            Inspector.AddError($"Не найден файл шаблона блоков АКР - {fileBlocksTemplate}", icon: System.Drawing.SystemIcons.Error);            
          }
          return new Dictionary<string, ObjectId>();
       }

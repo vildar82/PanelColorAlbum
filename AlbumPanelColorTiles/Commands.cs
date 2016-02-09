@@ -715,7 +715,7 @@ namespace AlbumPanelColorTiles
 
             if (facadesMounting.Count == 0)
             {
-               Inspector.AddError("Не определены фасады в чертеже - по монтажным планам.");
+               Inspector.AddError("Не определены фасады в чертеже - по монтажным планам.", icon: System.Drawing.SystemIcons.Error);
                throw new System.Exception("Отменено пользователем");
             }
 

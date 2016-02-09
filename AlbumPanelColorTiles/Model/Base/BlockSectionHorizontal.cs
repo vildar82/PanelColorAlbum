@@ -48,7 +48,8 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                else
                {
-                  Inspector.AddError($"В блоке сечения {BlName} не определено количество слоев по префиксу 'сл'");
+                  Inspector.AddError($"В блоке сечения {BlName} не определено количество слоев по префиксу 'сл'",
+                     icon: System.Drawing.SystemIcons.Error);
                }
             }
             // Торец слева (Cheek)

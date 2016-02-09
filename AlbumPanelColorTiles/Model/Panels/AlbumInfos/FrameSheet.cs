@@ -20,8 +20,7 @@ namespace AlbumPanelColorTiles.Panels
       {
          if (idBlRefFrame.IsNull)
          {
-            Inspector.AddError("Блок {0} не найден.",
-                              Settings.Default.BlockFrameName);
+            Inspector.AddError($"Блок '{Settings.Default.BlockFrameName}' не найден.", icon: System.Drawing.SystemIcons.Error);
             return;
          }
 
@@ -30,8 +29,8 @@ namespace AlbumPanelColorTiles.Panels
             _idBtrFrame = blRefFrame.BlockTableRecord;
             if (blRefFrame.AttributeCollection == null)
             {
-               Inspector.AddError("Блок {0} не соответствует требованиям. У него должны быть атрибуты: Наименование, Вид, Лист.",
-                                 Settings.Default.BlockFrameName);
+               Inspector.AddError($"Блок '{Settings.Default.BlockFrameName}' не соответствует требованиям. У него должны быть атрибуты: Наименование, Вид, Лист.",
+                                 icon: System.Drawing.SystemIcons.Error);
                return;
             }
             _attrs = new Dictionary<string, string>();
@@ -71,7 +70,7 @@ namespace AlbumPanelColorTiles.Panels
             }
             if (!string.IsNullOrEmpty(errMsg))
             {
-               Inspector.AddError($"Ошибки в блоке {Settings.Default.BlockFrameName}: {blRefFrame}");
+               Inspector.AddError($"Ошибки в блоке {Settings.Default.BlockFrameName}: {blRefFrame}", icon: System.Drawing.SystemIcons.Error);
             }
             else
             {

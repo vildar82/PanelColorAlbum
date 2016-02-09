@@ -30,7 +30,7 @@ namespace AlbumPanelColorTiles.Checks
             msg += string.Join(", ", markArBtrNames.ToArray());
             //_ed.WriteMessage("\n" + msg);
             //_errors.Add(new Error(msg));
-            Inspector.AddError(msg);
+            Inspector.AddError(msg, icon: System.Drawing.SystemIcons.Error);
          }
       }
 

@@ -137,7 +137,7 @@ namespace AlbumPanelColorTiles.Model.Base
             if (bt.Has(BlNameAkr))
             {
                IdBtrPanel = bt[BlNameAkr];
-               Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.");
+               Inspector.AddError($"Блок панели с именем {BlNameAkr} уже определен в чертеже.", icon: System.Drawing.SystemIcons.Error);
                return;
             }
             BlockTableRecord btrPanel = new BlockTableRecord();

@@ -142,7 +142,7 @@ namespace AlbumPanelColorTiles.Panels
                   if (!hasTileWithoutPaint)
                   {
                      //Ошибка. Не удалось определить покраску плитки.???
-                     Inspector.AddError(string.Format("{0} - не все плитки покрашены", markSb.MarkSbClean), blRefPanel);
+                     Inspector.AddError($"{markSb.MarkSbClean} - не все плитки покрашены", blRefPanel, icon: System.Drawing.SystemIcons.Error);
                      hasTileWithoutPaint = true;
                   }
                }

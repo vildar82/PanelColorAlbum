@@ -57,12 +57,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                panelBtr.ConvertBtr();
                if (!string.IsNullOrEmpty(panelBtr.ErrMsg))
                {
-                  Inspector.AddError(panelBtr.ErrMsg, panelBtr.Panels.First().Extents, panelBtr.Panels.First().IdBlRefAkr);
+                  Inspector.AddError(panelBtr.ErrMsg, panelBtr.Panels.First().Extents, panelBtr.Panels.First().IdBlRefAkr,
+                     icon: System.Drawing.SystemIcons.Error);
                }
             }
             catch (System.Exception ex)
             {
-               Inspector.AddError("Ошибка конвертации блока панели - {0}", ex.Message);
+               Inspector.AddError($"Ошибка конвертации блока панели - {ex.Message}", icon: System.Drawing.SystemIcons.Error);
                Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
             }
          }
@@ -164,13 +165,13 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          }
          else if (facadesFind.Count == 0)
          {
-            Inspector.AddError(string.Format("Не определен фасад для панели {0}", panelBtrExport.BlName),
-                                 blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr);
+            Inspector.AddError($"Не определен фасад для панели {panelBtrExport.BlName}",
+                   blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr, icon: System.Drawing.SystemIcons.Error);
          }
          else if (facadesFind.Count > 1)
          {
-            Inspector.AddError(string.Format("Найдено больше одного фасада для панели {0}", panelBtrExport.BlName),
-                                blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr);
+            Inspector.AddError($"Найдено больше одного фасада для панели {panelBtrExport.BlName}",
+                   blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr, icon: System.Drawing.SystemIcons.Error);
          }
          return resVal;
       }

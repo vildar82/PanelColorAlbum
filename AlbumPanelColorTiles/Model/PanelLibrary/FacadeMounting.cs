@@ -240,9 +240,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          if (dublicateNumbers.Count > 0)
          {
             string nums = string.Join(",", dublicateNumbers);
-            Inspector.AddError(string.Format(
-               "Повторяющиеся номера этажей в фасаде. Координата фасада X = {0}. Повторяющиеся номера этажей определенные по блокам монтажных планов этого фасада {1}",
-               XMin, nums));
+            Inspector.AddError($"Повторяющиеся номера этажей в фасаде. Координата фасада X = {XMin}. " +
+               $"Повторяющиеся номера этажей определенные по блокам монтажных планов этого фасада {nums}", 
+               icon: System.Drawing.SystemIcons.Error);
          }
          // Ч и П могут быть только по одной штуке
          var storeyUpperType = storeysFacade.Where(s => s.Type == EnumStorey.Upper);
@@ -250,14 +250,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             Inspector.AddError(string.Format(
                "Не должно быть больше одного этажа Чердака в одном фасаде. Для фасада найдено {0} блоков монтажных планов определенных как чердак. Координата фасада X = {1}.",
-               storeyUpperType.Count(), XMin));
+               storeyUpperType.Count(), XMin), icon: System.Drawing.SystemIcons.Error);
          }
          var storeyParapetType = storeysFacade.Where(s => s.Type == EnumStorey.Parapet);
          if (storeyParapetType.Count() > 1)
          {
             Inspector.AddError(string.Format(
                "Не должно быть больше одного этажа Парапета в одном фасаде. Для фасада найдено {0} блоков монтажных планов определенных как парапет. Координата фасада X = {1}.",
-               storeyParapetType.Count(), XMin));
+               storeyParapetType.Count(), XMin), icon: System.Drawing.SystemIcons.Error);
          }
       }
 

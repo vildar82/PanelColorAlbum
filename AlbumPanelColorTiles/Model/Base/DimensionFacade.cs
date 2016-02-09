@@ -69,7 +69,8 @@ namespace AlbumPanelColorTiles.Model.Base
                            );
          if (secBlocks.Count() == 0)
          {
-            Inspector.AddError($"Не определено горизонтальное сечение для панели {panelBase.Panel.mark}");
+            Inspector.AddError($"Не определено горизонтальное сечение для панели {panelBase.Panel.mark}", 
+               icon: System.Drawing.SystemIcons.Error);
             return;
          }
 
@@ -175,7 +176,7 @@ namespace AlbumPanelColorTiles.Model.Base
 
          if (secBlocks.Count() == 0)
          {
-            Inspector.AddError($"Не определено вертикальное сечение для панели {panelBase.Panel.mark}");
+            Inspector.AddError($"Не определено вертикальное сечение для панели {panelBase.Panel.mark}", icon: System.Drawing.SystemIcons.Error);
             return;
          }
 

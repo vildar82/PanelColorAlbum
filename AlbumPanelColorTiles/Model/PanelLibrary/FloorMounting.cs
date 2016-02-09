@@ -92,7 +92,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   // должен быть один блок обозначения стороны фасада
                   else if (frontsIntersects.Count > 1)
                   {
-                     Inspector.AddError("На монтажном плане не должно быть больше одного блока обозначения фасада.", blRefMounting);
+                     Inspector.AddError("На монтажном плане не должно быть больше одного блока обозначения фасада.", blRefMounting, 
+                        icon: System.Drawing.SystemIcons.Error);
                   }
                   else
                   {
@@ -153,7 +154,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             // ошибка определения номера этажа монтажки - это не чердак (Ч), не парапет (П), и не
             // просто число
-            Inspector.AddError(ex.Message + BlRefName, IdBlRefMounting);
+            Inspector.AddError(ex.Message + BlRefName, IdBlRefMounting, icon: System.Drawing.SystemIcons.Error);
             Log.Error(ex, "Floor - DefineStorey()");
          }
       }
@@ -187,8 +188,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          if (PanelsSbInFront.Count == 0)
          {
-            Inspector.AddError(string.Format("В блоке обозначения стороны фасада {0} не найдена ни одна панель.", facadeFrontBlock.BlName),
-               facadeFrontBlock.Extents, facadeFrontBlock.IdBlRef);
+            Inspector.AddError($"В блоке обозначения стороны фасада {facadeFrontBlock.BlName} не найдена ни одна панель.",
+               facadeFrontBlock.Extents, facadeFrontBlock.IdBlRef, icon: System.Drawing.SystemIcons.Error);
          }
          else
          {
@@ -213,7 +214,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             else
             {
-               Inspector.AddError($"Монтажный план {blRefMountPlan.Name}. Не определен номер секции {sectionPart}.");
+               Inspector.AddError($"Монтажный план {blRefMountPlan.Name}. Не определен номер секции {sectionPart}.", icon: System.Drawing.SystemIcons.Error);
             }
             numberPart = arrSplit[1];
          }         

@@ -297,9 +297,8 @@ namespace AlbumPanelColorTiles
          // В чертеже не должно быть панелей марки АР
          if (selBlocks.IdsBlRefPanelAr.Count > 0)
          {
-            Inspector.AddError(string.Format(
-                  "Ошибка. При покраске в чертеже не должно быть блоков панелей марки АР. Найдено {0} блоков марки АР.",
-                  selBlocks.IdsBlRefPanelAr.Count));
+            Inspector.AddError($"Ошибка. При покраске в чертеже не должно быть блоков панелей марки АР. Найдено {selBlocks.IdsBlRefPanelAr.Count} блоков марки АР.",
+                  icon: System.Drawing.SystemIcons.Error);
          }
          Sections = Model.Panels.Section.GetSections(selBlocks.SectionsBlRefs);
 

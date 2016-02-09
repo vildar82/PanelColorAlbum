@@ -27,12 +27,12 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          SelectPanels.SelectBlRefsInModel(false);
          if (SelectPanels.IdsBlRefPanelSb.Count > 0)
          {
-            Inspector.AddError("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).");
+            Inspector.AddError("В текущем чертеже в Модели не должно быть панелей Марки СБ (только Марки АР).", icon: System.Drawing.SystemIcons.Error);
             return;
          }
          if (SelectPanels.IdsBlRefPanelAr.Count == 0)
          {
-            Inspector.AddError("Не найдены панели Марки АР в Моделе текущего чертежа.");
+            Inspector.AddError("Не найдены панели Марки АР в Моделе текущего чертежа.", icon: System.Drawing.SystemIcons.Error);
             return;
          }
 

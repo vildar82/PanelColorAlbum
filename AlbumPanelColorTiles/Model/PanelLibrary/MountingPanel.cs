@@ -138,8 +138,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
          if (panelsSB.Count == 0)
          {
             // Ошибка - в блоке монтажного плана, не найдена ни одна панель
-            Inspector.AddError(string.Format("В блоке монтажного плана {0} не найдена ни одна панель.", btr.Name),
-                              new Extents3d(ptBase, new Point3d(ptBase.X + 10000, ptBase.Y + 10000, 0)), btr.Id);
+            Inspector.AddError($"В блоке монтажного плана {btr.Name} не найдена ни одна панель.",
+                              new Extents3d(ptBase, new Point3d(ptBase.X + 10000, ptBase.Y + 10000, 0)), 
+                              btr.Id, icon: System.Drawing.SystemIcons.Error);
          }
          return panelsSB;
       }
@@ -174,8 +175,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                   if (panelAkrLib == null)
                   {
                      // Не найден блок в библиотеке
-                     Inspector.AddError(string.Format("Не найдена панель в библиотеке соответствующая монтажке - {0}", panelSb.MarkSbWithoutElectric),
-                                       panelSb.ExtTransToModel, panelSb.IdBlRef);
+                     Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - {panelSb.MarkSbWithoutElectric}",
+                                       panelSb.ExtTransToModel, panelSb.IdBlRef, icon: System.Drawing.SystemIcons.Error);
                   }
                   else
                   {

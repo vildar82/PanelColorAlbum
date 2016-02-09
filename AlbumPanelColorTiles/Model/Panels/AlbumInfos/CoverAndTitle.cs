@@ -52,7 +52,7 @@ namespace AlbumPanelColorTiles.Model.Panels.AlbumInfos
       {
          if (idBlRef.IsNull)
          {
-            Inspector.AddError(errMsg);
+            Inspector.AddError(errMsg, icon: System.Drawing.SystemIcons.Error);
             isOk = false;
             return ObjectId.Null;
          }

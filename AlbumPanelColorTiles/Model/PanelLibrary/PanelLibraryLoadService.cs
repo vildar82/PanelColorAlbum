@@ -95,10 +95,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                                        StringComparison.CurrentCultureIgnoreCase)
                                        )
                                     {
-                                       Inspector.AddError(
-                                           "Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. Панель АКР {0}, Монтажная панель {1}".f(
-                                              markAr.MarkARPanelFullName, mountingPanelSb.MarkSbWithoutElectric),
-                                           panelAr.Extents, panelAr.IdBlRefAr);
+                                       Inspector.AddError("Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. " + 
+                                          $"Панель АКР {markAr.MarkARPanelFullName}, Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}",
+                                           panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Information);
                                        //continue;
                                     }
 
@@ -110,9 +109,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                        if (!string.Equals(mountingPanelSb.MarkPainting, markAr.MarkPaintingFull, StringComparison.CurrentCultureIgnoreCase))
                                        {
                                           // Ошибка - марки покраски не совпали.
-                                          string errMsg = string.Format("Не совпала марка покраски. Панель АКР {0}, Монтажная панель {1}{2}",
-                                                markAr.MarkARPanelFullName, mountingPanelSb.MarkSbWithoutElectric, mountingPanelSb.MarkPainting);
-                                          Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr);
+                                          string errMsg = $"Не совпала марка покраски. Панель АКР {markAr.MarkARPanelFullName}, " +
+                                             $"Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}{mountingPanelSb.MarkPainting}";                                          
+                                          Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
                                           Log.Error(errMsg);
                                        }
                                        break;
@@ -140,9 +139,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
                      }
                      if (!isFound)
                      {
-                        Inspector.AddError(
-                           string.Format("{0} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.", markAr.MarkARPanelFullName),
-                           extPanelAkr, panelAr.IdBlRefAr);
+                        Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.",
+                           extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
                      }
                   }
                }
@@ -172,7 +170,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          else
          {
-            Inspector.AddError("Не удалось определить фасады по монтажным планам.");
+            Inspector.AddError("Не удалось определить фасады по монтажным планам.", icon: System.Drawing.SystemIcons.Error);
          }
          if (Inspector.HasErrors)
          {

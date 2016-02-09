@@ -21,7 +21,7 @@ namespace AlbumPanelColorTiles.Lib
          var idDict = getDict();
          if (idDict.IsNull)
          {
-            Inspector.AddError("Словарь АКР в текущем чертеже не найден.");
+            Inspector.AddError("Словарь АКР в текущем чертеже не найден.", icon: System.Drawing.SystemIcons.Warning);
             return;
          }
          var ids = new ObjectIdCollection();

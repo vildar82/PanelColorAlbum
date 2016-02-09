@@ -72,7 +72,8 @@ namespace AlbumPanelColorTiles.Model.Base
                         }
                         else
                         {
-                           Inspector.AddError($"Не определены параметры блока сечения в файле шаблона блоков. {btr.Name}. {resParse.Error}");
+                           Inspector.AddError($"Не определены параметры блока сечения в файле шаблона блоков. {btr.Name}. {resParse.Error}",
+                              icon: System.Drawing.SystemIcons.Error);
                         }
                      }
                   }
@@ -97,7 +98,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Inspector.AddError("Не найдены блоки сечений панелей в файле шаблона блоков АКР. " +
                   $"Файл шаблона {fileBlocksTemplate}. Префикс блоков {Settings.Default.BlockPanelSectionVerticalPrefixName} " +
-                  $"и {Settings.Default.BlockPanelSectionHorizontalPrefixName}");
+                  $"и {Settings.Default.BlockPanelSectionHorizontalPrefixName}", icon: System.Drawing.SystemIcons.Error);
             }
          }
          return blSecToCopy.Values.ToList();         

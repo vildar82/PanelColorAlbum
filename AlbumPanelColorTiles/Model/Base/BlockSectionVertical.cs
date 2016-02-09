@@ -47,7 +47,8 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                else
                {
-                  Inspector.AddError($"В блоке сечения {BlName} не определено количество слоев по префиксу 'сл'");
+                  Inspector.AddError($"В блоке сечения {BlName} не определено количество слоев по префиксу 'сл'",
+                     icon: System.Drawing.SystemIcons.Error);
                }
             }
             // Высота сечения
@@ -60,7 +61,8 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                else
                {
-                  Inspector.AddError($"В блоке сечения {BlName} не определена высота сечения по префиксу 'h'");
+                  Inspector.AddError($"В блоке сечения {BlName} не определена высота сечения по префиксу 'h'", 
+                     icon: System.Drawing.SystemIcons.Error);
                }               
             }
             // Наличие окна в сечении

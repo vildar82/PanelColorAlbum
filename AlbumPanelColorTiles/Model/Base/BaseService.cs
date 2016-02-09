@@ -70,7 +70,8 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                catch (ArgumentException ex)
                {
-                  Inspector.AddError("Ошибка получения панели из базы xml - такая панель уже есть. {0}", ex.Message);
+                  Inspector.AddError($"Ошибка получения панели из базы xml - такая панель уже есть. {ex.Message}", 
+                     icon: System.Drawing.SystemIcons.Error);
                }
             }
          }
@@ -128,17 +129,20 @@ namespace AlbumPanelColorTiles.Model.Base
                   panel.mark = markSb;
                }
                return panel;           
-            }            
-
+            }        
+         }
+         if (panel == null)
+         {
             // Ошибка - панели с такой маркой нет в базе                 
             if (panelMount == null)
             {
-               Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}");
+               Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}", icon: System.Drawing.SystemIcons.Error);
             }
             else
             {
-               Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}", panelMount.ExtTransToModel, panelMount.IdBlRef);
-            }                 
+               Inspector.AddError($"Панели с такой маркой нет в базе - {markSb}", panelMount.ExtTransToModel, panelMount.IdBlRef,
+                  icon: System.Drawing.SystemIcons.Error);
+            }
          }
          return panel;
       }       
@@ -181,7 +185,7 @@ namespace AlbumPanelColorTiles.Model.Base
                }
                catch (System.Exception ex)
                {
-                  Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}");
+                  Inspector.AddError($"Не создана панель {panelBase.Panel.mark}. Ошибка - {ex.Message}",icon: System.Drawing.SystemIcons.Error);
                }
             }
             //   t.Commit();
@@ -220,7 +224,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
             if (floorAr == null)
             {
-               Inspector.AddError($"Не найден блок архитектурного плана для соответствующего монтажного плана {floorMount.BlRefName}");
+               Inspector.AddError($"Не найден блок архитектурного плана для соответствующего монтажного плана {floorMount.BlRefName}",
+                  icon: System.Drawing.SystemIcons.Error);
             }
 
             foreach (var panelMount in floorMount.PanelsSbInFront)
@@ -244,7 +249,7 @@ namespace AlbumPanelColorTiles.Model.Base
                      {
                         Inspector.AddError(
                            $"Не найдено соответствующее окно в архитектурном плане. Блок монтажной панели {panelMount.MarkSb}",
-                           panelMount.ExtTransToModel, panelMount.IdBlRef);
+                           panelMount.ExtTransToModel, panelMount.IdBlRef, icon: System.Drawing.SystemIcons.Error);
                         continue;
                      }
                      panelBase.WindowsBaseCenters.Add(ptOpeningCenter, windowKey.First().Value);
