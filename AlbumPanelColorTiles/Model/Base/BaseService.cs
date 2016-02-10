@@ -153,7 +153,7 @@ namespace AlbumPanelColorTiles.Model.Base
       /// </summary>      
       public void CreateBtrPanels(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
       {         
-         var panelsBaseGroup = matchingWindow(facadesMounting, floorsAr).Values.GroupBy(p => p.Panel.mark);
+         var panelsBaseGroup = matchingPlans(facadesMounting, floorsAr).Values.GroupBy(p => p.Panel.mark);
 
          ProgressMeter progressMeter = new ProgressMeter();
          progressMeter.SetLimit(panelsBaseGroup.Sum(g=>g.Count()));
@@ -194,7 +194,7 @@ namespace AlbumPanelColorTiles.Model.Base
          progressMeter.Stop();
       }
 
-      private Dictionary<string, PanelBase> matchingWindow(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
+      private Dictionary<string, PanelBase> matchingPlans(List<FacadeMounting> facadesMounting, List<FloorArchitect> floorsAr)
       {
          // Определение окон в монтажных планах по архитектурным планам
          var panelsBase = new Dictionary<string, PanelBase>(); // string - ключ - маркаСБ + Марки Окон по порядку.
@@ -224,8 +224,15 @@ namespace AlbumPanelColorTiles.Model.Base
 
             if (floorAr == null)
             {
-               Inspector.AddError($"Не найден блок архитектурного плана для соответствующего монтажного плана {floorMount.BlRefName}",
-                  icon: System.Drawing.SystemIcons.Error);
+               Inspector.AddError($"Не найден блок архитектурного плана для соответствующего монтажного плана '{floorMount.BlRefName}'",
+                  floorMount.IdBlRefMounting,
+                  icon: System.Drawing.SystemIcons.Error);               
+            }
+            else if (floorAr.Windows.Count == 0)
+            {
+               Inspector.AddError($"Не найдено ни одного окна в блоке архитектурного плана '{floorMount.BlRefName}'.",
+                  floorAr.IdBlRef,
+                  icon: System.Drawing.SystemIcons.Error);               
             }
 
             foreach (var panelMount in floorMount.PanelsSbInFront)
@@ -234,17 +241,22 @@ namespace AlbumPanelColorTiles.Model.Base
                if (panelXml == null) continue;
                PanelBase panelBase = new PanelBase(panelXml, this, panelMount);
                // Определение окон в панели по арх плану
-               if (floorAr != null && panelXml.windows?.window != null)
+               if (panelXml.windows?.window != null)
                {
                   foreach (var window in panelXml.windows.window)
                   {
+                     if (floorAr == null || floorAr.Windows.Count==0)
+                     {
+                        break;
+                     }
+
                      // Точка окна внутри панели по XML описанию
                      Point3d ptOpeningCenter = new Point3d(window.posi.X + window.width * 0.5, 0, 0);
                      // Точка окна внутри монтажного плана
                      Point3d ptWindInModel = panelMount.ExtTransToModel.MinPoint.Add(ptOpeningCenter.GetAsVector());
                      Point3d ptWindInArPlan = ptWindInModel.TransformBy(floorMount.Transform.Inverse());
 
-                     var windowKey = floorAr.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInArPlan)).MinBy(w => w.Key);
+                     var windowKey = floorAr?.Windows.GroupBy(w => w.Key.DistanceTo(ptWindInArPlan))?.MinBy(w => w.Key);
                      if (windowKey == null || windowKey.Key > 600)
                      {
                         Inspector.AddError(

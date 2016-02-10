@@ -28,6 +28,9 @@ namespace AlbumPanelColorTiles.Model.Base
       // Blocks
       public ObjectId IdBtrTile { get; private set; }
       public ObjectId IdBtrWindow { get; private set; }
+      /// <summary>
+      /// Марки окон в дин блоке окна.
+      /// </summary>
       public List<string> WindowMarks { get; private set; }
       public ObjectId IdBtrView { get; private set; }
       public ObjectId IdAttrDefView { get; private set; }

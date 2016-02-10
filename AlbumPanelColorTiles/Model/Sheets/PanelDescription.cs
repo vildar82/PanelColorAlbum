@@ -104,12 +104,16 @@ namespace AlbumPanelColorTiles.Sheets
          double lenProfile = 0;
          if (markSB.IsEndLeftPanel || markSB.IsEndRightPanel)
          {
-            lenProfile = Math.Round(markSB.HeightPanelByTile*0.001, 1);
+            lenProfile = Math.Round(markSB.HeightPanelByTile * 0.001, 1);
          }
          else if (markSB.MarkSbName.StartsWith("ОЛ", StringComparison.OrdinalIgnoreCase))
          {
             // Длина панели ???
-            lenProfile = Math.Round(( markSB.ExtentsTiles.MaxPoint.X - markSB.ExtentsTiles.MinPoint.X) * 0.001, 1)*2;
+            lenProfile = Math.Round(
+                           (
+                              markSB.ExtentsTiles.MaxPoint.X - markSB.ExtentsTiles.MinPoint.X
+                              + Settings.Default.TileHeight + Settings.Default.TileSeam
+                           ) * 0.001, 1) * 2;
          }
          else
          {

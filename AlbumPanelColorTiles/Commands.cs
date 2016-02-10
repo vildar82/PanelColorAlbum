@@ -699,6 +699,9 @@ namespace AlbumPanelColorTiles
          }
       }
 
+      /// <summary>
+      /// Построение фасадов из создаваемых панелей по описанию в XML.
+      /// </summary>
       [CommandMethod("PIK", "AKR-CreateFacade", CommandFlags.Modal)]
       public void CreateFacade()
       {

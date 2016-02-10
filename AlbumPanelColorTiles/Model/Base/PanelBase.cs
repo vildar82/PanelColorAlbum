@@ -433,16 +433,16 @@ namespace AlbumPanelColorTiles.Model.Base
          return (Openings.Any(b => b.IsPointInBounds(pt, 4))) || (Openings.Any(b => b.IsPointInBounds(ptMax, 4))); 
       }
 
-      private void insertWindowBlock(string mark, Point3d pt, BlockTableRecord btrPanel, Transaction t)
-      {
-         // Вставка блока окна                  
-         BlockReference blRefWin = new BlockReference(pt, Service.Env.IdBtrWindow);
-         blRefWin.LayerId = Service.Env.IdLayerWindow;
-         btrPanel.AppendEntity(blRefWin);
-         t.AddNewlyCreatedDBObject(blRefWin, true);
+      //private void insertWindowBlock(string mark, Point3d pt, BlockTableRecord btrPanel, Transaction t)
+      //{
+      //   // Вставка блока окна                  
+      //   BlockReference blRefWin = new BlockReference(pt, Service.Env.IdBtrWindow);
+      //   blRefWin.LayerId = Service.Env.IdLayerWindow;
+      //   btrPanel.AppendEntity(blRefWin);
+      //   t.AddNewlyCreatedDBObject(blRefWin, true);
 
-         BlockWindow.SetDynBlWinMark(blRefWin, mark);
-      }
+      //   BlockWindow.SetDynBlWinMark(blRefWin, mark);
+      //}
 
       private void setNLayerPanel()
       {

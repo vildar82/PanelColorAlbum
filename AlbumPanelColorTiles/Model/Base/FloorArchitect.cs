@@ -30,7 +30,7 @@ namespace AlbumPanelColorTiles.Model.Base
          IdBtr = blRefArPlan.BlockTableRecord;
          BlName = blRefArPlan.Name;
          // определение параметров плана и окон
-         definePlanNumberAndSection(blRefArPlan.Name);
+         definePlanNumberAndSection(blRefArPlan);
          // определение окон в плане
          Windows = defineWindows(blRefArPlan);
       }      
@@ -62,9 +62,10 @@ namespace AlbumPanelColorTiles.Model.Base
          return floorsAr;
       }
 
-      private void definePlanNumberAndSection(string blPlanArName)
+      private void definePlanNumberAndSection(BlockReference blRefArPlan)
       {
          // Номер плана и номер секции
+         string blPlanArName = blRefArPlan.Name;
          var val = blPlanArName.Substring(Settings.Default.BlockPlaneArchitectPrefixName.Length);
          var arrSplit = val.Split('_');
          string numberPart;
@@ -78,7 +79,7 @@ namespace AlbumPanelColorTiles.Model.Base
             }
             else
             {
-               Inspector.AddError($"Архитектурный план {blPlanArName}. Не определен номер секции {sectionPart}.", 
+               Inspector.AddError($"Архитектурный план '{blPlanArName}'. Не определен номер секции '{sectionPart}'.", blRefArPlan, 
                   icon: System.Drawing.SystemIcons.Error);
             }            
             numberPart = arrSplit[1];
@@ -94,7 +95,7 @@ namespace AlbumPanelColorTiles.Model.Base
          }
          else
          {
-            Inspector.AddError($"Архитектурный план {blPlanArName}. Не определен номер этажа {numberPart}.", 
+            Inspector.AddError($"Архитектурный план '{blPlanArName}'. Не определен номер этажа {numberPart}.", blRefArPlan,
                icon: System.Drawing.SystemIcons.Error);
          }
       }
@@ -114,14 +115,17 @@ namespace AlbumPanelColorTiles.Model.Base
             // Если это блок окна - имя начинается с WNW, на слое A-GLAZ
             //if (blRefWindow.Name.StartsWith("WNW", StringComparison.OrdinalIgnoreCase) &&
             //   blRefWindow.Layer.Equals("A-GLAZ", StringComparison.OrdinalIgnoreCase))
-            if (Regex.IsMatch(blRefWindow.Name, "окно", RegexOptions.IgnoreCase))
+            string blNameWindow = blRefWindow.GetEffectiveName();
+            if (Regex.IsMatch(blNameWindow, "окно", RegexOptions.IgnoreCase))
             {
                // Найти рядом текст марки окна - в радиусе 1000 
-               var markNearKey = marks.GroupBy(m => m.Key.DistanceTo(blRefWindow.Position)).MinBy(m => m.Key);
+               var markNearKey = marks.GroupBy(m => m.Key.DistanceTo(blRefWindow.Position))?.MinBy(m => m.Key);
                if (markNearKey == null || markNearKey.Key > 1000)
                {
-                  Inspector.AddError($"Архитектурный план {blRefArPlan.Name}. " + 
-                     $"Не определена марка окна около блока окна с координатами {blRefWindow.Position}.", 
+                  Extents3d extBlRefWin = blRefWindow.GeometricExtents;
+                  extBlRefWin.TransformBy(blRefArPlan.BlockTransform);
+                  Inspector.AddError($"Архитектурный план '{blRefArPlan.Name}' - " + 
+                     $"Не определена марка окна около блока окна '{blNameWindow}'.", extBlRefWin, blRefWindow.Id, 
                      icon: System.Drawing.SystemIcons.Error);
                   continue;
                }

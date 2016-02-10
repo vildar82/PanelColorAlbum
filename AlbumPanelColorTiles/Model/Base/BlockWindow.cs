@@ -54,11 +54,13 @@ namespace AlbumPanelColorTiles.Model.Base
          {
             if (item.PropertyName.Equals(PropNameVISIBILITY, StringComparison.OrdinalIgnoreCase))
             {
-               findProp = true;
+               findProp = true;               
                var allowedVals = item.GetAllowedValues();
-               if (allowedVals.Contains(mark))
+               // Найти марку без учетарегистра
+               var findMarkValue = allowedVals.FirstOrDefault(v => v.ToString().Equals(mark, StringComparison.OrdinalIgnoreCase));
+               if (findMarkValue !=null)
                {
-                  item.Value = mark;
+                  item.Value = findMarkValue;
                   return true;               
                }
                else
