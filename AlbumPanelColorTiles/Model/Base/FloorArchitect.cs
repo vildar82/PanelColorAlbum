@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using MoreLinq;
@@ -16,7 +17,9 @@ namespace AlbumPanelColorTiles.Model.Base
    public class FloorArchitect
    {
       public int Section { get; private set; }
-      public int Number { get; private set; }
+      //public int Number { get; private set; }      
+      public EnumStorey StoreyType { get; private set; }
+      public IEnumerable<int> StoreyNumbers { get; private set; }
       public string BlName { get; private set; }
       public ObjectId IdBlRef { get; private set; }
       public ObjectId IdBtr { get; private set; }
@@ -30,7 +33,14 @@ namespace AlbumPanelColorTiles.Model.Base
          IdBtr = blRefArPlan.BlockTableRecord;
          BlName = blRefArPlan.Name;
          // определение параметров плана и окон
-         definePlanNumberAndSection(blRefArPlan);
+         try
+         {
+            definePlanNumberAndSection(blRefArPlan);
+         }
+         catch (Exception ex)
+         {
+            Inspector.AddError($"Ошибка при определении параметров арх.плана {BlName}.", blRefArPlan, icon: System.Drawing.SystemIcons.Error);
+         }         
          // определение окон в плане
          Windows = defineWindows(blRefArPlan);
       }      
@@ -89,15 +99,37 @@ namespace AlbumPanelColorTiles.Model.Base
             numberPart = arrSplit[0];
          }
          int number;
-         if (int.TryParse(numberPart.Substring("эт-".Length), out number))
+
+         string valStorey = numberPart.Substring("эт-".Length);
+         if (string.Equals(valStorey, Settings.Default.PaintIndexUpperStorey, StringComparison.OrdinalIgnoreCase))
          {
-            Number = number;
+            StoreyType = EnumStorey.Upper;
+         }
+         else if (string.Equals(valStorey, Settings.Default.PaintIndexParapet, StringComparison.OrdinalIgnoreCase))
+         {
+            StoreyType = EnumStorey.Parapet;
          }
          else
          {
-            Inspector.AddError($"Архитектурный план '{blPlanArName}'. Не определен номер этажа {numberPart}.", blRefArPlan,
+            // число
+            StoreyType = EnumStorey.Number;
+            var splitNumbers = valStorey.Split('-');
+            if (splitNumbers.Count()>1)
+            {
+               int minNumber = int.Parse(splitNumbers[0]);
+               int maxNumber = int.Parse(splitNumbers[1]);
+               StoreyNumbers = Enumerable.Range(minNumber, maxNumber - minNumber);
+            }
+            else
+            {
+               StoreyNumbers = Enumerable.Range(int.Parse(splitNumbers[0]), 1);
+            }
+            if (this.StoreyNumbers.Count()==0)
+            {
+               Inspector.AddError($"Архитектурный план '{blPlanArName}'. Не определен номер этажа {numberPart}.", blRefArPlan,
                icon: System.Drawing.SystemIcons.Error);
-         }
+            }
+         }            
       }
 
       private Dictionary<Point3d, string> defineWindows(BlockReference blRefArPlan)
@@ -190,6 +222,26 @@ namespace AlbumPanelColorTiles.Model.Base
             }
          }         
          return marks;
+      }
+
+      public bool IsEqualMountingStorey(Storey storey)
+      {
+         bool res = false;
+         if (storey.Type == StoreyType)
+         {
+            if (storey.Type == EnumStorey.Number)
+            {
+               if (StoreyNumbers.Contains(storey.Number))
+               {
+                  res = true;
+               }
+            }
+            else
+            {
+               res = true;
+            }  
+         }
+         return res;
       }
    }
 }

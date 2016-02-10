@@ -204,7 +204,10 @@ namespace AlbumPanelColorTiles.Model.Base
          foreach (var floorMount in floorsMount)
          {
             // Найти соотв арх план
-            var floorAr = floorsAr.Find(f => (f.Section == floorMount.Section) && (f.Number == floorMount.Storey?.Number));
+            var floorAr = floorsAr.Find(f =>
+                              f.Section == floorMount.Section &&
+                              f.IsEqualMountingStorey(floorMount.Storey)
+                           );
 
             //Test Добавить текст имени плана Ар в блок монтажного плана
 #if Test
