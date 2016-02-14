@@ -47,7 +47,12 @@ namespace AlbumPanelColorTiles.Model.Base
       }
 
       public static bool SetDynBlWinMark(BlockReference blRefWin, string mark)
-      {         
+      {
+         //return true;
+         if (blRefWin == null)
+         {
+            return false;
+         }
          bool findProp = false;
          var dynProps = blRefWin.DynamicBlockReferencePropertyCollection;
          foreach (DynamicBlockReferenceProperty item in dynProps)

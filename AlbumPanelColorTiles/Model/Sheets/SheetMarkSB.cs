@@ -121,11 +121,13 @@ namespace AlbumPanelColorTiles.Sheets
          {
             idsCopy.Add(sheetMarkAr.MarkAR.IdBtrAr);
          }
-         IdMapping map = new IdMapping();
-         dbSource.WblockCloneObjects(idsCopy, dbMarkSB.BlockTableId, map, DuplicateRecordCloning.Replace, false);
-         foreach (var sheetMarkAr in _sheetsMarkAR)
+         using (IdMapping map = new IdMapping())
          {
-            sheetMarkAr.IdBtrArSheet = map[sheetMarkAr.MarkAR.IdBtrAr].Value;
+            dbSource.WblockCloneObjects(idsCopy, dbMarkSB.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+            foreach (var sheetMarkAr in _sheetsMarkAR)
+            {
+               sheetMarkAr.IdBtrArSheet = map[sheetMarkAr.MarkAR.IdBtrAr].Value;
+            }
          }
       }
 

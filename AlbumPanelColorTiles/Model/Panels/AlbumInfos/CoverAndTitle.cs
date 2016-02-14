@@ -30,8 +30,10 @@ namespace AlbumPanelColorTiles.Model.Panels.AlbumInfos
          {
             ids.Add(IdTitleBtr);
          }
-         IdMapping iMap = new IdMapping();
-         db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+         using (IdMapping iMap = new IdMapping())
+         {
+            db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+         }
       }
 
       public void CheckCover(ObjectId idBlRefCover)

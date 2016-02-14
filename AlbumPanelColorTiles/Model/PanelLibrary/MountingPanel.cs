@@ -191,15 +191,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
                // Копирование блоков в базу чертежа фасада
                if (idsPanelsAkrInLibAndFacade.Count > 0)
                {
-                  IdMapping iMap = new IdMapping();
-                  dbFacade.WblockCloneObjects(new ObjectIdCollection(idsPanelsAkrInLibAndFacade.Keys.ToArray()),
-                                             dbFacade.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
-                  // запись соответствия панелей
-                  foreach (var item in idsPanelsAkrInLibAndFacade)
+                  using (IdMapping iMap = new IdMapping())
                   {
-                     item.Value.IdBtrPanelAkrInFacade = iMap[item.Key].Value;
-                     // определение габаритов панели
-                     ((PanelAKR)item.Value).DefineGeom(item.Value.IdBtrPanelAkrInFacade);
+                     dbFacade.WblockCloneObjects(new ObjectIdCollection(idsPanelsAkrInLibAndFacade.Keys.ToArray()),
+                                                dbFacade.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+                     // запись соответствия панелей
+                     foreach (var item in idsPanelsAkrInLibAndFacade)
+                     {
+                        item.Value.IdBtrPanelAkrInFacade = iMap[item.Key].Value;
+                        // определение габаритов панели
+                        ((PanelAKR)item.Value).DefineGeom(item.Value.IdBtrPanelAkrInFacade);
+                     }
                   }
                }
                t.Commit();

@@ -279,6 +279,10 @@ namespace AlbumPanelColorTiles.Model.Base
             ptBlView = ptBlView.TransformBy(trans);
          }
          BlockReference blRefView = CreateBlRefInBtrDim(ptBlView, panelBase.Service.Env.IdBtrView, Settings.Default.SheetScale);
+         if (blRefView == null)
+         {
+            return;
+         }
 
          // атрибут Вида
          if (!panelBase.Service.Env.IdAttrDefView.IsNull)
@@ -352,7 +356,7 @@ namespace AlbumPanelColorTiles.Model.Base
             return;
          }
 
-         // Поиск блока профиля в инвенторе
+         // Поиск блока профиля в инвентаре
          BlockInfo biProfile = panelBase.Service.Env.BlocksInFacade.FirstOrDefault(b => b.BlName.Equals(Settings.Default.BlockProfileTile));
          if (biProfile == null)
          {
@@ -370,6 +374,8 @@ namespace AlbumPanelColorTiles.Model.Base
 
          // Вставка блока профиля - название и марка
          var blRefProfile = CreateBlRefInBtrDim(ptBlrefProfile, idBtrProfile, Settings.Default.SheetScale);
+         if (blRefProfile == null) return;
+
          // Добавление атрибутов Названия и марки
          // Атрибут Названия - из вхождения атрибута
          var atrRefName = biProfile.AttrsRef.FirstOrDefault(a => a.Tag.Equals("НАЗВАНИЕ"));
@@ -412,6 +418,7 @@ namespace AlbumPanelColorTiles.Model.Base
             }
             // вставка блока стрелки
             var blRefArrow = CreateBlRefInBtrDim(ptArrowBlPos, panelBase.Service.Env.IdBtrArrow, Settings.Default.SheetScale);
+            if (blRefArrow == null) return;
             // поворот стрелки и установка длины
             Vector2d vecArrow = ptArrowDirect.Convert2d() - ptArrowBlPos.Convert2d();
             blRefArrow.Rotation = vecArrow.Angle;
@@ -484,6 +491,10 @@ namespace AlbumPanelColorTiles.Model.Base
 
       protected BlockReference CreateBlRefInBtrDim(Point3d ptPos, ObjectId idBtr, double scale)
       {
+         if (idBtr.IsNull)
+         {
+            return null;
+         }
          BlockReference blRef = new BlockReference(ptPos, idBtr);
          //var mScale = Matrix3d.Scaling(Settings.Default.SheetScale, ptBlView);
          //blRefView.TransformBy(mScale);
@@ -515,6 +526,11 @@ namespace AlbumPanelColorTiles.Model.Base
 
       protected Result setDynParam(BlockReference blRef, string propName, double value)
       {
+         //return Result.Ok();
+         if (blRef == null)
+         {
+            return Result.Fail($"Блока не существует.");
+         }
          foreach (DynamicBlockReferenceProperty prop in blRef.DynamicBlockReferencePropertyCollection)
          {
             if (!prop.ReadOnly && prop.PropertyName.Equals(propName, StringComparison.OrdinalIgnoreCase))
@@ -524,6 +540,6 @@ namespace AlbumPanelColorTiles.Model.Base
             }
          }
          return Result.Fail($"Не найден динамический параметр {propName}");
-      }
+      }      
    }
 }

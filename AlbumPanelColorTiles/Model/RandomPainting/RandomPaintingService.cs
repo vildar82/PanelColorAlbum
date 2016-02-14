@@ -403,17 +403,20 @@ namespace AlbumPanelColorTiles.RandomPainting
                                    _colorAreaSize.ExtentsColorArea.MinPoint.Y + y * _colorAreaSize.HeightSpot, 0);
          }
 
-         IdMapping map = new IdMapping();
-         _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
-         ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
-         if (idBlRefCopy.IsValid && !idBlRefCopy.IsNull)
+         using (IdMapping map = new IdMapping())
          {
-            using (var blRefSpot = t.GetObject(idBlRefCopy, OpenMode.ForWrite, false, true) as BlockReference)
+            _db.DeepCloneObjects(_idColCopy, _idMS, map, false);
+            ObjectId idBlRefCopy = map[_idBlRefColorAreaTemplate].Value;
+
+            if (idBlRefCopy.IsValid && !idBlRefCopy.IsNull)
             {
-               blRefSpot.Position = position;
-               blRefSpot.LayerId = spot.Proper.IdLayer;
-               spot.IdBlRef = blRefSpot.Id;
-               _countInsertBlocksSpot++;
+               using (var blRefSpot = t.GetObject(idBlRefCopy, OpenMode.ForWrite, false, true) as BlockReference)
+               {
+                  blRefSpot.Position = position;
+                  blRefSpot.LayerId = spot.Proper.IdLayer;
+                  spot.IdBlRef = blRefSpot.Id;
+                  _countInsertBlocksSpot++;
+               }
             }
          }
       }

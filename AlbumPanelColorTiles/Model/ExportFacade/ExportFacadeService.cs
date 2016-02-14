@@ -105,19 +105,21 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
 
          ObjectIdCollection ids = new ObjectIdCollection(dictPanelsToExport.Keys.ToArray());
 
-         IdMapping map = new IdMapping();
-         var msExport = SymbolUtilityServices.GetBlockModelSpaceId(dbExport);
-         dbExport.WblockCloneObjects(ids, msExport, map, DuplicateRecordCloning.Replace, false);
-
-         // скопированные блоки в экспортированном чертеже
-         var idsBtrExport = new HashSet<ObjectId>();
-         foreach (var itemDict in dictPanelsToExport)
+         using (IdMapping map = new IdMapping())
          {
-            itemDict.Value.IdBlRefExport = map[itemDict.Key].Value;
-            using (var blRef = itemDict.Value.IdBlRefExport.Open(OpenMode.ForRead, false, true) as BlockReference)
+            var msExport = SymbolUtilityServices.GetBlockModelSpaceId(dbExport);
+            dbExport.WblockCloneObjects(ids, msExport, map, DuplicateRecordCloning.Replace, false);
+
+            // скопированные блоки в экспортированном чертеже
+            var idsBtrExport = new HashSet<ObjectId>();
+            foreach (var itemDict in dictPanelsToExport)
             {
-               idsBtrExport.Add(blRef.BlockTableRecord);
-               itemDict.Value.PanelBtrExport.IdBtrExport = blRef.BlockTableRecord;
+               itemDict.Value.IdBlRefExport = map[itemDict.Key].Value;
+               using (var blRef = itemDict.Value.IdBlRefExport.Open(OpenMode.ForRead, false, true) as BlockReference)
+               {
+                  idsBtrExport.Add(blRef.BlockTableRecord);
+                  itemDict.Value.PanelBtrExport.IdBtrExport = blRef.BlockTableRecord;
+               }
             }
          }
       }

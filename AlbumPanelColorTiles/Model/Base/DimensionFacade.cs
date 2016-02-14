@@ -82,7 +82,10 @@ namespace AlbumPanelColorTiles.Model.Base
          AddText(@"%%U1-1", new Point3d(panelBase.Length * 0.5, yPt+500, 0), 2.5*Settings.Default.SheetScale);
 
          ptPosHorizontalPanelSection = new Point3d(panelBase.XMinPanel, yPt, 0);
+
          var blRefSecHor = CreateBlRefInBtrDim(ptPosHorizontalPanelSection, idBtrSec, 1);
+         if (blRefSecHor == null) return;
+
          // установить дин параметры длины и ширины блока сечения панели         
          var res = setDynParam(blRefSecHor, "Толщина", panelBase.Thickness);
          res = setDynParam(blRefSecHor, "Длина", panelBase.LengthByTiles);
@@ -119,6 +122,7 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Point3d ptAperture = new Point3d(aperture.posi.X, ptPosHorizontalPanelSection.Y, 0);
                var blRefWin = CreateBlRefInBtrDim(ptAperture, panelBase.Service.Env.IdBtrWindowHorSection, 1);
+               if (blRefWin == null) continue;
                // Уст дин парам окна
                res = setDynParam(blRefWin, "Толщина", panelBase.Thickness);
                res = setDynParam(blRefWin, "Длина", aperture.width);
@@ -183,6 +187,7 @@ namespace AlbumPanelColorTiles.Model.Base
          ObjectId idBtrSec = secBlocks.First().IdBtr;
          Point3d ptPos = new Point3d(xPt, 0,0);
          var blRefSecVertic = CreateBlRefInBtrDim(ptPos, idBtrSec, 1);
+         if (blRefSecVertic == null) return;
          var res = setDynParam(blRefSecVertic, "Толщина", panelBase.Thickness);
       }     
 
@@ -199,9 +204,11 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptTopCross = new Point3d(xSec,yTop,0);
          Point3d ptBotCross = new Point3d(xSec, yBot, 0);
          BlockReference blRefCrossTop = CreateBlRefInBtrDim(ptTopCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         if (blRefCrossTop == null) return;
          var attrRefTop = addAttrToBlockCross(blRefCrossTop, "2");
 
          BlockReference blRefCrossBot = CreateBlRefInBtrDim(ptBotCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         if (blRefCrossBot == null) return;
          Matrix3d matrixMirrBotCross = Matrix3d.Mirroring(new Line3d(ptBotCross,
                                     new Point3d(ptBotCross.X + 1, ptBotCross.Y, ptBotCross.Z)));
          blRefCrossBot.TransformBy(matrixMirrBotCross);
@@ -220,6 +227,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Point3d ptRightCross = new Point3d(xRight, ySec, 0);
 
          BlockReference blRefCrossLeft = CreateBlRefInBtrDim(ptLeftCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         if (blRefCrossLeft == null) return;
          Matrix3d matrixMirrLeftCross = Matrix3d.Mirroring(new Line3d(ptLeftCross, ptRightCross));
          blRefCrossLeft.Rotation = 90d.ToRadians();
          blRefCrossLeft.TransformBy(matrixMirrLeftCross);         
@@ -229,6 +237,7 @@ namespace AlbumPanelColorTiles.Model.Base
          attrRefTop.Rotation = 0;
 
          BlockReference blRefCrossRight = CreateBlRefInBtrDim(ptRightCross, panelBase.Service.Env.IdBtrCross, Settings.Default.SheetScale);
+         if (blRefCrossRight == null) return;
          blRefCrossRight.Rotation = 270d.ToRadians();
          var attrRefBot = addAttrToBlockCross(blRefCrossRight, "1");
          attrRefBot.Rotation = 0;
@@ -241,6 +250,10 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private AttributeReference addAttrToBlockCross(BlockReference blRefCross, string num)
       {
+         if (blRefCross == null)
+         {
+            return null;
+         }
          AttributeReference attrRefCross = null;
          if (!panelBase.Service.Env.IdAttrDefCross.IsNull)
          {
@@ -270,6 +283,6 @@ namespace AlbumPanelColorTiles.Model.Base
             t.AddNewlyCreatedDBObject(text, true);
          }
          catch { }
-      }
+      }      
    }
 }

@@ -131,7 +131,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Database db = Service.Db;
          //Transaction t = db.TransactionManager.TopTransaction;
          using (var t = db.TransactionManager.StartTransaction())
-         {            
+         {
             BlockTable bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
             // Ошибка если блок с таким именем уже есть
             if (bt.Has(BlNameAkr))
@@ -165,6 +165,7 @@ namespace AlbumPanelColorTiles.Model.Base
             // Образмеривание (на Фасаде)
             DimensionFacade dimFacade = new DimensionFacade(btrPanel, t, this);
             dimFacade.Create();
+
             // Образмеривание (в Форме)
             DimensionForm dimForm = new DimensionForm(btrPanel, t, this);
             dimForm.Create();
@@ -200,7 +201,7 @@ namespace AlbumPanelColorTiles.Model.Base
          string blName = Settings.Default.BlockPanelAkrPrefixName + MarkWithoutElectric;
 
          // щечки
-         string cheek = Panel.cheeks?.cheek;
+         string cheek = Panel?.cheeks?.cheek;
          if (!string.IsNullOrWhiteSpace(cheek))
          {
             string cheekPrefix = string.Empty;
@@ -275,23 +276,26 @@ namespace AlbumPanelColorTiles.Model.Base
 
                      // Точка вставки блока окна
                      Point3d ptWin = new Point3d(item.posi.X, item.posi.Y, 0);
-                     // Вставка блока окна                  
-                     BlockReference blRefWin = new BlockReference(ptWin, Service.Env.IdBtrWindow);
-                     blRefWin.LayerId = Service.Env.IdLayerWindow;
-                     btrPanel.AppendEntity(blRefWin);
-                     t.AddNewlyCreatedDBObject(blRefWin, true);
-
-                     var resSetDyn = BlockWindow.SetDynBlWinMark(blRefWin, winMark.Value);
-                     if (!resSetDyn)
+                     // Вставка блока окна   
+                     if (!Service.Env.IdBtrWindow.IsNull)
                      {
-                        // Добавление текста марки окна
-                        DBText dbTextWin = new DBText();
-                        dbTextWin.Position = ptWin;
-                        dbTextWin.LayerId = Service.Env.IdLayerWindow;
-                        dbTextWin.TextString = winMark.Value;
-                        dbTextWin.Height = 180;
-                        btrPanel.AppendEntity(dbTextWin);
-                        t.AddNewlyCreatedDBObject(dbTextWin, true);
+                        BlockReference blRefWin = new BlockReference(ptWin, Service.Env.IdBtrWindow);
+                        blRefWin.LayerId = Service.Env.IdLayerWindow;
+                        btrPanel.AppendEntity(blRefWin);
+                        t.AddNewlyCreatedDBObject(blRefWin, true);
+
+                        var resSetDyn = BlockWindow.SetDynBlWinMark(blRefWin, winMark.Value);
+                        if (!resSetDyn)
+                        {
+                           // Добавление текста марки окна
+                           DBText dbTextWin = new DBText();
+                           dbTextWin.Position = ptWin;
+                           dbTextWin.LayerId = Service.Env.IdLayerWindow;
+                           dbTextWin.TextString = winMark.Value;
+                           dbTextWin.Height = 180;
+                           btrPanel.AppendEntity(dbTextWin);
+                           t.AddNewlyCreatedDBObject(dbTextWin, true);
+                        }
                      }
 #if Test
                      // Test
@@ -333,6 +337,10 @@ namespace AlbumPanelColorTiles.Model.Base
 
       private void addTile(BlockTableRecord btrPanel, Transaction t, Point3d pt)
       {
+         if (Service.Env.IdBtrTile.IsNull)
+         {
+            return;
+         }
          BlockReference blRefTile = new BlockReference(pt, Service.Env.IdBtrTile);
          blRefTile.Layer = "0";
          blRefTile.ColorIndex = 256; // ByLayer

@@ -38,8 +38,17 @@ namespace AlbumPanelColorTiles.Model.Base
 
       public abstract Result ParseBlName();
 
-      public static List<BlockSectionAbstract> LoadSections(string fileBlocksTemplate, BaseService service)
+      /// <summary>
+      /// Копирование блоков сечений из шаблона блоков и доп списка блоков blNames
+      /// </summary>
+      /// <param name="fileBlocksTemplate"></param>
+      /// <param name="service"></param>
+      /// <param name="blNames"></param>
+      /// <returns></returns>
+      public static List<BlockSectionAbstract> LoadSections(string fileBlocksTemplate, BaseService service, List<string> blNames, 
+            out Dictionary<string, ObjectId> blNamesCopy)
       {
+         blNamesCopy = new Dictionary<string, ObjectId>();
          Dictionary<ObjectId, BlockSectionAbstract> blSecToCopy = new Dictionary<ObjectId, BlockSectionAbstract>();         
          using (var dbBlocks = new Database(false, true))
          {
@@ -50,8 +59,15 @@ namespace AlbumPanelColorTiles.Model.Base
                foreach (ObjectId idBtr in bt)
                {
                   using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
-                  {                     
-                     BlockSectionAbstract blSec = null;
+                  {
+                     var blNameToCopy = blNames.Find(n => n.Equals(btr.Name, StringComparison.OrdinalIgnoreCase));
+                     if (!string.IsNullOrEmpty(blNameToCopy))
+                     {
+                        blNamesCopy.Add(blNameToCopy, btr.Id);
+                        continue;
+                     }                     
+
+                    BlockSectionAbstract blSec = null;
                      if (btr.Name.StartsWith(Settings.Default.BlockPanelSectionVerticalPrefixName, StringComparison.OrdinalIgnoreCase))
                      {
                         blSec = new BlockSectionVertical(btr.Name, service);
@@ -81,18 +97,35 @@ namespace AlbumPanelColorTiles.Model.Base
             }
             if (blSecToCopy.Count > 0)
             {
-               ObjectIdCollection ids = new ObjectIdCollection(blSecToCopy.Keys.ToArray());
-               IdMapping map = new IdMapping();
-               service.Db.WblockCloneObjects(ids, service.Db.BlockTableId, map, DuplicateRecordCloning.Replace, false);
-               foreach (var item in blSecToCopy)
+               using (ObjectIdCollection ids = new ObjectIdCollection(blSecToCopy.Keys.ToArray()))
                {
-                  item.Value.IdBtr = map[item.Key].Value;
-                  if (item.Value._hatchsAssociatedIdsDictInTemplate != null)
+                  foreach (var item in blNamesCopy.Values)
                   {
-                     item.Value.setHatchIdsMapping(map);
-                     //item.Value.ReplaceAssociateHatch();
+                     ids.Add(item);
                   }
-               }               
+
+                  using (IdMapping map = new IdMapping())
+                  {
+                     service.Db.WblockCloneObjects(ids, service.Db.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+                     foreach (var item in blSecToCopy)
+                     {
+                        item.Value.IdBtr = map[item.Key].Value;
+                        if (item.Value._hatchsAssociatedIdsDictInTemplate != null)
+                        {
+                           item.Value.setHatchIdsMapping(map);
+                           //item.Value.ReplaceAssociateHatch();
+                        }
+                     }
+                     foreach (var name in blNames)
+                     {
+                        ObjectId idBl;
+                        if (blNamesCopy.TryGetValue(name, out idBl))
+                        {
+                           blNamesCopy[name] = map[idBl].Value;
+                        }
+                     }
+                  }
+               }              
             }
             else
             {

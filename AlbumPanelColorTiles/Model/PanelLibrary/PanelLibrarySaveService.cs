@@ -194,9 +194,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             using (var dbBak = new Database(true, true))
             {
                dbBak.CloseInput(true);
-               IdMapping map = new IdMapping();
-               dbLib.WblockCloneObjects(idsBtrToCopy, dbBak.BlockTableId, map, DuplicateRecordCloning.Replace, false);
-               dbBak.SaveAs(newFile, DwgVersion.Current);
+               using (IdMapping map = new IdMapping())
+               {
+                  dbLib.WblockCloneObjects(idsBtrToCopy, dbBak.BlockTableId, map, DuplicateRecordCloning.Replace, false);
+                  dbBak.SaveAs(newFile, DwgVersion.Current);
+               }
             }
          }
       }

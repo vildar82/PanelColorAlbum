@@ -84,10 +84,12 @@ namespace AlbumPanelColorTiles.Panels
          // Замена блока рамки если он есть в чертеже фасада
          if (IsOk)
          {
-            IdMapping iMap = new IdMapping();
-            var ids = new ObjectIdCollection();
-            ids.Add(_idBtrFrame);
-            db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+            using (IdMapping iMap = new IdMapping())
+            {
+               var ids = new ObjectIdCollection();
+               ids.Add(_idBtrFrame);
+               db.WblockCloneObjects(ids, db.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+            }
             // Запись атрибутов (Наименование, и другие если есть)
             changeBlkRefFrame(db, Settings.Default.BlockFrameName, insertDescription);
          }

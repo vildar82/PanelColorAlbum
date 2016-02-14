@@ -242,7 +242,9 @@ namespace AlbumPanelColorTiles.Model.Base
             {
                Panel panelXml = GetPanelXml(panelMount.MarkSb, panelMount);
                if (panelXml == null) continue;
+
                PanelBase panelBase = new PanelBase(panelXml, this, panelMount);
+
                // Определение окон в панели по арх плану
                if (panelXml.windows?.window != null)
                {

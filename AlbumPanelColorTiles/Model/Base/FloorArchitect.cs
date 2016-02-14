@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -162,7 +163,17 @@ namespace AlbumPanelColorTiles.Model.Base
                   continue;
                }
                var markNear = markNearKey.First();
-               windows.Add(blRefWindow.Position, markNear.Value);
+               try
+               {
+                  windows.Add(blRefWindow.Position, markNear.Value);
+               }
+               catch (Exception ex)
+               {
+                  var extWin = blRefWindow.GeometricExtents;
+                  extWin.TransformBy(blRefArPlan.BlockTransform);
+                  Inspector.AddError($"Дублирование блока окна в '{btrArPlan.Name}' - {ex.Message}",
+                     extWin, blRefWindow.Id, icon: SystemIcons.Error);
+               }               
 #if Test
                         //Test Добавить точку окна и найденную марку окна в точку вставки блока окна
                         {

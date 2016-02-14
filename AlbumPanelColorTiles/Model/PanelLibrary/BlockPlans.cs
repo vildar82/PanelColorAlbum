@@ -118,9 +118,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
             }
             // копирование выбранных объектов в блок
             ObjectIdCollection ids = new ObjectIdCollection(idsFloor.ToArray());
-            IdMapping mapping = new IdMapping();
-            _db.DeepCloneObjects(ids, idBtr, mapping, false);
-
+            using (IdMapping mapping = new IdMapping())
+            {
+               _db.DeepCloneObjects(ids, idBtr, mapping, false);
+            }
             // перемещение объектов в блоке
             btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
             var moveMatrix = Matrix3d.Displacement(Point3d.Origin - location);

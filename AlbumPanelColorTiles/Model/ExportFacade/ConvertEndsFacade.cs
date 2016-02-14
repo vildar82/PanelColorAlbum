@@ -72,16 +72,18 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                panelBlRef.PanelBtrExport.IdsEndsRightEntity.ForEach(e => dictIdsEndEnts.Add(e, panelBlRef));
             }
             ObjectIdCollection ids = new ObjectIdCollection(dictIdsEndEnts.Keys.ToArray());
-            IdMapping mapping = new IdMapping();
-            CPS.DbExport.DeepCloneObjects(ids, IdBtrEnd, mapping, false);
-
-            //перемещение объектов в блоке
-            var moveMatrix = Matrix3d.Displacement(new Vector3d(0, panelBlRef.Position.Y - Position.Y, 0));
-            foreach (IdPair itemMap in mapping)
+            using (IdMapping mapping = new IdMapping())
             {
-               using (var ent = itemMap.Value.GetObject(OpenMode.ForWrite, false, true) as Entity)
+               CPS.DbExport.DeepCloneObjects(ids, IdBtrEnd, mapping, false);
+
+               //перемещение объектов в блоке
+               var moveMatrix = Matrix3d.Displacement(new Vector3d(0, panelBlRef.Position.Y - Position.Y, 0));
+               foreach (IdPair itemMap in mapping)
                {
-                  ent.TransformBy(moveMatrix);
+                  using (var ent = itemMap.Value.GetObject(OpenMode.ForWrite, false, true) as Entity)
+                  {
+                     ent.TransformBy(moveMatrix);
+                  }
                }
             }
          }

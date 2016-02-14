@@ -208,10 +208,12 @@ namespace AlbumPanelColorTiles.Model.Base
             try
             {
                // копирование сечений панелей
-               BlPanelSections = BlockSectionAbstract.LoadSections(fileBlocksTemplate, _service);
+               Dictionary<string, ObjectId> blNamesCopy;
+               BlPanelSections = BlockSectionAbstract.LoadSections(fileBlocksTemplate, _service, blNames, out blNamesCopy);
+               return blNamesCopy;
                // копирование остальных блоков
-               return AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blNames, fileBlocksTemplate,
-                              _service.Db, DuplicateRecordCloning.Replace);               
+               //return AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blNames, fileBlocksTemplate,
+               //               _service.Db, DuplicateRecordCloning.Replace);               
             }
             catch (Exception ex)
             {
