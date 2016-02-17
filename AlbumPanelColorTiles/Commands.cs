@@ -433,25 +433,25 @@ namespace AlbumPanelColorTiles
          Document doc = AcAp.DocumentManager.MdiActiveDocument;
          if (doc == null) return;
 
-         // Принудительное сохранение файла
-         if (File.Exists(doc.Name))
-         {
-            object obj = AcAp.GetSystemVariable("DBMOD");
-            // Проверка значения системной переменной DBMOD. Если 0 - значит чертёж не был изменён
-            if (Convert.ToInt16(obj) != 0)
-            {
-               var db = doc.Database;
-               try
-               {
-                  db.SaveAs(db.Filename, true, DwgVersion.Current, db.SecurityParameters);
-               }
-               catch (System.Exception ex)
-               {
-                  doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
-                  Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
-               }
-            }
-         }
+         //// Принудительное сохранение файла
+         //if (File.Exists(doc.Name))
+         //{
+         //   object obj = AcAp.GetSystemVariable("DBMOD");
+         //   // Проверка значения системной переменной DBMOD. Если 0 - значит чертёж не был изменён
+         //   if (Convert.ToInt16(obj) != 0)
+         //   {
+         //      var db = doc.Database;
+         //      try
+         //      {
+         //         db.SaveAs(db.Filename, true, DwgVersion.Current, db.SecurityParameters);
+         //      }
+         //      catch (System.Exception ex)
+         //      {
+         //         doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
+         //         Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
+         //      }
+         //   }
+         //}
 
          string commandName = "PaintPanels";
          if (string.Equals(_lastStartCommandName, commandName))
