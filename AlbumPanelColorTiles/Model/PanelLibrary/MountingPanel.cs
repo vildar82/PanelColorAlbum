@@ -108,7 +108,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            {
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
-                              paint = atrRef.TextString;
+                              paint = atrRef.TextString.Trim();
                               // Если выполняется создание альбома и выключена опция проверки покраски, то стираем марку покраски из монтажной панели
                               if (libLoadServ?.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
                               {
@@ -122,7 +122,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                            {
                               var atrDet = new AttributeRefDetail(atrRef);
                               attrsDet.Add(atrDet);
-                              mark = atrRef.TextString;
+                              mark = atrRef.TextString.Trim();
                            }
                         }
                      }
