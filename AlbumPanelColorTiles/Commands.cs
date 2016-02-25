@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using AcadLib;
+using AcadLib.Blocks;
+using AcadLib.Blocks.Dublicate;
 using AcadLib.Errors;
 using AcadLib.Plot;
 using AlbumPanelColorTiles.ImagePainting;
@@ -466,7 +468,10 @@ namespace AlbumPanelColorTiles
 
 
          try
-         {
+         {            
+            // Проверка дубликатов блоков            
+            CheckDublicateBlocks.Check();            
+
             Inspector.Clear();
             if (_album == null)
             {
@@ -483,6 +488,11 @@ namespace AlbumPanelColorTiles
             doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
             //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
             Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
+
+            if (Inspector.HasErrors)
+            {
+               Inspector.Show();
+            }
          }
          catch (System.Exception ex)
          {
@@ -491,11 +501,7 @@ namespace AlbumPanelColorTiles
             {
                Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
             }
-         }
-         if (Inspector.HasErrors)
-         {
-            Inspector.Show();
-         }
+         }         
          _lastStartCommandName = commandName;
          _lastStartCommandDateTime = DateTime.Now;
       }
