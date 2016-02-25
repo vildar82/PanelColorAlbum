@@ -54,8 +54,15 @@ namespace AlbumPanelColorTiles.Model.Panels
 						{                     
 							if (string.Equals(entity.Layer, Settings.Default.LayerMarks, StringComparison.OrdinalIgnoreCase))
 							{
-								entity.UpgradeOpen();
-								entity.Erase(true);
+                        try
+                        {
+                           entity.UpgradeOpen();
+                           entity.Erase(true);
+                        }
+                        catch (Exception ex)
+                        {
+                           Log.Error(ex, "AddMarkToPanelBtr - entity.UpgradeOpen();");                           
+                        }								
 							}
 						}
 					}
