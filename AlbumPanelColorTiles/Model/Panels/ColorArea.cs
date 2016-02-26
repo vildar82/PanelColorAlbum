@@ -75,7 +75,11 @@ namespace AlbumPanelColorTiles.Panels
          foreach (var colorArea in _colorAreas)
          {
             Rectangle rectTree = GetRectangleRTree(colorArea.Bounds);
-            rtree.Add(rectTree, colorArea);
+            try
+            {
+               rtree.Add(rectTree, colorArea);
+            }
+            catch { }
          }
          return rtree;
       }
