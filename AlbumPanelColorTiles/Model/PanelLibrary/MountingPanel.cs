@@ -260,6 +260,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          var lenY = Convert.ToInt32(extBlRefPanel.MaxPoint.Y - extBlRefPanel.MinPoint.Y);
          return (lenX > lenY) ? roundTo10(lenY) : roundTo10(lenX);
       }
+
       private static int roundTo10(int i)
       {         
          if (i % 10 != 0)

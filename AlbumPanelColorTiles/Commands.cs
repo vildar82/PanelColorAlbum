@@ -579,14 +579,19 @@ namespace AlbumPanelColorTiles
                         try
                         {
                            PlotDirToPdf plotter;
+                           string firstFileNameWoExt = Path.GetFileNameWithoutExtension(dialog.Dialog.FileNames.First());
                            if (dialog.Dialog.FileNames.Count()>1)
                            {
                               plotter = new PlotDirToPdf(dialog.Dialog.FileNames, Path.GetFileName(dialog.SelectedPath));
                            }
-                           else
+                           else if (firstFileNameWoExt.Equals("п", StringComparison.OrdinalIgnoreCase))
                            {                              
                               plotter = new PlotDirToPdf(dialog.SelectedPath);
-                           }                           
+                           }
+                           else
+                           {
+                              plotter = new PlotDirToPdf(dialog.Dialog.FileNames, firstFileNameWoExt);
+                           }                         
                            plotter.LayoutSort = layoutSort;
                            plotter.Plot();
                         }
@@ -609,8 +614,7 @@ namespace AlbumPanelColorTiles
                      keyOpSort.Keywords.Default = "Вкладки";
                      var res = ed.GetKeywords(keyOpSort);
                      if (res.Status == PromptStatus.OK)
-                     {
-                        repeat = false;
+                     {                        
                         if (res.StringResult == "Вкладки")
                         {
                            layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.TabOrder;
@@ -621,6 +625,11 @@ namespace AlbumPanelColorTiles
                         }
                      }
                   }
+               }
+               else
+               {
+                  ed.WriteMessage("\nОтменено пользователем.");
+                  return;
                }
             } while (repeat);
          }

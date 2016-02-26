@@ -18,7 +18,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       {
          _blName = blRef.Name;
          _idBlRef = blRef.Id;
-         _extents = blRef.GeometricExtents;
+         _extents = blRef.GeometricExtentsСlean();
          _rectangleRTree = ColorArea.GetRectangleRTree(_extents);
       }
 
