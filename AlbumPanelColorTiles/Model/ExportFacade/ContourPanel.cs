@@ -45,7 +45,14 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          // из всех плиток отделить торцевые плитки????
          // дерево границ плиток
          treeTiles = new RTreeLib.RTree<Extents3d>();
-         panelBtr.Tiles.ForEach(t => treeTiles.Add(ColorArea.GetRectangleRTree(t), t));
+         panelBtr.Tiles.ForEach(t =>
+                        {
+                           try
+                           {
+                              treeTiles.Add(ColorArea.GetRectangleRTree(t), t);
+                           }
+                           catch { }
+                        });
 
          // Первый угол панели - левый нижний
          var pt1 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MinPoint, EnumCorner.LeftLower);

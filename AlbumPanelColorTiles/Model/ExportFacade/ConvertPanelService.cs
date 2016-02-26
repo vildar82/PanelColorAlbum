@@ -107,7 +107,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          Dictionary<ObjectId, PanelBtrExport> dictPanelsBtrExport = new Dictionary<ObjectId, PanelBtrExport>();
 
          RTreeLib.RTree<Facade> treeFacades = new RTreeLib.RTree<Facade>();
-         facades.ForEach(f => treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f));
+         facades.ForEach(f =>
+                        {
+                           try
+                           {
+                              treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f);
+                           }
+                           catch { }
+                        });
+      
 
          ProgressMeter progress = new ProgressMeter();
          progress.SetLimit(Service.SelectPanels.IdsBlRefPanelAr.Count);

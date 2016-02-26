@@ -63,7 +63,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
             RTreeLib.RTree<FacadeFrontBlock> rtreeFront = new RTreeLib.RTree<FacadeFrontBlock>();
             foreach (var front in facadeFrontBlocks)
             {
-               rtreeFront.Add(front.RectangleRTree, front);
+               try
+               {
+                  rtreeFront.Add(front.RectangleRTree, front);
+               }
+               catch { }
             }
 
             // Найти блоки монтажек пересекающиеся с блоками обозначения стороны фасада                        
