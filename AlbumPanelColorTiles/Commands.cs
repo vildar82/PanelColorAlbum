@@ -466,35 +466,31 @@ namespace AlbumPanelColorTiles
          }
          Log.Info("Start Command: AKR-PaintPanels");
 
-
          try
          {
-            using (doc.LockDocument())
+            // Проверка дубликатов блоков            
+            CheckDublicateBlocks.Check();
+
+            Inspector.Clear();
+            if (_album == null)
             {
-               // Проверка дубликатов блоков            
-               CheckDublicateBlocks.Check();
+               _album = new Album();
+            }
+            else
+            {
+               // Повторный запуск программы покраски панелей.
+               // Сброс данных
+               _album.ResetData();
+            }
+            _album.PaintPanels();
+            doc.Editor.Regen();
+            doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+            //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+            Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
 
-               Inspector.Clear();
-               if (_album == null)
-               {
-                  _album = new Album();
-               }
-               else
-               {
-                  // Повторный запуск программы покраски панелей.
-                  // Сброс данных
-                  _album.ResetData();
-               }
-               _album.PaintPanels();
-               doc.Editor.Regen();
-               doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-               //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
-               Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
-
-               if (Inspector.HasErrors)
-               {
-                  Inspector.Show();
-               }
+            if (Inspector.HasErrors)
+            {
+               Inspector.Show();
             }
          }
          catch (System.Exception ex)
