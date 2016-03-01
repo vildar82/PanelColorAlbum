@@ -107,7 +107,7 @@ namespace AlbumPanelColorTiles.Panels
       }
 
       private static void IterateColorAreasInBtr(ObjectId idBtr, Album album,
-                                                List<ColorArea> colorAreas, Matrix3d matrix, string xrefName)
+                 List<ColorArea> colorAreas, Matrix3d matrix, string xrefName)
       {
          using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
          {

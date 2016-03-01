@@ -32,27 +32,37 @@ namespace AlbumPanelColorTiles.Panels
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var btr = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
-            foreach (ObjectId idEnt in btr)
+            PaintTileInBtr(SymbolUtilityServices.GetBlockModelSpaceId(db), rtreeColorAreas, Matrix3d.Identity);            
+            t.Commit();
+         }
+      }
+
+      public static void PaintTileInBtr(ObjectId idBtr, RTree<ColorArea> rtreeColorAreas, Matrix3d transToModel)
+      {
+         var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
+         foreach (ObjectId idEnt in btr)
+         {
+            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
+               string blName = blRef.GetEffectiveName();
+               if (blName.StartsWith(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
                {
-                  var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  string blName = blRefTile.GetEffectiveName();
-                  if (blName.StartsWith(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
+                  Tile tile = new Tile(blRef);
+                  //Определение покраски плитки
+                  Paint paint = ColorArea.GetPaint(tile.CenterTile.TransformBy(transToModel), rtreeColorAreas);
+                  if (paint != null)
                   {
-                     Tile tile = new Tile(blRefTile);
-                     //Определение покраски плитки
-                     Paint paint = ColorArea.GetPaint(tile.CenterTile, rtreeColorAreas);
-                     if (paint != null)
-                     {
-                        blRefTile.UpgradeOpen();
-                        blRefTile.Layer = paint.LayerName;
-                     }
-                  }                  
+                     blRef.UpgradeOpen();
+                     blRef.Layer = paint.LayerName;
+                  }
+               }
+               else if (!MarkSb.IsBlockNamePanel(blName))
+               {
+                  // Покраска во вложенных блоках, кроме АРК панелей
+                  PaintTileInBtr(blRef.BlockTableRecord, rtreeColorAreas, blRef.BlockTransform*transToModel);
                }
             }
-            t.Commit();
          }
       }
 
