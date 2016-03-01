@@ -32,13 +32,14 @@ namespace AlbumPanelColorTiles.Panels
          Database db = HostApplicationServices.WorkingDatabase;
          using (var t = db.TransactionManager.StartTransaction())
          {
-            var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
-            foreach (ObjectId idEnt in ms)
+            var btr = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            foreach (ObjectId idEnt in btr)
             {
                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRefTile = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
-                  if (blRefTile.GetEffectiveName() == Settings.Default.BlockTileName)
+                  string blName = blRefTile.GetEffectiveName();
+                  if (blName.StartsWith(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
                   {
                      Tile tile = new Tile(blRefTile);
                      //Определение покраски плитки
@@ -48,7 +49,7 @@ namespace AlbumPanelColorTiles.Panels
                         blRefTile.UpgradeOpen();
                         blRefTile.Layer = paint.LayerName;
                      }
-                  }
+                  }                  
                }
             }
             t.Commit();
