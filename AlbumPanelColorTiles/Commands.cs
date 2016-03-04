@@ -429,81 +429,81 @@ namespace AlbumPanelColorTiles
          }
       }
 
-      [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
-      public void PaintPanelsCommand()
-      {
-         Document doc = AcAp.DocumentManager.MdiActiveDocument;
-         if (doc == null) return;
+        [CommandMethod("PIK", "AKR-PaintPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
+        public void PaintPanelsCommand()
+        {
+            Document doc = AcAp.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
 
-         //// Принудительное сохранение файла
-         //if (File.Exists(doc.Name))
-         //{
-         //   object obj = AcAp.GetSystemVariable("DBMOD");
-         //   // Проверка значения системной переменной DBMOD. Если 0 - значит чертёж не был изменён
-         //   if (Convert.ToInt16(obj) != 0)
-         //   {
-         //      var db = doc.Database;
-         //      try
-         //      {
-         //         db.SaveAs(db.Filename, true, DwgVersion.Current, db.SecurityParameters);
-         //      }
-         //      catch (System.Exception ex)
-         //      {
-         //         doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
-         //         Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
-         //      }
-         //   }
-         //}
+            //// Принудительное сохранение файла
+            //if (File.Exists(doc.Name))
+            //{
+            //   object obj = AcAp.GetSystemVariable("DBMOD");
+            //   // Проверка значения системной переменной DBMOD. Если 0 - значит чертёж не был изменён
+            //   if (Convert.ToInt16(obj) != 0)
+            //   {
+            //      var db = doc.Database;
+            //      try
+            //      {
+            //         db.SaveAs(db.Filename, true, DwgVersion.Current, db.SecurityParameters);
+            //      }
+            //      catch (System.Exception ex)
+            //      {
+            //         doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
+            //         Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
+            //      }
+            //   }
+            //}
 
-         string commandName = "PaintPanels";
-         if (string.Equals(_lastStartCommandName, commandName))
-         {
-            if ((DateTime.Now - _lastStartCommandDateTime).Seconds < 5)
+            string commandName = "PaintPanels";
+            if (string.Equals(_lastStartCommandName, commandName))
             {
-               doc.Editor.WriteMessage("Между запусками команды прошло меньше 5 секунд. Отмена.");
-               return;
+                if ((DateTime.Now - _lastStartCommandDateTime).Seconds < 5)
+                {
+                    doc.Editor.WriteMessage("Между запусками команды прошло меньше 5 секунд. Отмена.");
+                    return;
+                }
             }
-         }
-         Log.Info("Start Command: AKR-PaintPanels");
+            Log.Info("Start Command: AKR-PaintPanels");
 
-         try
-         {
-            // Проверка дубликатов блоков            
-            CheckDublicateBlocks.Check();
+            try
+            {
+                // Проверка дубликатов блоков            
+                CheckDublicateBlocks.Check();
 
-            Inspector.Clear();
-            if (_album == null)
-            {
-               _album = new Album();
+                Inspector.Clear();
+                if (_album == null)
+                {
+                    _album = new Album();
+                }
+                else
+                {
+                    // Повторный запуск программы покраски панелей.
+                    // Сброс данных
+                    _album.ResetData();
+                }
+                _album.PaintPanels();
+                doc.Editor.Regen();
+                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
+                //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);                
             }
-            else
+            catch (System.Exception ex)
             {
-               // Повторный запуск программы покраски панелей.
-               // Сброс данных
-               _album.ResetData();
+                doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
+                if (!ex.Message.Contains("Отменено пользователем"))
+                {
+                    Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);                    
+                }
+                else
+                {
+                    return;
+                }
             }
-            _album.PaintPanels();
-            doc.Editor.Regen();
-            doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-            //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
-            Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
-
-            if (Inspector.HasErrors)
-            {
-               Inspector.Show();
-            }
-         }
-         catch (System.Exception ex)
-         {
-            doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
-            if (!ex.Message.Contains("Отменено пользователем"))
-            {
-               Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
-            }
-         }         
-         _lastStartCommandName = commandName;
-         _lastStartCommandDateTime = DateTime.Now;
-      }
+            _lastStartCommandName = commandName;
+            _lastStartCommandDateTime = DateTime.Now;
+            Inspector.Show();
+        }
 
       [CommandMethod("PIK", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
       public void PlotPdfCommand()
