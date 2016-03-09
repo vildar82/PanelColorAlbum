@@ -20,7 +20,7 @@
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
     <AssemblyVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyVersionSettings>
     <AssemblyFileVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.69.241</AssemblyVersion>
+    <AssemblyVersion>2.0.69.245</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -257,7 +257,9 @@
     <Compile Include="Model\Sheets\ViewporPanel.cs" />
     <Compile Include="Model\StartOptions.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
-    <Compile Include="Model\Utils\UtilsReplaceWindows.cs" />
+    <Compile Include="Model\Utils\Window\UtilsReplaceWindows.cs" />
+    <Compile Include="Model\Utils\Window\WindowRedefine.cs" />
+    <Compile Include="Model\Utils\Window\WindowTranslator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
