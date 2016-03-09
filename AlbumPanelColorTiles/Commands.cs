@@ -989,7 +989,11 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                
+                doc.Editor.WriteMessage($"\nНе удалось выполнить переопределение блока окна. {ex.Message}");
+                if (!ex.Message.Contains("Отменено пользователем"))
+                {
+                    Log.Error(ex, $"Command: AKR-Utils-WindowsRedefine. {doc.Name}");
+                }
             }            
         }
 

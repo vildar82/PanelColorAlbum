@@ -12,28 +12,41 @@ namespace AlbumPanelColorTiles.Utils.Window
 {
     public class WindowRedefine
     {
-        public static Dictionary<string, ObjectId> _idBtrWindowMarks;
+        private static Dictionary<string, ObjectIdCollection> dictIdBlRefAkrWindowMarks;
+
+        public bool IsAkrBlockWindow { get; set; }
         public string BlNameOld { get; set; }
-        public string Mark { get; set; }
         public ObjectId IdBtrOwner { get; set; }
         public ObjectId IdBlRef { get; set; }
         public Point3d Position { get; set; }
+        public WindowTranslator TranslatorW { get; set; }
 
-        public WindowRedefine(string oldBlName, string mark)
+        public WindowRedefine (bool isAkrBlWin, BlockReference blRefWinOld, WindowTranslator translatorW)
         {
-            BlNameOld = oldBlName;
-            Mark = mark;            
-        }
+            IsAkrBlockWindow = isAkrBlWin;
+            IdBlRef = blRefWinOld.Id;
+            TranslatorW = translatorW;
+            IdBtrOwner = blRefWinOld.OwnerId;
+            if (IsAkrBlockWindow)
+            {
+                Position = blRefWinOld.Position;
+            }
+            else
+            {
+                var extOldWind = blRefWinOld.GeometricExtentsСlean();
+                Position = extOldWind.MinPoint;
+            }
+        }        
 
         /// <summary>
         /// Получение определений блоков для всех марок окон в динамическом блоке
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<string, ObjectId> GetBtrMarks()
+        public static Dictionary<string, ObjectIdCollection> GetBlRefAkrWindowMarks()
         {
-            var idBtrWindowMarks = new Dictionary<string, ObjectId>();
+            var idBlRefAkrWindowMarks = new Dictionary<string, ObjectIdCollection>();
             // Получение определения блока для каждой марки
-            Database db = UtilsReplaceWindows.db;
+            Database db = UtilsReplaceWindows.Db;
             using (var bt = db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
             {
                 // Исходный блок окна
@@ -43,36 +56,102 @@ namespace AlbumPanelColorTiles.Utils.Window
                     BlockReference blRefWin = new BlockReference(Point3d.Origin, idBtrWindow);
                     blRefWin.SetDatabaseDefaults();
 
-                    List<string> marks = null;
-                    DynamicBlockReferenceProperty paramvisibility = null;
+                    List<string> marks = null;                    
                     foreach (DynamicBlockReferenceProperty param in blRefWin.DynamicBlockReferencePropertyCollection)
                     {
                         if (param.PropertyName.Equals(Settings.Default.BlockWindowVisibilityName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            paramvisibility = param;
+                        {                            
                             marks = param.GetAllowedValues().Cast<string>().ToList();
                             break;
                         }
                     }
 
-                    if (marks != null && paramvisibility != null)
+                    List<BlockReference> blRefWins = new List<BlockReference>();
+                    if (marks != null)
                     {
-                        ms.AppendEntity(blRefWin);
                         foreach (string mark in marks)
                         {
-                            paramvisibility.Value = mark;
-                            idBtrWindowMarks.Add(mark, blRefWin.BlockTableRecord);
-                        }
-                        blRefWin.Erase();
+                            using (blRefWin = new BlockReference(Point3d.Origin, idBtrWindow))
+                            {
+                                blRefWin.SetDatabaseDefaults();
+                                blRefWin.Layer = UtilsReplaceWindows.LayerWindow;
+                                blRefWins.Add(blRefWin);
+
+                                ms.AppendEntity(blRefWin);
+
+                                foreach (DynamicBlockReferenceProperty param in blRefWin.DynamicBlockReferencePropertyCollection)
+                                {
+                                    if (param.PropertyName.Equals(Settings.Default.BlockWindowVisibilityName, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        param.Value = mark;
+                                        break;
+                                    }
+                                }
+
+                                ObjectIdCollection idCol = new ObjectIdCollection();
+                                idCol.Add(blRefWin.Id);
+                                idBlRefAkrWindowMarks.Add(mark, idCol);
+                            }
+                        }                        
                     }
                 }
             }
-            return idBtrWindowMarks;
+            return idBlRefAkrWindowMarks;
         }
 
-        private static void setDynProp(BlockReference newBlRefW, WindowTranslator translatorW)
+        public static void EraseTemplateBlRefsAkrWin()
         {
-            foreach (DynamicBlockReferenceProperty prop in newBlRefW.DynamicBlockReferencePropertyCollection)
+            if (dictIdBlRefAkrWindowMarks != null)
+            {
+                foreach (var item in dictIdBlRefAkrWindowMarks)
+                {
+                    var blRefTemp = item.Value[0].GetObject(OpenMode.ForWrite, false, true) as BlockReference;
+                    blRefTemp.Erase();
+                }
+            }
+        }
+
+        public void Replace()
+        {
+            var blRefOldWin = IdBlRef.GetObject( OpenMode.ForRead, false, true) as BlockReference;
+            
+            if (IsAkrBlockWindow)
+            {
+                // Не заменять блок, а просто проверить видимость
+                setDynProp(blRefOldWin, TranslatorW);
+            }
+            else
+            {
+                ObjectIdCollection idColBlRefAkrWindow = getBlRefAkrWindow(TranslatorW.Mark);
+                IdMapping map = new IdMapping();
+                UtilsReplaceWindows.Db.DeepCloneObjects(idColBlRefAkrWindow,IdBtrOwner, map, false);
+                ObjectId idBlRefCopy = map[idColBlRefAkrWindow[0]].Value;
+
+                var blRefNew = idBlRefCopy.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
+                blRefNew.Position = Position;
+
+                blRefOldWin.UpgradeOpen();
+                blRefOldWin.Erase();
+            }
+        }
+
+        private ObjectIdCollection getBlRefAkrWindow(string mark)
+        {
+            ObjectIdCollection res;
+            if (dictIdBlRefAkrWindowMarks == null)
+            {
+                dictIdBlRefAkrWindowMarks = GetBlRefAkrWindowMarks();
+            }            
+            if (!dictIdBlRefAkrWindowMarks.TryGetValue(mark, out res))
+            {
+                throw new Exception($"Не найдена марка {mark}");
+            }            
+            return res;
+        }
+
+        private static void setDynProp(BlockReference blRefW, WindowTranslator translatorW)
+        {
+            foreach (DynamicBlockReferenceProperty prop in blRefW.DynamicBlockReferencePropertyCollection)
             {
                 if (prop.PropertyName.Equals("Видимость", StringComparison.OrdinalIgnoreCase) &&
                     !prop.Value.ToString().Equals(translatorW.Mark, StringComparison.OrdinalIgnoreCase))

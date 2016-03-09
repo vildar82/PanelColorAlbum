@@ -13,7 +13,7 @@ namespace AlbumPanelColorTiles.Lib
       /// <param name="blName">Имя блока</param>
       /// <param name="db">База в которую копировать</param>
       /// <exception cref="Exception">Не найден файл-шаблон с блоками</exception>
-      public static void CopyBlockFromTemplate(string blName, Database db)
+      public static ObjectId CopyBlockFromTemplate(string blName, Database db)
       {
          // Копирование определения блока из файла с блоками.
          string fileBlocksTemplate = Path.Combine(Commands.CurDllDir, Settings.Default.TemplateBlocksAKRFileName);
@@ -21,7 +21,7 @@ namespace AlbumPanelColorTiles.Lib
          {
             throw new Exception("Не найден файл-шаблон с блоками " + fileBlocksTemplate);
          }
-         AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db);
+         return AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(blName, fileBlocksTemplate, db, DuplicateRecordCloning.Replace);
       }
 
       //public static void Insert(string blName)
