@@ -982,6 +982,7 @@ namespace AlbumPanelColorTiles
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
+            Inspector.Clear();
             try
             {
                 UtilsReplaceWindows testReplaceWindows = new UtilsReplaceWindows();
@@ -994,7 +995,8 @@ namespace AlbumPanelColorTiles
                 {
                     Log.Error(ex, $"Command: AKR-Utils-WindowsRedefine. {doc.Name}");
                 }
-            }            
+            }
+            Inspector.Show();
         }
 
         [CommandMethod("PIK", "TestRemoveDashAKR", CommandFlags.Modal)]

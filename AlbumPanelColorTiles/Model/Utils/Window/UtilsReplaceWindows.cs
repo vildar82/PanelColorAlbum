@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Utils.Window;
@@ -53,7 +54,14 @@ namespace AlbumPanelColorTiles.Utils
                 // Замена блоков окон
                 foreach (var redefine in redefines)
                 {
-                    redefine.Replace();
+                    try
+                    {
+                        redefine.Replace();
+                    }
+                    catch (Exception ex)
+                    {
+                        Inspector.AddError($"Не удалось обновить блок {redefine.BlNameOld} - {ex.Message}", System.Drawing.SystemIcons.Error);
+                    }                    
                 }
                 // Удаление шаблонов дин блоков окна АКР_Окно
                 WindowRedefine.EraseTemplateBlRefsAkrWin();

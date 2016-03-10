@@ -112,26 +112,27 @@ namespace AlbumPanelColorTiles.Utils.Window
         }
 
         public void Replace()
-        {
-            var blRefOldWin = IdBlRef.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
-            
-            //if (IsAkrBlockWindow)
-            //{
-            //    // Не заменять блок, а просто проверить видимость
-            //    setDynProp(blRefOldWin, TranslatorW);
-            //}
-            //else
-            //{
-                ObjectIdCollection idColBlRefAkrWindow = getBlRefAkrWindow(TranslatorW.Mark);
-                IdMapping map = new IdMapping();
-                UtilsReplaceWindows.Db.DeepCloneObjects(idColBlRefAkrWindow,IdBtrOwner, map, false);
-                ObjectId idBlRefCopy = map[idColBlRefAkrWindow[0]].Value;
+        {            
+            ObjectIdCollection idColBlRefAkrWindow = getBlRefAkrWindow(TranslatorW.Mark);
+            IdMapping map = new IdMapping();
+            UtilsReplaceWindows.Db.DeepCloneObjects(idColBlRefAkrWindow, IdBtrOwner, map, false);
+            ObjectId idBlRefCopy = map[idColBlRefAkrWindow[0]].Value;
 
-                var blRefNew = idBlRefCopy.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
-                blRefNew.Position = Position;
-                                
-                blRefOldWin.Erase();
-            //}
+            if (idBlRefCopy.IsNull)
+            {
+                throw new Exception($"Ошибка при копировании блока окна с маркой {TranslatorW.Mark}.");
+            }
+
+            var blRefNew = idBlRefCopy.GetObject(OpenMode.ForWrite) as BlockReference;
+            if (blRefNew == null)
+            {
+                throw new Exception($"Ошибка при копировании блока окна с маркой {TranslatorW.Mark}.");
+            }
+
+            blRefNew.Position = Position;
+
+            var blRefOldWin = IdBlRef.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
+            blRefOldWin.Erase();            
         }
 
         private ObjectIdCollection getBlRefAkrWindow(string mark)
@@ -143,7 +144,7 @@ namespace AlbumPanelColorTiles.Utils.Window
             }            
             if (!dictIdBlRefAkrWindowMarks.TryGetValue(mark, out res))
             {
-                throw new Exception($"Не найдена марка {mark}");
+                throw new Exception($"Не найдена марка {mark}.");
             }            
             return res;
         }

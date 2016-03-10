@@ -12,7 +12,9 @@ namespace AlbumPanelColorTiles.Utils.Window
     public class WindowTranslator
     {
         public string BlNameOld { get; set; }
-        public string Mark { get; set; }        
+        public string Mark { get; set; }
+
+        private static Dictionary<string, string> dictMarkOldNewAkrWin;
 
         public WindowTranslator(string oldBlName, string mark)
         {
@@ -27,10 +29,46 @@ namespace AlbumPanelColorTiles.Utils.Window
             {
                 if (prop.PropertyName.Equals(Settings.Default.BlockWindowVisibilityName, StringComparison.OrdinalIgnoreCase))
                 {
-                    res = new WindowTranslator(Settings.Default.BlockWindowName, prop.Value.ToString());
+                    string markNew = getNewMarkAkrWin(prop.Value.ToString());
+                    res = new WindowTranslator(Settings.Default.BlockWindowName, markNew);
                     break;
                 }
             }
+            return res;
+        }
+
+        private static string getNewMarkAkrWin(string markOld)
+        {
+            string res;
+            if (markOld.Contains("/"))
+            {
+                if (dictMarkOldNewAkrWin == null)
+                {
+                    dictMarkOldNewAkrWin = getDictMarkOldNewAkrWin();
+                }
+                if (!dictMarkOldNewAkrWin.TryGetValue(markOld, out res))
+                {
+                    throw new Exception($"Не определена марка {markOld}.");
+                }
+            }
+            else
+            {
+                res = markOld;
+            }
+            return res;            
+        }
+
+        private static Dictionary<string, string> getDictMarkOldNewAkrWin()
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>
+            {                
+                { "ОП-2/Л", "ОП-2л"},
+                { "ОП-2/П", "ОП-2"},
+                { "ОП-4/Л", "ОП-4л"},
+                { "ОП-5/Л", "ОП-5л"},
+                { "ОП-6/Л", "ОП-6л"},
+                { "ОП-6/П", "ОП-6"},                
+            };
             return res;
         }
 
