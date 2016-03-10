@@ -68,7 +68,7 @@ namespace AlbumPanelColorTiles.Utils.Window
 
                     List<BlockReference> blRefWins = new List<BlockReference>();
                     if (marks != null)
-                    {
+                    {                        
                         foreach (string mark in marks)
                         {
                             using (blRefWin = new BlockReference(Point3d.Origin, idBtrWindow))
@@ -113,15 +113,15 @@ namespace AlbumPanelColorTiles.Utils.Window
 
         public void Replace()
         {
-            var blRefOldWin = IdBlRef.GetObject( OpenMode.ForRead, false, true) as BlockReference;
+            var blRefOldWin = IdBlRef.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
             
-            if (IsAkrBlockWindow)
-            {
-                // Не заменять блок, а просто проверить видимость
-                setDynProp(blRefOldWin, TranslatorW);
-            }
-            else
-            {
+            //if (IsAkrBlockWindow)
+            //{
+            //    // Не заменять блок, а просто проверить видимость
+            //    setDynProp(blRefOldWin, TranslatorW);
+            //}
+            //else
+            //{
                 ObjectIdCollection idColBlRefAkrWindow = getBlRefAkrWindow(TranslatorW.Mark);
                 IdMapping map = new IdMapping();
                 UtilsReplaceWindows.Db.DeepCloneObjects(idColBlRefAkrWindow,IdBtrOwner, map, false);
@@ -129,10 +129,9 @@ namespace AlbumPanelColorTiles.Utils.Window
 
                 var blRefNew = idBlRefCopy.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
                 blRefNew.Position = Position;
-
-                blRefOldWin.UpgradeOpen();
+                                
                 blRefOldWin.Erase();
-            }
+            //}
         }
 
         private ObjectIdCollection getBlRefAkrWindow(string mark)

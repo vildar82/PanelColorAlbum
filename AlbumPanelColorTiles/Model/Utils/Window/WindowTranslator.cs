@@ -28,6 +28,7 @@ namespace AlbumPanelColorTiles.Utils.Window
                 if (prop.PropertyName.Equals(Settings.Default.BlockWindowVisibilityName, StringComparison.OrdinalIgnoreCase))
                 {
                     res = new WindowTranslator(Settings.Default.BlockWindowName, prop.Value.ToString());
+                    break;
                 }
             }
             return res;

@@ -45,6 +45,10 @@ namespace AlbumPanelColorTiles.Utils
 
                 // Переопределение блока АКР_Окно
                 IdBtrWindow = BlockInsert.CopyBlockFromTemplate(Settings.Default.BlockWindowName, Db);
+                using (var btrWin = IdBtrWindow.GetObject( OpenMode.ForRead)as BlockTableRecord)
+                {                    
+                    btrWin.UpdateAnonymousBlocks();
+                }
 
                 // Замена блоков окон
                 foreach (var redefine in redefines)
