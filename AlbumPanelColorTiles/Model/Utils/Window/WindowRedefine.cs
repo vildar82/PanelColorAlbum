@@ -36,7 +36,12 @@ namespace AlbumPanelColorTiles.Utils.Window
                 var extOldWind = blRefWinOld.GeometricExtentsСlean();
                 Position = extOldWind.MinPoint;
             }
-        }        
+        }
+
+        public static void Init()
+        {
+            dictIdBlRefAkrWindowMarks = null;
+        }
 
         /// <summary>
         /// Получение определений блоков для всех марок окон в динамическом блоке

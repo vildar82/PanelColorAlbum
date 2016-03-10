@@ -19,12 +19,12 @@ namespace AlbumPanelColorTiles.Utils
         public static Database Db { get; private set; }
         public static ObjectId IdBtrWindow { get; private set; }
         public static Transaction Transaction { get; private set; }
-        public static string LayerWindow { get; } = "АР_Окна";
+        public static string LayerWindow { get; } = "АР_Окна";        
 
         Document doc;
         Editor ed;                
         
-        Dictionary<string, WindowTranslator> translatorWindows;
+        private static Dictionary<string, WindowTranslator> translatorWindows;
 
         public void Redefine()
         {
@@ -35,11 +35,16 @@ namespace AlbumPanelColorTiles.Utils
 
             using (Transaction = Db.TransactionManager.StartTransaction())
             {
+                WindowRedefine.Init();
+
                 // Блоки панелей АКР            
                 List<ObjectId> idsBtrPanels = getPanelsBtr();
 
                 // Транслятор имен блоков окон в параметр марки блока АКР_Окно
-                translatorWindows = WindowTranslator.GetTranslatorWindows();
+                if (translatorWindows == null)
+                {
+                    translatorWindows = WindowTranslator.GetTranslatorWindows();
+                }
 
                 // Сбор блоков окон для замены.
                 List<WindowRedefine> redefines = getRedefineBlocks(idsBtrPanels);
