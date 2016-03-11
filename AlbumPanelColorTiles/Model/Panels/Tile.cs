@@ -54,7 +54,7 @@ namespace AlbumPanelColorTiles.Panels
                   if (paint != null)
                   {
                      blRef.UpgradeOpen();
-                     blRef.Layer = paint.LayerName;
+                     blRef.Layer = paint.Layer;
                   }
                }
                else if (!MarkSb.IsBlockNamePanel(blName))

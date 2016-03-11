@@ -199,7 +199,7 @@ namespace AlbumPanelColorTiles.Panels
                         }
                         else
                         {
-                           blRef.Layer = paintAr.LayerName;
+                           blRef.Layer = paintAr.Layer;
                         }
                      }
                      else if (string.Equals( blNameEff, Settings.Default.BlockColorAreaName, StringComparison.CurrentCultureIgnoreCase))
@@ -245,10 +245,10 @@ namespace AlbumPanelColorTiles.Panels
       private List<TileCalc> CalculateTiles()
       {
          List<TileCalc> tilesCalc = new List<TileCalc>();
-         var paintsSameColor = _paints.GroupBy(p => p.LayerName);
+         var paintsSameColor = _paints.GroupBy(p => p.Layer);
          foreach (var item in paintsSameColor)
          {
-            TileCalc tileCalc = new TileCalc(item.Key, item.Count(), item.First().Color);
+            TileCalc tileCalc = new TileCalc(item.First(), item.Count());
             tilesCalc.Add(tileCalc);
          }
          return tilesCalc;

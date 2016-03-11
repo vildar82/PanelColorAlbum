@@ -233,7 +233,7 @@ namespace AlbumPanelColorTiles
       // Поиск цвета в списке цветов альбома
       public Paint GetPaint(string layerName)
       {
-         Paint paint = _colors.Find(c => c.LayerName == layerName);
+         Paint paint = _colors.Find(c => c.Layer == layerName);
          if (paint == null)
          {
             // Определение цвета слоя

@@ -1,30 +1,49 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using Autodesk.AutoCAD.Colors;
 
 namespace AlbumPanelColorTiles.Panels
 {
-   // Краска
-   public class Paint : IEquatable<Paint>
-   {
-      // цвет плтитки
-      private Color _color;
+    // Краска
+    public class Paint : IEquatable<Paint>
+    {
+        // цвет плтитки
+        public Color Color { get; private set; }
+        // Имя слоя. (для каждой краски свой слой с именем марки краски)
+        public string Layer { get; private set; }
+        public string Article { get; private set; }
+        public string Name { get; private set; }
 
-      // Имя слоя. (для каждой краски свой слой с именем марки краски)
-      private string _layerName;
+        public Paint(string layerName, Color color)
+        {
+            Layer = layerName;
 
-      public Paint(string layerName, Color color)
-      {
-         _layerName = layerName;
-         _color = color;
-      }
+            var splitUnders = layerName.Split(new char[] { '_' }, 2);
 
-      public Color Color { get { return _color; } }
-      public string LayerName { get { return _layerName; } }
+            Article = splitUnders[0];
 
-      public bool Equals(Paint other)
-      {
-         return _layerName.Equals(other._layerName) &&
-            _color.Equals(other._color);
-      }
-   }
+            if (splitUnders.Length == 2)
+            {
+                Name = splitUnders[1];
+            }
+            else
+            {
+                Name = string.Empty;
+            }
+
+            Color = color;
+        }
+
+        public bool Equals(Paint other)
+        {
+            return Layer.Equals(other.Layer) &&
+               Color.Equals(other.Color);
+        }
+
+        public static bool HasColorName(List<Paint> colors)
+        {
+            return colors.Any(p => p.Name != string.Empty);
+        }
+    }
 }
