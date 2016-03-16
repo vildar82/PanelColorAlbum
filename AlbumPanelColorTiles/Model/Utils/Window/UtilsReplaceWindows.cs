@@ -52,6 +52,9 @@ namespace AlbumPanelColorTiles.Utils
                 AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(
                     n => n.StartsWith(Settings.Default.BlockWindowName), fileAkrWinBlocksTemplate, Db, DuplicateRecordCloning.Replace);
 
+                // Проверка наличия слоя для вставки окон.
+                AcadLib.Layers.LayerExt.CheckLayerState(Settings.Default.LayerWindows);                
+
                 // Замена блоков окон
                 foreach (var redefine in redefines)
                 {

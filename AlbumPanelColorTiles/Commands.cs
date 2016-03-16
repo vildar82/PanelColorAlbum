@@ -1005,9 +1005,13 @@ namespace AlbumPanelColorTiles
             if (doc == null) return;                        
             try
             {
+                // Файл шаблонов окон.
                 string fileWins = Path.Combine(CurDllDir, Settings.Default.TemplateBlocksAkrWindows);
-                AcadLib.Blocks.Visual.VisualInsertBlock.InsertBlock(fileWins, n => n.StartsWith(Settings.Default.BlockWindowName), 
-                    new AcadLib.Layers.LayerInfo (Settings.Default.LayerWindows));
+                // Слой для окон
+                AcadLib.Layers.LayerInfo layerWin = new AcadLib.Layers.LayerInfo(Settings.Default.LayerWindows);               
+                layerWin.Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(Autodesk.AutoCAD.Colors.ColorMethod.ByAci, 4);
+                // Выбор и вставка блока окна. 
+                AcadLib.Blocks.Visual.VisualInsertBlock.InsertBlock(fileWins, n => n.StartsWith(Settings.Default.BlockWindowName), layerWin);
             }
             catch (System.Exception ex)
             {
