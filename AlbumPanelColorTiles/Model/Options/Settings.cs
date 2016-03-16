@@ -75,6 +75,7 @@
         public int StoreyDefineDeviation { get; set; }
         public string TemplateBlocksAKRExportFacadeFileName { get; set; }
         public string TemplateBlocksAKRFileName { get; set; }
+        public string TemplateBlocksAkrWindows { get; set; }
         public string TemplateSheetContentFileName { get; set; }
         public string TemplateSheetMarkSBFileName { get; set; }
         public int TileHeight { get; set; }
@@ -130,6 +131,7 @@
             LayerDimensionFacade = "АР_Размеры на фасаде";
             LayerDimensionForm = "АР_Размеры в форме";
             TemplateBlocksAKRFileName = "АКР_Блоки.dwg";
+            TemplateBlocksAkrWindows = "АКР_Окна.dwg";
             TemplateBlocksAKRExportFacadeFileName = "АКР_Блоки-ЭкспортФасада.dwg";
             SheetTemplateLayoutNameForContent = "Содержание";
             TemplateSheetContentFileName = "АКР_Шаблон_Содержание.dwg";

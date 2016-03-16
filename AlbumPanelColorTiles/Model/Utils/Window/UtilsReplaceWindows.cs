@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +17,8 @@ namespace AlbumPanelColorTiles.Utils
 {
     public class UtilsReplaceWindows
     {
-        public static Database Db { get; private set; }
-        public static ObjectId IdBtrWindow { get; private set; }
-        public static Transaction Transaction { get; private set; }
-        public static string LayerWindow { get; } = "АР_Окна";        
+        public static Database Db { get; private set; }        
+        public static Transaction Transaction { get; private set; }        
 
         Document doc;
         Editor ed;                
@@ -27,8 +26,7 @@ namespace AlbumPanelColorTiles.Utils
         private static Dictionary<string, WindowTranslator> translatorWindows;
 
         public void Redefine()
-        {
-            // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
+        {            
             doc = Application.DocumentManager.MdiActiveDocument;
             ed = doc.Editor;
             Db = doc.Database;            
@@ -49,12 +47,10 @@ namespace AlbumPanelColorTiles.Utils
                 // Сбор блоков окон для замены.
                 List<WindowRedefine> redefines = getRedefineBlocks(idsBtrPanels);
 
-                // Переопределение блока АКР_Окно
-                IdBtrWindow = BlockInsert.CopyBlockFromTemplate(Settings.Default.BlockWindowName, Db);
-                using (var btrWin = IdBtrWindow.GetObject( OpenMode.ForRead)as BlockTableRecord)
-                {                    
-                    btrWin.UpdateAnonymousBlocks();
-                }
+                // Переопределение блоков окон из библиотеки
+                string fileAkrWinBlocksTemplate = Path.Combine(Commands.CurDllDir, Settings.Default.TemplateBlocksAkrWindows);
+                AcadLib.Blocks.Block.CopyBlockFromExternalDrawing(
+                    n => n.StartsWith(Settings.Default.BlockWindowName), fileAkrWinBlocksTemplate, Db, DuplicateRecordCloning.Replace);
 
                 // Замена блоков окон
                 foreach (var redefine in redefines)
@@ -67,10 +63,7 @@ namespace AlbumPanelColorTiles.Utils
                     {
                         Inspector.AddError($"Не удалось обновить блок {redefine.BlNameOld} - {ex.Message}", System.Drawing.SystemIcons.Error);
                     }                    
-                }
-                // Удаление шаблонов дин блоков окна АКР_Окно
-                WindowRedefine.EraseTemplateBlRefsAkrWin();
-
+                }               
                 Transaction.Commit();
             }
         }        
@@ -78,8 +71,7 @@ namespace AlbumPanelColorTiles.Utils
         private List<ObjectId> getPanelsBtr()
         {
             List<ObjectId> idsBtrPanels = new List<ObjectId>();
-            var bt = Db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
-            IdBtrWindow = bt["АКР_Окно"];
+            var bt = Db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;            
             foreach (ObjectId idBtr in bt)
             {
                 var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;

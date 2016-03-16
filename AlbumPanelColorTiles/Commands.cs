@@ -980,8 +980,7 @@ namespace AlbumPanelColorTiles
         public void UtilsWindowsRedefine()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
-            if (doc == null) return;
-            // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
+            if (doc == null) return;            
             Inspector.Clear();
             try
             {
@@ -997,6 +996,27 @@ namespace AlbumPanelColorTiles
                 }
             }
             Inspector.Show();
+        }
+
+        [CommandMethod("PIK", "AKR-InsertWindows", CommandFlags.Modal)]
+        public void AKR_InsertWindows()
+        {
+            Document doc = AcAp.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;                        
+            try
+            {
+                string fileWins = Path.Combine(CurDllDir, Settings.Default.TemplateBlocksAkrWindows);
+                AcadLib.Blocks.Visual.VisualInsertBlock.InsertBlock(fileWins, n => n.StartsWith(Settings.Default.BlockWindowName), 
+                    new AcadLib.Layers.LayerInfo (Settings.Default.LayerWindows));
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage(ex.Message);
+                if (!ex.Message.Contains("Отменено пользователем"))
+                {
+                    Log.Error(ex, $"Command: AKR-InsertWindows. {doc.Name}");
+                }
+            }            
         }
 
         [CommandMethod("PIK", "TestRemoveDashAKR", CommandFlags.Modal)]

@@ -12,9 +12,8 @@ namespace AlbumPanelColorTiles.Utils.Window
 {
     public class WindowRedefine
     {
-        private static Dictionary<string, ObjectIdCollection> dictIdBlRefAkrWindowMarks;
-
-        public bool IsAkrBlockWindow { get; set; }
+        private static Dictionary<string, ObjectId> dictIdBtrAkrWindow;
+        
         public string BlNameOld { get; set; }
         public ObjectId IdBtrOwner { get; set; }
         public ObjectId IdBlRef { get; set; }
@@ -22,12 +21,11 @@ namespace AlbumPanelColorTiles.Utils.Window
         public WindowTranslator TranslatorW { get; set; }
 
         public WindowRedefine (bool isAkrBlWin, BlockReference blRefWinOld, WindowTranslator translatorW)
-        {
-            IsAkrBlockWindow = isAkrBlWin;
+        {            
             IdBlRef = blRefWinOld.Id;
             TranslatorW = translatorW;
             IdBtrOwner = blRefWinOld.OwnerId;
-            if (IsAkrBlockWindow)
+            if (isAkrBlWin)
             {
                 Position = blRefWinOld.Position;
             }
@@ -40,131 +38,49 @@ namespace AlbumPanelColorTiles.Utils.Window
 
         public static void Init()
         {
-            dictIdBlRefAkrWindowMarks = null;
-        }
-
-        /// <summary>
-        /// Получение определений блоков для всех марок окон в динамическом блоке
-        /// </summary>
-        /// <returns></returns>
-        public static Dictionary<string, ObjectIdCollection> GetBlRefAkrWindowMarks()
-        {
-            var idBlRefAkrWindowMarks = new Dictionary<string, ObjectIdCollection>();
-            // Получение определения блока для каждой марки
-            Database db = UtilsReplaceWindows.Db;
-            using (var bt = db.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
-            {
-                // Исходный блок окна
-                ObjectId idBtrWindow = bt["АКР_Окно"];                
-                using (var ms = bt[BlockTableRecord.ModelSpace].Open(OpenMode.ForWrite) as BlockTableRecord)
-                {
-                    BlockReference blRefWin = new BlockReference(Point3d.Origin, idBtrWindow);
-                    blRefWin.SetDatabaseDefaults();
-
-                    List<string> marks = null;                    
-                    foreach (DynamicBlockReferenceProperty param in blRefWin.DynamicBlockReferencePropertyCollection)
-                    {
-                        if (param.PropertyName.Equals(Settings.Default.BlockWindowVisibilityName, StringComparison.OrdinalIgnoreCase))
-                        {                            
-                            marks = param.GetAllowedValues().Cast<string>().ToList();
-                            break;
-                        }
-                    }
-
-                    List<BlockReference> blRefWins = new List<BlockReference>();
-                    if (marks != null)
-                    {                        
-                        foreach (string mark in marks)
-                        {
-                            using (blRefWin = new BlockReference(Point3d.Origin, idBtrWindow))
-                            {
-                                blRefWin.SetDatabaseDefaults();
-                                blRefWin.Layer = UtilsReplaceWindows.LayerWindow;
-                                blRefWins.Add(blRefWin);
-
-                                ms.AppendEntity(blRefWin);
-
-                                foreach (DynamicBlockReferenceProperty param in blRefWin.DynamicBlockReferencePropertyCollection)
-                                {
-                                    if (param.PropertyName.Equals(Settings.Default.BlockWindowVisibilityName, StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        param.Value = mark;
-                                        break;
-                                    }
-                                }
-
-                                ObjectIdCollection idCol = new ObjectIdCollection();
-                                idCol.Add(blRefWin.Id);
-                                idBlRefAkrWindowMarks.Add(mark, idCol);
-                            }
-                        }                        
-                    }
-                }
-            }
-            return idBlRefAkrWindowMarks;
-        }
-
-        public static void EraseTemplateBlRefsAkrWin()
-        {
-            if (dictIdBlRefAkrWindowMarks != null)
-            {
-                foreach (var item in dictIdBlRefAkrWindowMarks)
-                {
-                    var blRefTemp = item.Value[0].GetObject(OpenMode.ForWrite, false, true) as BlockReference;
-                    blRefTemp.Erase();
-                }
-            }
-        }
+            dictIdBtrAkrWindow = null;
+        }                
 
         public void Replace()
-        {            
-            ObjectIdCollection idColBlRefAkrWindow = getBlRefAkrWindow(TranslatorW.Mark);
-            IdMapping map = new IdMapping();
-            UtilsReplaceWindows.Db.DeepCloneObjects(idColBlRefAkrWindow, IdBtrOwner, map, false);
-            ObjectId idBlRefCopy = map[idColBlRefAkrWindow[0]].Value;
-
-            if (idBlRefCopy.IsNull)
+        {
+            ObjectId idBtrWin;
+            if (dictIdBtrAkrWindow == null)
             {
-                throw new Exception($"Ошибка при копировании блока окна с маркой {TranslatorW.Mark}.");
+                dictIdBtrAkrWindow = getBtrAkrWin(UtilsReplaceWindows.Db);
+            }
+            dictIdBtrAkrWindow.TryGetValue(TranslatorW.BlNameNew, out idBtrWin);
+
+            if (idBtrWin.IsNull)
+            {
+                throw new Exception($"Ошибка, не найден блок окна {TranslatorW.BlNameNew}.");
             }
 
-            var blRefNew = idBlRefCopy.GetObject(OpenMode.ForWrite) as BlockReference;
-            if (blRefNew == null)
-            {
-                throw new Exception($"Ошибка при копировании блока окна с маркой {TranslatorW.Mark}.");
-            }
-
-            blRefNew.Position = Position;
-
+            // Создание вхождения нового блока окнак
+            var blRefNew = new BlockReference(Position, idBtrWin);
+            blRefNew.SetDatabaseDefaults();
+            blRefNew.Layer = Settings.Default.LayerWindows;
+            // добавление его в определение блок
+            var btrOwner = IdBtrOwner.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            btrOwner.AppendEntity(blRefNew);
+            UtilsReplaceWindows.Transaction.AddNewlyCreatedDBObject(blRefNew, true);
+            // Удаление старого блока.
             var blRefOldWin = IdBlRef.GetObject(OpenMode.ForWrite, false, true) as BlockReference;
             blRefOldWin.Erase();            
         }
 
-        private ObjectIdCollection getBlRefAkrWindow(string mark)
+        private Dictionary<string, ObjectId> getBtrAkrWin(Database db)
         {
-            ObjectIdCollection res;
-            if (dictIdBlRefAkrWindowMarks == null)
+            Dictionary<string, ObjectId> dictRes = new Dictionary<string, ObjectId>();
+            var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+            foreach (var idBtr in bt)
             {
-                dictIdBlRefAkrWindowMarks = GetBlRefAkrWindowMarks();
-            }            
-            if (!dictIdBlRefAkrWindowMarks.TryGetValue(mark, out res))
-            {
-                throw new Exception($"Не найдена марка {mark}.");
-            }            
-            return res;
-        }
-
-        private static void setDynProp(BlockReference blRefW, WindowTranslator translatorW)
-        {
-            foreach (DynamicBlockReferenceProperty prop in blRefW.DynamicBlockReferencePropertyCollection)
-            {
-                if (prop.PropertyName.Equals("Видимость", StringComparison.OrdinalIgnoreCase) &&
-                    !prop.Value.ToString().Equals(translatorW.Mark, StringComparison.OrdinalIgnoreCase))
+                var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
+                if (btr.Name.StartsWith(Settings.Default.BlockWindowName))
                 {
-                    prop.Value = translatorW.Mark;
-                    break;
+                    dictRes.Add(btr.Name, btr.Id);
                 }
             }
+            return dictRes;
         }
     }
 }
