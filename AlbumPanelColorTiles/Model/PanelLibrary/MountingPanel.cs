@@ -36,10 +36,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
       public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, string mark, string painting)
       {
          MarkSb = mark;
-         MarkSbWithoutElectric = GetMarkWithoutElectric(mark);//.Replace(' ', '-');
+         MarkSbWithoutElectric = AkrHelper.GetMarkWithoutElectric(mark);//.Replace(' ', '-');
          // Проверка есть ли запись Окна _ОК1 в имени марки панели
          string windowSx;
-         MarkSbWithoutElectric = GetMarkWithoutWindowsSuffix(MarkSbWithoutElectric, out windowSx);
+         MarkSbWithoutElectric = AkrHelper.GetMarkWithoutWindowsSuffix(MarkSbWithoutElectric, out windowSx);
          WindowSuffix = windowSx;
 
          MarkPainting = painting;
@@ -54,33 +54,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          PtCenterPanelSbInModel = getCenterPanelInModel();
 
          IndexConcreteClass = DefineIndexConcreteClass(MarkSb);
-      }      
-
-      public static string GetMarkWithoutWindowsSuffix(string markSB, out string windowSuffix)
-      {
-         windowSuffix = string.Empty;
-         string res = markSB;
-         var matchs = Regex.Matches(markSB, @"_ок\d{0,2}($|_)", RegexOptions.IgnoreCase);
-         if (matchs.Count == 1)
-         {
-            res = markSB.Substring(0, matchs[0].Index);
-            windowSuffix = matchs[0].Value.EndsWith("_")? matchs[0].Value.Substring(1, matchs[0].Length - 2): matchs[0].Value.Substring(1);
-         }
-         return res;
-      }
-
-      public static string GetMarkWithoutElectric(string markSB)
-      {
-         string res = markSB;
-         // "-1э" или в конце строи или перед разделителем "_".
-         var matchs = Regex.Matches(markSB, @"-\d{0,2}э($|_)", RegexOptions.IgnoreCase);
-         if (matchs.Count == 1)
-         {
-            int indexAfterElectric = matchs[0].Index + (matchs[0].Value.EndsWith("_") ? matchs[0].Value.Length - 1 : matchs[0].Value.Length);
-            res = markSB.Substring(0, matchs[0].Index) + markSB.Substring(indexAfterElectric);
-         }
-         return res;
-      }
+      }        
 
       public static List<MountingPanel> GetPanels(BlockTableRecord btr, Point3d ptBase, Matrix3d transform, PanelLibraryLoadService libLoadServ)
       {
@@ -234,10 +208,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (atrMarkInfo != null)
             {
                var atr = atrMarkInfo.IdAtrRef.GetObject(OpenMode.ForWrite, false, true) as AttributeReference;
-               var indexOfWindowSuf = atr.TextString.LastIndexOf(WindowSuffix, StringComparison.CurrentCultureIgnoreCase);
-               if (indexOfWindowSuf != -1)
+               var indexWin = atr.TextString.IndexOf(Settings.Default.WindowPanelSuffix, StringComparison.CurrentCultureIgnoreCase);
+               if (indexWin != -1)
                {                  
-                  atr.TextString = atr.TextString.Substring(0, indexOfWindowSuf-1);
+                  atr.TextString = atr.TextString.Substring(0, indexWin);
                }               
             }
          }

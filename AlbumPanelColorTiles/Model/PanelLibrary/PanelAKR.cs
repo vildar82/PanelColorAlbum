@@ -28,7 +28,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
          var val = MarkSb.GetMarkSbName(blName);
          string windowSx;
-         MountingPanel.GetMarkWithoutWindowsSuffix(val, out windowSx);
+            AkrHelper.GetMarkWithoutWindowsSuffix(val, out windowSx);
          WindowSuffix = windowSx;
          MarkAkr = MarkSb.GetMarkSbCleanName(val);//.Replace(' ', '-');
                   

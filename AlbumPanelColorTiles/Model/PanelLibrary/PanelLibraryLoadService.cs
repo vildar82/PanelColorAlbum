@@ -85,13 +85,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
                               foreach (var mountingPanelSb in mountingsPanelSb)
                               {
                                  string markSbWithoutWhite = mountingPanelSb.MarkSbWithoutElectric.Replace(' ', '-');
-                                 string markAkrWithoutWhite = MountingPanel.GetMarkWithoutElectric(markSbAkr.MarkSbClean).Replace(' ', '-');
+                                 string markAkrWithoutWhite = AkrHelper.GetMarkWithoutElectric(markSbAkr.MarkSbClean).Replace(' ', '-');
                                  if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                  {
                                     //Проверка индекса окна
                                     if (!album.StartOptions.NewMode &&
-                                        markSbAkr.WindowSuffix !=0 && 
-                                        !string.Equals(mountingPanelSb.WindowSuffix, "ок" + markSbAkr.WindowSuffix,
+                                        markSbAkr.WindowIndex !=0 && 
+                                        !string.Equals(mountingPanelSb.WindowSuffix, markSbAkr.WindowName,
                                                        StringComparison.CurrentCultureIgnoreCase)
                                        )
                                     {

@@ -163,7 +163,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          List<PanelAkrFacade> removes = new List<PanelAkrFacade>();
          foreach (var panel in panelsAkrFacade)
          {
-            var markNoElec = MountingPanel.GetMarkWithoutElectric(panel.BlName);
+            var markNoElec = AkrHelper.GetMarkWithoutElectric(panel.BlName);
             if (panel.BlName.Length != markNoElec.Length)
             {
                removes.Add(panel);

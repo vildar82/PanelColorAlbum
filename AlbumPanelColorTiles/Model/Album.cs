@@ -369,17 +369,31 @@ namespace AlbumPanelColorTiles
          progressMeter.Stop();
       }
 
-      // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
-      private void RenamePanelsToArchitectIndex(List<MarkSb> marksSB)
-      {
-         // Определение этажа панели.
-         _storeys = Storey.IdentificationStoreys(marksSB, StartOptions.NumberFirstFloor);
-         // Маркировка Марок АР по архитектурному индексу
-         foreach (var markSB in marksSB)
-         {
-            markSB.DefineArchitectMarks(marksSB);
-         }
-      }
+        // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
+        private void RenamePanelsToArchitectIndex(List<MarkSb> marksSB)
+        {
+            // Определение этажа панели.
+            _storeys = Storey.IdentificationStoreys(marksSB, StartOptions.NumberFirstFloor);
+
+            // Определение индексов окон 
+            var alphanumComparer = new AcadLib.Comparers.AlphanumComparator();
+            var groupWindows = marksSB.GroupBy(m => m.MarkSbClean).Where(g => g.Skip(1).Any());
+            foreach (var win in groupWindows)
+            {
+                var winSorted = win.Where(w=>!string.IsNullOrEmpty(w.WindowName)).OrderBy(w => w.WindowName, alphanumComparer);
+                int i = 1;
+                foreach (var markSbWin in winSorted)
+                {
+                    markSbWin.WindowIndex = i++;
+                }
+            }
+
+            // Маркировка Марок АР по архитектурному индексу                  
+            foreach (var markSB in marksSB)
+            {
+                markSB.DefineArchitectMarks();
+            }
+        }
 
       // Замена вхождений блоков панелей Марки СБ на панели Марки АР
       private void ReplaceBlocksMarkSbOnMarkAr()

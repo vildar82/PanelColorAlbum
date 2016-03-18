@@ -78,7 +78,7 @@ namespace AlbumPanelColorTiles.Model.Base
          Panel = panelXml;
          Service = service;
 
-         MarkWithoutElectric = MountingPanel.GetMarkWithoutElectric(Panel.mark);
+         MarkWithoutElectric = AkrHelper.GetMarkWithoutElectric(Panel.mark);
 
          Length = panelXml.gab.length;
          Height = panelXml.gab.height;
