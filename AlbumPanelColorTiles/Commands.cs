@@ -1030,5 +1030,28 @@ namespace AlbumPanelColorTiles
             UtilsRemoveDash testRemoveDash = new UtilsRemoveDash();
             testRemoveDash.RemoveDashAKR();
         }
+
+        [CommandMethod("PIK", "AKR-AirConditionersCalc", CommandFlags.Modal)]
+        public void AirConditionersCalcCommand()
+        {
+            Document doc = AcAp.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
+            Log.Info("Start Command: AKR-AirConditionersCalc");
+            Inspector.Clear();
+            try
+            {
+                Model.Utils.AirConditioners.AirConditionersCalc airCondCalc = new Model.Utils.AirConditioners.AirConditionersCalc();
+                airCondCalc.Calc();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage($"\nНе удалось выполнить переопределение блока окна. {ex.Message}");
+                if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
+                {
+                    Log.Error(ex, $"Command: AKR-AirConditionersCalc. {doc.Name}");
+                }
+            }
+            Inspector.Show();
+        }
     }
 }
