@@ -20,7 +20,7 @@
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
     <AssemblyVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyVersionSettings>
     <AssemblyFileVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.83.295</AssemblyVersion>
+    <AssemblyVersion>2.0.83.307</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -259,6 +259,8 @@
     <Compile Include="Model\StartOptions.cs" />
     <Compile Include="Model\Utils\AirConditioners\AirConditioner.cs" />
     <Compile Include="Model\Utils\AirConditioners\AirConditionersCalc.cs" />
+    <Compile Include="Model\Utils\AirConditioners\AirCondRow.cs" />
+    <Compile Include="Model\Utils\AirConditioners\AirCondTable.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\Window\UtilsReplaceWindows.cs" />
     <Compile Include="Model\Utils\Window\WindowRedefine.cs" />

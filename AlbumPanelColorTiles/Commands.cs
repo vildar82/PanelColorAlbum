@@ -1046,7 +1046,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                doc.Editor.WriteMessage($"\nНе удалось выполнить переопределение блока окна. {ex.Message}");
+                doc.Editor.WriteMessage($"\n{ex.Message}");
                 if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
                 {
                     Log.Error(ex, $"Command: AKR-AirConditionersCalc. {doc.Name}");
