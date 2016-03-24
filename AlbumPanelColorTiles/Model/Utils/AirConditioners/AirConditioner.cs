@@ -41,6 +41,7 @@ namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
             }
             else
             {
+                ColorName = layer;
                 addErr("Имя слоя должно иметь вид, например: АР_Кондиционеры_1_NCS S 0300, где 1 - марка, NCS S 0300 цвет.");
             }                                    
         }       
