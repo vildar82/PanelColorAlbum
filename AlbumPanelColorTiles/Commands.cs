@@ -1000,7 +1000,7 @@ namespace AlbumPanelColorTiles
         }
 
         [CommandMethod("PIK", "AKR-InsertWindows", CommandFlags.Modal)]
-        public void AKR_InsertWindows()
+        public void InsertWindows()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;                        
