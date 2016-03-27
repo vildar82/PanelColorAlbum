@@ -45,9 +45,13 @@ namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
         {
             Table table = new Table();
             table.SetDatabaseDefaults(db);
-            table.TableStyle = db.GetTableStylePIK(); // если нет стиля ПИк в этом чертеже, то он скопируетс из шаблона, если он найдется            
+            table.TableStyle = db.GetTableStylePIK(true); // если нет стиля ПИк в этом чертеже, то он скопируетс из шаблона, если он найдется            
+            // Измпнение отступа в стилше ПИК на 1
+            UpdateTableStyle(table.TableStyle);
 
-            int rows = condRows.Count + 3;
+            bool hasTotalRow = (condRows.Count > 1);
+            int rows = hasTotalRow ? condRows.Count + 3 : condRows.Count + 2;            
+            
             table.SetSize(rows, 5);
 
             table.SetRowHeight(8);
@@ -76,7 +80,7 @@ namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
             // столбец Прим
             col = table.Columns[4];
             col.Alignment = CellAlignment.MiddleCenter;
-            col.Width = 40;            
+            col.Width = hasTotalRow? 40 : 60;            
 
             // Заголовок Маркв
             var cellColName = table.Cells[1, 0];
@@ -116,12 +120,17 @@ namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
             }
 
             // Объединение итого
-            table.MergeCells(CellRange.Create(table, row,0, row,2));            
-            table.Cells[row, 0].TextString = "Итого на фасад";
-            table.Cells[row, 3].TextString = condRows.Sum(c=>c.Count).ToString();
+            if (hasTotalRow)
+            {
+                table.MergeCells(CellRange.Create(table, row, 0, row, 2));
+                table.Cells[row, 0].TextString = "Итого на фасад";
+                table.Cells[row, 3].TextString = condRows.Sum(c => c.Count).ToString();
 
-            // Объединение примечания            
-            table.MergeCells(CellRange.Create(table, 2, 4, row, 4));
+                // Объединение примечания                        
+                table.MergeCells(CellRange.Create(table, 2, 4, row, 4));
+                table.Rows[row].Borders.Top.LineWeight = lwBold;
+            }
+            
             table.Cells[2, 4].TextString = "Стальной перфорированный лист, окрашенный порошковой эмалью в цвет по таблице.";
 
             var lastRow = table.Rows.Last();
@@ -129,16 +138,25 @@ namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
 
             table.GenerateLayout();
             return table;
-        }
+        }       
 
         private void insertTable(Table table)
         {
-            TableJig jigTable = new TableJig(table, 1 / db.Cannoscale.Scale, "Вставка спецификации кондиционеров");
+            double scale = db.TileMode ? 1 / db.Cannoscale.Scale : 1;
+            TableJig jigTable = new TableJig(table, scale, "Вставка спецификации кондиционеров");
             if (ed.Drag(jigTable).Status == PromptStatus.OK)
             {
                 var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
                 cs.AppendEntity(table);
                 db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(table, true);
+            }
+        }
+
+        private void UpdateTableStyle(ObjectId tableStyle)
+        {
+            using (var ts = db.Tablestyle.Open(OpenMode.ForWrite) as TableStyle)
+            {
+                ts.SetMargin(CellMargins.Left, 1, "_DATA");
             }
         }
     }

@@ -61,6 +61,10 @@ namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
                     }                    
                 }
             }
+            if (airConds.Count==0)
+            {
+                throw new Exception("Не найдены блоки кондиционеров 'АР_Корзина_Кондиционера'");
+            }
             return airConds;
         }
 
