@@ -112,7 +112,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                           string errMsg = $"Не совпала марка покраски. Панель АКР {markAr.MarkARPanelFullName}, " +
                                              $"Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}{mountingPanelSb.MarkPainting}";                                          
                                           Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
-                                          Log.Error(errMsg);
+                                          //Log.Error(errMsg);
                                        }
                                        break;
                                     }
