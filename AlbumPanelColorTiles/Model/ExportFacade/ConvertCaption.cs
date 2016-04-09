@@ -21,16 +21,16 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             if (!panelBtr.IdCaptionMarkSb.IsNull)
             {
                 Point3d posMarkSb = new Point3d(panelBtr.ExtentsNoEnd.MinPoint.X + 230, panelBtr.ExtentsNoEnd.MinPoint.Y + 20, 0);
-                Extents3d extMarkSb = convertText(panelBtr.IdCaptionMarkSb, 90, posMarkSb);
+                Extents3d extMarkSb = convertText(panelBtr.IdCaptionMarkSb, 90, posMarkSb, true);
                 Point3d posMarkPaint = new Point3d(posMarkSb.X + 250, posMarkSb.Y + 20, 0);
-                Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, posMarkPaint);
+                Extents3d extPaint = convertText(panelBtr.IdCaptionPaint, 90, posMarkPaint, false);
                 Extents3d extTexts = extMarkSb;
                 extTexts.AddExtents(extPaint);
                 сreateHatch(extTexts, btr);
             }
         }
 
-        private Extents3d convertText(ObjectId idDbText, int angle, Point3d pos)
+        private Extents3d convertText(ObjectId idDbText, int angle, Point3d pos, bool isMarkOrPaint)
         {
             Extents3d resVal = new Extents3d();
             if (idDbText.IsNull)
@@ -44,6 +44,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                 double lenMax = panelBtr.HeightByTile;
 
                 // Аннотативность???
+
                 if (panelBtr.HeightByTile >= 2000)
                 {
                     text.Position = pos;
@@ -53,6 +54,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                 else
                 {
                     lenMax = panelBtr.ExtentsNoEnd.MaxPoint.X - panelBtr.ExtentsNoEnd.MinPoint.X;
+                    // Небольшая корректировка положения текста
+                    if (isMarkOrPaint)
+                    {
+                        text.Position = new Point3d(10, 315,0);
+                    }
+                    else
+                    {
+                        text.Position = new Point3d(10, 65, 0);
+                    }
                 }
 
                 // Проверка длины текста - если не вписывается в размер панели то сжатие

@@ -245,20 +245,17 @@ namespace AlbumPanelColorTiles
             Log.Info("Start Command: AKR-CreatePlanBlocks");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
-            using (var DocLock = doc.LockDocument())
+            try
             {
-                try
+                BlockPlans mountingPlans = new BlockPlans();
+                mountingPlans.CreateBlockPlans();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage("\n{0}", ex.Message);
+                if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    BlockPlans mountingPlans = new BlockPlans();
-                    mountingPlans.CreateBlockPlans();
-                }
-                catch (System.Exception ex)
-                {
-                    doc.Editor.WriteMessage("\n{0}", ex.Message);
-                    if (!ex.Message.Contains("Отменено пользователем"))
-                    {
-                        Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
-                    }
+                    Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
                 }
             }
         }
@@ -271,21 +268,18 @@ namespace AlbumPanelColorTiles
             if (doc == null) return;
             Database db = doc.Database;
             Editor ed = doc.Editor;
-            using (var DocLock = doc.LockDocument())
+            LibraryEditor libEditor = new LibraryEditor();
+            try
             {
-                LibraryEditor libEditor = new LibraryEditor();
-                try
+                libEditor.Edit();
+            }
+            catch (System.Exception ex)
+            {
+                if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    libEditor.Edit();
+                    Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
                 }
-                catch (System.Exception ex)
-                {
-                    if (!ex.Message.Contains("Отменено пользователем"))
-                    {
-                        Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
-                    }
-                    ed.WriteMessage(ex.Message);
-                }
+                ed.WriteMessage(ex.Message);
             }
         }
 
@@ -300,32 +294,23 @@ namespace AlbumPanelColorTiles
             if (doc == null) return;
             Database db = doc.Database;
             Editor ed = doc.Editor;
-            using (var DocLock = doc.LockDocument())
+            try
             {
-                try
-                {
-                    Inspector.Clear();
+                Inspector.Clear();
 
-                    ExportFacadeService export = new ExportFacadeService();
-                    export.Export();
+                ExportFacadeService export = new ExportFacadeService();
+                export.Export();
 
-                    if (Inspector.HasErrors)
-                    {
-                        Inspector.Show();
-                    }
-                    else
-                    {
-                        doc.Editor.WriteMessage("\nГотово.");
-                    }
-                }
-                catch (System.Exception ex)
+                Inspector.Show();
+                doc.Editor.WriteMessage("\nГотово.");
+            }
+            catch (System.Exception ex)
+            {
+                if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
                 {
-                    if (!ex.Message.Contains("Отменено пользователем"))
-                    {
-                        Log.Error(ex, "Command: AKR-ExportFacade. {0}", doc.Name);
-                    }
-                    doc.Editor.WriteMessage("Ошибка при экспорте фасада - {0}", ex.Message);
+                    Log.Error(ex, $"Command: AKR-ExportFacade. {doc.Name}");
                 }
+                doc.Editor.WriteMessage($"Ошибка при экспорте фасада - {ex.Message}");
             }
         }
 
