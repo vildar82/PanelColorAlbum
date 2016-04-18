@@ -20,7 +20,7 @@ namespace AlbumPanelColorTiles.RandomPainting
         private Point mouseOffset;
 
         public FormRandomPainting(Dictionary<string, RandomPaint> propers,
-           RandomPaintService randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
+                RandomPaintService randomPaintingService, Dictionary<string, RandomPaint> trackPropers)
         {
             InitializeComponent();
 
@@ -193,6 +193,11 @@ namespace AlbumPanelColorTiles.RandomPainting
 
         private void comboBoxColor_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
+        }
+
+        private void comboBoxColor_SelectionChangeCommitted(object sender, EventArgs e)
+        {
             RandomPaint proper = comboBoxColor.SelectedItem as RandomPaint;
             comboBoxColor.BackColor = proper.Color;
             // Добавление набора с ползунком
@@ -336,6 +341,6 @@ namespace AlbumPanelColorTiles.RandomPainting
             trackBar.Value = value;
             // Подпись процента в TextBox
             setPercentToTextBox(proper);
-        }
+        }        
     }
 }

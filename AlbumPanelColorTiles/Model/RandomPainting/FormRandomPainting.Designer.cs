@@ -54,6 +54,7 @@
             this.toolTip1.SetToolTip(this.comboBoxColor, "Выбор цвета из слоев в чертеже");
             this.comboBoxColor.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBoxColor_DrawItem);
             this.comboBoxColor.SelectedIndexChanged += new System.EventHandler(this.comboBoxColor_SelectedIndexChanged);
+            this.comboBoxColor.SelectionChangeCommitted += new System.EventHandler(this.comboBoxColor_SelectionChangeCommitted);
             // 
             // label1
             // 
