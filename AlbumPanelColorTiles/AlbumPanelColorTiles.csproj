@@ -145,6 +145,17 @@
       <DependentUpon>Panels.xsd</DependentUpon>
     </Compile>
     <Compile Include="Model\Base\BlockSectionAbstract.cs" />
+    <Compile Include="Model\ChangeJob\ChangeJobService.cs" />
+    <Compile Include="Model\ChangeJob\ChangeJobTable.cs" />
+    <Compile Include="Model\ChangeJob\ChangePanel.cs" />
+    <Compile Include="Model\ChangeJob\FloorRow.cs" />
+    <Compile Include="Model\ChangeJob\FormChangePanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\ChangeJob\FormChangePanel.Designer.cs">
+      <DependentUpon>FormChangePanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\ChangeJob\SectionColumn.cs" />
     <Compile Include="Model\ExportFacade\ContourPanel.cs" />
     <Compile Include="Model\ExportFacade\ConvertCaption.cs" />
     <Compile Include="Model\ExportFacade\ConvertEndsFacade.cs" />
@@ -261,6 +272,13 @@
     <Compile Include="Model\Utils\AirConditioners\AirConditionersCalc.cs" />
     <Compile Include="Model\Utils\AirConditioners\AirCondRow.cs" />
     <Compile Include="Model\Utils\AirConditioners\AirCondTable.cs" />
+    <Compile Include="Model\Utils\CopyDict\SelectObject.cs" />
+    <Compile Include="Model\Utils\CopyDict\FormSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Model\Utils\CopyDict\FormSelect.Designer.cs">
+      <DependentUpon>FormSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\Window\UtilsReplaceWindows.cs" />
     <Compile Include="Model\Utils\Window\WindowRedefine.cs" />
@@ -302,6 +320,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Model\ChangeJob\FormChangePanel.resx">
+      <DependentUpon>FormChangePanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Model\FormStartOptions.resx">
       <DependentUpon>FormStartOptions.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -332,6 +353,9 @@
     <EmbeddedResource Include="Model\RandomPainting\FormRandomPainting.resx">
       <DependentUpon>FormRandomPainting.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Model\Utils\CopyDict\FormSelect.resx">
+      <DependentUpon>FormSelect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

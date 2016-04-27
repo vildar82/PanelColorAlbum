@@ -308,7 +308,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                 defUpperStoreyAndParapetArchMarks(marksArArchitectIndex, Settings.Default.PaintIndexParapet);
             }
-            else if (IsEndRightPanel || IsEndLeftPanel)
+            else if (Album.StartOptions.EndsInPainting && (IsEndRightPanel || IsEndLeftPanel))
             {
                 defEndsArchMarks(marksArArchitectIndex);
             }
@@ -417,7 +417,7 @@ namespace AlbumPanelColorTiles.Panels
                 markPaint = $"{Settings.Default.PaintIndexStorey}{floor}{endIndex}"; // Э2,3,4ТП
                 if (marksArArchitectIndex.ContainsKey(markPaint))
                 {
-                    markPaint = $"{markPaint}-{i++}";
+                    markPaint = $"{markPaint}{Album.StartOptions.SplitIndexPainting}{i++}";
                 }
                 marksArArchitectIndex.Add(markPaint, markAR);
                 if (markAR.MarkSB.WindowIndex > 0)
@@ -454,7 +454,7 @@ namespace AlbumPanelColorTiles.Panels
                 markPaint = $"{Settings.Default.PaintIndexStorey}{floor}";//Э2,5,8
                 if (marksArArchitectIndex.ContainsKey(markPaint))
                 {
-                    markPaint = $"{markPaint}-{i++}";
+                    markPaint = $"{markPaint}{Album.StartOptions.SplitIndexPainting}{i++}";
                 }
                 marksArArchitectIndex.Add(markPaint, markAR);
                 if (markAR.MarkSB.WindowIndex > 0)
@@ -486,7 +486,7 @@ namespace AlbumPanelColorTiles.Panels
                 int i = 1;
                 foreach (var markAR in MarksAR)
                 {
-                    string markPaint = $"{Settings.Default.PaintIndexStorey}{index}-{i++}"; // ЭЧ-1
+                    string markPaint = $"{Settings.Default.PaintIndexStorey}{index}{Album.StartOptions.SplitIndexPainting}{i++}"; // ЭЧ-1
                     marksArArchitectIndex.Add(markPaint, markAR);
                     if (markAR.MarkSB.WindowIndex > 0)
                     {

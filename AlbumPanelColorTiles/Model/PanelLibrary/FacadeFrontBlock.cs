@@ -16,7 +16,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       public FacadeFrontBlock(BlockReference blRef)
       {
-         _blName = blRef.Name;
+         _blName = blRef.GetEffectiveName();
          _idBlRef = blRef.Id;
          _extents = blRef.GeometricExtentsСlean();
          _rectangleRTree = ColorArea.GetRectangleRTree(_extents);

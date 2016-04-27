@@ -21,6 +21,7 @@ using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
 using AlbumPanelColorTiles.Utils;
+using AlbumPanelColorTiles.Utils.CopyDict;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -201,20 +202,42 @@ namespace AlbumPanelColorTiles
                 {
                     Inspector.Clear();
                     // Запрос имени открытого чертежа в который нужно скопировать словарь
-                    var res = doc.Editor.GetString("Имя чертежа в который копировать словарь АКР");
-                    if (res.Status == PromptStatus.OK)
+                    //var res = doc.Editor.GetString("Имя чертежа в который копировать словарь АКР");
+                    List<SelectObject> docs = new List<SelectObject>();
+                    foreach (Document item in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
                     {
-                        // Поиск чертежа среди открытых документов
-                        foreach (Document itemDoc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
+                        if (item == doc) continue;
+                        docs.Add(new SelectObject (item, item.Name));
+                    }
+
+                    FormSelect formSelectDoc = new FormSelect(docs);
+                    var res = Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(formSelectDoc);
+                    if (res ==  DialogResult.OK)
+                    {
+                        var docSelected = (Document)((SelectObject)formSelectDoc.SelectedItem).Object;
+                        if (doc == docSelected)
+                        {      
+                            MessageBox.Show("Выбран текущий чертеж!");                            
+                        }
+                        else
                         {
-                            if (string.Equals(Path.GetFileName(itemDoc.Name), res.StringResult, System.StringComparison.OrdinalIgnoreCase))
+                            using (var lockItemDoc = docSelected.LockDocument())
                             {
-                                using (var lockItemDoc = itemDoc.LockDocument())
-                                {
-                                    Lib.DictNOD.CopyDict(itemDoc.Database);
-                                }
+                                Lib.DictNOD.CopyDict(docSelected.Database);
+                                doc.Editor.WriteMessage("Словарь скопирован успешно.");
                             }
                         }
+                        // Поиск чертежа среди открытых документов
+                        //foreach (Document itemDoc in Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager)
+                        //{
+                        //    if (string.Equals(Path.GetFileName(itemDoc.Name), res.StringResult, System.StringComparison.OrdinalIgnoreCase))
+                        //    {
+                        //        using (var lockItemDoc = itemDoc.LockDocument())
+                        //        {
+                        //            Lib.DictNOD.CopyDict(itemDoc.Database);
+                        //        }
+                        //    }
+                        //}
                     }
                     else
                     {
@@ -845,7 +868,7 @@ namespace AlbumPanelColorTiles
             {
                 // Все монтажные блоки панелей в модели
                 var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForRead) as BlockTableRecord;
-                var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null);
+                var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null, null);
                 mountingsPanelsInMs.ForEach(p => p.RemoveWindowSuffix());
                 foreach (ObjectId idEnt in ms)
                 {
@@ -855,7 +878,7 @@ namespace AlbumPanelColorTiles
                         if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                         {
                             var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
-                            var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform, null);
+                            var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform, null, null);
                             mountingsPanels.ForEach(p => p.RemoveWindowSuffix());
                         }
                     }
@@ -876,7 +899,7 @@ namespace AlbumPanelColorTiles
             {
                 // Все монтажные блоки панелей в модели
                 var ms = SymbolUtilityServices.GetBlockModelSpaceId(db).GetObject(OpenMode.ForRead) as BlockTableRecord;
-                var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null);
+                var mountingsPanelsInMs = MountingPanel.GetPanels(ms, Point3d.Origin, Matrix3d.Identity, null, null);
                 mountingsPanelsInMs.ForEach(p => p.RemoveMarkPainting());
                 foreach (ObjectId idEnt in ms)
                 {
@@ -886,7 +909,7 @@ namespace AlbumPanelColorTiles
                         if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
                         {
                             var btr = blRefMounting.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
-                            var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform, null);
+                            var mountingsPanels = MountingPanel.GetPanels(btr, blRefMounting.Position, blRefMounting.BlockTransform, null, null);
                             mountingsPanels.ForEach(p => p.RemoveMarkPainting());
                         }
                     }

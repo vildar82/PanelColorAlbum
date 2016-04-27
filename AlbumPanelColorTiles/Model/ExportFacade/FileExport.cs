@@ -34,7 +34,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             throw new Exception("Нужно сохранить текущий чертеж.");
          }
 
-         var fileExportFullName = DictNOD.LoadString(_keyDict);
+         var fileExportFullName = DictNOD.LoadString(_keyDict, string.Empty);
          if (string.IsNullOrEmpty(fileExportFullName) || !File.Exists(fileExportFullName))
          {  
             var fileAkrName = Path.GetFileNameWithoutExtension(FileAkrFacade.Name);
