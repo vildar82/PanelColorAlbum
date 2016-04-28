@@ -63,6 +63,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                     foreach (var panelAr in markAr.Panels)
                     {
                         bool isFound = false;
+                        bool isFoundFloor = false;
                         // Границы блока АКР-Панели по плитке
                         var extPanelAkr = panelAr.GetExtentsTiles(markSbAkr);
                         double xCenterPanelAkr = extPanelAkr.MinPoint.X + (extPanelAkr.MaxPoint.X - extPanelAkr.MinPoint.X) * 0.5;
@@ -76,6 +77,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                 var floor = facade.Floors.Find(f => f.Storey.Equals(panelAr.Storey));
                                 if (floor != null)
                                 {
+                                    isFoundFloor = true;
                                     // Поск монтажки по линии от центра панели АКР
                                     var mountingsPanelSb = floor.PanelsSbInFront.FindAll(
                                        p => p.ExtTransToModel.MinPoint.X < xCenterPanelAkr && p.ExtTransToModel.MaxPoint.X > xCenterPanelAkr);
@@ -129,9 +131,23 @@ namespace AlbumPanelColorTiles.PanelLibrary
                             }
                             if (!isFound)
                             {
-                                Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.",
+                                if (isFoundFloor)
+                                {
+                                    Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.",
+                                       extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
+                                }
+                                else
+                                {
+                                    Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найден монтажный план.",
                                    extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
+                                }
                             }
+                        }
+                        // Не найден фасад
+                        else
+                        {
+                            Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найден монтажный план.",
+                                   extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
                         }
                     }
                 }

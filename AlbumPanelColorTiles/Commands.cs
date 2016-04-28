@@ -524,65 +524,56 @@ namespace AlbumPanelColorTiles
             if (doc == null) return;
             Editor ed = doc.Editor;
 
-            using (var lockDoc = doc.LockDocument())
+            try
             {
-                bool repeat = false;
-                PlotDirToPdf.EnumLayoutsSort layoutSort = PlotDirToPdf.EnumLayoutsSort.TabOrder;
-                do
-                {
-                    var optPrompt = new PromptKeywordOptions($"Печать листов в PDF из текущего чертежа, выбранных файлов или из всех чертежей в папке. Сортировка - {PlotDirToPdf.GetLayoutSortName(layoutSort)}");
-                    optPrompt.Keywords.Add("Текущего");
-                    optPrompt.Keywords.Add("Папки");
-                    optPrompt.Keywords.Add("Сортировка");
-                    optPrompt.Keywords.Default = "Папки";
+                PlotOptions plotOpt = new PlotOptions();
 
-                    var resPrompt = ed.GetKeywords(optPrompt);
-                    if (resPrompt.Status == PromptStatus.OK)
+                using (var lockDoc = doc.LockDocument())
+                {
+                    bool repeat = false;
+                    do
                     {
-                        if (resPrompt.StringResult == "Текущего")
+                        var optPrompt = new PromptKeywordOptions($"\nПечать листов в PDF из текущего чертежа, выбранных файлов или из всех чертежей в папке.");
+                        optPrompt.Keywords.Add("Текущего");
+                        optPrompt.Keywords.Add("Папки");
+                        //optPrompt.Keywords.Add("Сортировка");
+                        optPrompt.Keywords.Add("Настройки");
+                        optPrompt.Keywords.Default = "Папки";
+
+                        var resPrompt = ed.GetKeywords(optPrompt);
+                        if (resPrompt.Status == PromptStatus.OK)
                         {
-                            repeat = false;
-                            Log.Info("Текущего");
-                            try
+                            if (resPrompt.StringResult == "Текущего")
                             {
+                                repeat = false;
+                                Log.Info("Текущего");
                                 if (!File.Exists(doc.Name))
                                 {
                                     throw new System.Exception("Нужно сохранить текущий чертеж.");
                                 }
                                 string filePdfName = Path.Combine(Path.GetDirectoryName(doc.Name), Path.GetFileNameWithoutExtension(doc.Name) + ".pdf");
                                 PlotDirToPdf plotter = new PlotDirToPdf(new string[] { doc.Name }, filePdfName);
-                                plotter.LayoutSort = layoutSort;
+                                plotter.Options = plotOpt;
                                 plotter.Plot();
                             }
-                            catch (System.Exception ex)
+                            else if (resPrompt.StringResult == "Папки")
                             {
-                                ed.WriteMessage("\n" + ex.Message);
-                                if (!string.Equals(ex.Message, "Отменено пользователем.", System.StringComparison.CurrentCultureIgnoreCase))
+                                repeat = false;
+                                Log.Info("Папки");
+                                var dialog = new AcadLib.UI.FileFolderDialog();
+                                dialog.Dialog.Multiselect = true;
+                                dialog.IsFolderDialog = true;
+                                dialog.Dialog.Title = "Выбор папки или файлов для печати чертежей в PDF.";
+                                dialog.Dialog.Filter = "Чертежи|*.dwg";
+                                if (_album == null)
                                 {
-                                    Log.Error(ex, "plotter.PlotCur(); {0}", doc.Name);
+                                    dialog.Dialog.InitialDirectory = Path.GetDirectoryName(doc.Name);
                                 }
-                            }
-                        }
-                        else if (resPrompt.StringResult == "Папки")
-                        {
-                            repeat = false;
-                            Log.Info("Папки");
-                            var dialog = new AcadLib.UI.FileFolderDialog();
-                            dialog.Dialog.Multiselect = true;
-                            dialog.IsFolderDialog = true;
-                            dialog.Dialog.Title = "Выбор папки или файлов для печати чертежей в PDF.";
-                            dialog.Dialog.Filter = "Чертежи|*.dwg";
-                            if (_album == null)
-                            {
-                                dialog.Dialog.InitialDirectory = Path.GetDirectoryName(doc.Name);
-                            }
-                            else
-                            {
-                                dialog.Dialog.InitialDirectory = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
-                            }
-                            if (dialog.ShowDialog() == DialogResult.OK)
-                            {
-                                try
+                                else
+                                {
+                                    dialog.Dialog.InitialDirectory = _album.AlbumDir == null ? Path.GetDirectoryName(doc.Name) : _album.AlbumDir;
+                                }
+                                if (dialog.ShowDialog() == DialogResult.OK)
                                 {
                                     PlotDirToPdf plotter;
                                     string firstFileNameWoExt = Path.GetFileNameWithoutExtension(dialog.Dialog.FileNames.First());
@@ -598,46 +589,52 @@ namespace AlbumPanelColorTiles
                                     {
                                         plotter = new PlotDirToPdf(dialog.Dialog.FileNames, firstFileNameWoExt);
                                     }
-                                    plotter.LayoutSort = layoutSort;
+                                    plotter.Options = plotOpt;
                                     plotter.Plot();
                                 }
-                                catch (System.Exception ex)
-                                {
-                                    ed.WriteMessage("\n{0}", ex.Message);
-                                    if (!ex.Message.Contains("Отменено пользователем"))
-                                    {
-                                        Log.Error(ex, "plotter.PlotDir({0}); {1}", dialog.SelectedPath, doc.Name);
-                                    }
-                                }
                             }
-                        }
-                        else if (resPrompt.StringResult == "Сортировка")
-                        {
-                            repeat = true;
-                            var keyOpSort = new PromptKeywordOptions("Сортировка листов по порядку вкладок или по именам листов");
-                            keyOpSort.Keywords.Add("Вкладки");
-                            keyOpSort.Keywords.Add("Имена");
-                            keyOpSort.Keywords.Default = "Вкладки";
-                            var res = ed.GetKeywords(keyOpSort);
-                            if (res.Status == PromptStatus.OK)
+                            //else if (resPrompt.StringResult == "Сортировка")
+                            //{
+                            //    repeat = true;
+                            //    var keyOpSort = new PromptKeywordOptions("Сортировка листов по порядку вкладок или по именам листов");
+                            //    keyOpSort.Keywords.Add("Вкладки");
+                            //    keyOpSort.Keywords.Add("Имена");
+                            //    keyOpSort.Keywords.Default = "Вкладки";
+                            //    var res = ed.GetKeywords(keyOpSort);
+                            //    if (res.Status == PromptStatus.OK)
+                            //    {
+                            //        if (res.StringResult == "Вкладки")
+                            //        {
+                            //            layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.TabOrder;
+                            //        }
+                            //        else if (res.StringResult == "Имена")
+                            //        {
+                            //            layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.LayoutNames;
+                            //        }
+                            //    }
+                            //}
+                            else if (resPrompt.StringResult == "Настройки")
                             {
-                                if (res.StringResult == "Вкладки")
-                                {
-                                    layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.TabOrder;
-                                }
-                                else if (res.StringResult == "Имена")
-                                {
-                                    layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.LayoutNames;
-                                }
+                                // Сортировка; Все файлы в один пдф или для каждого файла отдельная пдф
+                                plotOpt.Show();
+                                repeat = true;
                             }
                         }
-                    }
-                    else
-                    {
-                        ed.WriteMessage("\nОтменено пользователем.");
-                        return;
-                    }
-                } while (repeat);
+                        else
+                        {
+                            ed.WriteMessage("\nОтменено пользователем.");
+                            return;
+                        }
+                    } while (repeat);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage($"\n{ex.Message}");
+                if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
+                {
+                    Log.Error(ex, $"Command: AKR-RandomPainting. {doc.Name}");
+                }
             }
         }
 
