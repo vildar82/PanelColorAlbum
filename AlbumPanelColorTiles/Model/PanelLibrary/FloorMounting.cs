@@ -44,9 +44,21 @@ namespace AlbumPanelColorTiles.PanelLibrary
             Transform = blRefMounting.BlockTransform;
             definePlanSection(blRefMounting);
 
-            Extents = blRefMounting.Bounds;
-            PlanExtentsHeight = Extents==null? 33000: Extents.Value.MaxPoint.Y - Extents.Value.MinPoint.Y;
-            PlanExtentsLength = Extents == null ? 50000 : Extents.Value.MaxPoint.X - Extents.Value.MinPoint.X;
+            Extents = blRefMounting.Bounds;       
+            if (Extents.HasValue)
+            {
+                var ext = Extents.Value;
+                ext.TransformBy(blRefMounting.BlockTransform.Inverse());
+                var h = Extents.Value.MaxPoint.Y - Extents.Value.MinPoint.Y;
+                var l = Extents.Value.MaxPoint.X - Extents.Value.MinPoint.X;
+                PlanExtentsHeight = ext.MaxPoint.Y - ext.MinPoint.Y;
+                PlanExtentsLength = ext.MaxPoint.X - ext.MinPoint.X;
+            }
+            else
+            {
+                PlanExtentsHeight = 30000;
+                PlanExtentsLength = 50000;
+            }            
 
             //defFloorNameAndNumber(blRefMounting);
 

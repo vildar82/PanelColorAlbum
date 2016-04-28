@@ -62,6 +62,7 @@
             this.listBoxChangePanels.Size = new System.Drawing.Size(462, 196);
             this.listBoxChangePanels.TabIndex = 0;
             this.listBoxChangePanels.SelectedIndexChanged += new System.EventHandler(this.listBoxChangePanels_SelectedIndexChanged);
+            this.listBoxChangePanels.DoubleClick += new System.EventHandler(this.listBoxChangePanels_DoubleClick);
             // 
             // groupBoxPanelAkr
             // 
@@ -227,6 +228,7 @@
             // 
             // buttonCancel
             // 
+            this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonCancel.Location = new System.Drawing.Point(490, 396);
             this.buttonCancel.Name = "buttonCancel";

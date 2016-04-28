@@ -494,8 +494,7 @@ namespace AlbumPanelColorTiles
                 }
                 _album.PaintPanels();
                 doc.Editor.Regen();
-                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");
-                //doc.Editor.WriteMessage("\nВыполните команду AlbumPanels для создания альбома покраски панелей с плиткой.");
+                doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");                
                 Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)
@@ -535,8 +534,7 @@ namespace AlbumPanelColorTiles
                     {
                         var optPrompt = new PromptKeywordOptions($"\nПечать листов в PDF из текущего чертежа, выбранных файлов или из всех чертежей в папке.");
                         optPrompt.Keywords.Add("Текущего");
-                        optPrompt.Keywords.Add("Папки");
-                        //optPrompt.Keywords.Add("Сортировка");
+                        optPrompt.Keywords.Add("Папки");                        
                         optPrompt.Keywords.Add("Настройки");
                         optPrompt.Keywords.Default = "Папки";
 
@@ -592,27 +590,7 @@ namespace AlbumPanelColorTiles
                                     plotter.Options = plotOpt;
                                     plotter.Plot();
                                 }
-                            }
-                            //else if (resPrompt.StringResult == "Сортировка")
-                            //{
-                            //    repeat = true;
-                            //    var keyOpSort = new PromptKeywordOptions("Сортировка листов по порядку вкладок или по именам листов");
-                            //    keyOpSort.Keywords.Add("Вкладки");
-                            //    keyOpSort.Keywords.Add("Имена");
-                            //    keyOpSort.Keywords.Default = "Вкладки";
-                            //    var res = ed.GetKeywords(keyOpSort);
-                            //    if (res.Status == PromptStatus.OK)
-                            //    {
-                            //        if (res.StringResult == "Вкладки")
-                            //        {
-                            //            layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.TabOrder;
-                            //        }
-                            //        else if (res.StringResult == "Имена")
-                            //        {
-                            //            layoutSort = AcadLib.Plot.PlotDirToPdf.EnumLayoutsSort.LayoutNames;
-                            //        }
-                            //    }
-                            //}
+                            }                            
                             else if (resPrompt.StringResult == "Настройки")
                             {
                                 // Сортировка; Все файлы в один пдф или для каждого файла отдельная пдф

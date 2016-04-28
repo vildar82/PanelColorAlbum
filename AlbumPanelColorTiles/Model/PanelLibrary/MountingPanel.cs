@@ -34,7 +34,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
         /// <summary>
         /// Индекс класса бетона панели (определяется по приставке цифры к короткому имени марки панелои 3НСНг2 - индекс =2, 3НСНг = 0)
         /// </summary>
-        public int IndexConcreteClass { get; private set; }
+        public int IndexConcreteClass { get; private set; }        
 
         public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, 
             string mark, string painting, FloorMounting floor)
@@ -48,7 +48,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             WindowSuffix = windowSx;
 
             MarkPainting = painting;
-
+                        
             ExtBlRef = blRefPanelSB.Bounds;
             ExtBlRefClean = blRefPanelSB.GeometricExtentsСlean(); //blRefPanelSB.GeometricExtents;         
             Thickness = getThickness(ExtBlRefClean);

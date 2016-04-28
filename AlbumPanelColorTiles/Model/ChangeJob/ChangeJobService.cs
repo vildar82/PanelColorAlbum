@@ -159,13 +159,27 @@ namespace AlbumPanelColorTiles.ChangeJob
 
             // Обвести облачком каждую панель с изменившейся покраской
             foreach (var chPanel in chPanels)
-            {
+            {   
                 // Границы монт. панели на монт. плане в координатах Модели.
                 var extMP = chPanel.ExtMountPanel;
                 extMP.TransformBy(blRefFloor.BlockTransform);
 
-                var ptCloudMin = new Point3d(extMP.MinPoint.X+150, extMP.MinPoint.Y - 300, 0);
-                var ptCloudMax = new Point3d(extMP.MaxPoint.X-150, extMP.MaxPoint.Y + 300, 0);
+                Point3d ptCloudMin;
+                Point3d ptCloudMax;
+                Point3d ptText;
+
+                if (chPanel.IsHorizontal)
+                {
+                    ptCloudMin = new Point3d(extMP.MinPoint.X + 150, extMP.MinPoint.Y - 150, 0);
+                    ptCloudMax = new Point3d(extMP.MaxPoint.X - 150, extMP.MaxPoint.Y + 150, 0);
+                    ptText = new Point3d(ptCloudMin.X, ptCloudMin.Y - 100, 0);
+                }
+                else
+                {
+                    ptCloudMin = new Point3d(extMP.MinPoint.X - 150, extMP.MinPoint.Y + 150, 0);
+                    ptCloudMax = new Point3d(extMP.MaxPoint.X + 150, extMP.MaxPoint.Y - 150, 0);
+                    ptText = new Point3d(ptCloudMax.X+100, ptCloudMin.Y+(ptCloudMax.Y-ptCloudMin.Y)*0.5, 0);
+                }                
                 var extCloud = new Extents3d(ptCloudMin, ptCloudMax);
 
                 // Полилиния облака изменения
@@ -181,8 +195,9 @@ namespace AlbumPanelColorTiles.ChangeJob
                 text.SetDatabaseDefaults();
                 text.ColorIndex = 1;
                 text.TextHeight = 250;
-                text.Contents = $"Старая марка покраски: {chPanel.PaintOld}, \n\rНовая марка покраски: {chPanel.PaintNew}";
-                text.Location = new Point3d(extCloud.MinPoint.X, extCloud.MinPoint.Y-100, 0);
+                text.Contents = $"Старая марка покраски: {chPanel.PaintOld}, \n\rНовая марка покраски: {chPanel.PaintNew} " +
+                    $"\n\rПанель: {chPanel.MarkSb}";
+                text.Location = ptText;
                 btr.AppendEntity(text);
                 t.AddNewlyCreatedDBObject(text, true);
 

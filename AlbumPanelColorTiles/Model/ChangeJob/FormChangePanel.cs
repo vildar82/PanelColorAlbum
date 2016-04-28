@@ -97,5 +97,10 @@ namespace AlbumPanelColorTiles.ChangeJob
             ChangeJobService.ExcludePanel(chPanel);
             UpdateData();
         }
+
+        private void listBoxChangePanels_DoubleClick(object sender, EventArgs e)
+        {
+            ShowPanel(true);
+        }
     }
 }
