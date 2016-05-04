@@ -24,6 +24,12 @@ namespace AlbumPanelColorTiles.ChangeJob
             HeightMax = panelMount.Floor.PlanExtentsHeight;
         }
 
+        public FloorRow(Storey storey, double maxH)
+        {
+            Storey = storey;
+            HeightMax = maxH;
+        }
+
         public static FloorRow GetFloorRow(MountingPanel panelMount)
         {
             var fr = ChangeJobService.FloorRows.Find(f => f.Storey == panelMount.Floor.Storey);

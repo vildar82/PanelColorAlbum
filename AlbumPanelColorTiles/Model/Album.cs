@@ -48,7 +48,7 @@ namespace AlbumPanelColorTiles
         // Сокращенное имя проеккта
         //private int _numberFirstFloor;
         //private int _numberFirstSheet;
-        private List<Storey> _storeys;
+        private List<Storey> _storeys;        
 
         public Album()
         {
@@ -82,6 +82,8 @@ namespace AlbumPanelColorTiles
         /// Список плиток по цветам
         /// </summary>
         public List<TileCalc> TotalTilesCalc { get; private set; }
+
+        public PanelLibrary.PanelLibraryLoadService LibLoadService { get; set; }
 
         // Сброс блоков панелей в чертеже. Замена панелей марки АР на панели марки СБ
         public static void ResetBlocks()
@@ -233,8 +235,60 @@ namespace AlbumPanelColorTiles
             _sheetsSet = new SheetsSet(this);
             _sheetsSet.CreateAlbum();
 
+            // Заполнение атрибутов марок покраски в блоках монтажек
+            try
+            {
+                var libService = new PanelLibrary.PanelLibraryLoadService();
+                libService.FillMarkPainting(this);
+                this.LibLoadService = libService;
+            }
+            catch (System.Exception ex)
+            {
+                string errMsg = "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);";
+                this.Doc.Editor.WriteMessage($"\n{errMsg} - {ex.Message}");
+                Log.Error(ex, errMsg);
+            }
+
+            //// Проверка новых панелей, которых нет в библиотеке
+            //try
+            //{
+            //   PanelLibrarySaveService.CheckNewPanels();
+            //}
+            //catch (Exception ex)
+            //{
+            //   Log.Error(ex, "Не удалось проверить есть ли новые панели в чертеже фасада, которых нет в библиотеке.");
+            //}
+
             // Если есть панели с изменениями - создание задания.
-            ChangeJob.ChangeJobService.CreateJob();
+            try
+            {
+                ChangeJob.ChangeJobService.CreateJob(this);
+            }
+            catch (System.Exception ex)
+            {
+                Inspector.AddError($"Ошибка при создании Задания на Изменение марок покраски - {ex.Message}");
+            }
+
+            // Еспорт списка панелей в ексель.
+            try
+            {
+                ExportToExcel.Export(this);
+            }
+            catch (System.Exception ex)
+            {
+                Log.Error(ex, "Не удалось экспортировать панели в Excel.");
+            }
+
+            // вставка итоговой таблицы по плитке
+            try
+            {
+                TotalTileTable tableTileTotal = new TotalTileTable(this);
+                tableTileTotal.InsertTableTotalTile();
+            }
+            catch (System.Exception ex)
+            {
+                Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
+            }
         }
 
         // Поиск цвета в списке цветов альбома

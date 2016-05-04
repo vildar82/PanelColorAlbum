@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -21,8 +22,9 @@ namespace AlbumPanelColorTiles.ChangeJob
         private static int OffsetMountPlansY = 5000;
         private static int OffsetMountPlansX = 5000;
         public static ObjectId IdTextStylePik;
+        public static Color ColorChange;
         public static List<SectionColumn> SecCols { get; set; }
-        public static List<FloorRow> FloorRows { get; set; }
+        public static List<FloorRow> FloorRows { get; set; }        
 
         public static void Init()
         {
@@ -37,9 +39,11 @@ namespace AlbumPanelColorTiles.ChangeJob
             ChangePanels.Add(chPanel);
         }
 
-        public static void CreateJob()
+        public static void CreateJob(Album album)
         {
             if (ChangePanels.Count == 0) return;
+
+            List<FacadeMounting> facades = album.LibLoadService.Facades;
 
             // Показать список панелей с изменившейся маркой.
             // Исключение ошибочныйх панелей.
@@ -59,10 +63,37 @@ namespace AlbumPanelColorTiles.ChangeJob
                 Editor ed = doc.Editor;
 
                 IdTextStylePik = db.GetTextStylePIK();
-                
-                double totalLen = SecCols.Sum(s => s.LengthMax) + (SecCols.Count-1) * OffsetMountPlansX;
+                ColorChange = Color.FromRgb(205, 77, 4);
+
+                // все монтажные планы сгруппированные по секциям по возрастания
+                var mountPlansSecGroups = facades.SelectMany(s => s.Floors).GroupBy(g => g).Select(s => s.First())
+                                                    .GroupBy(g => g.Section).OrderBy(o => o.Key);
+
+                var mountPlansFloorGroups = mountPlansSecGroups.SelectMany(s => s).GroupBy(g=>g.Storey);
+
+                double totalLen = 0;// SecCols.Sum(s => s.LengthMax) + (SecCols.Count-1) * OffsetMountPlansX;
                 double tableHeight = ChangePanels.Count * 800 + 2500;
-                double totalHeight = FloorRows.Sum(f => f.HeightMax) + (FloorRows.Count-1) * OffsetMountPlansY +tableHeight; 
+                double totalHeight = 0;// FloorRows.Sum(f => f.HeightMax) + (FloorRows.Count-1) * OffsetMountPlansY +tableHeight;
+
+                // определение максимальной длины плана в каждой секции
+                foreach (var item in mountPlansSecGroups)
+                {
+                    var maxLen = item.Max(m => m.PlanExtentsLength);
+                    totalLen += maxLen;
+                    var secCol = new SectionColumn(item.Key, maxLen);
+                    SecCols.Add(secCol);    
+                }
+                totalLen += (mountPlansSecGroups.Count() - 1) * OffsetMountPlansX;
+
+                // определение максимальной высоты плана в каждом этаже
+                foreach (var item in mountPlansFloorGroups)
+                {
+                    var maxH = item.Max(m => m.PlanExtentsHeight);
+                    totalHeight += maxH;
+                    var fr = new FloorRow(item.Key, maxH);
+                    FloorRows.Add(fr);
+                }
+                totalHeight += (mountPlansFloorGroups.Count() - 1) * OffsetMountPlansY + tableHeight;
 
                 // Запрос точки вставки изменений
                 // Общая высота планов изменений                        
@@ -70,29 +101,44 @@ namespace AlbumPanelColorTiles.ChangeJob
                 var ptStart = new Point3d(ptRes.X, ptRes.Y + totalHeight, 0);
                 //AcadLib.Jigs.RectangleJig
 
-                SecCols.Sort();
-                FloorRows.Sort();
-
-                // Определение X для столбцов секций
+                // Положение столбцов секций                
                 double xPrev = ptStart.X;
-                SecCols.First().X = xPrev;
-                foreach (var secCol in SecCols.Skip(1))
+                foreach (var item in SecCols)
                 {
-                    secCol.X = xPrev + OffsetMountPlansX + secCol.LengthMax;
-                    xPrev = secCol.X;                 
-                }
-                // Определение Y для этажей
-                double yPrev = ptStart.Y;
-                FloorRows.First().Y = yPrev;
-                foreach (var fr in FloorRows.Skip(1))
-                {
-                    fr.Y = yPrev - fr.HeightMax - OffsetMountPlansY;
-                    yPrev = fr.Y;
+                    item.X = xPrev;
+                    xPrev += item.LengthMax + OffsetMountPlansX;
                 }
 
-                // группировка измененных панелей по секциям и этажам
-                var groupChPanels = ChangePanels.OrderBy(o=>o.FloorRow.Storey).ThenBy(o=>o.SecCol.Section)
-                                                .GroupBy(g => new { g.FloorRow, g.SecCol });               
+                double yPrev = ptStart.Y;
+                foreach (var item in FloorRows)
+                {
+                    item.Y = yPrev;
+                    yPrev -= item.HeightMax + OffsetMountPlansY;
+                }
+
+                //SecCols.Sort();
+                //FloorRows.Sort();
+
+                //// Определение X для столбцов секций
+                //double xPrev = ptStart.X;
+                //SecCols.First().X = xPrev;
+                //foreach (var secCol in SecCols.Skip(1))
+                //{
+                //    secCol.X = xPrev + OffsetMountPlansX + secCol.LengthMax;
+                //    xPrev = secCol.X;                 
+                //}
+                //// Определение Y для этажей
+                //double yPrev = ptStart.Y;
+                //FloorRows.First().Y = yPrev;
+                //foreach (var fr in FloorRows.Skip(1))
+                //{
+                //    fr.Y = yPrev - fr.HeightMax - OffsetMountPlansY;
+                //    yPrev = fr.Y;
+                //}
+
+                //// группировка измененных панелей по секциям и этажам
+                //var groupChPanels = ChangePanels.OrderBy(o=>o.FloorRow.Storey).ThenBy(o=>o.SecCol.Section)
+                //                                .GroupBy(g => new { g.FloorRow, g.SecCol });               
 
                 // Формирование паланов изменений и общей таблицы изменений.
                 using (var t = db.TransactionManager.StartTransaction())
@@ -111,16 +157,22 @@ namespace AlbumPanelColorTiles.ChangeJob
                     }
 
                     var ptTextData = new Point3d(ptStart.X + totalLen*0.5,yTextSection+3500, 0);
-                    string textData = "Изменения марок покраски от " + DateTime.Now;
+                    string textData = "Изменения марок покраски от " + album.Date;
                     addText(ms, t, ptTextData, textData, 1500, TextHorizontalMode.TextCenter);
 
                     var xFloorTexts = ptStart.X;
-                    foreach (var group in groupChPanels)
-                    {                        
-                        ptPlan = new Point3d(group.Key.SecCol.X, group.Key.FloorRow.Y, 0);
-                        // изменения для этого монтажного плана
-                        var extPlan = createChangePlan(group.ToList(), ptPlan, ms, t);
-                        if (extPlan.MinPoint.X < xFloorTexts) xFloorTexts = extPlan.MinPoint.X;
+                    foreach (var groupSec in mountPlansSecGroups)
+                    {
+                        var secCol = SecCols.First(s => s.Section == groupSec.Key);
+                        foreach (var item in groupSec)
+                        {
+                            var fr = FloorRows.First(f => f.Storey == item.Storey);
+                            ptPlan = new Point3d(secCol.X, fr.Y, 0);
+                            // изменения для этого монтажного плана
+                            var chPanels = ChangePanels.Where(p => p.PanelMount.Floor == item);
+                            var extPlan = createChangePlan(chPanels.ToList(), ptPlan, item.IdBtrMounting, ms, t);
+                            if (extPlan.MinPoint.X < xFloorTexts) xFloorTexts = extPlan.MinPoint.X;
+                        }
                     }
 
                     // подпись этажа                    
@@ -150,12 +202,15 @@ namespace AlbumPanelColorTiles.ChangeJob
             
         }
 
-        private static Extents3d createChangePlan(List<ChangePanel> chPanels, Point3d ptPlan, BlockTableRecord btr, Transaction t)
+        private static Extents3d createChangePlan(List<ChangePanel> chPanels, Point3d ptPlan, ObjectId idBtrFloor,
+                                                    BlockTableRecord btr,Transaction t)
         {
             // Вставить блок монтажки
-            var blRefFloor = new BlockReference(ptPlan, chPanels.First().PanelMount.Floor.IdBtrMounting);
+            var blRefFloor = new BlockReference(ptPlan, idBtrFloor);
             btr.AppendEntity(blRefFloor);
             t.AddNewlyCreatedDBObject(blRefFloor, true);
+
+            
 
             // Обвести облачком каждую панель с изменившейся покраской
             foreach (var chPanel in chPanels)
@@ -186,14 +241,14 @@ namespace AlbumPanelColorTiles.ChangeJob
                 var pl = extCloud.GetPolyline();
                 var plCloud = getCloudPolyline(pl);
                 plCloud.SetDatabaseDefaults();
-                plCloud.ColorIndex = 1;
+                plCloud.Color = ColorChange;
                 btr.AppendEntity(plCloud);
                 t.AddNewlyCreatedDBObject(plCloud, true);
 
                 // Текст изменения
                 MText text = new MText();
                 text.SetDatabaseDefaults();
-                text.ColorIndex = 1;
+                text.Color = ColorChange;
                 text.TextHeight = 250;
                 text.Contents = $"Старая марка покраски: {chPanel.PaintOld}, \n\rНовая марка покраски: {chPanel.PaintNew} " +
                     $"\n\rПанель: {chPanel.MarkSb}";

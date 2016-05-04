@@ -81,6 +81,18 @@ namespace AlbumPanelColorTiles.Sheets
                 catch { }
             }
 
+            // Измененные марки покраски
+            if (ChangeJob.ChangeJobService.ChangePanels.Count > 0)
+            {
+                try
+                {
+                    Worksheet sheetPanels = workBook.Sheets.Add();
+                    sheetPanels.Name = "Изменение";
+                    sheetChangesFill(sheetPanels, album);
+                }
+                catch { }
+            }
+
             // Показать ексель.
             // Лучше сохранить файл и закрыть!!!???         
             string excelFile = Path.Combine(album.AlbumDir, "АКР_" + Path.GetFileNameWithoutExtension(album.DwgFacade) + ".xlsx");
@@ -297,6 +309,38 @@ namespace AlbumPanelColorTiles.Sheets
                 row++;
             }
             sheetError.Columns.AutoFit();
+        }
+
+        private static void sheetChangesFill(Worksheet sheetChange, Album album)
+        {
+            int row = addTitle(sheetChange, album);
+            row++;
+            sheetChange.Cells[row, 1].Value = "Измененные марки покраски";
+            row++;
+            sheetChange.Cells[row, 1].Value = "№пп";
+            sheetChange.Cells[row, 2].Value = "Панель";
+            sheetChange.Cells[row, 3].Value = "Старая марка";
+            sheetChange.Cells[row, 4].Value = "Новая марка";
+            sheetChange.Cells[row, 5].Value = "Секция";
+            sheetChange.Cells[row, 6].Value = "Этаж";
+            row++;
+            int count = 1;
+
+            var chPanelsSorted = ChangeJob.ChangeJobService.ChangePanels.OrderBy(n=>n.MarkSb)
+                .ThenBy(s => s.PanelMount.Floor.Section).ThenBy(f => f.PanelMount.Floor.Storey);
+            foreach (var chPanel in chPanelsSorted)
+            {
+                sheetChange.Cells[row, 1].Value = count++.ToString();
+                sheetChange.Cells[row, 2].Value = chPanel.MarkSb;
+                sheetChange.Cells[row, 3].Value = chPanel.PaintOld;
+                sheetChange.Cells[row, 4].Value = chPanel.PaintNew;
+                sheetChange.Cells[row, 5].Value = chPanel.PanelMount.Floor.Section.ToString();
+                sheetChange.Cells[row, 6].Value = chPanel.PanelMount.Floor.Storey.ToString();
+                row++;
+            }
+            sheetChange.Columns.AutoFit();
+            var col1 = sheetChange.Columns[1];
+            col1.ColumnWidth = 5;
         }
     }
 }

@@ -14,6 +14,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
         }
 
         public Album Album { get; private set; }
+        public List<FacadeMounting> Facades { get; private set; }
         // все блоки панелей-СБ в чертеже
         //private List<PanelSB> _allPanelsSB = new List<PanelSB> ();
 
@@ -41,13 +42,13 @@ namespace AlbumPanelColorTiles.PanelLibrary
         {
             Album = album;
             // Определение фасадов по монтажным планам
-            List<FacadeMounting> facades = FacadeMounting.GetFacadesFromMountingPlans(this);
+            Facades = FacadeMounting.GetFacadesFromMountingPlans(this);
 
             //testPtFacades(facades);
 
             Inspector.Clear();
 
-            if (facades.Count == 0)
+            if (Facades.Count == 0)
             {
                 string errMsg = "Не найдены фасады по монтажным планам для заполнения марок покраски в монтажках.";
                 Log.Info(errMsg);
@@ -68,7 +69,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         var extPanelAkr = panelAr.GetExtentsTiles(markSbAkr);
                         double xCenterPanelAkr = extPanelAkr.MinPoint.X + (extPanelAkr.MaxPoint.X - extPanelAkr.MinPoint.X) * 0.5;
                         // поиск фасада - X центра панели АКР попадает в границы фасада Xmin и Xmax
-                        var facadesFound = facades.FindAll(f => f.XMin < xCenterPanelAkr && f.XMax > xCenterPanelAkr);
+                        var facadesFound = Facades.FindAll(f => f.XMin < xCenterPanelAkr && f.XMax > xCenterPanelAkr);
                         if (facadesFound != null)
                         {
                             foreach (var facade in facadesFound)
@@ -159,20 +160,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
         {
             Inspector.Clear();
             // Попытка определить фасады по монтажкам
-            List<FacadeMounting> facades = FacadeMounting.GetFacadesFromMountingPlans(this);
+            Facades = FacadeMounting.GetFacadesFromMountingPlans(this);
             if (Inspector.HasErrors)
             {
                 Inspector.Show();
                 return;
             }
-            if (facades.Count > 0)
+            if (Facades.Count > 0)
             {
                 // загрузка АКР-панелей из библиотеки
-                MountingPanel.LoadBtrPanels(facades);
+                MountingPanel.LoadBtrPanels(Facades);
                 // удаление АКР-Панелей старых фасадов
-                FacadeMounting.DeleteOldAkrPanels(facades);
+                FacadeMounting.DeleteOldAkrPanels(Facades);
                 // расстановка АКР-Панелей по фасадам
-                FacadeMounting.CreateFacades(facades);
+                FacadeMounting.CreateFacades(Facades);
             }
             else
             {

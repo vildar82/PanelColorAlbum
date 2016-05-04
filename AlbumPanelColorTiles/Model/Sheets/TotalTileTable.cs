@@ -26,7 +26,7 @@ namespace AlbumPanelColorTiles.Sheets
             // подсчет итогового кол плитки
             Table table = getTable(db);
 
-            TableJig jigTable = new TableJig(table, 1 / db.Cannoscale.Scale, "\nВставка итоговой таблицы плитки на альбом");
+            TableJig jigTable = new TableJig(table, 100, "\nВставка итоговой таблицы плитки на альбом");
             if (ed.Drag(jigTable).Status == PromptStatus.OK)
             {
                 using (var t = db.TransactionManager.StartTransaction())
@@ -67,7 +67,7 @@ namespace AlbumPanelColorTiles.Sheets
 
             table.Rows[1].Height = 15;
 
-            table.Cells[0, 0].TextString = "Расход плитки на альбом " + _album.StartOptions.Abbr;
+            table.Cells[0, 0].TextString = "Расход плитки на альбом " + _album.StartOptions.Abbr + " от " + _album.Date;
             table.Cells[1, 0].TextString = "Поз.";
             table.Cells[1, 1].TextString = "Артикул";
             table.Cells[1, 2].TextString = "Образец";

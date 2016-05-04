@@ -25,6 +25,12 @@ namespace AlbumPanelColorTiles.ChangeJob
             LengthMax = panelMount.Floor.PlanExtentsLength;
         }
 
+        public SectionColumn(int sec, double maxLen)
+        {
+            Section = sec;
+            LengthMax = maxLen;
+        }
+
         public static SectionColumn GetSectionColumn(MountingPanel panelMount)
         {
             var sec = ChangeJobService.SecCols.Find(s => s.Section == panelMount.Floor.Section);
