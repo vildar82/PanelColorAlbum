@@ -40,11 +40,11 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             return AcadLib.Layers.LayerExt.GetLayerOrCreateNew(layer);
         }
 
-        public void CreateContour2(BlockTableRecord btr)
+        public ObjectId CreateContour2(BlockTableRecord btr)
         {
             if (panelBtr.ExtentsByTile.Diagonal() < endOffset)
             {
-                return;
+                return ObjectId.Null;
             }
 
             // из всех плиток отделить торцевые плитки????
@@ -86,11 +86,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                 colPlTile.Add(pl);
             }
             var pl3d = colPlTile.GetExteriorContour();
-            pl3d.LayerId = panelBtr.CPS.IdLayerContour;
+            if (panelBtr.CPS != null)
+            {
+                pl3d.LayerId = panelBtr.CPS.IdLayerContour;
+            }
             btr.AppendEntity(pl3d);
             btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(pl3d, true);
 
             panelBtr.ExtentsNoEnd = pl3d.GeometricExtents;
+            return pl3d.Id;
         }        
 
         [Obsolete("Используй CreateContour2")]

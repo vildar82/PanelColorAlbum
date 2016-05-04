@@ -953,7 +953,7 @@ namespace AlbumPanelColorTiles
                         var blRef = new BlockReference(pt, idBtr);
                         ms.AppendEntity(blRef);
                         t.AddNewlyCreatedDBObject(blRef, true);
-                        pt = new Point3d(pt.X, pt.Y + 5000, 0);
+                        pt = new Point3d(pt.X, pt.Y + 7000, 0);
                     }
                 }
                 t.Commit();
@@ -1036,6 +1036,12 @@ namespace AlbumPanelColorTiles
                 }
             }
             Inspector.Show();
+        }
+
+        [CommandMethod("PIK", "UtilsReplaceMtextDescriptionOBR", CommandFlags.Modal)]
+        public void UtilsReplaceMtextDescriptionOBR()
+        {            
+            UtilDescriptionInOBR.Check();
         }
     }
 }

@@ -56,7 +56,7 @@ namespace AlbumPanelColorTiles.Panels
             _idBtr = idBtrMarkSb;
             _markSbBlockName = markSbBlockName;
             defineStoreyTypePanel(blRefPanel);
-            checkPanelIndexes(markSbName, blRefPanel);
+            checkPanelIndexes(markSbName);
             _marksAR = new List<MarkAr>();
             _colorAreas = ColorArea.GetColorAreas(_idBtr, album);
             _rtreeColorArea = ColorArea.GetRTree(_colorAreas);
@@ -381,7 +381,7 @@ namespace AlbumPanelColorTiles.Panels
         }
 
         // Проверка есть ли доп индексы в имени блока панели марки СБ - такие как ТП, ТЛ, ОК№
-        private void checkPanelIndexes(string markSbName, BlockReference blRefPanel)
+        private void checkPanelIndexes(string markSbName)
         {
             // markSbName - марка СБ (без приставки АКР_Панель_)
             // проверка торца

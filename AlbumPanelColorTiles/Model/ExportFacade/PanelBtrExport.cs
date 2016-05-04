@@ -218,7 +218,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             return resVal;
         }
 
-        private void iterateEntInBlock(BlockTableRecord btr)
+        public void iterateEntInBlock(BlockTableRecord btr, bool _deleteWaste = true)
         {
             Dictionary<Extents3d, Extents3d> tilesDict = new Dictionary<Extents3d, Extents3d>();
             _extentsByTile = new Extents3d();
@@ -229,7 +229,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                     EntInfos.Add(new EntityInfo(ent));
 
                     // Удаление лишних объектов (мусора)
-                    if (deleteWaste(ent)) continue; // Если объект удален, то переход к новому объекту в блоке
+                    if (_deleteWaste && deleteWaste(ent)) continue; // Если объект удален, то переход к новому объекту в блоке
 
                     // Если это плитка, то определение размеров панели по габаритам всех плиток
                     if (ent is BlockReference && string.Equals(((BlockReference)ent).GetEffectiveName(),

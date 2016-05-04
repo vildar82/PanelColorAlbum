@@ -279,6 +279,7 @@
     <Compile Include="Model\Utils\CopyDict\FormSelect.Designer.cs">
       <DependentUpon>FormSelect.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\Utils\UtilDescriptionInOBR.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\Window\UtilsReplaceWindows.cs" />
     <Compile Include="Model\Utils\Window\WindowRedefine.cs" />
