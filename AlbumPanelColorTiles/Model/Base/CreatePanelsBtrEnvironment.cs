@@ -217,7 +217,7 @@ namespace AlbumPanelColorTiles.Model.Base
             }
             catch (Exception ex)
             {
-               Log.Error(ex, "AcadLib.Blocks.Block.CopyBlockFromExternalDrawing");
+               Logger.Log.Error(ex, "AcadLib.Blocks.Block.CopyBlockFromExternalDrawing");
             }
          }
          else

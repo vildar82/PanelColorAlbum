@@ -73,7 +73,7 @@ namespace AlbumPanelColorTiles.Sheets
                             }
                             catch (Exception ex)
                             {
-                                Log.Error(ex, "panelDesc.CreateDescription();");
+                                Logger.Log.Error(ex, "panelDesc.CreateDescription();");
                             }
                         }
 

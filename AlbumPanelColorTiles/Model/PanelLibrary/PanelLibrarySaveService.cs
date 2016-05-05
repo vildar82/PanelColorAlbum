@@ -58,7 +58,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
       //         ed.WriteMessage("\n{0}", panel);
       //      }
       //      ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку.");
-      //      Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
+      //      Logger.Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
       //   }
       //}
 
@@ -126,7 +126,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          // Файл библиотеки блоков панелей.
          if (!File.Exists(LibPanelsFilePath))
          {
-            Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
+            Logger.Log.Error("Нет файла библиотеки панелей {0}", LibPanelsFilePath);
             return;
          }
          // сбор блоков для сохранения
@@ -274,7 +274,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                dbLib.SaveAs(dbLib.Filename, DwgVersion.Current);
                // строка отчета
                msgReport = getReport(formSave.PanelsToSave);
-               Log.Info("Обновлена библиотека панелей.");
+               Logger.Log.Info("Обновлена библиотека панелей.");
                SaveChangesToExel.Save(formSave.PanelsToSave);
             }
             else
@@ -303,7 +303,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          catch (Exception ex)
          {
-            Log.Error(ex, "sendReport MailMessage");
+            Logger.Log.Error(ex, "sendReport MailMessage");
          }
       }
 

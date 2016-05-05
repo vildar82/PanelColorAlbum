@@ -126,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
-    <Compile Include="Log.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Model\Album.cs" />
     <Compile Include="Model\Base\BaseService.cs" />
     <Compile Include="Model\Base\BlockInfo.cs" />
@@ -280,6 +280,7 @@
       <DependentUpon>FormSelect.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\Utils\UtilDescriptionInOBR.cs" />
+    <Compile Include="Model\Utils\UtilsCopyColorArea.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\Window\UtilsReplaceWindows.cs" />
     <Compile Include="Model\Utils\Window\WindowRedefine.cs" />

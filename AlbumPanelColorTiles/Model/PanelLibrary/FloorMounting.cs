@@ -182,7 +182,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 // ошибка определения номера этажа монтажки - это не чердак (Ч), не парапет (П), и не
                 // просто число
                 Inspector.AddError(ex.Message + BlRefName, IdBlRefMounting, icon: System.Drawing.SystemIcons.Error);
-                Log.Error(ex, "Floor - DefineStorey()");
+                Logger.Log.Error(ex, "Floor - DefineStorey()");
             }
         }
 

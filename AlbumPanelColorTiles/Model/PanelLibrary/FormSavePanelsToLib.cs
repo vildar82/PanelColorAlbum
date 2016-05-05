@@ -142,7 +142,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          {
             docNew.CloseAndDiscard();
             MessageBox.Show("Неудалось скопировать блок из библиотеки в новый чертеж для показа.");
-            Log.Error(ex, "buttonShowInLib_Click");
+            Logger.Log.Error(ex, "buttonShowInLib_Click");
          }
          if (!idBtr.IsNull && idBtr.IsValid)
          {

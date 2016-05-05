@@ -100,7 +100,7 @@ namespace AlbumPanelColorTiles.Model
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Не удалось сохранить стартовые параметры.");
+                Logger.Log.Error(ex, "Не удалось сохранить стартовые параметры.");
             }
             return resVal;
         }

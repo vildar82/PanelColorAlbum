@@ -246,7 +246,7 @@ namespace AlbumPanelColorTiles
             {
                 string errMsg = "Ошибка заполнения марок покраски в монтажки - libService.FillMarkPainting(_album);";
                 this.Doc.Editor.WriteMessage($"\n{errMsg} - {ex.Message}");
-                Log.Error(ex, errMsg);
+                Logger.Log.Error(ex, errMsg);
             }
 
             //// Проверка новых панелей, которых нет в библиотеке
@@ -256,7 +256,7 @@ namespace AlbumPanelColorTiles
             //}
             //catch (Exception ex)
             //{
-            //   Log.Error(ex, "Не удалось проверить есть ли новые панели в чертеже фасада, которых нет в библиотеке.");
+            //   Logger.Log.Error(ex, "Не удалось проверить есть ли новые панели в чертеже фасада, которых нет в библиотеке.");
             //}
 
             // Если есть панели с изменениями - создание задания.
@@ -276,7 +276,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                Log.Error(ex, "Не удалось экспортировать панели в Excel.");
+                Logger.Log.Error(ex, "Не удалось экспортировать панели в Excel.");
             }
 
             // вставка итоговой таблицы по плитке
@@ -287,7 +287,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
+                Logger.Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
             }
         }
 
@@ -338,7 +338,7 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                Log.Error(ex, "Tile.PaintTileInModel(rtreeColorAreas);");
+                Logger.Log.Error(ex, "Tile.PaintTileInModel(rtreeColorAreas);");
             }
 
             // Сброс блоков панелей Марки АР на панели марки СБ.

@@ -61,7 +61,7 @@ namespace AlbumPanelColorTiles.Model.Panels
                         }
                         catch (Exception ex)
                         {
-                           Log.Error(ex, "AddMarkToPanelBtr - entity.UpgradeOpen();");                           
+                           Logger.Log.Error(ex, "AddMarkToPanelBtr - entity.UpgradeOpen();");                           
                         }								
                      }
                   }

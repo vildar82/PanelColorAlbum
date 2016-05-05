@@ -249,7 +249,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                         }
                         catch (Exception ex)
                         {
-                            Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
+                            Logger.Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
                         }
                         continue;
                     }

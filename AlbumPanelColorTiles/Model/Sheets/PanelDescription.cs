@@ -95,7 +95,7 @@ namespace AlbumPanelColorTiles.Sheets
 
       private void error(string logErr)
       {
-         Log.Error("PanelDescription.CreateDescription() - layoutId.IsNull.");
+         Logger.Log.Error("PanelDescription.CreateDescription() - layoutId.IsNull.");
          Inspector.AddError($"Не удалось создать описание панели на листах панелей {markSB.MarkSbBlockName}", icon: System.Drawing.SystemIcons.Error);
       }
 

@@ -126,7 +126,7 @@ namespace AlbumPanelColorTiles
                 return;
             }
 
-            Log.Info("Start Command: AKR-AlbumPanels");
+            Logger.Log.StartCommand("AKR-AlbumPanels");
 
 
             if (_album == null)
@@ -165,7 +165,7 @@ namespace AlbumPanelColorTiles
                         }
                         doc.Editor.Regen();
                         doc.Editor.WriteMessage("\nАльбом панелей выполнен успешно:" + _album.AlbumDir);
-                        Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
+                        Logger.Log.Info("Альбом панелей выполнен успешно: {0}", _album.AlbumDir);
                     }
                     else
                     {
@@ -177,7 +177,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\nНе удалось создать альбом панелей. {0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Не удалось создать альбом панелей. {0}", doc.Name);
                     }
                 }
             }
@@ -191,7 +191,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-CopyDictionary", CommandFlags.Modal | CommandFlags.Session)]
         public void CopyDictionaryCommand()
         {
-            Log.Info("Start Command: AKR-CopyDictionary");
+            Logger.Log.StartCommand("AKR-CopyDictionary");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Database db = doc.Database;
@@ -252,7 +252,7 @@ namespace AlbumPanelColorTiles
                 {
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Command: AKR-CopyDictionary. {0}", doc.Name);
                     }
                     doc.Editor.WriteMessage("Ошибка копирования словаря - {0}", ex.Message);
                 }
@@ -265,7 +265,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-CreatePlanBlocks", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
         public void CreatePlanBlocksCommand()
         {
-            Log.Info("Start Command: AKR-CreatePlanBlocks");
+            Logger.Log.StartCommand("AKR-CreatePlanBlocks");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             try
@@ -278,7 +278,7 @@ namespace AlbumPanelColorTiles
                 doc.Editor.WriteMessage("\n{0}", ex.Message);
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
+                    Logger.Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
                 }
             }
         }
@@ -286,7 +286,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-EditPanelLibrary", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
         public void EditPanelLibraryCommand()
         {
-            Log.Info("Start Command: AKR-EditPanelLibrary");
+            Logger.Log.StartCommand("AKR-EditPanelLibrary");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Database db = doc.Database;
@@ -300,7 +300,7 @@ namespace AlbumPanelColorTiles
             {
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
+                    Logger.Log.Error(ex, "Command: AKR-EditPanelLibrary. {0}", doc.Name);
                 }
                 ed.WriteMessage(ex.Message);
             }
@@ -312,7 +312,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-ExportFacade", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
         public void ExportFacadeCommand()
         {
-            Log.Info("Start Command: AKR-ExportFacade");
+            Logger.Log.StartCommand("AKR-ExportFacade");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Database db = doc.Database;
@@ -331,7 +331,7 @@ namespace AlbumPanelColorTiles
             {
                 if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
                 {
-                    Log.Error(ex, $"Command: AKR-ExportFacade. {doc.Name}");
+                    Logger.Log.Error(ex, $"Command: AKR-ExportFacade. {doc.Name}");
                 }
                 doc.Editor.WriteMessage($"Ошибка при экспорте фасада - {ex.Message}");
             }
@@ -352,14 +352,14 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                Log.Error(ex, "HelpCommand");
+                Logger.Log.Error(ex, "HelpCommand");
             }
         }
 
         [CommandMethod("PIK", "AKR-ImagePainting", CommandFlags.Modal)]
         public void ImagePaintingCommand()
         {
-            Log.Info("Start Command: AKR-ImagePainting");
+            Logger.Log.StartCommand("AKR-ImagePainting");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             using (var DocLock = doc.LockDocument())
@@ -377,7 +377,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\n{0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Command: AKR-ImagePainting. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Command: AKR-ImagePainting. {0}", doc.Name);
                     }
                 }
             }
@@ -390,7 +390,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-LoadPanelsFromLibrary", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
         public void LoadPanelsFromLibraryCommand()
         {
-            Log.Info("Start Command: AKR-LoadPanelsFromLibrary");
+            Logger.Log.StartCommand("AKR-LoadPanelsFromLibrary");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             using (var DocLock = doc.LockDocument())
@@ -405,7 +405,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\n{0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Command: AKR-LoadPanelsFromLibrary. {0}", doc.Name);
                     }
                 }
             }
@@ -418,7 +418,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-CreateFacadeCommand", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
         public void CreateFacadeCommand()
         {
-            Log.Info("Start Command: AKR-CreateFacadeCommand");
+            Logger.Log.StartCommand("AKR-CreateFacadeCommand");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             using (var DocLock = doc.LockDocument())
@@ -433,7 +433,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\n{0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Command: AKR-CreateFacadeCommand. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Command: AKR-CreateFacadeCommand. {0}", doc.Name);
                     }
                 }
             }
@@ -460,7 +460,7 @@ namespace AlbumPanelColorTiles
             //      catch (System.Exception ex)
             //      {
             //         doc.Editor.WriteMessage($"Ошибка сохранения файла. {ex.Message}");
-            //         Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
+            //         Logger.Log.Error(ex, "Ошибка при сохранении чертеже перед покраской");
             //      }
             //   }
             //}
@@ -474,7 +474,7 @@ namespace AlbumPanelColorTiles
                     return;
                 }
             }
-            Log.Info("Start Command: AKR-PaintPanels");
+            Logger.Log.StartCommand("AKR-PaintPanels");
 
             try
             {
@@ -495,14 +495,14 @@ namespace AlbumPanelColorTiles
                 _album.PaintPanels();
                 doc.Editor.Regen();
                 doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");                
-                Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
+                Logger.Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
             }
             catch (System.Exception ex)
             {
                 doc.Editor.WriteMessage("\nНе выполнена покраска панелей. {0}", ex.Message);
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
+                    Logger.Log.Error(ex, "Не выполнена покраска панелей. {0}", doc.Name);
                 }
                 else
                 {
@@ -517,7 +517,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-PlotPdf", CommandFlags.Modal | CommandFlags.Session)]
         public void PlotPdfCommand()
         {
-            Log.Info("Start Command AKR-PlotPdf");
+            Logger.Log.StartCommand("AKR-PlotPdf");
             // Печать в PDF. Текущий чертеж или чертежи в указанной папке
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
@@ -544,7 +544,7 @@ namespace AlbumPanelColorTiles
                             if (resPrompt.StringResult == "Текущего")
                             {
                                 repeat = false;
-                                Log.Info("Текущего");
+                                Logger.Log.Info("Текущего");
                                 if (!File.Exists(doc.Name))
                                 {
                                     throw new System.Exception("Нужно сохранить текущий чертеж.");
@@ -557,7 +557,7 @@ namespace AlbumPanelColorTiles
                             else if (resPrompt.StringResult == "Папки")
                             {
                                 repeat = false;
-                                Log.Info("Папки");
+                                Logger.Log.Info("Папки");
                                 var dialog = new AcadLib.UI.FileFolderDialog();
                                 dialog.Dialog.Multiselect = true;
                                 dialog.IsFolderDialog = true;
@@ -611,7 +611,7 @@ namespace AlbumPanelColorTiles
                 doc.Editor.WriteMessage($"\n{ex.Message}");
                 if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
                 {
-                    Log.Error(ex, $"Command: AKR-RandomPainting. {doc.Name}");
+                    Logger.Log.Error(ex, $"Command: AKR-RandomPainting. {doc.Name}");
                 }
             }
         }
@@ -619,7 +619,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-RandomPainting", CommandFlags.Modal)]
         public void RandomPaintingCommand()
         {
-            Log.Info("Start Command: AKR-RandomPainting");
+            Logger.Log.StartCommand("AKR-RandomPainting");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             using (var DocLock = doc.LockDocument())
@@ -638,7 +638,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\n{0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Command: AKR-RandomPainting. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Command: AKR-RandomPainting. {0}", doc.Name);
                     }
                 }
             }
@@ -648,7 +648,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-ResetPanels", CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace | CommandFlags.Modal)]
         public void ResetPanelsCommand()
         {
-            Log.Info("Start Command: AKR-ResetPanels");
+            Logger.Log.StartCommand("AKR-ResetPanels");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             using (var DocLock = doc.LockDocument())
@@ -668,7 +668,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\nНе удалось выполнить сброс панелей. {0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Не удалось выполнить сброс панелей. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Не удалось выполнить сброс панелей. {0}", doc.Name);
                     }
                 }
             }
@@ -677,7 +677,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-SavePanelsToLibrary", CommandFlags.Session | CommandFlags.Modal | CommandFlags.NoBlockEditor)]
         public void SavePanelsToLibraryCommand()
         {
-            Log.Info("Start Command: AKR-SavePanelsToLibrary");
+            Logger.Log.StartCommand("AKR-SavePanelsToLibrary");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             using (var lockDoc = doc.LockDocument())
@@ -692,7 +692,7 @@ namespace AlbumPanelColorTiles
                     doc.Editor.WriteMessage("\nНе удалось выполнить сохранение панелей. {0}", ex.Message);
                     if (!ex.Message.Contains("Отменено пользователем"))
                     {
-                        Log.Error(ex, "Command: AKR-SavePanelsToLibrary. {0}", doc.Name);
+                        Logger.Log.Error(ex, "Command: AKR-SavePanelsToLibrary. {0}", doc.Name);
                     }
                 }
             }
@@ -704,7 +704,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-CreateFacade", CommandFlags.Modal)]
         public void CreateFacade()
         {
-            Log.Info("Start Command: AKR-CreateFacade");
+            Logger.Log.StartCommand("AKR-CreateFacade");
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Database db = doc.Database;
@@ -732,7 +732,7 @@ namespace AlbumPanelColorTiles
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
+                    Logger.Log.Error(ex, "baseService.ClearPanelsAkrFromDrawing(db);");
                 }
                 // Подготовка - копирование блоков, слоев, стилей, и т.п.
                 baseService.InitToCreationPanels(db);
@@ -768,7 +768,7 @@ namespace AlbumPanelColorTiles
                 doc.Editor.WriteMessage($"\nНе удалось выполнить построение фасада. {ex.Message}");
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Log.Error(ex, $"Command: AKR-CreateFacade. {doc.Name}");
+                    Logger.Log.Error(ex, $"Command: AKR-CreateFacade. {doc.Name}");
                 }
             }
             if (Inspector.HasErrors)
@@ -780,7 +780,7 @@ namespace AlbumPanelColorTiles
         [CommandMethod("PIK", "AKR-SelectPanels", CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
         public void SelectPanelsCommand()
         {
-            Log.Info("Start Command: AKR-SelectPanels");
+            Logger.Log.StartCommand("AKR-SelectPanels");
             // Выбор блоков панелей на чертеже в Модели
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
@@ -828,7 +828,7 @@ namespace AlbumPanelColorTiles
                 }
                 ed.SetImpliedSelection(panels.Values.SelectMany(p => p).ToArray());
                 ed.WriteMessage("\nВыбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
-                Log.Info("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
+                Logger.Log.Info("Выбрано блоков панелей в Модели: Марки СБ - {0}, Марки АР - {1}", countMarkSbPanels, countMarkArPanels);
             }
         }
 
@@ -869,6 +869,8 @@ namespace AlbumPanelColorTiles
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             Editor ed = doc.Editor;
             Database db = doc.Database;
+
+            Logger.Log.StartCommand("AKR-RemoveMarkPaintingFromMountingPanels");
 
             using (var t = db.TransactionManager.StartTransaction())
             {
@@ -960,7 +962,7 @@ namespace AlbumPanelColorTiles
             }
         }
 
-        [CommandMethod("PIK", "AKR-Utils-WindowsRedefine", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR_Utils_WindowsRedefine", CommandFlags.Modal)]
         public void UtilsWindowsRedefine()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -976,7 +978,7 @@ namespace AlbumPanelColorTiles
                 doc.Editor.WriteMessage($"\nНе удалось выполнить переопределение блока окна. {ex.Message}");
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Log.Error(ex, $"Command: AKR-Utils-WindowsRedefine. {doc.Name}");
+                    Logger.Log.Error(ex, $"Command: AKR-Utils-WindowsRedefine. {doc.Name}");
                 }
             }
             Inspector.Show();
@@ -986,7 +988,8 @@ namespace AlbumPanelColorTiles
         public void InsertWindows()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
-            if (doc == null) return;                        
+            if (doc == null) return;
+            Logger.Log.StartCommand("AKR-InsertWindows");
             try
             {
                 // Файл шаблонов окон.
@@ -1002,7 +1005,7 @@ namespace AlbumPanelColorTiles
                 doc.Editor.WriteMessage(ex.Message);
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Log.Error(ex, $"Command: AKR-InsertWindows. {doc.Name}");
+                    Logger.Log.Error(ex, $"Command: AKR-InsertWindows. {doc.Name}");
                 }
             }            
         }
@@ -1020,7 +1023,7 @@ namespace AlbumPanelColorTiles
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
-            Log.Info("Start Command: AKR-AirConditionersCalc");
+            Logger.Log.StartCommand("AKR-AirConditionersCalc");
             Inspector.Clear();
             try
             {
@@ -1032,16 +1035,56 @@ namespace AlbumPanelColorTiles
                 doc.Editor.WriteMessage($"\n{ex.Message}");
                 if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
                 {
-                    Log.Error(ex, $"Command: AKR-AirConditionersCalc. {doc.Name}");
+                    Logger.Log.Error(ex, $"Command: AKR-AirConditionersCalc. {doc.Name}");
                 }
             }
             Inspector.Show();
         }
 
-        [CommandMethod("PIK", "UtilsReplaceMtextDescriptionOBR", CommandFlags.Modal)]
-        public void UtilsReplaceMtextDescriptionOBR()
-        {            
-            UtilDescriptionInOBR.Check();
+        //[CommandMethod("PIK", "UtilsReplaceMtextDescriptionOBR", CommandFlags.Modal)]
+        //public void UtilsReplaceMtextDescriptionOBR()
+        //{            
+        //    UtilDescriptionInOBR.Check();            
+        //}
+
+        [CommandMethod("PIK", "Akr-ColorAreaCopy", CommandFlags.Modal | CommandFlags.UsePickSet | CommandFlags.Redraw )]
+        public void ColorAreaCopy()
+        {
+            Document doc = AcAp.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
+            Logger.Log.StartCommand("AKR-ColorAreaCopy");            
+            try
+            {
+                UtilsCopyColorArea.Copy();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage($"\n{ex.Message}");
+                if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
+                {
+                    Logger.Log.Error(ex, $"Command: AKR-ColorAreaCopy. {doc.Name}");
+                }
+            }            
+        }
+
+        [CommandMethod("PIK", "Akr-ColorAreaPaste", CommandFlags.Modal)]
+        public void ColorAreaPaste()
+        {
+            Document doc = AcAp.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
+            Logger.Log.StartCommand("AKR-ColorAreaPaste");
+            try
+            {
+                UtilsCopyColorArea.Paste();
+            }
+            catch (System.Exception ex)
+            {
+                doc.Editor.WriteMessage($"\n{ex.Message}");
+                if (!ex.Message.Contains(AcadLib.General.CanceledByUser))
+                {
+                    Logger.Log.Error(ex, $"Command: AKR-ColorAreaPaste. {doc.Name}");
+                }
+            }            
         }
     }
 }

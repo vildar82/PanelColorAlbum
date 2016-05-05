@@ -25,7 +25,7 @@ namespace AlbumPanelColorTiles.Options
             }
             catch (Exception ex)
             {
-               Log.Error(ex, "DeserializeXmlFile {0}", _file);
+               Logger.Log.Error(ex, "DeserializeXmlFile {0}", _file);
                throw;
             }
          }

@@ -64,7 +64,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
             catch (System.Exception ex)
             {
                Inspector.AddError($"Ошибка конвертации блока панели - {ex.Message}", icon: System.Drawing.SystemIcons.Error);
-               Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
+               Logger.Log.Error(ex, "Ошибка конвертиации экспортрированного блока панели");
             }
          }
          progress.Stop();

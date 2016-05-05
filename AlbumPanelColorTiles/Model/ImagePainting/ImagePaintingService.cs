@@ -150,7 +150,7 @@ namespace AlbumPanelColorTiles.ImagePainting
          }
          catch (System.Exception ex)
          {
-            Log.Error(ex, "FormImage_Fire()");
+            Logger.Log.Error(ex, "FormImage_Fire()");
          }
       }
 

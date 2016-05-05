@@ -54,7 +54,7 @@ namespace AlbumPanelColorTiles.ImagePainting
          }
          catch (Exception ex)
          {
-            Log.Error(ex, "getCropBitmap()");
+            Logger.Log.Error(ex, "getCropBitmap()");
          }
       }
 

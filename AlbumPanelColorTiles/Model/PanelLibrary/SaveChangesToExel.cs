@@ -42,7 +42,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          catch (Exception ex)
          {
-            Log.Error(ex, $"Не удалось сохранить изменения библиотеки в Excel {fileXls}");
+            Logger.Log.Error(ex, $"Не удалось сохранить изменения библиотеки в Excel {fileXls}");
          }
       }
 
@@ -64,7 +64,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
          catch (Exception ex)
          {
-            Log.Error(ex, $"Не удалось создать файл Excel {fileXls}");
+            Logger.Log.Error(ex, $"Не удалось создать файл Excel {fileXls}");
          }
       }
    }

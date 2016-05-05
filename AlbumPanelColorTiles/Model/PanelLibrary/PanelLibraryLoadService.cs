@@ -51,7 +51,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             if (Facades.Count == 0)
             {
                 string errMsg = "Не найдены фасады по монтажным планам для заполнения марок покраски в монтажках.";
-                Log.Info(errMsg);
+                Logger.Log.Info(errMsg);
                 Album.Doc.Editor.WriteMessage("\n{0}", errMsg);
                 return;
             }
@@ -115,7 +115,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                                         //string errMsg = $"Не совпала марка покраски. Панель АКР {markAr.MarkARPanelFullName}, " +
                                                         //   $"Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}{mountingPanelSb.MarkPainting}";
                                                         //Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
-                                                        //Log.Error(errMsg);
+                                                        //Logger.Log.Error(errMsg);
                                                         ChangeJob.ChangeJobService.AddChangePanel(panelAr, mountingPanelSb);
                                                     }
                                                     break;

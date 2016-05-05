@@ -76,7 +76,7 @@ namespace AlbumPanelColorTiles.Plot
             }
             catch (System.Exception ex)
             {
-               Log.Error(ex, "MultiSheetPlot()");
+               Logger.Log.Error(ex, "MultiSheetPlot()");
             }
             finally
             {
