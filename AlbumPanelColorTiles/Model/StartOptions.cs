@@ -71,8 +71,8 @@ namespace AlbumPanelColorTiles.Model
             CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING, false);
             NewMode = DictNOD.LoadBool(Album.KEYNAMENEWMODE, false);
             NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
-            NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);            
-            SortPanels = DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
+            NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
+            SortPanels = true; //DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
             EndsInPainting = DictNOD.LoadBool(Album.KEYNAMEENDSINPAINTING, false);
             SplitIndexPainting = DictNOD.LoadString(Album.KEYNAMESPLITINDEXPAINTING, "_");
         }

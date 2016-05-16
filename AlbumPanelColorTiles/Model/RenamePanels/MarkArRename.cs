@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AcadLib.Errors;
 using AlbumPanelColorTiles.Panels;
 
 namespace AlbumPanelColorTiles.RenamePanels
@@ -74,9 +75,16 @@ namespace AlbumPanelColorTiles.RenamePanels
       // Переименование марки покрааски
       public void RenameMark(string newPaintingMark, Dictionary<string, MarkArRename> marksArForRename)
       {
-         marksArForRename.Remove(MarkArCurFull);
-         RenamePainting(newPaintingMark);
-         marksArForRename.Add(MarkArCurFull, this);
+            try
+            {
+                marksArForRename.Remove(MarkArCurFull);
+                RenamePainting(newPaintingMark);
+                marksArForRename.Add(MarkArCurFull, this);
+            }
+            catch
+            {
+                Inspector.AddError($"Не удалось переименовать покраску для панели {_markArCurFull}, на покраску {newPaintingMark}");
+            }            
       }
 
       private void RenamePainting(string markPainting)

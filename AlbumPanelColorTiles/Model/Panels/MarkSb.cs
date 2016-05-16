@@ -408,7 +408,8 @@ namespace AlbumPanelColorTiles.Panels
             else
                 endIndex = Settings.Default.PaintIndexEndRightPanel; //"ТП"
                                                                      // Панели этажей
-            int i = 1;
+            //int i = 1;
+            Dictionary<string, int> indexTypeColor = new Dictionary<string, int>();
             foreach (var markAR in MarksAR)
             {
                 string markPaint;
@@ -417,7 +418,8 @@ namespace AlbumPanelColorTiles.Panels
                 markPaint = $"{Settings.Default.PaintIndexStorey}{floor}{endIndex}"; // Э2,3,4ТП
                 if (marksArArchitectIndex.ContainsKey(markPaint))
                 {
-                    markPaint = $"{markPaint}{Album.StartOptions.SplitIndexPainting}{i++}";
+                    int i = GetIndecTypePainting(indexTypeColor, markPaint);
+                    markPaint = $"{markPaint}{Album.StartOptions.SplitIndexPainting}{i}";
                 }
                 marksArArchitectIndex.Add(markPaint, markAR);
                 if (markAR.MarkSB.WindowIndex > 0)
@@ -445,7 +447,8 @@ namespace AlbumPanelColorTiles.Panels
         private void defOtherArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex)
         {
             // Панели этажей
-            int i = 1;
+            Dictionary<string, int> indexTypeColor = new Dictionary<string, int>();
+            //int i = 1;
             foreach (var markAR in MarksAR)
             {
                 string markPaint;
@@ -453,8 +456,9 @@ namespace AlbumPanelColorTiles.Panels
                 string floor = String.Join(",", floors);
                 markPaint = $"{Settings.Default.PaintIndexStorey}{floor}";//Э2,5,8
                 if (marksArArchitectIndex.ContainsKey(markPaint))
-                {
-                    markPaint = $"{markPaint}{Album.StartOptions.SplitIndexPainting}{i++}";
+                {                    
+                    int i = GetIndecTypePainting(indexTypeColor, markPaint);
+                    markPaint = $"{markPaint}{Album.StartOptions.SplitIndexPainting}{i}";
                 }
                 marksArArchitectIndex.Add(markPaint, markAR);
                 if (markAR.MarkSB.WindowIndex > 0)
@@ -463,6 +467,22 @@ namespace AlbumPanelColorTiles.Panels
                 }
                 markAR.MarkPaintingCalulated = markPaint;
             }
+        }
+
+        private static int GetIndecTypePainting(Dictionary<string, int> indexTypeColor, string markPaint)
+        {
+            int i;
+            if (indexTypeColor.ContainsKey(markPaint))
+            {
+                i = indexTypeColor[markPaint] + 1;
+                indexTypeColor[markPaint] = i;
+            }
+            else
+            {
+                i = 1;
+                indexTypeColor.Add(markPaint, i);
+            }
+            return i;
         }
 
         private void defUpperStoreyAndParapetArchMarks(Dictionary<string, MarkAr> marksArArchitectIndex, string index)
