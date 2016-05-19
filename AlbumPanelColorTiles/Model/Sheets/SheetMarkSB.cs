@@ -41,7 +41,20 @@ namespace AlbumPanelColorTiles.Sheets
 
         public int CompareTo(SheetMarkSB other)
         {
-            return _markSB.MarkSbName.CompareTo(other.MarkSB);
+            // Сортировка по типу этажа панели - рядовые этажы сначала, чердак и парапет потом
+            if ((_markSB.StoreyTypePanel == EnumStorey.Number && other._markSB.StoreyTypePanel == EnumStorey.Number) ||
+                (_markSB.StoreyTypePanel != EnumStorey.Number && other._markSB.StoreyTypePanel != EnumStorey.Number))
+            {
+                return _markSB.MarkSbName.CompareTo(other.MarkSB);
+            }
+            if (_markSB.StoreyTypePanel == EnumStorey.Number)
+            {
+                return -1;
+            }
+            else
+            {
+                return 1;
+            }
         }
 
         // Создание файла марки СБ и листов с панелями марок АР

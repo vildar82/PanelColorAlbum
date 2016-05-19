@@ -55,11 +55,17 @@ namespace AlbumPanelColorTiles.Model
         [DefaultValue("_")]        
         public string SplitIndexPainting { get; set; }
 
-        [Category("Не важно")]
+        [Category("Содержание")]
         [DisplayName("Номер первого листа в альбоме")]
         [Description("Начальный номер для листов панелей в альбоме. Если 0, то этот параметр не учитывается.")]
         [DefaultValue(0)]
         public int NumberFirstSheet { get; set; }
+
+        [Category("Содержание")]
+        [DisplayName("Доп листов содержания")]
+        [Description("Количество дополнительных листов содержания.")]
+        [DefaultValue(0)]
+        public int NumberAddSheetContent { get; set; }
 
         public void LoadDefault()
         {            
@@ -72,6 +78,7 @@ namespace AlbumPanelColorTiles.Model
             NewMode = DictNOD.LoadBool(Album.KEYNAMENEWMODE, false);
             NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
             NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
+            NumberAddSheetContent= loadNumberFromDict(Album.KEYNAMENUMBERADDSHEETCONTENT, 0);
             SortPanels = true; //DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
             EndsInPainting = DictNOD.LoadBool(Album.KEYNAMEENDSINPAINTING, false);
             SplitIndexPainting = DictNOD.LoadString(Album.KEYNAMESPLITINDEXPAINTING, "_");
@@ -92,6 +99,7 @@ namespace AlbumPanelColorTiles.Model
                 saveAbbreviateName(resVal.Abbr);
                 saveNumberToDict(resVal.NumberFirstFloor, Album.KEYNAMENUMBERFIRSTFLOOR);
                 saveNumberToDict(resVal.NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
+                saveNumberToDict(resVal.NumberAddSheetContent, Album.KEYNAMENUMBERADDSHEETCONTENT);                
                 DictNOD.SaveBool(resVal.CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
                 DictNOD.SaveBool(resVal.SortPanels, Album.KEYNAMESORTPANELS);
                 DictNOD.SaveBool(resVal.NewMode, Album.KEYNAMENEWMODE);

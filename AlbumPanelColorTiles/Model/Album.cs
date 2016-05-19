@@ -30,6 +30,7 @@ namespace AlbumPanelColorTiles
         public const string KEYNAMESPLITINDEXPAINTING = "SplitIndexPainting";        
         public const string KEYNAMENUMBERFIRSTFLOOR = "NumberFirstFloor";
         public const string KEYNAMENUMBERFIRSTSHEET = "NumberFirstSheet";
+        public const string KEYNAMENUMBERADDSHEETCONTENT = "NumberAddSheetContent";
         public const string REGAPPPATH = @"Software\Vildar\AKR";
         public const string REGKEYABBREVIATE = "Abbreviate";
 

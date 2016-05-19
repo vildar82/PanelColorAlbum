@@ -61,7 +61,7 @@ namespace AlbumPanelColorTiles.Sheets
                   // Определение кол-ва марок АР
                   int countMarkArs = CalcMarksArNumber(_sheetsMarkSB);
                   // Определение кол-ва листов содержания (только для панелей без учета лтстов обложек и тп.)
-                  _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs);
+                  _countContentSheets = CalcSheetsContentNumber(tableContent.Rows.Count, countMarkArs) + _album.StartOptions.NumberAddSheetContent;
                   // Заполнение штампа на первом листе содержания
                   FillingStampContent(blRefStamp, curContentLayoutNum- _countSheetsBeforContent, t);
                   // текущая строка для записи листа
