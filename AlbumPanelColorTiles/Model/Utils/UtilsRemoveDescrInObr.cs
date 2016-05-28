@@ -31,26 +31,40 @@ namespace AlbumPanelColorTiles.Utils
                     {
                         foreach (var idEnt in btr)
                         {
-                            var ent = idEnt.GetObject(OpenMode.ForRead, false, true);
-                            if (ent is MText)
+                            var ent = idEnt.GetObject(OpenMode.ForRead, false, true) as Entity;
+                            if (ent is Dimension) continue;
+
+                            try
                             {
-                                var mtext = (MText)ent;
-                                if (mtext.Text.StartsWith("Швы вертикальные", StringComparison.OrdinalIgnoreCase) ||
-                                    mtext.Text.StartsWith("Примечани", StringComparison.OrdinalIgnoreCase))
+                                var ext = ent.GeometricExtents;
+                                if (ext.MaxPoint.Y < -1600)
                                 {
-                                    mtext.UpgradeOpen();
-                                    mtext.Erase();
-                                }                                
+                                    ent.UpgradeOpen();
+                                    ent.Erase();
+                                    continue;
+                                }
                             }
-                            else if (ent is BlockReference)
+                            catch { }
+                            
+                            if (ent is BlockReference)
                             {
                                 var blRef = (BlockReference)ent;
-                                var blName = blRef.GetEffectiveName();
-                                if (blName.StartsWith("Примечани", StringComparison.OrdinalIgnoreCase))
+                                if (blRef.Name.Contains("Примечани", StringComparison.OrdinalIgnoreCase))
                                 {
                                     blRef.UpgradeOpen();
                                     blRef.Erase();
-                                }                                
+                                    continue;
+                                }
+                            }
+                            else if (ent is MText)
+                            {
+                                var mtext = (MText)ent;
+                                if (mtext.Text.StartsWith("Швы вертикальные", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    mtext.UpgradeOpen();
+                                    mtext.Erase();
+                                    continue;
+                                }
                             }
                         }
                     }
