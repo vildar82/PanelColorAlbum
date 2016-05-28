@@ -896,7 +896,7 @@ namespace AlbumPanelColorTiles
             ed.Regen();
         }
 
-        [CommandMethod("PIK", "TestClearXdataAKRPanels", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR-UtilsClearXdataAKRPanels", CommandFlags.Modal)]
         public void TestClearXdataAKRPanels()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -935,7 +935,7 @@ namespace AlbumPanelColorTiles
             }
         }
 
-        [CommandMethod("PIK", "TestInsertAKRPanels", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR-UtilsInsertAKRPanels", CommandFlags.Modal)]
         public void TestInsertAKRPanels()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -1010,7 +1010,7 @@ namespace AlbumPanelColorTiles
             }            
         }
 
-        [CommandMethod("PIK", "TestRemoveDashAKR", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR_UtilsRemoveDashAKR", CommandFlags.Modal)]
         public void TestRemoveDashAKR()
         {
             // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)
@@ -1047,7 +1047,7 @@ namespace AlbumPanelColorTiles
         //    UtilDescriptionInOBR.Check();            
         //}
 
-        [CommandMethod("PIK", "Akr-ColorAreaCopy", CommandFlags.Modal | CommandFlags.UsePickSet | CommandFlags.Redraw )]
+        [CommandMethod("PIK", "AKR-ColorAreaCopy", CommandFlags.Modal | CommandFlags.UsePickSet | CommandFlags.Redraw )]
         public void ColorAreaCopy()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -1067,7 +1067,7 @@ namespace AlbumPanelColorTiles
             }            
         }
 
-        [CommandMethod("PIK", "Akr-ColorAreaPaste", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR-ColorAreaPaste", CommandFlags.Modal)]
         public void ColorAreaPaste()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -1085,6 +1085,15 @@ namespace AlbumPanelColorTiles
                     Logger.Log.Error(ex, $"Command: AKR-ColorAreaPaste. {doc.Name}");
                 }
             }            
+        }
+
+        [CommandMethod("PIK", "AKR-UtilsRemoveDescFromOBR", CommandFlags.Modal)]
+        public void UtilsRemoveDescFromOBR()
+        {
+            CommandStart.Start((doc) =>
+            {
+                UtilsRemoveDescrInObr.Remove();
+            });
         }
     }
 }

@@ -12,20 +12,21 @@ namespace AlbumPanelColorTiles.Model
         [DisplayName("Индекс проекта")]
         [Description("Добавляется к марке покраски.")]
         [DefaultValue("Н47Г")]
-        public string Abbr { get; set; }
+        public string Abbr { get; set; } = "Н47Г";
 
         [Category("Важно")]
         [DisplayName("Проверка марок покраски")]
         [Description("При создании альбома марки покраски будут сверяться со значениями в блоках монтажных панелей. Необходимо включать эту опцию после выдачи задания по маркам покраски конструкторам.")]
         [DefaultValue(false)]
         [TypeConverter(typeof(BooleanTypeConverter))]
-        public bool CheckMarkPainting { get; set; }
+        public bool CheckMarkPainting { get; set; } = false;
 
         [Category("Важно")]
         [DisplayName("Номер первого этажа СБ")]
         [Description("Первый этаж для сборной части.")]
         [DefaultValue(2)]
-        public int NumberFirstFloor { get; set; }
+        public int NumberFirstFloor { get; set; } = 2;
+
 
         [Browsable(false)]
         [Category("Важно")]
@@ -33,39 +34,42 @@ namespace AlbumPanelColorTiles.Model
         [Description("Сортировка блоков панелей перед покраской - слева-направо, снизу-вверх по этажам. Влияет на порядок присвоения марок панелям. Для старых проектов выбирайте Нет, для новых Да. После нового года эта опция будет скрыта и включена по-умолчанию.")]
         [DefaultValue(true)]
         [TypeConverter(typeof(BooleanTypeConverter))]
-        public bool SortPanels { get; set; }
+        public bool SortPanels { get; set; } = true;
 
-        [Category("Важно")]
-        [DisplayName("Способ построения панелей")]
-        [Description("Новый - это автоматически создаваемые панели. Старый - ручной и по библиотеке блоков панелей.")]
-        [DefaultValue(false)]
-        [TypeConverter(typeof(BooleanNewModeConverter))]
-        public bool NewMode { get; set; }
+        //[Browsable(false)]
+        //[Category("Важно")]
+        //[DisplayName("Способ построения панелей")]
+        //[Description("Новый - это автоматически создаваемые панели. Старый - ручной и по библиотеке блоков панелей.")]
+        //[DefaultValue(false)]
+        //[TypeConverter(typeof(BooleanNewModeConverter))]
+        //public bool NewMode { get; set; }
 
+        [Browsable(false)]
         [Category("Важно")]
         [DisplayName("Торцы в марке покраски")]
         [Description("Добалять или нет индекс торцов в марку покраски. Например 'Э2ТП'.")]
         [DefaultValue(false)]
         [TypeConverter(typeof(BooleanTypeConverter))]
-        public bool EndsInPainting { get; set; }
+        public bool EndsInPainting { get; set; } = false;
 
+        [Browsable(false)]
         [Category("Важно")]
         [DisplayName("Разделитель индекса покраски")]
         [Description("Разделитель для индекса покраски. Раньше был'-', сейчас принят '_'.")]
-        [DefaultValue("_")]        
-        public string SplitIndexPainting { get; set; }
+        [DefaultValue("_")]
+        public string SplitIndexPainting { get; set; } = "_";
 
         [Category("Содержание")]
         [DisplayName("Номер первого листа в альбоме")]
         [Description("Начальный номер для листов панелей в альбоме. Если 0, то этот параметр не учитывается.")]
         [DefaultValue(0)]
-        public int NumberFirstSheet { get; set; }
+        public int NumberFirstSheet { get; set; } = 0;
 
         [Category("Содержание")]
         [DisplayName("Доп листов содержания")]
         [Description("Количество дополнительных листов содержания.")]
         [DefaultValue(0)]
-        public int NumberAddSheetContent { get; set; }
+        public int NumberAddSheetContent { get; set; } = 0;
 
         public void LoadDefault()
         {            
@@ -75,13 +79,13 @@ namespace AlbumPanelColorTiles.Model
                 Abbr = loadAbbreviateName();// "Н47Г";                     
             }
             CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING, false);
-            NewMode = DictNOD.LoadBool(Album.KEYNAMENEWMODE, false);
+            //NewMode = DictNOD.LoadBool(Album.KEYNAMENEWMODE, false);
             NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
             NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
             NumberAddSheetContent= loadNumberFromDict(Album.KEYNAMENUMBERADDSHEETCONTENT, 0);
-            SortPanels = true; //DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
-            EndsInPainting = DictNOD.LoadBool(Album.KEYNAMEENDSINPAINTING, false);
-            SplitIndexPainting = DictNOD.LoadString(Album.KEYNAMESPLITINDEXPAINTING, "_");
+            //SortPanels = true; //DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
+            //EndsInPainting = DictNOD.LoadBool(Album.KEYNAMEENDSINPAINTING, false);
+            //SplitIndexPainting = DictNOD.LoadString(Album.KEYNAMESPLITINDEXPAINTING, "_");
         }
 
         public StartOption PromptStartOptions()
@@ -101,10 +105,10 @@ namespace AlbumPanelColorTiles.Model
                 saveNumberToDict(resVal.NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
                 saveNumberToDict(resVal.NumberAddSheetContent, Album.KEYNAMENUMBERADDSHEETCONTENT);                
                 DictNOD.SaveBool(resVal.CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
-                DictNOD.SaveBool(resVal.SortPanels, Album.KEYNAMESORTPANELS);
-                DictNOD.SaveBool(resVal.NewMode, Album.KEYNAMENEWMODE);
-                DictNOD.SaveBool(resVal.EndsInPainting, Album.KEYNAMEENDSINPAINTING);
-                DictNOD.SaveString(resVal.SplitIndexPainting, Album.KEYNAMESPLITINDEXPAINTING);
+                //DictNOD.SaveBool(resVal.SortPanels, Album.KEYNAMESORTPANELS);
+                //DictNOD.SaveBool(resVal.NewMode, Album.KEYNAMENEWMODE);
+                //DictNOD.SaveBool(resVal.EndsInPainting, Album.KEYNAMEENDSINPAINTING);
+                //DictNOD.SaveString(resVal.SplitIndexPainting, Album.KEYNAMESPLITINDEXPAINTING);
             }
             catch (Exception ex)
             {

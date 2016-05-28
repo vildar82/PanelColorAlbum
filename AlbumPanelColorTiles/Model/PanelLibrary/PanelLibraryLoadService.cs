@@ -92,17 +92,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                             if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                             {
                                                 //Проверка индекса окна
-                                                if (!album.StartOptions.NewMode &&
-                                                    markSbAkr.WindowIndex != 0 &&
-                                                    !string.Equals(mountingPanelSb.WindowSuffix, markSbAkr.WindowName,
-                                                                   StringComparison.CurrentCultureIgnoreCase)
-                                                   )
-                                                {
-                                                    Inspector.AddError("Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. " +
-                                                       $"Панель АКР {markAr.MarkARPanelFullName}, Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}",
-                                                        panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Information);
-                                                    //continue;
-                                                }
+                                                //if (!album.StartOptions.NewMode &&
+                                                //    markSbAkr.WindowIndex != 0 &&
+                                                //    !string.Equals(mountingPanelSb.WindowSuffix, markSbAkr.WindowName,
+                                                //                   StringComparison.CurrentCultureIgnoreCase)
+                                                //   )
+                                                //{
+                                                //    Inspector.AddError("Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. " +
+                                                //       $"Панель АКР {markAr.MarkARPanelFullName}, Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}",
+                                                //        panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Information);
+                                                //    //continue;
+                                                //}
 
                                                 //Найдена монтажная панель
                                                 isFound = true;
