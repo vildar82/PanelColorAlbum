@@ -552,9 +552,9 @@ namespace AlbumPanelColorTiles.Panels
                         _paints.Add(paint);
                     }
                     // Окна                  
-                    else if (blName.Equals(Settings.Default.BlockWindowName, StringComparison.OrdinalIgnoreCase))
+                    else if (BlockWindow.IsblockWindow(blName))
                     {
-                        BlockWindow window = new BlockWindow(blRef, blName);
+                        BlockWindow window = new BlockWindow(blRef, blName, this);
                         Windows.Add(window);
                     }
                 }

@@ -962,7 +962,7 @@ namespace AlbumPanelColorTiles
             }
         }
 
-        [CommandMethod("PIK", "AKR_Utils_WindowsRedefine", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR-Utils_WindowsRedefine", CommandFlags.Modal)]
         public void UtilsWindowsRedefine()
         {
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
@@ -971,7 +971,8 @@ namespace AlbumPanelColorTiles
             try
             {
                 UtilsReplaceWindows testReplaceWindows = new UtilsReplaceWindows();
-                testReplaceWindows.Redefine();
+                var count = testReplaceWindows.Redefine();
+                doc.Editor.WriteMessage($"\nЗаменено {count} окон.");
             }
             catch (System.Exception ex)
             {
@@ -1010,7 +1011,7 @@ namespace AlbumPanelColorTiles
             }            
         }
 
-        [CommandMethod("PIK", "AKR_UtilsRemoveDashAKR", CommandFlags.Modal)]
+        [CommandMethod("PIK", "AKR-UtilsRemoveDashAKR", CommandFlags.Modal)]
         public void TestRemoveDashAKR()
         {
             // Переименование блоков панелей с тире (3НСг-72.29.32 - на 3НСг 72.29.32)

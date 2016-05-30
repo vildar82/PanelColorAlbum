@@ -43,8 +43,8 @@ namespace AlbumPanelColorTiles.Sheets
       {
          int clearance = 100;
 
-         double aspectRatio = 287.0 / 395.0;
-         double viewHeight = 287 * ScaleDefault; // высота видового экрана в ед модели
+         double aspectRatio = 207.0 / 395.0;
+         double viewHeight = 207 * ScaleDefault; // высота видового экрана в ед модели
          double maxWidthPanel = 395 * ScaleDefault; // по ширине видового экрана         
          double maxHeightPanel = 207 * ScaleDefault; // часть видового экрана под панель
 

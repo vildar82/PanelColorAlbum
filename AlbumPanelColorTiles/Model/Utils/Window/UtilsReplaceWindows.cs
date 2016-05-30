@@ -25,8 +25,9 @@ namespace AlbumPanelColorTiles.Utils
         
         private static Dictionary<string, WindowTranslator> translatorWindows;
 
-        public void Redefine()
-        {            
+        public int Redefine()
+        {
+            int count = 0;    
             doc = Application.DocumentManager.MdiActiveDocument;
             ed = doc.Editor;
             Db = doc.Database;            
@@ -61,6 +62,7 @@ namespace AlbumPanelColorTiles.Utils
                     try
                     {
                         redefine.Replace();
+                        count++;
                     }
                     catch (Exception ex)
                     {
@@ -69,6 +71,7 @@ namespace AlbumPanelColorTiles.Utils
                 }               
                 Transaction.Commit();
             }
+            return count;
         }        
 
         private List<ObjectId> getPanelsBtr()
@@ -115,6 +118,14 @@ namespace AlbumPanelColorTiles.Utils
                     {
                         WindowRedefine winRedefine = new WindowRedefine(isAkrBlWin, blRefWindowOld, translatorW);
                         redefines.Add(winRedefine);
+                    }
+                    else
+                    {
+                        if (blName.Contains("окно", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Inspector.AddError($"Не определен транслятор для блока '{blName}'",
+                                System.Drawing.SystemIcons.Warning);
+                        }
                     }
                 }
             }

@@ -79,7 +79,7 @@ namespace AlbumPanelColorTiles.Sheets
                        $"швы горизонтальные {Settings.Default.TileSeam} мм, \n\n" +
                        $"Расход плитки: {Settings.Default.TileLenght}x{Settings.Default.TileHeight}x{Settings.Default.TileThickness} - \n" +
                        $"{tileCount} шт ({tileTotalArea} м\\U+00B2)";
-         if (markSB.Windows.Count()>0)
+         if (markSB.Windows.Any())
          {
             text += "\n\nОконные блоки в панели:";
             var wins = markSB.Windows.GroupBy(w => w.Mark).OrderBy(w => w.Key);
