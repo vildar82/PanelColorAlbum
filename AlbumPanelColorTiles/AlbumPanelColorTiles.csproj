@@ -20,7 +20,7 @@
     <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
     <AssemblyVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyVersionSettings>
     <AssemblyFileVersionSettings>None.None.DayOfYearStamp.Increment</AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.151.369</AssemblyVersion>
+    <AssemblyVersion>2.0.152.376</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -164,6 +164,7 @@
     <Compile Include="Model\ExportFacade\FileExport.cs" />
     <Compile Include="Model\ExportFacade\PanelBlRefExport.cs" />
     <Compile Include="Model\ExportFacade\PanelBtrExport.cs" />
+    <Compile Include="Model\ExportFacade\Test.cs" />
     <Compile Include="Model\FormStartOptions.cs">
       <SubType>Form</SubType>
     </Compile>

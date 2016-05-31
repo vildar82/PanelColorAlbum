@@ -106,16 +106,15 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          // определение экспортируемых панелей - в файле АКР
          Dictionary<ObjectId, PanelBtrExport> dictPanelsBtrExport = new Dictionary<ObjectId, PanelBtrExport>();
 
-         RTreeLib.RTree<Facade> treeFacades = new RTreeLib.RTree<Facade>();
-         facades.ForEach(f =>
-                        {
-                           try
-                           {
-                              treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f);
-                           }
-                           catch { }
-                        });
-      
+         //RTreeLib.RTree<Facade> treeFacades = new RTreeLib.RTree<Facade>();
+         //facades.ForEach(f =>
+         //               {
+         //                  try
+         //                  {
+         //                     treeFacades.Add(ColorArea.GetRectangleRTree(f.Extents), f);
+         //                  }
+         //                  catch { }
+         //               });      
 
          ProgressMeter progress = new ProgressMeter();
          progress.SetLimit(Service.SelectPanels.IdsBlRefPanelAr.Count);
@@ -141,8 +140,8 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                PanelBlRefExport panelBlRefExport = new PanelBlRefExport(blRef, panelBtrExport);
                panelBtrExport.Panels.Add(panelBlRefExport);
 
-               // определение фасада панели
-               panelBlRefExport.Facade = defFacadeForPanel(treeFacades, blRef, panelBtrExport, panelBlRefExport);
+               //// определение фасада панели
+               //panelBlRefExport.Facade = defFacadeForPanel(treeFacades, blRef, panelBtrExport, panelBlRefExport);
             }
          }
          PanelsBtrExport = dictPanelsBtrExport.Values.ToList();
@@ -161,27 +160,27 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
          DbExport.Purge(graph);
       }
 
-      private Facade defFacadeForPanel(RTreeLib.RTree<Facade> treeFacades, BlockReference blRef,
-                                          PanelBtrExport panelBtrExport, PanelBlRefExport panelBlRefExport)
-      {
-         Facade resVal = null;
-         RTreeLib.Point pt = new RTreeLib.Point(panelBlRefExport.Position.X, panelBlRefExport.Position.Y, 0);
-         var facadesFind = treeFacades.Nearest(pt, 100);
-         if (facadesFind.Count == 1)
-         {
-            resVal = facadesFind.First();
-         }
-         else if (facadesFind.Count == 0)
-         {
-            Inspector.AddError($"Не определен фасад для панели {panelBtrExport.BlName}",
-                   blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr, icon: System.Drawing.SystemIcons.Error);
-         }
-         else if (facadesFind.Count > 1)
-         {
-            Inspector.AddError($"Найдено больше одного фасада для панели {panelBtrExport.BlName}",
-                   blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr, icon: System.Drawing.SystemIcons.Error);
-         }
-         return resVal;
-      }
+      //private Facade defFacadeForPanel(RTreeLib.RTree<Facade> treeFacades, BlockReference blRef,
+      //                                    PanelBtrExport panelBtrExport, PanelBlRefExport panelBlRefExport)
+      //{
+      //   Facade resVal = null;
+      //   RTreeLib.Point pt = new RTreeLib.Point(panelBlRefExport.Position.X, panelBlRefExport.Position.Y, 0);
+      //   var facadesFind = treeFacades.Nearest(pt, 100);
+      //   if (facadesFind.Count == 1)
+      //   {
+      //      resVal = facadesFind.First();
+      //   }
+      //   else if (facadesFind.Count == 0)
+      //   {
+      //      Inspector.AddError($"Не определен фасад для панели {panelBtrExport.BlName}",
+      //             blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr, icon: System.Drawing.SystemIcons.Error);
+      //   }
+      //   else if (facadesFind.Count > 1)
+      //   {
+      //      Inspector.AddError($"Найдено больше одного фасада для панели {panelBtrExport.BlName}",
+      //             blRef.GeometricExtents, panelBlRefExport.IdBlRefAkr, icon: System.Drawing.SystemIcons.Error);
+      //   }
+      //   return resVal;
+      //}
    }
 }
