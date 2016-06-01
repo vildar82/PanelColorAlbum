@@ -91,9 +91,7 @@ namespace AlbumPanelColorTiles.Model.ExportFacade
                 // Плитка панели, а не торца
                 Polyline pl = item.GetPolyline();
                 colPlTile.Add(pl);
-            }
-
-            Test.PrintPltilesPanel(colPlTile);
+            }            
 
             var pl3d = colPlTile.GetExteriorContour();
             if (panelBtr.CPS != null)
