@@ -70,7 +70,7 @@ namespace AlbumPanelColorTiles.Sheets
          mtext.Attachment = AttachmentPoint.MiddleCenter;
          mtext.Location = ptMtextCenter;
          mtext.TextStyleId = db.GetTextStylePIK();
-         mtext.Height = 2.5;
+         mtext.TextHeight = 2.5;            
 
          int tileCount = markSB.Tiles.Count;
          double tileTotalArea = Math.Round(TileCalc.OneTileArea * tileCount, 2);         
