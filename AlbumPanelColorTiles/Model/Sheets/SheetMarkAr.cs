@@ -173,7 +173,7 @@ namespace AlbumPanelColorTiles.Sheets
                 }
                 else if (atrRef.Tag.Equals("ПРИМЕЧАНИЕ", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!isFacadeView)
+                    if (!isFacadeView || MarkAR.MarkSB.Windows.Count==0)
                     {
                         text = "  ";
                     }
