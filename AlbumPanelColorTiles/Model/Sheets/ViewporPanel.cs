@@ -108,7 +108,7 @@ namespace AlbumPanelColorTiles.Sheets
                 }
                 catch { }
             }
-            //resVal.TransformBy(blRef.BlockTransform);
+            resVal.TransformBy(blRef.BlockTransform);
             return resVal;
         }
 

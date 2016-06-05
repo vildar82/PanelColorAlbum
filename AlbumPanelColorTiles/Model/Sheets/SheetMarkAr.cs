@@ -360,33 +360,33 @@ namespace AlbumPanelColorTiles.Sheets
 
             //if (this.MarkAR.MarkSB.Album.StartOptions.NewMode)
             //{
-                var vpPanel = new ViewportPanel(vp, blRefMarkAr, isFacadeView);
-                vpPanel.Setup();
+            //var vpPanel = new ViewportPanel(vp, blRefMarkAr, isFacadeView);
+            //vpPanel.Setup();
             //}
             //else
             //{
-            //    // Определение границ блока
-            //    Point2d ptCenterMarkAR;
-            //    if (isFacadeView)
-            //    {
-            //        if (_markAR.MarkSB.IsEndLeftPanel && !_markAR.MarkSB.IsEndRightPanel)
-            //            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X + Settings.Default.SheetPanelEndShift,
-            //                                         blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
-            //        else if (_markAR.MarkSB.IsEndRightPanel && !_markAR.MarkSB.IsEndLeftPanel)
-            //            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - Settings.Default.SheetPanelEndShift,
-            //                                         blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
-            //        else
-            //            ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X,
-            //                                          blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
-            //    }
-            //    else
-            //    {
-            //        // Диман гоаорит не нужно сдвигать торцевые панели в форме.
-            //        ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X,
-            //                                blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
-            //    }
-            //    ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
-            //    //vp.Dispose();
+            // Определение границ блока
+            Point2d ptCenterMarkAR;
+            if (isFacadeView)
+            {
+                if (_markAR.MarkSB.IsEndLeftPanel && !_markAR.MarkSB.IsEndRightPanel)
+                    ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X + Settings.Default.SheetPanelEndShift,
+                                                 blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+                else if (_markAR.MarkSB.IsEndRightPanel && !_markAR.MarkSB.IsEndLeftPanel)
+                    ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X - Settings.Default.SheetPanelEndShift,
+                                                 blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+                else
+                    ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X + _markAR.MarkSB.CenterPanel.X,
+                                                  blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            }
+            else
+            {
+                // Диман гоаорит не нужно сдвигать торцевые панели в форме.
+                ptCenterMarkAR = new Point2d(blRefMarkAr.Position.X - _markAR.MarkSB.CenterPanel.X,
+                                        blRefMarkAr.Position.Y + _markAR.MarkSB.CenterPanel.Y);
+            }
+            ViewPortDirection(vp, dbMarkSB, ptCenterMarkAR);
+            //vp.Dispose();
             //}
             return idBtrLayout;
         }

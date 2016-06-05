@@ -106,8 +106,13 @@ namespace AlbumPanelColorTiles
             var minVer = new Version(20, 1);
             if (Autodesk.AutoCAD.ApplicationServices.Application.Version < minVer)
             {
-                doc.Editor.WriteMessage("\nКоманда создания альбома временно не работает на версиях ниже 2016 sp1.");
-                return;
+                string msg = "Команда создания альбома может работать с ошибками на версиях ниже 2016 sp1.";
+                if (MessageBox.Show(msg, "Предупреждение", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != DialogResult.OK)
+                {
+                    return;
+                }
+                //doc.Editor.WriteMessage("\nКоманда создания альбома временно не работает на версиях ниже 2016 sp1.");
+                //return;
             }
 
             string commandName = "AlbumPanels";
