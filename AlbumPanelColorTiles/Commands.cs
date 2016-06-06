@@ -280,10 +280,10 @@ namespace AlbumPanelColorTiles
             }
             catch (System.Exception ex)
             {
-                doc.Editor.WriteMessage("\n{0}", ex.Message);
+                doc.Editor.WriteMessage($"\n{ex.Message}");
                 if (!ex.Message.Contains("Отменено пользователем"))
                 {
-                    Logger.Log.Error(ex, "Command: AKR-CreatePlanBlocks. {0}", doc.Name);
+                    Logger.Log.Error(ex, $"Command: AKR-CreatePlanBlocks. {doc.Name}");
                 }
             }
         }
