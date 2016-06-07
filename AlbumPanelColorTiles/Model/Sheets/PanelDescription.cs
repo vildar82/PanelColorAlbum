@@ -89,7 +89,7 @@ namespace AlbumPanelColorTiles.Sheets
                     var winFirst = win.First();
                     if (winFirst.IsFireBox)
                     {
-                        text += "(противопожарное E-30)";
+                        text += "(Противопожарное, E-30)";
                     }
                 }
             }

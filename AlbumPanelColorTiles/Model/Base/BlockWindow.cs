@@ -23,7 +23,7 @@ namespace AlbumPanelColorTiles.Model.Base
         /// Окно противопожарное
         /// </summary>
         public bool IsFireBox { get; set; }
-        public static List<string> FireBoxMarks { get; set; } = new List<string>() { "ОП-3.1", "ОП-3.2" };
+        public static List<string> FireBoxMarks { get; set; } = new List<string>() { "ОП-3.2" };
 
         public BlockWindow(BlockReference blRef, string blName, MarkSb markSb)
         {
