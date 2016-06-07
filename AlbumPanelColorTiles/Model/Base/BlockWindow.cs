@@ -19,6 +19,11 @@ namespace AlbumPanelColorTiles.Model.Base
         public string Mark { get; private set; } = string.Empty;
         public string BlName { get; private set; }
         public MarkSb MarkSb { get; private set; }
+        /// <summary>
+        /// Окно противопожарное
+        /// </summary>
+        public bool IsFireBox { get; set; }
+        public static List<string> FireBoxMarks { get; set; } = new List<string>() { "ОП-3.1", "ОП-3.2" };
 
         public BlockWindow(BlockReference blRef, string blName, MarkSb markSb)
         {
@@ -52,7 +57,11 @@ namespace AlbumPanelColorTiles.Model.Base
             try
             {
                 var split = BlName.Split(new[] { '_' });
-                Mark = split.Skip(2).First();
+                Mark = split.Skip(2).First();   
+                if (FireBoxMarks.Contains(Mark))
+                {
+                    IsFireBox = true;
+                }
             }
             catch
             {
