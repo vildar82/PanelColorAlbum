@@ -224,7 +224,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 else if (res.StringResult == "сБорка")
                 {
                     // Собрать все блоки в одну точку.
-                    Utils.UtilsPutBlocksTogether.Together();
+                    Utils.UtilsPlanBlocksTogether.Together();
                     throw new Exception(AcadLib.General.CanceledByUser);
                 }
                 else

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -12,7 +13,7 @@ namespace AlbumPanelColorTiles.Utils
     /// <summary>
     /// Собрать блоки в одну точку
     /// </summary>
-    public static class UtilsPutBlocksTogether
+    public static class UtilsPlanBlocksTogether
     {
         /// <summary>
         /// Блоки для сборки вместе
@@ -39,10 +40,13 @@ namespace AlbumPanelColorTiles.Utils
                 {
                     var blRef = idBlRef.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     if (blRef == null) continue;
-                    // вставка нового вхождения этого блока
-                    var blRefNew = new BlockReference(ptInsert, blRef.BlockTableRecord);
-                    cs.AppendEntity(blRefNew);
-                    t.AddNewlyCreatedDBObject(blRefNew, true);
+                    if (blRef.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName))
+                    {
+                        // вставка нового вхождения этого блока                    
+                        var blRefNew = new BlockReference(ptInsert, blRef.BlockTableRecord);
+                        cs.AppendEntity(blRefNew);
+                        t.AddNewlyCreatedDBObject(blRefNew, true);
+                    }                    
                 }
                 t.Commit();
             }
