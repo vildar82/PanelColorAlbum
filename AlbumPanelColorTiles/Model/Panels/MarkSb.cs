@@ -525,7 +525,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                 _extentsTiles.AddPoint(tile.CenterTile);
             }
-            _heightPanelByTile = _extentsTiles.MaxPoint.Y - _extentsTiles.MinPoint.Y + Settings.Default.TileSeam;
+            _heightPanelByTile = _extentsTiles.MaxPoint.Y - _extentsTiles.MinPoint.Y + Settings.Default.TileSeam + Settings.Default.TileHeight;
             return new Point2d((_extentsTiles.MinPoint.X + _extentsTiles.MaxPoint.X) * 0.5, (_extentsTiles.MinPoint.Y + _extentsTiles.MaxPoint.Y) * 0.5);
         }
 
