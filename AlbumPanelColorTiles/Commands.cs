@@ -96,6 +96,21 @@ namespace AlbumPanelColorTiles
             }
         }
 
+        public void CheckAcadVer2016()
+        {
+            var minVer = new Version(20, 1);
+            if (Autodesk.AutoCAD.ApplicationServices.Application.Version < minVer)
+            {
+                string msg = "Команда может работать с фатальными ошибками на версиях ниже 2016 sp1.";
+                if (MessageBox.Show(msg, "Предупреждение", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != DialogResult.OK)
+                {
+                    throw new System.Exception(General.CanceledByUser);                    
+                }
+                //doc.Editor.WriteMessage("\nКоманда создания альбома временно не работает на версиях ниже 2016 sp1.");
+                //return;
+            }
+        }
+
         // Создание альбома колористических решений панелей (Альбома панелей).
         [CommandMethod("PIK", "AKR-AlbumPanels", CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
         public void AlbumPanels()
@@ -103,17 +118,7 @@ namespace AlbumPanelColorTiles
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
 
-            var minVer = new Version(20, 1);
-            if (Autodesk.AutoCAD.ApplicationServices.Application.Version < minVer)
-            {
-                string msg = "Команда создания альбома может работать с ошибками на версиях ниже 2016 sp1.";
-                if (MessageBox.Show(msg, "Предупреждение", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != DialogResult.OK)
-                {
-                    return;
-                }
-                //doc.Editor.WriteMessage("\nКоманда создания альбома временно не работает на версиях ниже 2016 sp1.");
-                //return;
-            }
+            CheckAcadVer2016();
 
             string commandName = "AlbumPanels";
             if (string.Equals(_lastStartCommandName, commandName))
@@ -527,6 +532,8 @@ namespace AlbumPanelColorTiles
             Document doc = AcAp.DocumentManager.MdiActiveDocument;
             if (doc == null) return;
             Editor ed = doc.Editor;
+
+            CheckAcadVer2016();
 
             try
             {

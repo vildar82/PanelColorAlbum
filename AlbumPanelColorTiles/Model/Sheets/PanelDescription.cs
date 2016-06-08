@@ -115,10 +115,10 @@ namespace AlbumPanelColorTiles.Sheets
             {
                 // Длина панели ???
                 lenProfile = Math.Round(
-                               (
-                                  markSB.ExtentsTiles.MaxPoint.X - markSB.ExtentsTiles.MinPoint.X
-                                  + Settings.Default.TileHeight + Settings.Default.TileSeam
-                               ) * 0.001, 1) * 2;
+                               (markSB.ExtentsTiles.MaxPoint.X - markSB.ExtentsTiles.MinPoint.X
+                                  + Settings.Default.TileLenght + Settings.Default.TileSeam)
+                                  * 0.001, 1)
+                                  * ((markSB.StoreyTypePanel == EnumStorey.Upper)? 1: 2);
             }
             else
             {
