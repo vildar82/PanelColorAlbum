@@ -131,24 +131,8 @@ namespace AlbumPanelColorTiles.Panels
         {
             // Копирование блока
             var idBtrMarkSb = Lib.Block.CopyBtr(idBtrMarkAr, markSbBlName);
-            // Перенос блоков плиток на слой 0         
-            using (var btrMarkSb = idBtrMarkSb.Open(OpenMode.ForRead) as BlockTableRecord)
-            {
-                foreach (ObjectId idEnt in btrMarkSb)
-                {
-                    if (idEnt.ObjectClass.Name == "AcDbBlockReference")
-                    {
-                        using (var blRef = idEnt.Open(OpenMode.ForWrite, false, true) as BlockReference)
-                        {
-                            if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
-                            {
-                                blRef.Layer = "0";
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            Tile.TilesToLayer(idBtrMarkSb);
+        }        
 
         public static string GetMarkSbBlockName(string markSb)
         {

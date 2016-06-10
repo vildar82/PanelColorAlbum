@@ -102,13 +102,15 @@ namespace AlbumPanelColorTiles
                 var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
 
+                var checkedBlocks = new HashSet<string>();
+
                 foreach (ObjectId idEnt in ms)
                 {
                     if (idEnt.ObjectClass.Name == "AcDbBlockReference")
                     {
                         var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                         if (MarkSb.IsBlockNamePanel(blRef.Name))
-                        {
+                        {                            
                             // Если это панель марки АР, то заменяем на панель марки СБ.
                             if (MarkSb.IsBlockNamePanelMarkAr(blRef.Name))
                             {
@@ -126,12 +128,23 @@ namespace AlbumPanelColorTiles
                                     ed.WriteMessage("\n" + errMsg);
                                     // Надо чтобы проектировщик проверил эти блоки, может в них нужно добавить зоны покраски (т.к. в блоках марки АР их нет).
                                 }
-                                var blRefMarkSb = new BlockReference(blRef.Position, bt[markSbBlName]);
+                                var idBtrMarkSb = bt[markSbBlName];
+                                var blRefMarkSb = new BlockReference(blRef.Position, idBtrMarkSb);
                                 blRefMarkSb.SetDatabaseDefaults();
                                 blRefMarkSb.Layer = blRef.Layer;
                                 ms.UpgradeOpen();
                                 ms.AppendEntity(blRefMarkSb);
                                 t.AddNewlyCreatedDBObject(blRefMarkSb, true);
+                                // Перенос плитки на слой "АР_Плитка"
+                                if (checkedBlocks.Add(markSbBlName))
+                                {
+                                    Tile.TilesToLayer(idBtrMarkSb);
+                                }
+                            }
+                            // Перенос плитки на слой "АР_Плитка"
+                            if (checkedBlocks.Add(blRef.Name))
+                            {
+                                Tile.TilesToLayer(blRef.BlockTableRecord);
                             }
                         }
                     }
