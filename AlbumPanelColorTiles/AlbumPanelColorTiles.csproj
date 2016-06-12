@@ -22,7 +22,7 @@
     </AssemblyVersionSettings>
     <AssemblyFileVersionSettings>
     </AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.164.398</AssemblyVersion>
+    <AssemblyVersion>2.0.164.399</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -112,7 +112,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="EPPlus">
-      <HintPath>..\..\..\..\Package\Excel\EPPlus.dll</HintPath>
+      <HintPath>..\..\..\..\Package\Excel\4.0.5\EPPlus.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MoreLinq, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
