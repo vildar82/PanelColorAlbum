@@ -101,7 +101,7 @@ namespace AlbumPanelColorTiles
             var minVer = new Version(20, 1);
             if (Autodesk.AutoCAD.ApplicationServices.Application.Version < minVer)
             {
-                string msg = "Команда может работать с фатальными ошибками на версиях ниже 2016 sp1.";
+                string msg = "Команда может работать с фатальными ошибками на версиях AutoCAD ниже 2016 sp1.";
                 if (MessageBox.Show(msg, "Предупреждение", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != DialogResult.OK)
                 {
                     throw new System.Exception(General.CanceledByUser);                    
