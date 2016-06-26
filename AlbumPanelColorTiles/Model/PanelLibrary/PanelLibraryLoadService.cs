@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
@@ -43,6 +44,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             Album = album;
             // Определение фасадов по монтажным планам
             Facades = FacadeMounting.GetFacadesFromMountingPlans(this);
+            var allMountPanels = Facades.SelectMany(s=>s.Panels);
 
             //testPtFacades(facades);
 
@@ -63,93 +65,66 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 {
                     foreach (var panelAr in markAr.Panels)
                     {
-                        bool isFound = false;
-                        bool isFoundFloor = false;
+                        bool isFound = false;                        
                         // Границы блока АКР-Панели по плитке
                         var extPanelAkr = panelAr.GetExtentsTiles(markSbAkr);
                         double xCenterPanelAkr = extPanelAkr.MinPoint.X + (extPanelAkr.MaxPoint.X - extPanelAkr.MinPoint.X) * 0.5;
-                        // поиск фасада - X центра панели АКР попадает в границы фасада Xmin и Xmax
-                        var facadesFound = Facades.FindAll(f => f.XMin < xCenterPanelAkr && f.XMax > xCenterPanelAkr);
-                        if (facadesFound != null)
+                        
+                        // Поск монтажки по линии от центра панели АКР
+                        var mountingsPanelSb = allMountPanels.Where(p => 
+                            p.Floor.Storey.Equals(panelAr.Storey) &&
+                            p.ExtTransToModel.MinPoint.X <= xCenterPanelAkr && p.ExtTransToModel.MaxPoint.X >= xCenterPanelAkr);
+                        // Проверка имени панели
+                        if (mountingsPanelSb.Any())
                         {
-                            foreach (var facade in facadesFound)
+                            foreach (var mountingPanelSb in mountingsPanelSb)
                             {
-                                // поиск нужного этажа
-                                var floor = facade.Floors.Find(f => f.Storey.Equals(panelAr.Storey));
-                                if (floor != null)
+                                string markSbWithoutWhite = mountingPanelSb.MarkSbWithoutElectric.Replace(' ', '-');
+                                string markAkrWithoutWhite = AkrHelper.GetMarkWithoutElectric(markSbAkr.MarkSbClean).Replace(' ', '-');
+                                if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
                                 {
-                                    isFoundFloor = true;
-                                    // Поск монтажки по линии от центра панели АКР
-                                    var mountingsPanelSb = floor.PanelsSbInFront.FindAll(
-                                       p => p.ExtTransToModel.MinPoint.X < xCenterPanelAkr && p.ExtTransToModel.MaxPoint.X > xCenterPanelAkr);
-                                    // Проверка имени панели
-                                    if (mountingsPanelSb != null)
-                                    {
-                                        foreach (var mountingPanelSb in mountingsPanelSb)
-                                        {
-                                            string markSbWithoutWhite = mountingPanelSb.MarkSbWithoutElectric.Replace(' ', '-');
-                                            string markAkrWithoutWhite = AkrHelper.GetMarkWithoutElectric(markSbAkr.MarkSbClean).Replace(' ', '-');
-                                            if (string.Equals(markSbWithoutWhite, markAkrWithoutWhite, StringComparison.CurrentCultureIgnoreCase))
-                                            {
-                                                //Проверка индекса окна
-                                                //if (!album.StartOptions.NewMode &&
-                                                //    markSbAkr.WindowIndex != 0 &&
-                                                //    !string.Equals(mountingPanelSb.WindowSuffix, markSbAkr.WindowName,
-                                                //                   StringComparison.CurrentCultureIgnoreCase)
-                                                //   )
-                                                //{
-                                                //    Inspector.AddError("Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. " +
-                                                //       $"Панель АКР {markAr.MarkARPanelFullName}, Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}",
-                                                //        panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Information);
-                                                //    //continue;
-                                                //}
+                                    //Проверка индекса окна
+                                    //if (!album.StartOptions.NewMode &&
+                                    //    markSbAkr.WindowIndex != 0 &&
+                                    //    !string.Equals(mountingPanelSb.WindowSuffix, markSbAkr.WindowName,
+                                    //                   StringComparison.CurrentCultureIgnoreCase)
+                                    //   )
+                                    //{
+                                    //    Inspector.AddError("Предупреждение. Не совпали индексы окон в монтажной панели и в АКР панели. " +
+                                    //       $"Панель АКР {markAr.MarkARPanelFullName}, Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}",
+                                    //        panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Information);
+                                    //    //continue;
+                                    //}
 
-                                                //Найдена монтажная панель
-                                                isFound = true;
-                                                // Проверка марки покраски
-                                                if (Album.StartOptions.CheckMarkPainting)
-                                                {                                                    
-                                                    if (!string.Equals(mountingPanelSb.MarkPainting, markAr.MarkPaintingFull, StringComparison.CurrentCultureIgnoreCase))
-                                                    {
-                                                        //// Ошибка - марки покраски не совпали.
-                                                        //string errMsg = $"Не совпала марка покраски. Панель АКР {markAr.MarkARPanelFullName}, " +
-                                                        //   $"Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}{mountingPanelSb.MarkPainting}";
-                                                        //Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
-                                                        //Logger.Log.Error(errMsg);
-                                                        ChangeJob.ChangeJobService.AddChangePanel(panelAr, mountingPanelSb);
-                                                    }
-                                                    break;
-                                                }
-                                                // Заполнение атрибута покраски
-                                                else
-                                                {
-                                                    mountingPanelSb.SetPaintingToAttr(markAr);
-                                                }
-                                            }
+                                    //Найдена монтажная панель
+                                    isFound = true;
+                                    // Проверка марки покраски
+                                    if (Album.StartOptions.CheckMarkPainting)
+                                    {
+                                        if (!string.Equals(mountingPanelSb.MarkPainting, markAr.MarkPaintingFull, StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            //// Ошибка - марки покраски не совпали.
+                                            //string errMsg = $"Не совпала марка покраски. Панель АКР {markAr.MarkARPanelFullName}, " +
+                                            //   $"Монтажная панель {mountingPanelSb.MarkSbWithoutElectric}{mountingPanelSb.MarkPainting}";
+                                            //Inspector.AddError(errMsg, panelAr.Extents, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
+                                            //Logger.Log.Error(errMsg);
+                                            ChangeJob.ChangeJobService.AddChangePanel(panelAr, mountingPanelSb);
                                         }
+                                        break;
+                                    }
+                                    // Заполнение атрибута покраски
+                                    else
+                                    {
+                                        mountingPanelSb.SetPaintingToAttr(markAr);
                                     }
                                 }
                             }
-                            if (!isFound)
-                            {
-                                if (isFoundFloor)
-                                {
-                                    Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.",
-                                       extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
-                                }
-                                else
-                                {
-                                    Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найден монтажный план.",
-                                   extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
-                                }
-                            }
-                        }
-                        // Не найден фасад
-                        else
+                        }                        
+                        if (!isFound)
                         {
-                            Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найден монтажный план.",
-                                   extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
-                        }
+                            Inspector.AddError($"{markAr.MarkARPanelFullName} - Не найдена соответствующая монтажная панель для заполнения атрибута марки покраски.",
+                               extPanelAkr, panelAr.IdBlRefAr, icon: System.Drawing.SystemIcons.Error);
+                        }                        
                     }
                 }
             }

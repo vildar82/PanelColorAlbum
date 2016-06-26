@@ -34,7 +34,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
         /// <summary>
         /// Индекс класса бетона панели (определяется по приставке цифры к короткому имени марки панелои 3НСНг2 - индекс =2, 3НСНг = 0)
         /// </summary>
-        public int IndexConcreteClass { get; private set; }        
+        public int IndexConcreteClass { get; private set; }
+        public double Y { get; internal set; }
 
         public MountingPanel(BlockReference blRefPanelSB, List<AttributeRefDetail> attrsDet, Matrix3d trans, 
             string mark, string painting, FloorMounting floor)
@@ -151,7 +152,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                     List<PanelAKR> panelsAkrInLib = PanelAKR.GetAkrPanelLib(dbLib);
                     // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
                     Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
-                    List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Floors.SelectMany(s => s.PanelsSbInFront)).ToList();
+                    List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Panels).ToList();
                     foreach (var panelSb in allPanelsSb)
                     {
                         PanelAKR panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
@@ -191,7 +192,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 }
             }
             // определение отметок этажей Ч и П в фасадах
-            facades.ForEach(f => f.DefYForUpperAndParapetStorey());
+            //facades.ForEach(f => f.DefYForUpperAndParapetStorey());
         }
 
         /// <summary>
