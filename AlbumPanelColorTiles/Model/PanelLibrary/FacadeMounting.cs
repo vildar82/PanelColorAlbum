@@ -115,8 +115,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                 // отметка высоты секции
                 var yPeakPanel = secPanel.Where(w=>w.Floor.Storey.Type == EnumStorey.Number).
-                    OrderByDescending(o=>o.Floor.Storey).First();
-                curY = yPeakPanel.Y + yPeakPanel.Floor.Storey.Height;
+                    OrderByDescending(o=>o.Floor.Storey).FirstOrDefault();
+                if (yPeakPanel == null)
+                {
+                    // Нет этажных панелей в секции                    
+                    curY = yFirstFloor;
+                }
+                else
+                {
+                    curY = yPeakPanel.Y + yPeakPanel.Floor.Storey.Height;
+                }
+                
                 // панели чердака
                 var upperPanels =secPanel.Where(p=>p.Floor.Storey.Type == EnumStorey.Upper);
                 if (upperPanels.Any())
