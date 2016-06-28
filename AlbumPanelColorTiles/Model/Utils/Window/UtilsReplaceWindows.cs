@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Lib;
 using AlbumPanelColorTiles.Options;
-using AlbumPanelColorTiles.Utils.Window;
+using AlbumPanelColorTiles.Utils.Windows;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;

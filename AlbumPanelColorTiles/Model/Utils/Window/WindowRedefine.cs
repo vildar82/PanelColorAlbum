@@ -8,7 +8,7 @@ using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Utils.Window
+namespace AlbumPanelColorTiles.Utils.Windows
 {
     public class WindowRedefine
     {

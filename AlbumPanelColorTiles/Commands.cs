@@ -1108,5 +1108,14 @@ namespace AlbumPanelColorTiles
                 UtilsRemoveDescrInObr.Remove();
             });
         }
+
+        [CommandMethod("PIK", "AKR-Navigator", CommandFlags.Modal)]
+        public void UtilsNavigator ()
+        {
+            CommandStart.Start((doc) =>
+            {
+                Utils.Navigator.UtilsSelectPanelsByHeight.ShowPanelsByHeight();
+            });
+        }
     }
 }

@@ -33,7 +33,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          MarkAkr = MarkSb.GetMarkSbCleanName(val);//.Replace(' ', '-');
                   
          // Список объектов в блоке
-         EntInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);
+         EntInfos = EntityInfo.GetEntInfoBtr(idBtrAkrPanel);            
       }      
 
       public void DefineGeom(ObjectId idBtrPanelAkr)

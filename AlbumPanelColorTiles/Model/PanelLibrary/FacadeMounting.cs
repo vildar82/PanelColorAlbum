@@ -57,7 +57,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                     {
                         double yFloor = panelSb.Y;
                         // Подпись номера этажа
-                        //captionFloor(facade.XMin, yFloor, panelSb.Floor, ms, t);
+                        captionFloor(facade.XMin, yFloor, panelSb.Floor, ms, t);
                         if (panelSb.PanelAkr != null || panelSb.PanelBase != null)
                         {
                             Point3d ptPanelAkr = new Point3d(panelSb.ExtTransToModel.MinPoint.X, yFloor, 0);
@@ -255,9 +255,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
             DBText textFloor = new DBText();
             textFloor.SetDatabaseDefaults(ms.Database);
             textFloor.Annotative = AnnotativeStates.False;
-            textFloor.Height = Settings.Default.FacadeCaptionFloorTextHeight;// 250;// FacadeCaptionFloorTextHeight
+            textFloor.Height = Settings.Default.FacadeCaptionFloorTextHeight;// 250;// FacadeCaptionFloorTextHeight            
             textFloor.TextString = floor.Storey.ToString();
-            textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (floor.Storey.Height * 0.5), 0);
+            var height =floor.Storey.Height != 0? floor.Storey.Height: 2000;
+            textFloor.Position = new Point3d(x - Settings.Default.FacadeCaptionFloorIndent, yFloor + (height * 0.5), 0);
             ms.AppendEntity(textFloor);
             t.AddNewlyCreatedDBObject(textFloor, true);
         }

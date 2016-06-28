@@ -11,6 +11,7 @@
     <AssemblyName>AlbumPanelColorTiles</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -22,7 +23,7 @@
     </AssemblyVersionSettings>
     <AssemblyFileVersionSettings>
     </AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.179.401</AssemblyVersion>
+    <AssemblyVersion>2.0.180.409</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -115,6 +116,9 @@
       <HintPath>..\..\..\..\Package\Excel\4.0.5\EPPlus.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MicroMvvm">
+      <HintPath>..\..\..\..\Package\MVVM\MicroMvvm.dll</HintPath>
+    </Reference>
     <Reference Include="MoreLinq, Version=1.4.18916.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
       <HintPath>..\packages\morelinq.1.4.0\lib\net35\MoreLinq.dll</HintPath>
       <Private>True</Private>
@@ -125,12 +129,14 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
@@ -287,11 +293,18 @@
     <Compile Include="Model\Utils\CopyDict\FormSelect.Designer.cs">
       <DependentUpon>FormSelect.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\Utils\Navigator\Panel.cs" />
+    <Compile Include="Model\Utils\Navigator\ViewNavigator.cs" />
+    <Compile Include="Model\Utils\Navigator\ViewPanel.cs" />
+    <Compile Include="Model\Utils\Navigator\WindowNavigator.xaml.cs">
+      <DependentUpon>WindowNavigator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\Utils\UtilDescriptionInOBR.cs" />
     <Compile Include="Model\Utils\UtilsCopyColorArea.cs" />
     <Compile Include="Model\Utils\UtilsPutBlocksTogether.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDescrInObr.cs" />
+    <Compile Include="Model\Utils\Navigator\UtilsSelectPanelsByHeight.cs" />
     <Compile Include="Model\Utils\Window\UtilsReplaceWindows.cs" />
     <Compile Include="Model\Utils\Window\WindowRedefine.cs" />
     <Compile Include="Model\Utils\Window\WindowTranslator.cs" />
@@ -402,11 +415,16 @@
   <ItemGroup>
     <None Include="Resources\Fire.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="Model\Base\Panels.xml">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Model\Utils\Navigator\WindowNavigator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets" Condition="Exists('..\packages\VVVV.FreeImage.3.15.1.1\build\net40\VVVV.FreeImage.targets')" />

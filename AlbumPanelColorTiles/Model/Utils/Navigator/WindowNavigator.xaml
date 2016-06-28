@@ -1,0 +1,16 @@
+﻿<Window x:Class="AlbumPanelColorTiles.Utils.Navigator.WindowNavigator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AlbumPanelColorTiles.Utils.Navigator"
+        mc:Ignorable="d"
+        Title="WindowNavigator" Height="300" Width="300">
+    <Grid>
+        <DataGrid ItemsSource="{Binding Panels}" SelectedItem="{Binding SelectedPanel}"
+                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
+                  CanUserResizeColumns="True" CanUserSortColumns="True" AutoGenerateColumns="True"
+                  Margin="5" FrozenColumnCount="1" FontSize="12" AlternatingRowBackground="LightGray">
+        </DataGrid>
+    </Grid>
+</Window>
