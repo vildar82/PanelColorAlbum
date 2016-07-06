@@ -398,7 +398,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                 string markPaint;
                 var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
-                string floor = String.Join(",", floors);
+                string floor = GetFloorsSequence(floors);// String.Join(",", floors);
                 markPaint = $"{Settings.Default.PaintIndexStorey}{floor}{endIndex}"; // Э2,3,4ТП
                 if (marksArArchitectIndex.ContainsKey(markPaint))
                 {
@@ -437,7 +437,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                 string markPaint;
                 var floors = markAR.Panels.GroupBy(p => p.Storey.Number).Select(p => p.First().Storey.Number).OrderBy(f => f);
-                string floor = String.Join(",", floors);
+                string floor = GetFloorsSequence(floors); // String.Join(",", floors);
                 markPaint = $"{Settings.Default.PaintIndexStorey}{floor}";//Э2,5,8
                 if (marksArArchitectIndex.ContainsKey(markPaint))
                 {                    
@@ -560,6 +560,24 @@ namespace AlbumPanelColorTiles.Panels
                 }
             }
             return resPanelAR;
+        }
+
+        private static string GetFloorsSequence (IEnumerable<int> floors)
+        {
+            string res = string.Empty;
+            int firstFloor = floors.First();
+            int lastFloor = floors.Last();
+            int countFloors = floors.Count();
+            var rightRange = Enumerable.Range(firstFloor, countFloors);
+            if (countFloors>3 && rightRange.SequenceEqual(floors))
+            {
+                res = firstFloor + "-" + lastFloor;
+            }
+            else
+            {
+                res = string.Join(",", floors);
+            }
+            return res;
         }
     }
 }
