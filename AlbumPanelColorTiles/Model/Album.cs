@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Checks;
-using AlbumPanelColorTiles.Model;
-using AlbumPanelColorTiles.Model.Base;
-using AlbumPanelColorTiles.Model.Panels;
-using AlbumPanelColorTiles.Model.Select;
-using AlbumPanelColorTiles.Options;
+using AlbumPanelColorTiles;
+using AlbumPanelColorTiles.Base;
 using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Select;
+using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Sheets;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
@@ -71,7 +70,7 @@ namespace AlbumPanelColorTiles
         public Document Doc { get { return _doc; } }
         public string DwgFacade { get { return _doc.Name; } }
         public List<MarkSb> MarksSB { get { return _marksSB; } }
-        public List<Model.Panels.Section> Sections { get; set; }
+        public List<Panels.Section> Sections { get; set; }
         public SheetsSet SheetsSet { get { return _sheetsSet; } }
         public StartOption StartOptions { get; private set; }
         public AlbumInfo AlbumInfo { get; set; }
@@ -375,7 +374,7 @@ namespace AlbumPanelColorTiles
                 Inspector.AddError($"Ошибка. При покраске в чертеже не должно быть блоков панелей марки АР. Найдено {selBlocks.IdsBlRefPanelAr.Count} блоков марки АР.",
                       icon: System.Drawing.SystemIcons.Error);
             }
-            Sections = Model.Panels.Section.GetSections(selBlocks.SectionsBlRefs);
+            Sections = Panels.Section.GetSections(selBlocks.SectionsBlRefs);
 
             // Определение покраски панелей.
             _marksSB = MarkSb.GetMarksSB(rtreeColorAreas, this, "Покраска панелей...", selBlocks.IdsBlRefPanelSb);
@@ -391,7 +390,7 @@ namespace AlbumPanelColorTiles
             }
 
             // Определение принадлежности блоков панелеи секциям
-            Model.Panels.Section.DefineSections(this);
+            Panels.Section.DefineSections(this);
 
             // Переименование марок АР панелей в соответствии с индексами архитекторов (Э2_Яр1)
             RenamePanelsToArchitectIndex(_marksSB);

@@ -9,7 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Utils
+namespace AlbumPanelColorTiles.Utils
 {
    class UtilsRemoveDash
    {      

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Panels;
+using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;

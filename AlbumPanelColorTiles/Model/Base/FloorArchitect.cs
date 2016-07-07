@@ -6,13 +6,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Base;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using MoreLinq;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    // Архитектурный план с марками окнон
    public class FloorArchitect

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using AlbumPanelColorTiles.Model.Base;
+using AlbumPanelColorTiles.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +14,9 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
 using AcadLib.Errors;
 
-[assembly: CommandClass(typeof(AlbumPanelColorTiles.Model.Base.Tests.BaseServiceTests))]
+[assembly: CommandClass(typeof(AlbumPanelColorTiles.Base.Tests.BaseServiceTests))]
 
-namespace AlbumPanelColorTiles.Model.Base.Tests
+namespace AlbumPanelColorTiles.Base.Tests
 {
    [TestFixture()]
    public class BaseServiceTests

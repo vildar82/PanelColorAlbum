@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
-using TestAKRAutoCAD.Model.Base;
+using TestAKRAutoCAD.Base;
 
 [assembly: CommandClass(typeof(TestAKRAutoCAD.CommandsTest))]
 

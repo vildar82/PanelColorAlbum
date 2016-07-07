@@ -3,7 +3,7 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
     public class ConvertCaption
     {

@@ -4,7 +4,7 @@ using System.Globalization;
 using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles
 {
     public class StartOption
     {

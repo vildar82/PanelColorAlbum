@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using AlbumPanelColorTiles.Model.Base;
+using AlbumPanelColorTiles.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Base.Tests
+namespace AlbumPanelColorTiles.Base.Tests
 {
    [TestFixture()]
    public class FloorArchitectTests

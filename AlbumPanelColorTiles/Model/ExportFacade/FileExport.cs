@@ -4,7 +4,7 @@ using AlbumPanelColorTiles.Lib;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
    /// <summary>
    /// Определение файла в котроый будет экспортирован фасад.

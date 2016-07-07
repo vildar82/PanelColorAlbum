@@ -9,7 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using AcadLib;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    // Общее образмеривание для Фасада и Формы
    public abstract class DimensionAbstract

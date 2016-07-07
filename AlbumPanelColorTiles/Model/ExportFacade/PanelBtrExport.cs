@@ -5,7 +5,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
     /// <summary>
     /// Экспортная панель

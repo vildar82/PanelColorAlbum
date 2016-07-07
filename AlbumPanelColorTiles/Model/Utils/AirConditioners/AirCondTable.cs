@@ -8,7 +8,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
+namespace AlbumPanelColorTiles.Utils.AirConditioners
 {
     public class AirCondTable
     {        

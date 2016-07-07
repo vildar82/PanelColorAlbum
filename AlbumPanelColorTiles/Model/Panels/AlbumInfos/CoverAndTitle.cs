@@ -3,7 +3,7 @@ using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Panels.AlbumInfos
+namespace AlbumPanelColorTiles.Panels.AlbumInfos
 {
    // Обложека и титульный лист
    public class CoverAndTitle

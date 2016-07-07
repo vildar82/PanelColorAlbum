@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AlbumPanelColorTiles.Model.Utils.Navigator
+namespace AlbumPanelColorTiles.Utils.Navigator
 {
     public class Panel
     {

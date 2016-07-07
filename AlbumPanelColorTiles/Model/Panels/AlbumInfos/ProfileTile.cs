@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AcadLib.Blocks;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Panels.AlbumInfos
+namespace AlbumPanelColorTiles.Panels.AlbumInfos
 {
    public class ProfileTile
    {

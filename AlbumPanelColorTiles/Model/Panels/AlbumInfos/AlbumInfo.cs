@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AlbumPanelColorTiles.Model.Panels.AlbumInfos;
+using AlbumPanelColorTiles.Panels.AlbumInfos;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Panels
+namespace AlbumPanelColorTiles.Panels
 {
    // Инфо по альбому - заполнение рамки, обложки, титульного блока
    public class AlbumInfo

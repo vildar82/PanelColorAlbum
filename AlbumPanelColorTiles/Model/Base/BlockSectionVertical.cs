@@ -7,7 +7,7 @@ using AcadLib;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    public class BlockSectionVertical : BlockSectionAbstract
    {

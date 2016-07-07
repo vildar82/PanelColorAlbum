@@ -2,12 +2,12 @@
 using System.Linq;
 using AcadLib.Comparers;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Panels;
+using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
    public class ConvertPanelService
    {

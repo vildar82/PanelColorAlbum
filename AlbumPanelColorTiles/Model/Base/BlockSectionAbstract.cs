@@ -8,7 +8,7 @@ using AcadLib.Errors;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    /// <summary>
    /// Блоки сечений панелей

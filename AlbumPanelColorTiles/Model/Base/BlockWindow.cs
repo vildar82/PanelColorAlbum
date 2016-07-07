@@ -10,7 +10,7 @@ using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
     public class BlockWindow
     {

@@ -10,7 +10,7 @@ using AcadLib;
 using Autodesk.AutoCAD.Geometry;
 using AcadLib.Errors;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    // Образмеривание панели (на Фасаде)
    public class DimensionFacade : DimensionAbstract

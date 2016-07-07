@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace AlbumPanelColorTiles.Model
+namespace AlbumPanelColorTiles
 {
    public partial class FormStartOptions : Form
    {

@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Base;
+using AlbumPanelColorTiles.Base;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 
-namespace TestAKRAutoCAD.Model.Base
+namespace TestAKRAutoCAD.Base
 {
    public class BaseServiceTests
    {

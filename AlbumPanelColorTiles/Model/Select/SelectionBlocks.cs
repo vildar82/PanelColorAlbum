@@ -6,7 +6,7 @@ using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Select
+namespace AlbumPanelColorTiles.Select
 {
     // Выбор панелей в чертеже
     public class SelectionBlocks
@@ -128,7 +128,7 @@ namespace AlbumPanelColorTiles.Model.Select
                         else if (string.Equals(blNameEff, Settings.Default.BlockFacadeName, StringComparison.CurrentCultureIgnoreCase))
                         {
                             FacadeBlRefs.Add(idEnt);
-                        }
+                        }                        
                     }
                 }            
                 t.Commit();

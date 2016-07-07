@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Panels;
-using AlbumPanelColorTiles.Model.Select;
+using AlbumPanelColorTiles.Panels;
+using AlbumPanelColorTiles.Select;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
     // Экспорт фасада
     public class ExportFacadeService

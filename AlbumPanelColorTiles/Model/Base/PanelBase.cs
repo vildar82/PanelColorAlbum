@@ -10,9 +10,9 @@ using System.Xml.Serialization;
 using AlbumPanelColorTiles.PanelLibrary;
 using AcadLib.Errors;
 using MoreLinq;
-using AlbumPanelColorTiles.Model.Base.CreatePanel;
+using AlbumPanelColorTiles.Base.CreatePanel;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    public class PanelBase
    {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    /// <summary>
    /// Описание штриховки - патерн, слой, цвет, тип и т.д.

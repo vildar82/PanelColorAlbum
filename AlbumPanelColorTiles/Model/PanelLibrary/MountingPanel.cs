@@ -27,7 +27,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
         public string MarkSbWithoutElectric { get; private set; }
         public PanelAKR PanelAkr { get; set; }
         public Point3d PtCenterPanelSbInModel { get; private set; }
-        public Model.Base.PanelBase PanelBase { get; set; }
+        public Base.PanelBase PanelBase { get; set; }
         public string WindowSuffix { get; private set; }
         public int Thickness { get; private set; }
         public FloorMounting Floor { get; set; }

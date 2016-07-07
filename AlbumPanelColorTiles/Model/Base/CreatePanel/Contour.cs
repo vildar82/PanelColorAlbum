@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Base.CreatePanel
+namespace AlbumPanelColorTiles.Base.CreatePanel
 {
    public class Contour
    {

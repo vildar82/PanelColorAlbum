@@ -1,8 +1,8 @@
-﻿using AlbumPanelColorTiles.Model.Panels;
+﻿using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
    /// <summary>
    /// Панель экспортированная - вхождение блока панели

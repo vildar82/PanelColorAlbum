@@ -3,7 +3,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Panels
+namespace AlbumPanelColorTiles.Panels
 {
    // Фасад архитектурный
    // определяется блоком АКР_Фасад которым обозначены фасады с панелями.

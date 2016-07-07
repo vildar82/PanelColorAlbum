@@ -7,7 +7,7 @@ using Autodesk.AutoCAD.Geometry;
 using AcadLib;
 using AcadLib.RTree.SpatialIndex;
 
-namespace AlbumPanelColorTiles.Model.ExportFacade
+namespace AlbumPanelColorTiles.ExportFacade
 {
     // Построение контура панели
     public class ContourPanel

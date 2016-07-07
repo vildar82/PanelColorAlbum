@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Windows;
-using AlbumPanelColorTiles.Model.Panels;
+using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.Panels;

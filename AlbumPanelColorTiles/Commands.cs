@@ -11,16 +11,15 @@ using AcadLib.Errors;
 using AcadLib.Plot;
 using AlbumPanelColorTiles.ImagePainting;
 using AlbumPanelColorTiles.Lib;
-using AlbumPanelColorTiles.Model.Base;
-using AlbumPanelColorTiles.Model.ExportFacade;
-using AlbumPanelColorTiles.Model.Utils;
+using AlbumPanelColorTiles.Base;
+using AlbumPanelColorTiles.ExportFacade;
+using AlbumPanelColorTiles.Utils;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using AlbumPanelColorTiles.PanelLibrary.LibEditor;
 using AlbumPanelColorTiles.Panels;
 using AlbumPanelColorTiles.RandomPainting;
 using AlbumPanelColorTiles.RenamePanels;
-using AlbumPanelColorTiles.Utils;
 using AlbumPanelColorTiles.Utils.CopyDict;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -28,6 +27,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using AcAp = Autodesk.AutoCAD.ApplicationServices.Application;
+using AlbumPanelColorTiles.Base;
 
 [assembly: CommandClass(typeof(AlbumPanelColorTiles.Commands))]
 
@@ -489,7 +489,11 @@ namespace AlbumPanelColorTiles
             try
             {
                 // Проверка дубликатов блоков            
-                CheckDublicateBlocks.Check();
+                Select.SelectionBlocks sel = new Select.SelectionBlocks (doc.Database);
+                sel.SelectBlRefsInModel(false);
+                var panelsToCheck = sel.IdsBlRefPanelAr;
+                panelsToCheck.AddRange(sel.IdsBlRefPanelSb);
+                CheckDublicateBlocks.Check(panelsToCheck);
 
                 Inspector.Clear();
                 if (_album == null)
@@ -502,7 +506,10 @@ namespace AlbumPanelColorTiles
                     // Сброс данных
                     _album.ResetData();
                 }
+
+                // Покраска
                 _album.PaintPanels();
+
                 doc.Editor.Regen();
                 doc.Editor.WriteMessage("\nПокраска панелей выполнена успешно.");                
                 Logger.Log.Info("Покраска панелей выполнена успешно. {0}", doc.Name);
@@ -1040,7 +1047,7 @@ namespace AlbumPanelColorTiles
             Inspector.Clear();
             try
             {
-                Model.Utils.AirConditioners.AirConditionersCalc airCondCalc = new Model.Utils.AirConditioners.AirConditionersCalc();
+                Utils.AirConditioners.AirConditionersCalc airCondCalc = new Utils.AirConditioners.AirConditionersCalc();
                 airCondCalc.Calc();
             }
             catch (System.Exception ex)

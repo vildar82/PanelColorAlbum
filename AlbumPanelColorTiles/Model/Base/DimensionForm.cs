@@ -7,7 +7,7 @@ using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    public class DimensionForm : DimensionAbstract
    {

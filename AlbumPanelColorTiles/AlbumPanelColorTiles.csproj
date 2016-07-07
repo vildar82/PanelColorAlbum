@@ -299,6 +299,9 @@
     <Compile Include="Model\Utils\Navigator\WindowNavigator.xaml.cs">
       <DependentUpon>WindowNavigator.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Utils\TileTable\Tile.cs" />
+    <Compile Include="Model\Utils\TileTable\TileData.cs" />
+    <Compile Include="Model\Utils\TileTable\UtilsTileTable.cs" />
     <Compile Include="Model\Utils\UtilDescriptionInOBR.cs" />
     <Compile Include="Model\Utils\UtilsCopyColorArea.cs" />
     <Compile Include="Model\Utils\UtilsPutBlocksTogether.cs" />

@@ -5,7 +5,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
-namespace AlbumPanelColorTiles.Model.Panels
+namespace AlbumPanelColorTiles.Panels
 {
    public class Caption
    {

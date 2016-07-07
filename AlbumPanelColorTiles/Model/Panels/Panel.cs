@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AlbumPanelColorTiles.Model.Panels;
+using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
@@ -49,7 +49,7 @@ namespace AlbumPanelColorTiles.Panels
       public Point3d InsPt { get { return _insPt; } }
 
       public MarkAr MarkAr { get { return _markAr; } }
-      public Model.Panels.Section Section { get; set; }
+      public Panels.Section Section { get; set; }
 
       public Storey Storey
       {

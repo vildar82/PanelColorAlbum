@@ -9,7 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
+namespace AlbumPanelColorTiles.Utils.AirConditioners
 {
     public class AirConditionersCalc
     {

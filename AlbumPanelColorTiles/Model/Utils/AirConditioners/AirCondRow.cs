@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.Colors;
 
-namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
+namespace AlbumPanelColorTiles.Utils.AirConditioners
 {
     public class AirCondRow
     {

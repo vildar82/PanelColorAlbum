@@ -6,7 +6,7 @@ using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Panels
+namespace AlbumPanelColorTiles.Panels
 {
    // Описание блока Секции
    public class Section : IComparable<Section>

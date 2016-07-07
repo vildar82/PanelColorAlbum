@@ -6,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using AcadLib.Errors;
-using AlbumPanelColorTiles.Model.Select;
+using AlbumPanelColorTiles.Select;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using MoreLinq;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    public class BaseService
    {  

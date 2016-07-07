@@ -8,7 +8,7 @@ using AcadLib.Blocks;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace AlbumPanelColorTiles.Model.Utils.AirConditioners
+namespace AlbumPanelColorTiles.Utils.AirConditioners
 {
     public class AirConditioner
     {

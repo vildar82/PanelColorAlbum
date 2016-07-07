@@ -12,7 +12,7 @@ using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AlbumPanelColorTiles.Model.Base
+namespace AlbumPanelColorTiles.Base
 {
    // Вспомогательные данные для создания блоков панелей - слои, стили, блоки и т.п.
    public class CreatePanelsBtrEnvironment
