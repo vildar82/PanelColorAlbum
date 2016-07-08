@@ -23,7 +23,7 @@
     </AssemblyVersionSettings>
     <AssemblyFileVersionSettings>
     </AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.188.411</AssemblyVersion>
+    <AssemblyVersion>2.0.190.416</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -301,6 +301,7 @@
     </Compile>
     <Compile Include="Model\Utils\TileTable\Tile.cs" />
     <Compile Include="Model\Utils\TileTable\TileData.cs" />
+    <Compile Include="Model\Utils\TileTable\TileTable.cs" />
     <Compile Include="Model\Utils\TileTable\UtilsTileTable.cs" />
     <Compile Include="Model\Utils\UtilDescriptionInOBR.cs" />
     <Compile Include="Model\Utils\UtilsCopyColorArea.cs" />

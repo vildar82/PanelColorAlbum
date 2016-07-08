@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,9 @@ namespace AlbumPanelColorTiles.Utils.TileTable
     /// </summary>
     public class UtilsTileTable
     {
+        private Dictionary<ObjectId, List<Tile>> dictBtrTiles = new Dictionary<ObjectId, List<Tile>> ();
+        private TileData data = new TileData ();
+
         public Document Doc { get; set; }
         public Database Db { get; set; }
         public Editor Ed { get; set; }
@@ -36,19 +40,56 @@ namespace AlbumPanelColorTiles.Utils.TileTable
 
             using (var t = Db.TransactionManager.StartTransaction())
             {
-                foreach (var idEnt in sel)
+                data.Tiles = FindTiles(sel, null);
+                t.Commit();
+            }
+
+            // Группировка плиток
+            data.Calc();
+
+            // Таблица
+            TileTable tableService = new TileTable (Db, data);
+            tableService.CalcRows();
+            var table = tableService.Create();
+            tableService.Insert(table, Doc);
+        }
+
+        private List<Tile> FindTiles (IEnumerable sel, string ownerBtrName)
+        {
+            List<Tile> tiles = new List<Tile> ();
+            List<ObjectId> idsBtr = new List<ObjectId> ();
+
+            foreach (ObjectId idEnt in sel)
+            {
+                var blRef = idEnt.GetObject( OpenMode.ForRead) as BlockReference;
+                if (blRef == null) continue;
+
+                string blName = blRef.GetEffectiveName();
+
+                if (blName.StartsWith(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
                 {
-                    var blRef = idEnt.GetObject( OpenMode.ForRead) as BlockReference;
-                    if (blRef == null) continue;
-
-                    string blName = blRef.GetEffectiveName();
-
-                    if (blName.StartsWith(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        
-                    }
+                    var color = data.GetColor(blRef.LayerId);
+                    Tile tile = new Tile(blRef, blName, ownerBtrName, color);
+                    tiles.Add(tile);
+                }
+                else
+                {
+                    idsBtr.Add(blRef.BlockTableRecord);
                 }
             }
+
+            foreach (var idBtr in idsBtr)
+            {
+                List<Tile> tilesInBtr;
+                if (!dictBtrTiles.TryGetValue(idBtr, out tilesInBtr))
+                {
+                    var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;                    
+                    tilesInBtr = FindTiles(btr, btr.Name);
+                    dictBtrTiles.Add(btr.Id, tilesInBtr);
+                }
+                tiles.AddRange(tilesInBtr);
+            }
+            return tiles;
         }
     }
 }

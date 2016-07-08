@@ -25,6 +25,22 @@ namespace AlbumPanelColorTiles.Panels
 
         public Point3d CenterTile { get { return _centerTile; } }
 
+        public static void GetColorNameFromLayer (string layerName, out string article, out string ncs)
+        {
+            var splitUnders = layerName.Split(new char[] { '_' }, 2);
+
+            article = splitUnders[0];
+
+            if (splitUnders.Length == 2)
+            {
+                ncs = splitUnders[1];
+            }
+            else
+            {
+                ncs = string.Empty;
+            }
+        }
+
         /// <summary>
         /// Покраска блоков плитки в Модели (без блоков АКР-Панелей)
         /// </summary>

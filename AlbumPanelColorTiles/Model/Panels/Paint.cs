@@ -18,22 +18,14 @@ namespace AlbumPanelColorTiles.Panels
         public Paint(string layerName, Color color)
         {
             Layer = layerName;
-
-            var splitUnders = layerName.Split(new char[] { '_' }, 2);
-
-            Article = splitUnders[0];
-
-            if (splitUnders.Length == 2)
-            {
-                Name = splitUnders[1];
-            }
-            else
-            {
-                Name = string.Empty;
-            }
+            string article;
+            string ncs;
+            Tile.GetColorNameFromLayer(layerName, out article, out ncs);
+            Article = article;
+            Name = ncs;
 
             Color = color;
-        }
+        }        
 
         public bool Equals(Paint other)
         {
