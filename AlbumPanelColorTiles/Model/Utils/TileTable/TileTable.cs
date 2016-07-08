@@ -122,7 +122,11 @@ namespace AlbumPanelColorTiles.Utils.TileTable
                     row++;
                 }
                     
-                SetTitleAndCap(table,ref row, "Расход плитки Монолитной части " + now);                
+                SetTitleAndCap(table,ref row, "Расход плитки Монолитной части " + now);
+
+                var rowHeader = table.Rows[row - 2];                
+                rowHeader.Borders.Bottom.LineWeight = lwBold;
+
                 FillTiles(table,ref row, data.TileInMonolith);
             }
         }
