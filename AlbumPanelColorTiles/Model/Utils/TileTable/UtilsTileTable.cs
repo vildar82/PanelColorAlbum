@@ -43,6 +43,11 @@ namespace AlbumPanelColorTiles.Utils.TileTable
                 data.Tiles = FindTiles(sel, null);
                 t.Commit();
             }
+            if (data.Tiles.Count == 0)
+            {
+                Ed.WriteMessage("\nБлоки плитки не найдены.");
+                return;
+            }
 
             // Группировка плиток
             data.Calc();

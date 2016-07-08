@@ -491,7 +491,6 @@ namespace AlbumPanelColorTiles
             });
         }
 
-
         [CommandMethod(groupPik, nameof(AKR_CreatePlanBlocks), CommandFlags.Modal | CommandFlags.NoPaperSpace | CommandFlags.NoBlockEditor)]
         public void AKR_CreatePlanBlocks ()
         {
@@ -630,8 +629,7 @@ namespace AlbumPanelColorTiles
                 Utils.TileTable.UtilsTileTable tileTable = new Utils.TileTable.UtilsTileTable (doc);
                 tileTable.CreateTable();
             });
-        }
-        
+        }        
 
         [CommandMethod(groupPik, nameof(AKR_RemoveMarkPaintingFromMountingPanels), CommandFlags.Modal)]
         public void AKR_RemoveMarkPaintingFromMountingPanels ()

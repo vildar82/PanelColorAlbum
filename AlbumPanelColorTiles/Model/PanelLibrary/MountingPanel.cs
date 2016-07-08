@@ -146,49 +146,46 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                 dbLib.ReadDwgFile(PanelLibrarySaveService.LibPanelsFilePath, FileShare.ReadWrite, true, "");
                 dbLib.CloseInput(true);
-                using (var t = dbLib.TransactionManager.StartTransaction())
+
+                // список блоков АКР-Панелей в библиотеке (полные имена блоков).
+                List<PanelAKR> panelsAkrInLib = PanelAKR.GetAkrPanelLib(dbLib, false);
+                // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
+                Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
+                List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Panels).ToList();
+                foreach (var panelSb in allPanelsSb)
                 {
-                    // список блоков АКР-Панелей в библиотеке (полные имена блоков).
-                    List<PanelAKR> panelsAkrInLib = PanelAKR.GetAkrPanelLib(dbLib);
-                    // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
-                    Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
-                    List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Panels).ToList();
-                    foreach (var panelSb in allPanelsSb)
+                    PanelAKR panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
+                    if (panelAkrLib == null)
                     {
-                        PanelAKR panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
-                        if (panelAkrLib == null)
+                        // Не найден блок в библиотеке
+                        Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - {panelSb.MarkSbWithoutElectric}",
+                                          panelSb.ExtTransToModel, panelSb.IdBlRef, icon: System.Drawing.SystemIcons.Error);
+                    }
+                    else
+                    {
+                        //panelAkrLib.PanelSb = panelSb;
+                        if (!idsPanelsAkrInLibAndFacade.ContainsKey(panelAkrLib.IdBtrAkrPanel))
                         {
-                            // Не найден блок в библиотеке
-                            Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - {panelSb.MarkSbWithoutElectric}",
-                                              panelSb.ExtTransToModel, panelSb.IdBlRef, icon: System.Drawing.SystemIcons.Error);
+                            idsPanelsAkrInLibAndFacade.Add(panelAkrLib.IdBtrAkrPanel, panelAkrLib);
                         }
-                        else
+                        panelSb.PanelAkr = panelAkrLib;
+                    }
+                }
+                // Копирование блоков в базу чертежа фасада
+                if (idsPanelsAkrInLibAndFacade.Count > 0)
+                {
+                    using (IdMapping iMap = new IdMapping())
+                    {
+                        dbFacade.WblockCloneObjects(new ObjectIdCollection(idsPanelsAkrInLibAndFacade.Keys.ToArray()),
+                                                   dbFacade.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
+                        // запись соответствия панелей
+                        foreach (var item in idsPanelsAkrInLibAndFacade)
                         {
-                            //panelAkrLib.PanelSb = panelSb;
-                            if (!idsPanelsAkrInLibAndFacade.ContainsKey(panelAkrLib.IdBtrAkrPanel))
-                            {
-                                idsPanelsAkrInLibAndFacade.Add(panelAkrLib.IdBtrAkrPanel, panelAkrLib);
-                            }
-                            panelSb.PanelAkr = panelAkrLib;
+                            item.Value.IdBtrPanelAkrInFacade = iMap[item.Key].Value;
+                            // определение габаритов панели
+                            item.Value.DefineGeom(item.Value.IdBtrPanelAkrInFacade);
                         }
                     }
-                    // Копирование блоков в базу чертежа фасада
-                    if (idsPanelsAkrInLibAndFacade.Count > 0)
-                    {
-                        using (IdMapping iMap = new IdMapping())
-                        {
-                            dbFacade.WblockCloneObjects(new ObjectIdCollection(idsPanelsAkrInLibAndFacade.Keys.ToArray()),
-                                                       dbFacade.BlockTableId, iMap, DuplicateRecordCloning.Replace, false);
-                            // запись соответствия панелей
-                            foreach (var item in idsPanelsAkrInLibAndFacade)
-                            {
-                                item.Value.IdBtrPanelAkrInFacade = iMap[item.Key].Value;
-                                // определение габаритов панели
-                                ((PanelAKR)item.Value).DefineGeom(item.Value.IdBtrPanelAkrInFacade);
-                            }
-                        }
-                    }
-                    t.Commit();
                 }
             }
             // определение отметок этажей Ч и П в фасадах
