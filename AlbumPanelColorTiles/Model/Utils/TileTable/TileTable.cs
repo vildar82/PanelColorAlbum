@@ -124,8 +124,9 @@ namespace AlbumPanelColorTiles.Utils.TileTable
                     
                 SetTitleAndCap(table,ref row, "Расход плитки Монолитной части " + now);
 
-                var rowHeader = table.Rows[row - 2];                
+                var rowHeader = table.Rows[row - 1];                
                 rowHeader.Borders.Bottom.LineWeight = lwBold;
+                rowHeader.Borders.Top.LineWeight = lwBold;
 
                 FillTiles(table,ref row, data.TileInMonolith);
             }
@@ -165,6 +166,10 @@ namespace AlbumPanelColorTiles.Utils.TileTable
 
                 row++;
             }
+
+            var rowHeader = table.Rows[row];
+            rowHeader.Borders.Top.LineWeight = lwBold;
+            rowHeader.Borders.Bottom.LineWeight = lwBold;
 
             mCells = CellRange.Create(table, row, 0, row, 2);
             table.MergeCells(mCells);
