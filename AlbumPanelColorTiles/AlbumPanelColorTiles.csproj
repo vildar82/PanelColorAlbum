@@ -23,7 +23,7 @@
     </AssemblyVersionSettings>
     <AssemblyFileVersionSettings>
     </AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.190.419</AssemblyVersion>
+    <AssemblyVersion>2.0.193.423</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -194,6 +194,11 @@
     <Compile Include="Model\AkrHelper.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
     <Compile Include="Model\Options\SerializerXml.cs" />
+    <Compile Include="Model\PanelLibrary\LibEditor\UI\PanelAkrView.cs" />
+    <Compile Include="Model\PanelLibrary\LibEditor\UI\PanelsAkrView.cs" />
+    <Compile Include="Model\PanelLibrary\LibEditor\UI\PanelsWindow.xaml.cs">
+      <DependentUpon>PanelsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\Panels\AlbumInfos\ProfileTile.cs" />
     <Compile Include="Model\Sheets\PanelDescription.cs" />
     <Compile Include="Model\PanelLibrary\AttributeRefDetail.cs" />
@@ -425,6 +430,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Model\PanelLibrary\LibEditor\UI\PanelsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Model\Utils\Navigator\WindowNavigator.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -481,8 +481,8 @@ namespace AlbumPanelColorTiles
             });
         }
 
-        [CommandMethod(groupPik, nameof(AKR_EditPanelLibrary), CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
-        public void AKR_EditPanelLibrary ()
+        [CommandMethod(groupPik, nameof(AKR_LibraryEditor), CommandFlags.Modal | CommandFlags.NoBlockEditor | CommandFlags.NoPaperSpace)]
+        public void AKR_LibraryEditor ()
         {
             CommandStart.Start(doc =>
             {

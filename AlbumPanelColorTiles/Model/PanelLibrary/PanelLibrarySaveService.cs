@@ -84,7 +84,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          return panels;
       }
 
-      public static List<PanelAKR> GetPanelsInLib(bool defineFullPanelData)
+      public static List<PanelAKR> GetPanelsInLib(string panelsFile, bool defineFullPanelData)
       {
          List<PanelAKR> panelsInLib = new List<PanelAKR>();
          // Получение списка панелей в библиотеке
@@ -98,8 +98,8 @@ namespace AlbumPanelColorTiles.PanelLibrary
          //File.Copy(PanelLibrarySaveService.LibPanelsFilePath, fileLibPanelsTemp, true);
 
          using (Database dbLib = new Database(false, true))
-         {
-            dbLib.ReadDwgFile(PanelLibrarySaveService.LibPanelsFilePath, FileShare.ReadWrite, true, "");
+         {      
+            dbLib.ReadDwgFile(panelsFile, FileShare.ReadWrite, true, "");
             dbLib.CloseInput(true);
             // список блоков АКР-Панелей в библиотеке (полные имена блоков).
             panelsInLib = PanelAKR.GetAkrPanelLib(dbLib, defineFullPanelData);

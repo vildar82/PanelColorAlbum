@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -19,6 +21,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
         public ObjectId IdBtrAkrPanel { get; private set; }
         public string MarkAkr { get; private set; }
         public ObjectId IdBtrPanelAkrInFacade { get; set; }
+        public ImageSource Image { get; set; }
 
         public PanelAKR (ObjectId idBtrAkrPanel, string blName)
         {
@@ -56,6 +59,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         }
                     }
                 }
+                Image = AcadLib.Blocks.Visual.BlockPreviewHelper.GetPreview(btrAkr);
             }
             HeightPanelByTile = _extentsTiles.MaxPoint.Y - _extentsTiles.MinPoint.Y + Settings.Default.TileSeam;
             double shiftEnd = 0;
@@ -81,19 +85,32 @@ namespace AlbumPanelColorTiles.PanelLibrary
             List<PanelAKR> panelsAkrLIb = new List<PanelAKR>();
             using (var bt = dbLib.BlockTableId.Open(OpenMode.ForRead) as BlockTable)
             {
-                foreach (ObjectId idBtr in bt)
+                using (ProgressMeter progress = new ProgressMeter())
                 {
-                    using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
+                    progress.SetLimit(1000);
+                    progress.Start("Считывание панелей из библиотеки...");
+
+                    foreach (ObjectId idBtr in bt)
                     {
-                        if (MarkSb.IsBlockNamePanel(btr.Name))
+                        using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
                         {
-                            PanelAKR panelAkr = new PanelAKR(idBtr, btr.Name);
-                            panelsAkrLIb.Add(panelAkr);
+                            if (MarkSb.IsBlockNamePanel(btr.Name))
+                            {
+                                PanelAKR panelAkr = new PanelAKR(idBtr, btr.Name);
+                                if (defineFullPaneldata)
+                                {
+                                    panelAkr.DefineGeom(idBtr);
+                                }
+                                panelsAkrLIb.Add(panelAkr);
+
+                                progress.MeterProgress();
+                            }
                         }
                     }
+                    progress.Stop();
                 }
             }
             return panelsAkrLIb;
-        }
+        }       
     }
 }
