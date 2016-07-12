@@ -34,12 +34,16 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
         public void Insert ()
         {
             Document doc = Application.DocumentManager.MdiActiveDocument;
-            Database db = doc.Database;
-            using (var t = db.TransactionManager.StartTransaction())
+            if (doc == null) return;
+            using (doc.LockDocument())
             {
-                CopyEnt(panelAkr.IdBtrAkrPanel, db.BlockTableId);                
-                AcadLib.Blocks.BlockInsert.Insert(panelAkr.BlName);                
-                t.Commit();
+                Database db = doc.Database;
+                using (var t = db.TransactionManager.StartTransaction())
+                {
+                    CopyEnt(panelAkr.IdBtrAkrPanel, db.BlockTableId);                    
+                    AcadLib.Blocks.BlockInsert.Insert(panelAkr.BlName);
+                    t.Commit();
+                }
             }
         }
 

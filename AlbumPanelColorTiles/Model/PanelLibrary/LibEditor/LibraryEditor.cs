@@ -10,27 +10,27 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor
     {
         // Просмотр списка панелей в библиотеке. (поиск, просмотр, добавление примечания.)
         // Удаление блоков панелей из библиотеки.
+        private Database dbLib;
 
         public void Edit ()
-        {            
+        {
             var panelsFile = GetPanelsFile();
-            try
-            {
-                using (Database dbLib = new Database(false, true))
-                {
-                    dbLib.ReadDwgFile(panelsFile, FileShare.ReadWrite, true, "");
-                    dbLib.CloseInput(true);
-                    // список блоков АКР-Панелей в библиотеке (полные имена блоков).
-                    var panelsInLib = PanelAKR.GetAkrPanelLib(dbLib, true);
-                    UI.PanelsAkrView panelsView = new UI.PanelsAkrView(panelsInLib);
-                    UI.PanelsWindow panelsWindow = new UI.PanelsWindow(panelsView);
-                    Application.ShowModalWindow(panelsWindow);
-                }
-            }
-            finally
-            {
-                File.Delete(panelsFile);
-            }
+            dbLib = new Database(false, true);
+            dbLib.ReadDwgFile(panelsFile, FileShare.ReadWrite, true, "");
+            dbLib.CloseInput(true);
+            // список блоков АКР-Панелей в библиотеке (полные имена блоков).
+            var panelsInLib = PanelAKR.GetAkrPanelLib(dbLib, true);
+            UI.PanelsAkrView panelsView = new UI.PanelsAkrView(panelsInLib);
+            UI.PanelsWindow panelsWindow = new UI.PanelsWindow(panelsView);
+            panelsWindow.Closed += PanelsWindow_Closed;
+            Application.ShowModelessWindow(panelsWindow);
+        }
+
+        private void PanelsWindow_Closed (object sender, EventArgs e)
+        {
+            string file = dbLib.Filename;
+            dbLib.Dispose();
+            File.Delete(file);
         }
 
         private string GetPanelsFile ()

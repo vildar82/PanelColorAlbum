@@ -22,7 +22,7 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
         public PanelsWindow (PanelsAkrView view)
         {
             InitializeComponent();
-            DataContext = view;
+            DataContext = view;            
         }
     }
 }

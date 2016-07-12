@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using MicroMvvm;
 
@@ -13,7 +14,8 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
     public class PanelsAkrView : ObservableObject
     {
         private List<PanelAKR> panelsAkr;
-        private string filter;        
+        private string filter;
+        private Visibility visible;    
 
         public PanelsAkrView(List<PanelAKR> panels)
         {
@@ -32,7 +34,25 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
             }
         }
 
-        public ICommand Insert { get { return new RelayCommand(() => SelectedPanel.Insert(), () => SelectedPanel != null); } }
+        public Visibility Visible {
+            get { return visible; }
+            set {
+                visible = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public ICommand Insert {
+            get {
+                return new RelayCommand(() =>
+                {
+                    Visible = Visibility.Hidden;                    
+                    SelectedPanel.Insert();
+                    Visible = Visibility.Visible;
+                },
+                () => SelectedPanel != null);
+            }
+        }
 
         private void FillPanels (IEnumerable<PanelAKR> panels)
         {

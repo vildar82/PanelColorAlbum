@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AlbumPanelColorTiles.PanelLibrary.LibEditor.UI"
         mc:Ignorable="d"
-        Title="Панели в библиотеке">
+        Title="Панели в библиотеке"        
+        Visibility="{Binding Visible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
     
     <Grid>
         <Grid.RowDefinitions>

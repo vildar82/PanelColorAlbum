@@ -87,8 +87,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                 using (ProgressMeter progress = new ProgressMeter())
                 {
-                    progress.SetLimit(1000);
-                    progress.Start("Считывание панелей из библиотеки...");
+                    List<Tuple<ObjectId, string>> idBtrPanels = new List<Tuple<ObjectId, string>>();
 
                     foreach (ObjectId idBtr in bt)
                     {
@@ -96,16 +95,29 @@ namespace AlbumPanelColorTiles.PanelLibrary
                         {
                             if (MarkSb.IsBlockNamePanel(btr.Name))
                             {
-                                PanelAKR panelAkr = new PanelAKR(idBtr, btr.Name);
-                                if (defineFullPaneldata)
-                                {
-                                    panelAkr.DefineGeom(idBtr);
-                                }
-                                panelsAkrLIb.Add(panelAkr);
-
-                                progress.MeterProgress();
+                                idBtrPanels.Add(new Tuple<ObjectId, string>(idBtr, btr.Name));                                
                             }
                         }
+                    }                                    
+                                
+                    progress.SetLimit(idBtrPanels.Count);
+                    progress.Start("Считывание панелей из библиотеки...");
+
+                    foreach (var idBtr in idBtrPanels)
+                    {
+                        if (HostApplicationServices.Current.UserBreak())
+                        {
+                            throw new System.Exception(AcadLib.General.CanceledByUser);
+                        }
+
+                        PanelAKR panelAkr = new PanelAKR(idBtr.Item1, idBtr.Item2);
+                        if (defineFullPaneldata)
+                        {
+                            panelAkr.DefineGeom(idBtr.Item1);
+                        }
+                        panelsAkrLIb.Add(panelAkr);
+
+                        progress.MeterProgress();
                     }
                     progress.Stop();
                 }
