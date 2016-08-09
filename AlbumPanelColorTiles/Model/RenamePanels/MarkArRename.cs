@@ -77,13 +77,15 @@ namespace AlbumPanelColorTiles.RenamePanels
       {
             try
             {
-                marksArForRename.Remove(MarkArCurFull);
+                var markFullBefore = MarkArCurFull;
                 RenamePainting(newPaintingMark);
-                marksArForRename.Add(MarkArCurFull, this);
+                marksArForRename.Remove(markFullBefore);
+                var markFullNew = MarkArCurFull;
+                marksArForRename.Add(markFullNew, this);
             }
             catch
             {
-                Inspector.AddError($"Не удалось переименовать покраску для панели {_markArCurFull}, на покраску {newPaintingMark}");
+                //Inspector.AddError($"Не удалось переименовать покраску для панели {_markArCurFull}, на покраску {newPaintingMark}");
             }            
       }
 
