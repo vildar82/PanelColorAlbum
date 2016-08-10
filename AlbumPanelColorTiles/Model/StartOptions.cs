@@ -74,10 +74,10 @@ namespace AlbumPanelColorTiles
         public void LoadDefault()
         {            
             // Дефолтное значение аббревиатуры проекта
-            if (Abbr == null)
-            {
+            //if (Abbr == null)
+            //{
                 Abbr = loadAbbreviateName();// "Н47Г";                     
-            }
+            //}
             CheckMarkPainting = DictNOD.LoadBool(Album.KEYNAMECHECKMARKPAINTING, false);
             //NewMode = DictNOD.LoadBool(Album.KEYNAMENEWMODE, false);
             NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);

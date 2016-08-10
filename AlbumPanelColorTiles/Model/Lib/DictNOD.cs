@@ -117,8 +117,8 @@ namespace AlbumPanelColorTiles.Lib
                         string markArDict = names[0];
                         MarkArRename markArRename;
                         if (beforeRenameMarkARList.TryGetValue(markArDict, out markArRename))
-                        {                            
-                             markArRename.RenameMark(names[1], beforeRenameMarkARList);                            
+                        {                           
+                            markArRename.RenameMark(names[1], beforeRenameMarkARList);                            
                         }
                         else
                         {

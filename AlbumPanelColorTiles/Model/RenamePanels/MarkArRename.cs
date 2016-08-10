@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Panels;
@@ -22,6 +23,11 @@ namespace AlbumPanelColorTiles.RenamePanels
          _abbr = _markAR.MarkSB.Abbr;
          _markArCurFull = _markAR.MarkARPanelFullNameCalculated;// GetMarkArPreview(_markPainting);
       }
+
+        public MarkArRename Copy ()
+        {
+            return (MarkArRename)MemberwiseClone();
+        }
 
       public static string Abbr
       {
@@ -77,15 +83,18 @@ namespace AlbumPanelColorTiles.RenamePanels
       {
             try
             {
-                var markFullBefore = MarkArCurFull;
-                RenamePainting(newPaintingMark);
-                marksArForRename.Remove(markFullBefore);
-                var markFullNew = MarkArCurFull;
-                marksArForRename.Add(markFullNew, this);
+                if (!marksArForRename.Values.Any(m =>m.MarkAR.MarkSB == MarkAR.MarkSB && m.MarkPainting == newPaintingMark))
+                {
+                    var markFullBefore = MarkArCurFull;
+                    RenamePainting(newPaintingMark);
+                    var markFullNew = MarkArCurFull;
+                    marksArForRename.Add(markFullNew, this);
+                    marksArForRename.Remove(markFullBefore);
+                }
             }
             catch
             {
-                //Inspector.AddError($"Не удалось переименовать покраску для панели {_markArCurFull}, на покраску {newPaintingMark}");
+                Inspector.AddError($"Не удалось переименовать покраску для панели {_markArCurFull}, на покраску {newPaintingMark}");
             }            
       }
 
