@@ -79,6 +79,11 @@ namespace AlbumPanelColorTiles.Panels
             return storeys;
         }
 
+        public override int GetHashCode ()
+        {
+            return _type.GetHashCode() ^ _number.GetHashCode();
+        }
+
         public int CompareTo (Storey other)
         {
             if (_type == EnumStorey.Number)
