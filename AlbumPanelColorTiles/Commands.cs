@@ -706,6 +706,15 @@ namespace AlbumPanelColorTiles
         }
         
 
+            [CommandMethod(groupPik, nameof(AKR_Utils_ColorAreasTable), CommandFlags.Modal)]
+        public void AKR_Utils_ColorAreasTable ()
+        {
+            CommandStart.Start(doc =>
+            {
+                var colorAreasTableUtils = new Utils.ColorAreaTable.UtilsColorAreasTible(doc);
+                colorAreasTableUtils.CreateTable();
+            });
+        }
 
         //
         //

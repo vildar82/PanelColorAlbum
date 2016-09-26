@@ -23,7 +23,7 @@
     </AssemblyVersionSettings>
     <AssemblyFileVersionSettings>
     </AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.229.431</AssemblyVersion>
+    <AssemblyVersion>2.0.270.435</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -291,6 +291,11 @@
     <Compile Include="Model\Utils\AirConditioners\AirConditionersCalc.cs" />
     <Compile Include="Model\Utils\AirConditioners\AirCondRow.cs" />
     <Compile Include="Model\Utils\AirConditioners\AirCondTable.cs" />
+    <Compile Include="Model\Utils\ColorAreaTable\ColorArea.cs" />
+    <Compile Include="Model\Utils\ColorAreaTable\ColorAreasTable.cs" />
+    <Compile Include="Model\Utils\ColorAreaTable\DataColorAreas.cs" />
+    <Compile Include="Model\Utils\ColorAreaTable\DataRow.cs" />
+    <Compile Include="Model\Utils\ColorAreaTable\UtilsColorAreasTible.cs" />
     <Compile Include="Model\Utils\CopyDict\SelectObject.cs" />
     <Compile Include="Model\Utils\CopyDict\FormSelect.cs">
       <SubType>Form</SubType>
