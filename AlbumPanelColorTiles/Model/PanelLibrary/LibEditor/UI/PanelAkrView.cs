@@ -13,20 +13,20 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
 {
     public class PanelAkrView : ObservableObject
     {
-        private PanelAKR panelAkr;
+        public PanelAKR PanelAkr { get; set; }
 
         public PanelAkrView(PanelAKR panel)
         {
-            panelAkr = panel;            
+            PanelAkr = panel;            
         }
 
-        public string Name { get { return panelAkr.BlName; } }
-        public ImageSource Image { get { return panelAkr.Image; } }
-        public double Height { get { return panelAkr.HeightPanelByTile; } }
+        public string Name { get { return PanelAkr.MarkAkr; } }
+        public ImageSource Image { get { return PanelAkr.Image; } }
+        public double Height { get { return PanelAkr.HeightPanelByTile; } }
         public string Description {
-            get { return panelAkr.Description; }
+            get { return PanelAkr.Description; }
             set {
-                panelAkr.Description = value;
+                PanelAkr.Description = value;
                 RaisePropertyChanged();
             }
         }
@@ -40,8 +40,8 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
                 Database db = doc.Database;
                 using (var t = db.TransactionManager.StartTransaction())
                 {
-                    CopyEnt(panelAkr.IdBtrAkrPanel, db.BlockTableId);                    
-                    AcadLib.Blocks.BlockInsert.Insert(panelAkr.BlName);
+                    CopyEnt(PanelAkr.IdBtrAkrPanel, db.BlockTableId);                    
+                    AcadLib.Blocks.BlockInsert.Insert(PanelAkr.BlName);
                     t.Commit();
                 }
             }

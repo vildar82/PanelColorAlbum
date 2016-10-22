@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,13 +16,27 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
     {
         private List<PanelAKR> panelsAkr;
         private string filter;
-        private Visibility visible;    
+        private Visibility visible;
+        private LibraryEditor libEditor;
+        private List<PanelAKR> panelsToDelete= new List<PanelAKR> ();
 
-        public PanelsAkrView(List<PanelAKR> panels)
+        public PanelsAkrView(List<PanelAKR> panels, LibraryEditor libEditor)
         {
+            this.libEditor = libEditor;
             panelsAkr = panels;
+            var alphaComparer = AcadLib.Comparers.AlphanumComparator.New;           
+            panelsAkr.Sort((p1, p2) => alphaComparer.Compare(p1.MarkAkr,p2.MarkAkr));
             FillPanels(panels);
+
+            
+            Insert = new RelayCommand(OnInsertExecute, OnInsertCanExecute);
+            Delete = new RelayCommand<PanelAkrView>(OnDeleteExecute);
+            UndoDelete = new RelayCommand(OnUndoDeleteExecute, OnUndoDeleteCanExecute);
         }
+
+        public ICommand Insert { get; set; }
+        public ICommand Delete { get; set; }
+        public ICommand UndoDelete { get; set; }        
 
         public ObservableCollection<PanelAkrView> Panels { get; set; } = new ObservableCollection<PanelAkrView>();
         public PanelAkrView SelectedPanel { get; set; }
@@ -42,18 +57,6 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
             }
         }
 
-        public ICommand Insert {
-            get {
-                return new RelayCommand(() =>
-                {
-                    Visible = Visibility.Hidden;                    
-                    SelectedPanel.Insert();
-                    Visible = Visibility.Visible;
-                },
-                () => SelectedPanel != null);
-            }
-        }
-
         private void FillPanels (IEnumerable<PanelAKR> panels)
         {
             Panels.Clear();
@@ -71,14 +74,52 @@ namespace AlbumPanelColorTiles.PanelLibrary.LibEditor.UI
                 FillPanels(panelsAkr);
                 return;
             }
-            var filteredPanels = panelsAkr.Where(p => isPassFilter(p.BlName, filter));
+            var filteredPanels = panelsAkr.Where(p => isPassFilter(p.MarkAkr, filter));
             FillPanels(filteredPanels);
         }
 
-        private bool isPassFilter (string blName, string filter)
+        private bool isPassFilter (string name, string filter)
         {
-            var res = Regex.IsMatch(blName, filter, RegexOptions.IgnoreCase);
+            var res = Regex.IsMatch(name, filter, RegexOptions.IgnoreCase);
             return res;
+        }
+
+        private void OnInsertExecute ()
+        {
+            Visible = Visibility.Hidden;
+            SelectedPanel.Insert();
+            Visible = Visibility.Visible;
+        }
+        private bool OnInsertCanExecute ()
+        {
+            return SelectedPanel != null;
+        }
+
+        private void OnDeleteExecute (PanelAkrView panelView)
+        {            
+            panelsToDelete.Add(panelView.PanelAkr);            
+            Panels.Remove(panelView);
+            panelsAkr.Remove(panelView.PanelAkr);
+        }
+
+        private void OnUndoDeleteExecute ()
+        {
+            foreach (var item in panelsToDelete)
+            {
+                panelsAkr.Add(item);
+                Panels.Add(new PanelAkrView(item));
+            }
+            panelsToDelete.Clear();
+        }
+
+        private bool OnUndoDeleteCanExecute ()
+        {
+            return panelsToDelete.Count > 0;
+        }
+
+        public void OnClose (object sender, EventArgs e)
+        {
+            libEditor.CloseAndDelete(panelsToDelete);
         }
     }
 }

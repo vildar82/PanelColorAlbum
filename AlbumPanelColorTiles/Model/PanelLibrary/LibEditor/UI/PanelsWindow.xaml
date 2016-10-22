@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AlbumPanelColorTiles.PanelLibrary.LibEditor.UI"
         mc:Ignorable="d"
-        Title="Панели в библиотеке"        
-        Visibility="{Binding Visible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-    
+        Title="Библиотека панелей"        
+        Visibility="{Binding Visible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,7 +18,7 @@
             <Label Content="Поиск"/>
             <TextBox Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" Width="150" Margin="5"/>
         </StackPanel>
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Panels, UpdateSourceTrigger=PropertyChanged}"
+        <DataGrid x:Name="gridPanels" Grid.Row="1" ItemsSource="{Binding Panels, UpdateSourceTrigger=PropertyChanged}"
                   AutoGenerateColumns="False" IsReadOnly="True"
                   SelectedItem="{Binding SelectedPanel}">
             <DataGrid.Resources>
@@ -29,21 +28,34 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Имя" Binding="{Binding Name}" ElementStyle="{StaticResource Centered}"/>
-                <DataGridTemplateColumn Header="Вид">
+                <DataGridTextColumn Header="Имя" Width="Auto" Binding="{Binding Name}" ElementStyle="{StaticResource Centered}"/>
+                <DataGridTemplateColumn Header="Вид" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding Image}"/>                            
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Высота" Binding="{Binding Height}" ElementStyle="{StaticResource Centered}"/>
-                <DataGridTextColumn Header="Примечание" Binding="{Binding Description}" ElementStyle="{StaticResource Centered}"/>
+                <DataGridTextColumn Header="Высота" Width="Auto" Binding="{Binding Height}" ElementStyle="{StaticResource Centered}" 
+                                    ToolTipService.ToolTip="Высота панели определяется по общим границам блоков плитки."/>
+                <DataGridTextColumn Header="Примечание" Width="*" Binding="{Binding Description}" ElementStyle="{StaticResource Centered}"/>
+                <DataGridTemplateColumn Header="Удаление" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Удалить" 
+                                    Command="{Binding ElementName=gridPanels, Path=DataContext.Delete}" 
+                                    CommandParameter="{Binding}" MaxHeight="25" MaxWidth="100" Margin="5"
+                                    ToolTip="Панель удалиться из списка сразу, а из библиотеки после закрытия этого окна. Можно нажать кнопку Отмены удалений для восстановления панели в списке и не удалять из библиотеки."/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>            
         </DataGrid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button Content="Вставить блок" Command="{Binding Insert}" Margin="5"/>
-        </StackPanel>
+        <DockPanel Grid.Row="2">
+            <Button Content="Вставить блок" Command="{Binding Insert}" Margin="5" ToolTip="Вставка выделенного блока панели в текущий файл"/>
+            <Button Content="Отмена удалений" Command="{Binding UndoDelete}" Margin="5" HorizontalAlignment="Right"
+                    ToolTip="Отменить удаление панелей - удаленные панели вернуться в список и не будут удаляться из библиотеки."/>
+        </DockPanel>
         <StackPanel Grid.Row="3" Orientation="Horizontal">
             <Label Content="Панелей: "/>
             <Label Content="{Binding Panels.Count}"/>

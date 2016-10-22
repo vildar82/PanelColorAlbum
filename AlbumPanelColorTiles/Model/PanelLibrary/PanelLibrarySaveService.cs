@@ -151,10 +151,9 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
       private static string getBackupPanelsLibFile(string libPanelsFilePath)
       {
-         string suffix = string.Format("{0}", DateTime.Now.ToString("dd.MM.yyyy-HH.mm"));
-         string newFile = Path.Combine(
-            Path.GetDirectoryName(libPanelsFilePath), string.Format("{0}_{1}.{2}",
-            Path.GetFileNameWithoutExtension(libPanelsFilePath), suffix, "dwg"));
+         string suffix = DateTime.Now.ToString("dd.MM.yyyy-HH.mm");
+         string newFile = Path.Combine(Path.GetDirectoryName(libPanelsFilePath), 
+             $"{Path.GetFileNameWithoutExtension(libPanelsFilePath)}_{suffix}.dwg");
          return newFile;
       }
 
@@ -203,7 +202,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
          }
       }
 
-      private void copyLibPanelFile()
+      public static void BackUpLibPanelsFile()
       {
          string newFile = getBackupPanelsLibFile(LibPanelsFilePath);
          File.Copy(LibPanelsFilePath, newFile, true);
