@@ -133,6 +133,10 @@ namespace AlbumPanelColorTiles.Utils.Windows
             translator.Add("бп-1", new WindowTranslator("бп-1", "БП-1"));
             // ОБД-1
             translator.Add("Окно_ОБД-1", new WindowTranslator("Окно_ОБД-1", "ОБД-1"));
+            // АКР_Окно_ОП-25_4 -> ОП-25
+            translator.Add("АКР_Окно_ОП-25_4", new WindowTranslator("АКР_Окно_ОП-25_4", "ОП-25"));
+            // АКР_Окно_ОП-24П -> ОП-25
+            translator.Add("АКР_Окно_ОП-24П", new WindowTranslator("АКР_Окно_ОП-24П", "ОП-25"));
 
             return translator;
         }
