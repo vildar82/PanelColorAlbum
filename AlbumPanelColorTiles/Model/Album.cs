@@ -137,13 +137,13 @@ namespace AlbumPanelColorTiles
                                 // Перенос плитки на слой "АР_Плитка"
                                 if (checkedBlocks.Add(markSbBlName))
                                 {
-                                    Tile.TilesToLayer(idBtrMarkSb);
+                                    Tile.TilesNormalize(idBtrMarkSb);
                                 }
                             }
                             // Перенос плитки на слой "АР_Плитка"
                             if (checkedBlocks.Add(blRef.Name))
                             {
-                                Tile.TilesToLayer(blRef.BlockTableRecord);
+                                Tile.TilesNormalize(blRef.BlockTableRecord);
                             }
                         }
                     }

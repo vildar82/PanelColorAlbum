@@ -105,14 +105,14 @@ namespace AlbumPanelColorTiles.Panels
         /// <summary>
         /// Название окна в блоке панели после приставки _ок - например "[ОП6]", "ОП6 ОП5" - что человек напишет.
         /// </summary>
-        public string WindowName { get; set; }
-
-        // Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
+        public string WindowName { get; set; }        
+        /// <summary>
+        /// Создание определения блока марки СБ из блока марки АР, и сброс покраски плитки (в слой 0)
+        /// </summary>        
         public static void CreateBlockMarkSbFromAr(ObjectId idBtrMarkAr, string markSbBlName)
         {
             // Копирование блока
-            var idBtrMarkSb = Lib.Block.CopyBtr(idBtrMarkAr, markSbBlName);
-            Tile.TilesToLayer(idBtrMarkSb);
+            var idBtrMarkSb = Lib.Block.CopyBtr(idBtrMarkAr, markSbBlName);            
         }        
 
         public static string GetMarkSbBlockName(string markSb)

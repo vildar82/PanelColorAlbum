@@ -194,7 +194,7 @@ namespace AlbumPanelColorTiles.Panels
                                     article = paintAr.Article;
                                 }
                                 // Запись артикла цвета в атрибут блока плитки
-                                FillTileArticle(blRef, article);
+                                Tile.FillTileArticle(blRef, article);
                             }
                             else if (string.Equals(blNameEff, Settings.Default.BlockColorAreaName, StringComparison.CurrentCultureIgnoreCase))
                             {
@@ -205,33 +205,7 @@ namespace AlbumPanelColorTiles.Panels
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Запись артикла цвета в атрибут блока плитки
-        /// </summary>
-        /// <param name="blRef">Блок плитки открытый на запись</param>
-        /// <param name="article">Артикул</param>
-        private void FillTileArticle(BlockReference blRef, string article)
-        {
-            if (blRef.AttributeCollection!= null)
-            {
-                foreach (ObjectId atrId in blRef.AttributeCollection)
-                {
-                    if (!atrId.IsValidEx()) continue;
-                    using (var atr = atrId.Open(OpenMode.ForRead) as AttributeReference)
-                    {
-                        if (atr == null) continue;
-                        if (atr.Tag.Equals(Tile.PropArticle, StringComparison.OrdinalIgnoreCase))
-                        {
-                            atr.UpgradeOpen();
-                            atr.TextString = article;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        }        
 
         public bool EqualPaint(List<Paint> paintAR)
         {

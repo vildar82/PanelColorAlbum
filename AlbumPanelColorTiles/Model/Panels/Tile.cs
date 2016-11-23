@@ -5,6 +5,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
 using AcadLib.Blocks;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -75,7 +76,8 @@ namespace AlbumPanelColorTiles.Panels
                         {
                             blRef.UpgradeOpen();
                             blRef.Layer = paint.Layer;
-                            tile.SetPaint(paint);
+                            FillTileArticle(blRef, paint.Article); // Так же поворачивает атрибут
+                            //tile.SetPaint(paint);
                         }
                     }
                     else if (!MarkSb.IsBlockNamePanel(blName))
@@ -103,23 +105,57 @@ namespace AlbumPanelColorTiles.Panels
         }
 
         /// <summary>
-        /// Перенос плитки на слой "АР_Плитка"
-        /// </summary>
-        /// <param name="idBtrMarkSb"></param>
-        public static void TilesToLayer(ObjectId idBtrMarkSb)
+        /// Нормализация плиток - слой, поворот артикула и установка пустого артикула
+        /// </summary>        
+        public static void TilesNormalize(ObjectId idBtrMarkSb)
         {
             // Перенос блоков плиток на слой                 
             var layerTile = LayerExt.CheckLayerState(new LayerInfo("АР_Плитка"));
             var btrMarkSb = idBtrMarkSb.GetObject(OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btrMarkSb)
             {
+                if (!idEnt.IsValidEx()) continue;
                 var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                 if (blRef == null) continue;
                 if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     blRef.UpgradeOpen();
+                    // Слой
                     blRef.LayerId = layerTile;
+                    // Нормализация плитки (зеркальность, поворот)
+                    //blRef.Normalize(); // Есть плитки с подрезкой - как ее нормализовать, пока непонтно!!!???
+                    Tile.FillTileArticle(blRef, "");
                     blRef.DowngradeOpen();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Запись артикла цвета в атрибут блока плитки
+        /// </summary>
+        /// <param name="blRef">Блок плитки открытый на запись</param>
+        /// <param name="article">Артикул</param>
+        public static void FillTileArticle(BlockReference blRef, string article)
+        {
+            if (blRef.AttributeCollection != null)
+            {
+                foreach (ObjectId atrId in blRef.AttributeCollection)
+                {
+                    if (!atrId.IsValidEx()) continue;
+                    using (var atr = atrId.Open(OpenMode.ForRead) as AttributeReference)
+                    {
+                        if (atr == null) continue;
+                        if (atr.Tag.Equals(Tile.PropArticle, StringComparison.OrdinalIgnoreCase))
+                        {
+                            atr.UpgradeOpen();
+                            atr.TextString = article;
+                            if (atr.Rotation!=0)
+                            {
+                                atr.Rotation = 0;
+                            }
+                            break;
+                        }
+                    }
                 }
             }
         }
