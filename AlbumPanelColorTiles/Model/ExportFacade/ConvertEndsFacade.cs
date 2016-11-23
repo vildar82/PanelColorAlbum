@@ -2,6 +2,7 @@
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using System;
 
 namespace AlbumPanelColorTiles.ExportFacade
 {
@@ -55,7 +56,14 @@ namespace AlbumPanelColorTiles.ExportFacade
             // создание определения блока
             using (var bt = CPS.DbExport.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
             {
-                IdBtrEnd = getIdBtrEnd(bt);
+                try
+                {
+                    IdBtrEnd = getIdBtrEnd(bt);
+                }
+                catch(Exception ex)
+                {
+                    Logger.Log.Error(ex, "createBlock() - IdBtrEnd = getIdBtrEnd(bt);");
+                }
             }
 
             // для каждой панели - копирование объектв торца с преобразование в координаты модели
