@@ -23,7 +23,7 @@
     </AssemblyVersionSettings>
     <AssemblyFileVersionSettings>
     </AssemblyFileVersionSettings>
-    <AssemblyVersion>2.0.306.439</AssemblyVersion>
+    <AssemblyVersion>2.0.328.440</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

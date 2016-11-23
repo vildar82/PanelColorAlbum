@@ -60,6 +60,7 @@
         public string LayerParapetPanels { get; set; }
         public string LayerUpperStoreyPanels { get; set; }
         public string LayerWindows { get; set; }
+        public string LayerTileArticle { get; set; }        
         public string PaintIndexEndLeftPanel { get; set; }
         public string PaintIndexEndRightPanel { get; set; }
         public string PaintIndexLastStorey { get; set; }
@@ -128,6 +129,7 @@
             LayerUpperStoreyPanels = "АР_Панели_Чердак";
             LayerParapetPanels = "АР_Панели_Парапет";
             LayerWindows = "АР_Окна";
+            LayerTileArticle = "АР_Плитка_Артикул";
             LayerDimensionFacade = "АР_Размеры на фасаде";
             LayerDimensionForm = "АР_Размеры в форме";
             TemplateBlocksAKRFileName = "АКР_Блоки.dwg";

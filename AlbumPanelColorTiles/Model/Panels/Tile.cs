@@ -4,23 +4,26 @@ using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
+using AcadLib.Blocks;
 
 namespace AlbumPanelColorTiles.Panels
 {
     // Плитка
-    public class Tile : IEquatable<Tile>
+    public class Tile : BlockBase, IEquatable<Tile>
     {
-        private Extents3d _bounds;
+        public const string PropArticle = "АРТИКУЛ";
+        //private Extents3d _bounds;
         private Point3d _centerTile;
-        private ObjectId _idBlRef;
+        private Paint _paint;
+        //private ObjectId _idBlRef;
 
         // Id внутри определения блока панели (марки СБ).
-        public Tile(BlockReference blRefTile)
+        public Tile(BlockReference blRefTile, string blName) : base(blRefTile, blName)
         {
-            _idBlRef = blRefTile.ObjectId;
-            _bounds = blRefTile.GeometricExtents;
-            _centerTile = new Point3d((_bounds.MaxPoint.X + _bounds.MinPoint.X) * 0.5,
-                                      (_bounds.MaxPoint.Y + _bounds.MinPoint.Y) * 0.5, 0);
+            //_idBlRef = blRefTile.ObjectId;
+            //_bounds = blRefTile.GeometricExtents;
+            _centerTile = new Point3d((Bounds.Value.MaxPoint.X + Bounds.Value.MinPoint.X) * 0.5,
+                                      (Bounds.Value.MaxPoint.Y + Bounds.Value.MinPoint.Y) * 0.5, 0);
         }
 
         public Point3d CenterTile { get { return _centerTile; } }
@@ -65,13 +68,14 @@ namespace AlbumPanelColorTiles.Panels
                     string blName = blRef.GetEffectiveName();
                     if (blName.StartsWith(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
                     {
-                        Tile tile = new Tile(blRef);
+                        Tile tile = new Tile(blRef, blName);
                         //Определение покраски плитки
                         Paint paint = ColorArea.GetPaint(tile.CenterTile.TransformBy(transToModel), rtreeColorAreas);
                         if (paint != null)
                         {
                             blRef.UpgradeOpen();
                             blRef.Layer = paint.Layer;
+                            tile.SetPaint(paint);
                         }
                     }
                     else if (!MarkSb.IsBlockNamePanel(blName))
@@ -83,10 +87,19 @@ namespace AlbumPanelColorTiles.Panels
             }
         }
 
+        private void SetPaint(Paint paint)
+        {
+            _paint = paint;
+            if (_paint != null)
+            {
+                FillPropValue(PropArticle, _paint.Article, isRequired:false);
+            }
+        }
+
         public bool Equals(Tile other)
         {
-            return _idBlRef.Equals(other._idBlRef) &&
-               _bounds.IsEqualTo(other._bounds, Album.Tolerance);
+            return IdBlRef.Equals(other.IdBlRef) &&
+               Bounds.Value.IsEqualTo(other.Bounds.Value, Album.Tolerance);
         }
 
         /// <summary>
