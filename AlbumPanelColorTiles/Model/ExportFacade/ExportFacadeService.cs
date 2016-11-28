@@ -47,7 +47,7 @@ namespace AlbumPanelColorTiles.ExportFacade
             CPS = new ConvertPanelService(this);
             CPS.DefinePanels(facades);
 
-            using (Database dbExport = new Database(!_fileExport.IsExistsFileExport, true))
+            using (var dbExport = new Database(!_fileExport.IsExistsFileExport, true))
             {
                 if (_fileExport.IsExistsFileExport)
                 {

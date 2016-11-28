@@ -5,6 +5,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Select
 {
@@ -101,6 +102,7 @@ namespace AlbumPanelColorTiles.Select
                 var ms = SymbolUtilityServices.GetBlockModelSpaceId(_db).GetObject(OpenMode.ForRead) as BlockTableRecord;
                 foreach (ObjectId idEnt in ms)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     if (blRef == null || !lvs.IsVisible(blRef)) continue;
                     // Блоки АКР-Панелей
@@ -162,6 +164,7 @@ namespace AlbumPanelColorTiles.Select
             {
                 foreach (ObjectId idEnt in ms)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     using (var blRef = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                     {
                         if (blRef == null) continue;
