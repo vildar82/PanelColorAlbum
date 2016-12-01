@@ -640,6 +640,19 @@ namespace AlbumPanelColorTiles
                 Editor ed = doc.Editor;
                 Database db = doc.Database;
 
+                try
+                {
+                    var startOptions = new StartOption();
+                    startOptions.LoadDefault();
+                    if (startOptions.CheckMarkPainting)
+                    {
+                        MessageBox.Show("Для чертежа включена проверка марок покраски панелей. Нельзя выполнять очистку!", 
+                            "АКР. Очистка марок покраски в монтажных панелях.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return;
+                    }
+                }
+                catch { }
+
                 using (var t = db.TransactionManager.StartTransaction())
                 {
                     // Все монтажные блоки панелей в модели
