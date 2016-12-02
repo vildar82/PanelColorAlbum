@@ -76,6 +76,10 @@ namespace AlbumPanelColorTiles
         public AlbumInfo AlbumInfo { get; set; }
         public List<Storey> Storeys { get { return _storeys; } }
         //public BaseService BasePanelsService { get; private set; }
+        /// <summary>
+        /// Включена/выключена подпись артикла в плитке (в альбома панелей)
+        /// </summary>
+        public bool IsTileArticleOn { get; set; }
 
         /// <summary>
         /// Общий расход плитки на альбом.
@@ -241,6 +245,9 @@ namespace AlbumPanelColorTiles
             //   BasePanelsService.ReadPanelsFromBase();
             //}
 
+            // Определение включен ли артикул подписи в плитке (по состоянию замороженности слоя - Артикул пдлитки)
+            IsTileArticleOn = GetTileArticleState();
+
             // Подсчет общего кол плитки на альбом
             TotalTilesCalc = TileCalc.CalcAlbum(this);
 
@@ -301,6 +308,28 @@ namespace AlbumPanelColorTiles
             catch (System.Exception ex)
             {
                 Logger.Log.Error(ex, "Не удалось вставить итоговую таблицу плитки на альбом.");
+            }
+        }
+
+        /// <summary>
+        /// Определение включен ли артикул подписи в плитке (по состоянию замороженности слоя - Артикул пдлитки)
+        /// </summary>        
+        private bool GetTileArticleState()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (var lt = db.LayerTableId.Open(OpenMode.ForRead) as LayerTable)
+            {
+                if (lt.Has(Settings.Default.LayerTileArticle))
+                {
+                    using (var ltr = lt[Settings.Default.LayerTileArticle].Open(OpenMode.ForRead) as LayerTableRecord)
+                    {
+                        if (ltr != null)
+                        {
+                            return !ltr.IsFrozen;
+                        }
+                    }
+                }
+                return false;
             }
         }
 

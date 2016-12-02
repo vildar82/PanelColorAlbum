@@ -175,11 +175,14 @@ namespace AlbumPanelColorTiles.Sheets
                     layersToFreezeOnFormSheet.Add(idLay);
                 }
                 // Слой артикула плитки
-                if (lt.Has(Settings.Default.LayerTileArticle))
+                if (_markSB.Album.IsTileArticleOn)
                 {
-                    var idLay = lt[Settings.Default.LayerTileArticle];
-                    LayerOn(idLay);
-                    layersToFreezeOnFormSheet.Add(idLay);
+                    if (lt.Has(Settings.Default.LayerTileArticle))
+                    {
+                        var idLay = lt[Settings.Default.LayerTileArticle];
+                        LayerOn(idLay);
+                        layersToFreezeOnFormSheet.Add(idLay);
+                    }
                 }
                 // Слой размеров в форме
                 if (lt.Has(Settings.Default.LayerDimensionForm))
