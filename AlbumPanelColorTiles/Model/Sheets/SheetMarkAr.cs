@@ -114,9 +114,44 @@ namespace AlbumPanelColorTiles.Sheets
                            dbMarkSB, layersToFreezeOnFormSheet, layersToFreezeOnFacadeSheet, false);
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkArForm, false);
+            // Вставка артиклов цвета - подписей в плитках (поверх панели в форме)
+            InsertTileArticlesToPanelInForm(idBlRefMarkArForm);
+
 
             //   t.Commit();
             //}
+        }
+
+        /// <summary>
+        /// Вставка артиклов цвета - подписей в плитках (поверх панели в форме)
+        /// </summary>        
+        private void InsertTileArticlesToPanelInForm(ObjectId idBlRefMarkArForm)
+        {            
+            if (!_markAR.Album.IsTileArticleOn) return;
+
+            var blRefPanel = idBlRefMarkArForm.GetObject(OpenMode.ForRead) as BlockReference;
+            // трансформация блока панели
+            var panelTransform = blRefPanel.BlockTransform;
+
+            var ms = blRefPanel.OwnerId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            var db = ms.Database;
+            var t = db.TransactionManager.TopTransaction;
+            for (int i =0; i<_markAR.MarkSB.Tiles.Count; i++)
+            {
+                var tile = _markAR.MarkSB.Tiles[i];
+                var paint = _markAR.Paints[i];
+                var ptCenterTileInModel = tile.CenterTile.TransformBy(panelTransform);
+                var textArticle = new DBText();
+                textArticle.Justify = AttachmentPoint.MiddleCenter;
+                textArticle.AlignmentPoint = ptCenterTileInModel;
+                textArticle.AdjustAlignment(db);
+                textArticle.Layer = "0";
+                textArticle.ColorIndex = 7;
+                textArticle.TextString = paint.Article;
+                textArticle.Height =40;
+                ms.AppendEntity(textArticle);
+                t.AddNewlyCreatedDBObject(textArticle, true);
+            }
         }
 
         private void CheckTableExtents(ObjectId idTable)
