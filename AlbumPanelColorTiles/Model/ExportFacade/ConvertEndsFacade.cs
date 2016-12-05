@@ -3,6 +3,7 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System;
+using AcadLib.Errors;
 
 namespace AlbumPanelColorTiles.ExportFacade
 {
@@ -56,15 +57,7 @@ namespace AlbumPanelColorTiles.ExportFacade
             // создание определения блока
             using (var bt = CPS.DbExport.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
             {
-                try
-                {
-                    IdBtrEnd = getIdBtrEnd(bt);
-                }
-                catch(Exception ex)
-                {
-                    Logger.Log.Error(ex, $"createBlock() - IdBtrEnd = getIdBtrEnd(bt); BlNameEnd = {BlNameEnd}");
-                    return;
-                }
+                IdBtrEnd = getIdBtrEnd(bt);
             }
 
             // для каждой панели - копирование объектв торца с преобразование в координаты модели
@@ -151,7 +144,8 @@ namespace AlbumPanelColorTiles.ExportFacade
                 // имя блока торца по координате Y
                 nameEnd = itemLefEndsByY.Key.ToString("0.0");
             }
-            return string.Format("АКР_Торец_{0}_{1}", nameEnd, sideName);
+            var res = $"АКР_Торец_{nameEnd}_{sideName}".Replace(",", ".");
+            return res;
         }
 
         private Point3d defPosition ()

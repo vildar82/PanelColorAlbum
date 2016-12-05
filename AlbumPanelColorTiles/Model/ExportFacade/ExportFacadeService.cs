@@ -80,8 +80,8 @@ namespace AlbumPanelColorTiles.ExportFacade
                 {
                     using (var t = dbExport.TransactionManager.StartTransaction())
                     {
-                        // Преобразования определений блоков
-                        CPS.ConvertBtr();
+                        // Преобразования определений блоков                        
+                        CPS.ConvertBtr();         
 
                         // Преобразования торцов фасадов
                         CPS.ConvertEnds();
