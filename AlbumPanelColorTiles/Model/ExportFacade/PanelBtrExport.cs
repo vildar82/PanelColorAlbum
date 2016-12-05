@@ -4,6 +4,8 @@ using System.Linq;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using AcadLib.RTree.SpatialIndex;
 
 namespace AlbumPanelColorTiles.ExportFacade
 {
@@ -51,7 +53,7 @@ namespace AlbumPanelColorTiles.ExportFacade
         public List<ObjectId> IdsEndsRightEntity { get; set; }
         public List<ObjectId> IdsEndsTopEntity { get; set; }
         public List<PanelBlRefExport> Panels { get; private set; }
-        public List<Extents3d> Tiles { get; private set; }
+        public List<Tuple<ObjectId,Extents3d>> Tiles { get; private set; }
 
         public PanelBtrExport(ObjectId idBtrAkr, ConvertPanelService cps)
         {
@@ -63,7 +65,7 @@ namespace AlbumPanelColorTiles.ExportFacade
             IdsEndsTopEntity = new List<ObjectId>();
             IdsEndsBottomEntity = new List<ObjectId>();
             EntInfos = new List<EntityInfo>();
-            Tiles = new List<Extents3d>();
+            Tiles = new List<Tuple<ObjectId,Extents3d>>();
         }
 
         public void ConvertBtr()
@@ -78,7 +80,7 @@ namespace AlbumPanelColorTiles.ExportFacade
                 contourPanel.CreateContour2(btr);
 
                 // Определение торцевых объектов (плитки и полилинии контура торца)
-                defineEnds();
+                defineEnds(contourPanel);
 
                 // Удаление объектов торцов из блока панели, если это ОЛ
                 if (CaptionMarkSb.StartsWith("ОЛ", StringComparison.CurrentCultureIgnoreCase))
@@ -124,8 +126,9 @@ namespace AlbumPanelColorTiles.ExportFacade
         // Удаление мусора из блока
         private static bool deleteWaste(Entity ent)
         {
-            if (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade, StringComparison.CurrentCultureIgnoreCase) ||
-                              string.Equals(ent.Layer, Settings.Default.LayerDimensionForm, StringComparison.CurrentCultureIgnoreCase))
+            if (!(ent is BlockReference) || 
+                (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade, StringComparison.CurrentCultureIgnoreCase) ||
+                string.Equals(ent.Layer, Settings.Default.LayerDimensionForm, StringComparison.CurrentCultureIgnoreCase)))
             {
                 ent.UpgradeOpen();
                 ent.Erase();
@@ -134,7 +137,7 @@ namespace AlbumPanelColorTiles.ExportFacade
             return false;
         }
 
-        private void defineEnds()
+        private void defineEnds(ContourPanel contourPanel)
         {
             // условие наличия торцов
             if (ExtentsByTile.Diagonal() < 1000 || ExtentsNoEnd.Diagonal() < 1000 ||
@@ -147,48 +150,67 @@ namespace AlbumPanelColorTiles.ExportFacade
             // Торец слева
             if ((ExtentsNoEnd.MinPoint.X - ExtentsByTile.MinPoint.X) > 400)
             {
-                // поиск объектов с координатой близкой к ExtentsByTile.MinPoint.X
-                var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MinPoint.X, true);
-                if (idsEndEntsTemp.Count > 0)
+                // поиск объектов с координатой близкой к ExtentsByTile.MinPoint.X     
+                var endTiles = GetEndTiles(new Extents3d(ExtentsByTile.MinPoint, 
+                            new Point3d(ExtentsByTile.MinPoint.X + 300, ExtentsByTile.MaxPoint.Y, ExtentsByTile.MaxPoint.Z)),
+                            contourPanel.TreeTiles);
+                //var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MinPoint.X, true);
+                if (endTiles.Count > 0)
                 {
                     HashSet<ObjectId> idsEndLeftEntsHash = new HashSet<ObjectId>();
-                    idsEndEntsTemp.ForEach(t => idsEndLeftEntsHash.Add(t));
+                    endTiles.ForEach(t => idsEndLeftEntsHash.Add(t));
                     IdsEndsLeftEntity = idsEndLeftEntsHash.ToList();
                 }
             }
             // Торец справа
             if ((ExtentsByTile.MaxPoint.X - ExtentsNoEnd.MaxPoint.X) > 400)
             {
-                var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.X, true);
-                if (idsEndEntsTemp.Count > 0)
+                var endTiles = GetEndTiles(new Extents3d(
+                    new Point3d(ExtentsByTile.MaxPoint.X - 300, ExtentsByTile.MinPoint.Y, ExtentsByTile.MinPoint.Z),
+                    ExtentsByTile.MaxPoint), contourPanel.TreeTiles);
+                //var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.X, true);
+                if (endTiles.Count > 0)
                 {
                     HashSet<ObjectId> idsEndRightEntsHash = new HashSet<ObjectId>();
-                    idsEndEntsTemp.ForEach(t => idsEndRightEntsHash.Add(t));
+                    endTiles.ForEach(t => idsEndRightEntsHash.Add(t));
                     IdsEndsRightEntity = idsEndRightEntsHash.ToList();
                 }
             }
             // Торец сверху
             if ((ExtentsByTile.MaxPoint.Y - ExtentsNoEnd.MaxPoint.Y) > 400)
             {
-                var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.Y, false);
-                if (idsEndEntsTemp.Count > 0)
+                var endTiles = GetEndTiles(new Extents3d(
+                    new Point3d(ExtentsByTile.MinPoint.X, ExtentsByTile.MaxPoint.Y-300, ExtentsByTile.MaxPoint.Z),
+                    ExtentsByTile.MaxPoint), contourPanel.TreeTiles);
+                //var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.Y, false);
+                if (endTiles.Count > 0)
                 {
                     HashSet<ObjectId> idsEndTopEntsHash = new HashSet<ObjectId>();
-                    idsEndEntsTemp.ForEach(t => idsEndTopEntsHash.Add(t));
+                    endTiles.ForEach(t => idsEndTopEntsHash.Add(t));
                     IdsEndsTopEntity = idsEndTopEntsHash.ToList();
                 }
             }
             // Торец снизу
             if ((ExtentsNoEnd.MinPoint.Y - ExtentsByTile.MinPoint.Y) > 400)
             {
-                var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MinPoint.Y, false);
-                if (idsEndEntsTemp.Count > 0)
+                var endTiles = GetEndTiles(new Extents3d(ExtentsByTile.MinPoint,
+                    new Point3d(ExtentsByTile.MaxPoint.X, ExtentsByTile.MinPoint.Y + 300, ExtentsByTile.MinPoint.Z)), 
+                    contourPanel.TreeTiles);
+                //var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MinPoint.Y, false);
+                if (endTiles.Count > 0)
                 {
                     HashSet<ObjectId> idsEndBotEntsHash = new HashSet<ObjectId>();
-                    idsEndEntsTemp.ForEach(t => idsEndBotEntsHash.Add(t));
+                    endTiles.ForEach(t => idsEndBotEntsHash.Add(t));
                     IdsEndsBottomEntity = idsEndBotEntsHash.ToList();
                 }
             }
+        }
+
+        private List<ObjectId> GetEndTiles(Extents3d extEndTiles, RTree<Tuple<ObjectId,Extents3d>> treeTiles)
+        {
+            var rect = new Rectangle(extEndTiles);
+            var tiles = treeTiles.Intersects(rect);            
+            return tiles.Select(s => s.Item1).ToList();
         }
 
         private void deleteEnds(List<ObjectId> idsList)
@@ -220,39 +242,13 @@ namespace AlbumPanelColorTiles.ExportFacade
 
         public void iterateEntInBlock(BlockTableRecord btr, bool _deleteWaste = true)
         {
-            Dictionary<Extents3d, Extents3d> tilesDict = new Dictionary<Extents3d, Extents3d>();
+            var tilesDict = new Dictionary<Extents3d, Tuple<ObjectId, Extents3d>>();
             _extentsByTile = new Extents3d();
             foreach (ObjectId idEnt in btr)
             {
                 using (var ent = idEnt.GetObject(OpenMode.ForRead) as Entity)
                 {
                     EntInfos.Add(new EntityInfo(ent));
-
-                    // Удаление лишних объектов (мусора)
-                    if (_deleteWaste && deleteWaste(ent)) continue; // Если объект удален, то переход к новому объекту в блоке
-
-                    // Если это плитка, то определение размеров панели по габаритам всех плиток
-                    if (ent is BlockReference && string.Equals(((BlockReference)ent).GetEffectiveName(),
-                               Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        var ext = ent.GeometricExtents;
-                        _extentsByTile.AddExtents(ext);
-
-                        try
-                        {
-                            tilesDict.Add(ext, ext);
-                        }
-                        catch (ArgumentException)
-                        {
-                            // Ошибка - плитка с такими границами уже есть
-                            ErrMsg += "Наложение плиток. ";
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
-                        }
-                        continue;
-                    }
 
                     // Если это подпись Марки (на слое Марок)
                     if (ent is DBText && string.Equals(ent.Layer, Settings.Default.LayerMarks, StringComparison.CurrentCultureIgnoreCase))
@@ -272,6 +268,33 @@ namespace AlbumPanelColorTiles.ExportFacade
                         }
                         continue;
                     }
+
+                    // Удаление лишних объектов (мусора)
+                    if (_deleteWaste && deleteWaste(ent)) continue; // Если объект удален, то переход к новому объекту в блоке
+
+                    // Если это плитка, то определение размеров панели по габаритам всех плиток
+                    if (ent is BlockReference && string.Equals(((BlockReference)ent).GetEffectiveName(),
+                               Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        var blRef = ent as BlockReference;
+                        var ext = blRef.GeometricExtentsСlean();
+                        _extentsByTile.AddExtents(ext);
+
+                        try
+                        {
+                            tilesDict.Add(ext, new Tuple<ObjectId, Extents3d>(blRef.Id, ext));
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Ошибка - плитка с такими границами уже есть
+                            ErrMsg += "Наложение плиток. ";
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
+                        }
+                        continue;
+                    }                    
                 }
             }
 

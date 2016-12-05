@@ -62,7 +62,8 @@ namespace AlbumPanelColorTiles.ExportFacade
                 }
                 catch(Exception ex)
                 {
-                    Logger.Log.Error(ex, "createBlock() - IdBtrEnd = getIdBtrEnd(bt);");
+                    Logger.Log.Error(ex, $"createBlock() - IdBtrEnd = getIdBtrEnd(bt); BlNameEnd = {BlNameEnd}");
+                    return;
                 }
             }
 

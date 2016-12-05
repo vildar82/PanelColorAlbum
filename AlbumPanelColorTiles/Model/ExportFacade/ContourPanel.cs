@@ -17,7 +17,7 @@ namespace AlbumPanelColorTiles.ExportFacade
 
         private PanelBtrExport panelBtr;
 
-        private RTree<Extents3d> treeTiles;
+        public RTree<Tuple<ObjectId, Extents3d>> TreeTiles { get; set; }
 
         public ContourPanel(PanelBtrExport panelBtr)
         {
@@ -49,60 +49,71 @@ namespace AlbumPanelColorTiles.ExportFacade
 
             // из всех плиток отделить торцевые плитки????
             // дерево границ плиток
-            treeTiles = new RTree<Extents3d>();
-            panelBtr.Tiles.ForEach(t =>
+            TreeTiles = new RTree<Tuple<ObjectId, Extents3d>>();
+            foreach (var item in panelBtr.Tiles)
             {
                 try
                 {
-                    var r = new Rectangle(Math.Round(t.MinPoint.X,1),Math.Round(t.MinPoint.Y,1), 
-                        Math.Round(t.MaxPoint.X, 1), Math.Round(t.MaxPoint.Y,1), 0, 0);
-                    treeTiles.Add(r, t);
+                    var r = new Rectangle(Math.Round(item.Item2.MinPoint.X, 1), Math.Round(item.Item2.MinPoint.Y, 1),
+                        Math.Round(item.Item2.MaxPoint.X, 1), Math.Round(item.Item2.MaxPoint.Y, 1), 0, 0);
+                    TreeTiles.Add(r, item);
                 }
                 catch { }
-            });
-
-            // Отфильтровать плитки - панели от торцевых.
-            List<Polyline> colPlTile = new List<Polyline>();            
-            foreach (var item in panelBtr.Tiles)
-            {
-                // Проверить наличие плиток справа и слева - если есть плитка с одной из сторон то это плитка панели а не торца
-                // Проверка наличия плиток слева от этой
-                double yCenter =((Math.Round(item.MaxPoint.Y,1) - Math.Round( item.MinPoint.Y,1)) * 0.5);
-                var ptCenterLeft = new Point(Math.Round(item.MinPoint.X, 1), yCenter, 0);                
-                var finds = treeTiles.Nearest(ptCenterLeft, distTileMinInPanel);
-                if (!finds.Skip(1).Any())
-                {
-                    // Нет плиток слева, проверка плиток справа
-                    var ptCenterRight = new Point(Math.Round(item.MaxPoint.X,1), yCenter, 0);
-                    finds = treeTiles.Nearest(ptCenterRight, distTileMinInPanel);
-                    if (!finds.Skip(1).Any())
-                    {
-                        // Нет плиток справа
-                        // Проверка - торцевые плитки могут быть только у граней панели
-                        if ((item.MinPoint.X - panelBtr.ExtentsByTile.MinPoint.X) < distTileMinInPanel ||
-                            panelBtr.ExtentsByTile.MaxPoint.X - item.MaxPoint.X < distTileMinInPanel ||
-                            item.MinPoint.Y - panelBtr.ExtentsByTile.MinPoint.Y < distTileMinInPanel ||
-                            panelBtr.ExtentsByTile.MaxPoint.Y - item.MaxPoint.Y < distTileMinInPanel)
-                        {
-                            continue;
-                        }
-                    }
-                }                
-                // Плитка панели, а не торца
-                Polyline pl = item.GetPolyline();
-                colPlTile.Add(pl);
             }            
 
-            var pl3d = colPlTile.GetExteriorContour();
-            if (panelBtr.CPS != null)
+            // Отфильтровать плитки - панели от торцевых.
+            using (var colPlTiles = new DisposableSet<Polyline>())
             {
-                pl3d.LayerId = panelBtr.CPS.IdLayerContour;
-            }
-            btr.AppendEntity(pl3d);
-            btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(pl3d, true);
+                //List<Polyline> colPlTile = new List<Polyline>();
+                foreach (var item in panelBtr.Tiles)
+                {
+                    // Проверить наличие плиток справа и слева - если есть плитка с одной из сторон то это плитка панели а не торца
+                    // Проверка наличия плиток слева от этой
+                    double yCenter = ((Math.Round(item.Item2.MaxPoint.Y, 1) - Math.Round(item.Item2.MinPoint.Y, 1)) * 0.5);
+                    var ptCenterLeft = new Point(Math.Round(item.Item2.MinPoint.X, 1), yCenter, 0);
+                    var finds = TreeTiles.Nearest(ptCenterLeft, distTileMinInPanel);
+                    if (!finds.Skip(1).Any())
+                    {
+                        // Нет плиток слева, проверка плиток справа
+                        var ptCenterRight = new Point(Math.Round(item.Item2.MaxPoint.X, 1), yCenter, 0);
+                        finds = TreeTiles.Nearest(ptCenterRight, distTileMinInPanel);
+                        if (!finds.Skip(1).Any())
+                        {
+                            // Нет плиток справа
+                            // Проверка - торцевые плитки могут быть только у граней панели
+                            if ((item.Item2.MinPoint.X - panelBtr.ExtentsByTile.MinPoint.X) < distTileMinInPanel ||
+                                panelBtr.ExtentsByTile.MaxPoint.X - item.Item2.MaxPoint.X < distTileMinInPanel ||
+                                item.Item2.MinPoint.Y - panelBtr.ExtentsByTile.MinPoint.Y < distTileMinInPanel ||
+                                panelBtr.ExtentsByTile.MaxPoint.Y - item.Item2.MaxPoint.Y < distTileMinInPanel)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                    // Плитка панели, а не торца
+                    Polyline pl = item.Item2.GetPolyline();
+                    colPlTiles.Add(pl);
+                }
 
-            panelBtr.ExtentsNoEnd = pl3d.GeometricExtents;
-            return pl3d.Id;
+                using (var regUnion = BrepExtensions.Union(colPlTiles, null))
+                {
+                    var plUnion = regUnion.GetPolylines().FirstOrDefault(f => f.Value == BrepLoopType.LoopExterior);
+                    //var pl3d = colPlTiles.GetExteriorContour();
+                    if (plUnion.Key != null)
+                    {
+                        if (panelBtr.CPS != null)
+                        {
+                            plUnion.Key.LayerId = panelBtr.CPS.IdLayerContour;
+                        }
+                        btr.AppendEntity(plUnion.Key);
+                        btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(plUnion.Key, true);
+
+                        panelBtr.ExtentsNoEnd = plUnion.Key.GeometricExtents;
+                        return plUnion.Key.Id;
+                    }
+                }
+            }
+            return ObjectId.Null;
         }        
 
         [Obsolete("Используй CreateContour2")]
@@ -115,13 +126,13 @@ namespace AlbumPanelColorTiles.ExportFacade
 
             // из всех плиток отделить торцевые плитки????
             // дерево границ плиток
-            treeTiles = new RTree<Extents3d>();
+            TreeTiles = new RTree<Tuple<ObjectId, Extents3d>>();
             panelBtr.Tiles.ForEach(t =>
                            {
                                try
                                {
-                                   var r = new Rectangle(t.MinPoint.X, t.MinPoint.Y, t.MaxPoint.X, t.MaxPoint.Y, 0, 0);
-                                   treeTiles.Add(r, t);
+                                   var r = new Rectangle(t.Item2.MinPoint.X, t.Item2.MinPoint.Y, t.Item2.MaxPoint.X, t.Item2.MaxPoint.Y, 0, 0);
+                                   TreeTiles.Add(r, t);
                                }
                                catch { }
                            });
@@ -162,7 +173,7 @@ namespace AlbumPanelColorTiles.ExportFacade
                 y += getOffsetY(corner, 100);
             }
             ptNext = new Point(x, y, 0);
-            var resTiles = treeTiles.Nearest(ptNext, distTileMinInPanel);
+            var resTiles = TreeTiles.Nearest(ptNext, distTileMinInPanel);
             if (resTiles.Count == 0)
             {
                 return findTile(x, y, corner, isX);
@@ -170,7 +181,7 @@ namespace AlbumPanelColorTiles.ExportFacade
             else
             {
                 var resVal = resTiles.First();
-                return resVal;
+                return resVal.Item2;
             }
         }
 
@@ -178,7 +189,7 @@ namespace AlbumPanelColorTiles.ExportFacade
         {
             double x = 0;
             Point pt1X = new Point(pt.X + getOffsetX(corner, endOffset), pt.Y, 0);
-            var resTiles = treeTiles.Nearest(pt1X, distTileMinInPanel);
+            var resTiles = TreeTiles.Nearest(pt1X, distTileMinInPanel);
             if (resTiles.Count == 0)
             {
                 // Нет плитки - торец!
@@ -194,7 +205,7 @@ namespace AlbumPanelColorTiles.ExportFacade
 
             double y = 0;
             Point pt1Y = new Point(pt.X, pt.Y + getOffsetY(corner, endOffset), 0);
-            resTiles = treeTiles.Nearest(pt1Y, distTileMinInPanel);
+            resTiles = TreeTiles.Nearest(pt1Y, distTileMinInPanel);
             if (resTiles.Count == 0)
             {
                 // Нет плитки - торец!
