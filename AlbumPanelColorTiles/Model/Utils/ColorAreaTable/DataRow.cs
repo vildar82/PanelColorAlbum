@@ -12,13 +12,13 @@ namespace AlbumPanelColorTiles.Utils.ColorAreaTable
         public Dictionary<ColorArea, string> LayersCount { get; set; }
         public Tuple<int, double> Area { get; set; }
 
-        public DataRow (string size, Dictionary<ColorArea, List<ColorArea>> items)
+        public DataRow (string size, Dictionary<ColorArea, List<ColorArea>> items, int totalAreas)
         {
             Size = size;            
-            CalcArea(items);
+            CalcArea(items, totalAreas);
         }
 
-        private void CalcArea (Dictionary<ColorArea, List<ColorArea>> items)
+        private void CalcArea (Dictionary<ColorArea, List<ColorArea>> items, int totalAreas)
         {
             double areaAll = 0;
             int countAll = 0;
@@ -26,7 +26,9 @@ namespace AlbumPanelColorTiles.Utils.ColorAreaTable
             foreach (var item in items)
             {
                 var area = GetArea(item.Value);
-                var cell = $"{item.Value.Count} ({area}м{AcadLib.General.Symbols.Square})";
+                // %                
+                var percent =Math.Round(item.Value.Count * 100d / totalAreas,1);
+                var cell = $"{item.Value.Count} ({area}м{AcadLib.General.Symbols.Square}) {percent}%";
                 LayersCount.Add(item.Key, cell);
                 areaAll += area;
                 countAll += item.Value.Count;

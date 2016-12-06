@@ -27,7 +27,7 @@ namespace AlbumPanelColorTiles.Utils.ColorAreaTable
                 Select(s => new DataRow(s.First().Size, 
                         s.GroupBy(g => g.BlLayer).OrderBy(o => o.Key).
                         ToDictionary(k=>k.First(), 
-                                    v=> v.ToList()))).ToList();
+                                    v=> v.ToList()), areas.Count)).ToList();
             Total = new Tuple<int, double>(areas.Count, areas.Sum(s => s.Area));
         }        
     }

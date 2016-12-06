@@ -86,7 +86,9 @@ namespace AlbumPanelColorTiles.Utils.ColorAreaTable
 
         private string TupleValueToString (int count, double area)
         {
-            return $"{count} ({area}м{AcadLib.General.Symbols.Square})";
+            // %
+            var percent =Math.Round(count * 100d / data.Total.Item1,1);
+            return $"{count} ({area}м{AcadLib.General.Symbols.Square}) {percent}%";
         }
     }
 }
