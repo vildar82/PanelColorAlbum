@@ -497,7 +497,7 @@ namespace AlbumPanelColorTiles.Panels
                     string blName = blRef.GetEffectiveName();
                     // Плитка
                     if (blName.Equals(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
-                    {
+                    {   
                         Tile tile = new Tile(blRef, blName);
                         //Определение покраски плитки
                         Paint paint = ColorArea.GetPaint(tile.CenterTile, _rtreeColorArea);

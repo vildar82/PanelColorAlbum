@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.Geometry;
 using RTreeLib;
 using AcadLib.Blocks;
 using AcadLib;
+using System.Collections.Generic;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -112,6 +113,9 @@ namespace AlbumPanelColorTiles.Panels
             // Перенос блоков плиток на слой                 
             var layerTile = LayerExt.CheckLayerState(new LayerInfo("АР_Плитка"));
             var btrMarkSb = idBtrMarkSb.GetObject(OpenMode.ForRead) as BlockTableRecord;
+
+            var tilesDict = new Dictionary<Extents3d, BlockReference>(AcadLib.Comparers.Extents3dComparer.Default1);
+
             foreach (ObjectId idEnt in btrMarkSb)
             {
                 if (!idEnt.IsValidEx()) continue;
@@ -119,13 +123,24 @@ namespace AlbumPanelColorTiles.Panels
                 if (blRef == null) continue;
                 if (string.Equals(blRef.GetEffectiveName(), Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    blRef.UpgradeOpen();
-                    // Слой
-                    blRef.LayerId = layerTile;
-                    // Нормализация плитки (зеркальность, поворот)
-                    //blRef.Normalize(); // Есть плитки с подрезкой - как ее нормализовать, пока непонтно!!!???
-                    Tile.FillTileArticle(blRef, "");
-                    blRef.DowngradeOpen();
+                    var tileExt = blRef.GeometricExtentsСlean();
+                    if (tilesDict.ContainsKey(tileExt))
+                    {
+                        // Дублирование плитки - удаление
+                        blRef.UpgradeOpen();
+                        blRef.Erase();
+                    }
+                    else
+                    {
+                        tilesDict.Add(tileExt, blRef);
+                        blRef.UpgradeOpen();
+                        // Слой
+                        blRef.LayerId = layerTile;
+                        // Нормализация плитки (зеркальность, поворот)
+                        //blRef.Normalize(); // Есть плитки с подрезкой - как ее нормализовать, пока непонтно!!!???
+                        Tile.FillTileArticle(blRef, "");
+                        blRef.DowngradeOpen();
+                    }
                 }
             }
         }
