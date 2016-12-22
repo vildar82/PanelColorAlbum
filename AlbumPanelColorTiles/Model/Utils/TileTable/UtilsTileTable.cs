@@ -9,6 +9,7 @@ using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Utils.TileTable
 {
@@ -66,6 +67,7 @@ namespace AlbumPanelColorTiles.Utils.TileTable
 
             foreach (ObjectId idEnt in sel)
             {
+                if (!idEnt.IsValidEx()) continue;
                 var blRef = idEnt.GetObject( OpenMode.ForRead) as BlockReference;
                 if (blRef == null) continue;
 

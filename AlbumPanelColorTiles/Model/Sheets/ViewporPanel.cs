@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -93,6 +94,7 @@ namespace AlbumPanelColorTiles.Sheets
             var btr = blRef.DynamicBlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btr)
             {
+                if (!idEnt.IsValidEx()) continue;
                 var ent = idEnt.GetObject(OpenMode.ForRead, false, true) as Entity;
                 if (ent.Layer.Equals(ignoreLayer, StringComparison.OrdinalIgnoreCase))
                 {

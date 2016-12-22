@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -127,6 +128,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 var moveMatrix = Matrix3d.Displacement(Point3d.Origin - location);
                 foreach (ObjectId idEnt in btr)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     var ent = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Entity;
                     ent.TransformBy(moveMatrix);
                 }
@@ -134,6 +136,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 // удаление выбранных объектов
                 foreach (ObjectId idEnt in ids)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     var ent = t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Entity;
                     ent.Erase();
                 }

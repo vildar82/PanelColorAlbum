@@ -174,7 +174,7 @@ namespace AlbumPanelColorTiles.Panels
                 int i = 0;
                 foreach (ObjectId idEnt in btrMarkAr)
                 {
-                    if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                    if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                     {
                         using (var blRef = idEnt.Open(OpenMode.ForWrite, false, true) as BlockReference)
                         {

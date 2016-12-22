@@ -63,7 +63,7 @@ namespace AlbumPanelColorTiles.Panels
             var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btr)
             {
-                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                 {
                     var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     string blName = blRef.GetEffectiveName();

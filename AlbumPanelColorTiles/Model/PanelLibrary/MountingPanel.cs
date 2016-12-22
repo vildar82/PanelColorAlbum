@@ -8,6 +8,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -72,7 +73,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             List<MountingPanel> panelsSB = new List<MountingPanel>();
             foreach (ObjectId idEnt in btr)
             {
-                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                 {
                     using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
                     {
@@ -151,14 +152,14 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 List<PanelAKR> panelsAkrInLib = PanelAKR.GetAkrPanelLib(dbLib, false);
                 // словарь соответствия блоков в библиотеке и в чертеже фасада после копирования блоков
                 Dictionary<ObjectId, PanelAKR> idsPanelsAkrInLibAndFacade = new Dictionary<ObjectId, PanelAKR>();
-                List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Panels).ToList();
+                List<MountingPanel> allPanelsSb = facades.SelectMany(f => f.Panels).ToList();                
                 foreach (var panelSb in allPanelsSb)
                 {
                     PanelAKR panelAkrLib = findAkrPanelFromPanelSb(panelSb, panelsAkrInLib);
                     if (panelAkrLib == null)
                     {
                         // Не найден блок в библиотеке
-                        Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - {panelSb.MarkSbWithoutElectric}",
+                        Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - '{panelSb.MarkSbWithoutElectric}', на этаже {panelSb.Floor}",
                                           panelSb.ExtTransToModel, panelSb.IdBlRef, icon: System.Drawing.SystemIcons.Error);
                     }
                     else

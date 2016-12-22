@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -65,7 +66,7 @@ namespace AlbumPanelColorTiles.Panels
             var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in ms)
             {
-               if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+               if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                {
                   var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                   if (MarkSb.IsBlockNamePanel(blRef.Name))

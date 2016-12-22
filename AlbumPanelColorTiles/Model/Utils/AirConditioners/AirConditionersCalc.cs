@@ -44,7 +44,7 @@ namespace AlbumPanelColorTiles.Utils.AirConditioners
 
         private List<AirConditioner> Filter(List<ObjectId> selBls)
         {
-            List<AirConditioner> airConds = new List<AirConditioner>();
+            var airConds = new List<AirConditioner>();
             foreach (var idBlRef in selBls)
             {
                 using (var blRef = idBlRef.Open( OpenMode.ForRead, false, true)as BlockReference)

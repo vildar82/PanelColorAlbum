@@ -6,6 +6,7 @@ using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using AcadLib.RTree.SpatialIndex;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.ExportFacade
 {
@@ -246,6 +247,7 @@ namespace AlbumPanelColorTiles.ExportFacade
             _extentsByTile = new Extents3d();
             foreach (ObjectId idEnt in btr)
             {
+                if (!idEnt.IsValidEx()) continue;
                 using (var ent = idEnt.GetObject(OpenMode.ForRead) as Entity)
                 {
                     EntInfos.Add(new EntityInfo(ent));

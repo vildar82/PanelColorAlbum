@@ -7,6 +7,7 @@ using AlbumPanelColorTiles.Base;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Utils.Windows
 {
@@ -74,6 +75,7 @@ namespace AlbumPanelColorTiles.Utils.Windows
             var bt = db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
             foreach (var idBtr in bt)
             {
+                if (!idBtr.IsValidEx()) continue;
                 var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
                 if (btr.Name.StartsWith(Settings.Default.BlockWindowName))
                 {

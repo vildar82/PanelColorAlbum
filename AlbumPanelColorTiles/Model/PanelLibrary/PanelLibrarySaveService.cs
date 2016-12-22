@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -26,63 +27,64 @@ namespace AlbumPanelColorTiles.PanelLibrary
          _dbCur = _doc.Database;
       }
 
-      ///// <summary>
-      ///// Проверка есть ли в текущем чертеже фасада новые панели, которых нет в библиотеке
-      ///// </summary>
-      //public static void CheckNewPanels()
-      //{
-      //   var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
-      //   var dbCur = doc.Database;
-      //   var ed = doc.Editor;
+        ///// <summary>
+        ///// Проверка есть ли в текущем чертеже фасада новые панели, которых нет в библиотеке
+        ///// </summary>
+        //public static void CheckNewPanels()
+        //{
+        //   var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
+        //   var dbCur = doc.Database;
+        //   var ed = doc.Editor;
 
-      //   // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
-      //   List<PanelAkrFacade> panelsAkrFacade = GetPanelsAkrInDb(dbCur);
-      //   // исключение панелей с индексом электрики
-      //   removeElectricPanels(panelsAkrFacade);
-      //   // список панелей в бибилиотеке
-      //   List<PanelAkrLib> panelsAkrLib = GetPanelsInLib();
-      //   // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
-      //   List<string> panelsNotInLib = new List<string>();
-      //   foreach (var panelInFacade in panelsAkrFacade)
-      //   {
-      //      if (!panelsAkrLib.Exists(p => string.Equals(p.BlName, panelInFacade.BlName, StringComparison.CurrentCultureIgnoreCase)))
-      //      {
-      //         panelsNotInLib.Add(panelInFacade.BlName);
-      //      }
-      //   }
-      //   if (panelsNotInLib.Count > 0)
-      //   {
-      //      ed.WriteMessage("\n!!!Важно!!! В чертеже есть новые блоки АКР-Панелей которых нет в библиотеке:");
-      //      foreach (var panel in panelsNotInLib)
-      //      {
-      //         ed.WriteMessage("\n{0}", panel);
-      //      }
-      //      ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку.");
-      //      Logger.Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
-      //   }
-      //}
+        //   // список панелей (АКР-Панели марки СБ - без марки покраски) в текущем чертеже
+        //   List<PanelAkrFacade> panelsAkrFacade = GetPanelsAkrInDb(dbCur);
+        //   // исключение панелей с индексом электрики
+        //   removeElectricPanels(panelsAkrFacade);
+        //   // список панелей в бибилиотеке
+        //   List<PanelAkrLib> panelsAkrLib = GetPanelsInLib();
+        //   // сравнение списков и поиск новых панелей, которых нет в бибилиотеке
+        //   List<string> panelsNotInLib = new List<string>();
+        //   foreach (var panelInFacade in panelsAkrFacade)
+        //   {
+        //      if (!panelsAkrLib.Exists(p => string.Equals(p.BlName, panelInFacade.BlName, StringComparison.CurrentCultureIgnoreCase)))
+        //      {
+        //         panelsNotInLib.Add(panelInFacade.BlName);
+        //      }
+        //   }
+        //   if (panelsNotInLib.Count > 0)
+        //   {
+        //      ed.WriteMessage("\n!!!Важно!!! В чертеже есть новые блоки АКР-Панелей которых нет в библиотеке:");
+        //      foreach (var panel in panelsNotInLib)
+        //      {
+        //         ed.WriteMessage("\n{0}", panel);
+        //      }
+        //      ed.WriteMessage("\nРекомендуется сохранить их в библиотеку - на палитре есть кнопка для сохранения панелей в библиотеку.");
+        //      Logger.Log.Error("Есть новые панели, которых нет в библиотеке: {0}", string.Join("; ", panelsNotInLib));
+        //   }
+        //}
 
-      public static List<PanelAkrFacade> GetPanelsAkrInDb(Database db)
-      {
-         List<PanelAkrFacade> panels = new List<PanelAkrFacade>();
-         using (var t = db.TransactionManager.StartTransaction())
-         {
-            var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-            foreach (ObjectId idBtr in bt)
+        public static List<PanelAkrFacade> GetPanelsAkrInDb(Database db)
+        {
+            List<PanelAkrFacade> panels = new List<PanelAkrFacade>();
+            using (var t = db.TransactionManager.StartTransaction())
             {
-               var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
-               if (!btr.IsLayout)
-               {
-                  if (MarkSb.IsBlockNamePanel(btr.Name) && !MarkSb.IsBlockNamePanelMarkAr(btr.Name))
-                  {
-                     panels.Add(new PanelAkrFacade(idBtr, btr.Name));
-                  }
-               }
+                var bt = t.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                foreach (ObjectId idBtr in bt)
+                {
+                    if (!idBtr.IsValidEx()) continue;
+                    var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
+                    if (!btr.IsLayout)
+                    {
+                        if (MarkSb.IsBlockNamePanel(btr.Name) && !MarkSb.IsBlockNamePanelMarkAr(btr.Name))
+                        {
+                            panels.Add(new PanelAkrFacade(idBtr, btr.Name));
+                        }
+                    }
+                }
+                t.Commit();
             }
-            t.Commit();
-         }
-         return panels;
-      }
+            return panels;
+        }
 
       public static List<PanelAKR> GetPanelsInLib(string panelsFile, bool defineFullPanelData)
       {

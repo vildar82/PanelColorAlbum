@@ -6,6 +6,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -226,7 +227,7 @@ namespace AlbumPanelColorTiles.Sheets
       {
          foreach (ObjectId idEnt in btrLayoutContent)
          {
-            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+            if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
             {
                var blRefStampContent = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                if (blRefStampContent.GetEffectiveName().Equals(Settings.Default.BlockFrameName, StringComparison.OrdinalIgnoreCase))
@@ -243,7 +244,7 @@ namespace AlbumPanelColorTiles.Sheets
          // Поиск таблицы
          foreach (ObjectId idEnt in btrLayoutContent)
          {
-            if (idEnt.ObjectClass.Name == "AcDbTable")
+            if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbTable")
             {
                return t.GetObject(idEnt, OpenMode.ForWrite, false, true) as Table;
             }

@@ -5,6 +5,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -48,7 +49,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 blName = btrAkr.Name;
                 foreach (ObjectId idEnt in btrAkr)
                 {
-                    if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                    if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                     {
                         using (var blRefTile = idEnt.Open(OpenMode.ForRead, false, true) as BlockReference)
                         {
@@ -91,6 +92,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
 
                     foreach (ObjectId idBtr in bt)
                     {
+                        if (!idBtr.IsValidEx()) continue;
                         using (var btr = idBtr.Open(OpenMode.ForRead) as BlockTableRecord)
                         {
                             if (MarkSb.IsBlockNamePanel(btr.Name))

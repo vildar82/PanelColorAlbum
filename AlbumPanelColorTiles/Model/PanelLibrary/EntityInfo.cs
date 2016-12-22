@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.DatabaseServices;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -39,6 +40,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             {
                 foreach (ObjectId idEnt in btr)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     using (var ent = idEnt.Open(OpenMode.ForRead) as Entity)
                     {
                         entsInfo.Add(new EntityInfo(ent));

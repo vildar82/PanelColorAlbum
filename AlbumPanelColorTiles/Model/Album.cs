@@ -16,6 +16,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using RTreeLib;
+using AcadLib;
 
 namespace AlbumPanelColorTiles
 {
@@ -109,7 +110,7 @@ namespace AlbumPanelColorTiles
 
                 foreach (ObjectId idEnt in ms)
                 {
-                    if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                    if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                     {
                         var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                         if (MarkSb.IsBlockNamePanel(blRef.Name))
@@ -156,6 +157,7 @@ namespace AlbumPanelColorTiles
                 // Удаление определений блоков Марок АР.
                 foreach (ObjectId idBtr in bt)
                 {
+                    if (!idBtr.IsValidEx()) continue;
                     var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
                     if (MarkSb.IsBlockNamePanel(btr.Name))
                     {

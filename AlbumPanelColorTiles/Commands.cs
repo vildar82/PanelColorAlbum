@@ -386,7 +386,7 @@ namespace AlbumPanelColorTiles
                         var ms = t.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
                         foreach (ObjectId idEnt in ms)
                         {
-                            if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                            if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                             {
                                 var blRef = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                                 if (MarkSb.IsBlockNamePanel(blRef.Name))
@@ -661,7 +661,7 @@ namespace AlbumPanelColorTiles
                     mountingsPanelsInMs.ForEach(p => p.RemoveMarkPainting());
                     foreach (ObjectId idEnt in ms)
                     {
-                        if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                        if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                         {
                             var blRefMounting = t.GetObject(idEnt, OpenMode.ForRead, false, true) as BlockReference;
                             if (blRefMounting.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName, StringComparison.CurrentCultureIgnoreCase))
@@ -693,6 +693,7 @@ namespace AlbumPanelColorTiles
                     Point3d pt = Point3d.Origin;
                     foreach (ObjectId idBtr in bt)
                     {
+                        if (!idBtr.IsValidEx()) continue;
                         var btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
                         if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                         {

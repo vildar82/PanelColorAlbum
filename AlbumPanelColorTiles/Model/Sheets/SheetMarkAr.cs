@@ -5,6 +5,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Sheets
 {
@@ -286,7 +287,7 @@ namespace AlbumPanelColorTiles.Sheets
         {
             foreach (ObjectId idEnt in btrLayout)
             {
-                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                 {
                     var blRefStampContent = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     if (blRefStampContent.GetEffectiveName() == Settings.Default.BlockFrameName)
@@ -303,7 +304,7 @@ namespace AlbumPanelColorTiles.Sheets
         {
             foreach (ObjectId idEnt in btrLayout)
             {
-                if (idEnt.ObjectClass.Name == "AcDbTable")
+                if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbTable")
                 {
                     return idEnt.GetObject(OpenMode.ForWrite, false, true) as Table;
                 }
@@ -319,7 +320,7 @@ namespace AlbumPanelColorTiles.Sheets
             var btrLayout = t.GetObject(layoutMarkAR.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btrLayout)
             {
-                if (idEnt.ObjectClass.Name == "AcDbViewport")
+                if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbViewport")
                 {
                     var vp = t.GetObject(idEnt, OpenMode.ForRead, false, true) as Viewport;
                     if (vp.Layer.Equals("АР_Видовые экраны", StringComparison.OrdinalIgnoreCase))

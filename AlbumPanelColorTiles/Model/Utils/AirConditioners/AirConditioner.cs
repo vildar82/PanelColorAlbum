@@ -60,6 +60,7 @@ namespace AlbumPanelColorTiles.Utils.AirConditioners
             {
                 foreach (ObjectId idAtrRef in blRef.AttributeCollection)
                 {
+                    if (!idAtrRef.IsValidEx()) continue;
                     using (var atrRef = idAtrRef.Open( OpenMode.ForRead, false, true)as AttributeReference)
                     {
                         if (atrRef.Tag.Equals("НОМЕР", StringComparison.OrdinalIgnoreCase))

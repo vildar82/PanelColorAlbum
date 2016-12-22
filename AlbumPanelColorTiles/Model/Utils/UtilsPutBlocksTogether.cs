@@ -7,6 +7,7 @@ using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Utils
 {
@@ -38,6 +39,7 @@ namespace AlbumPanelColorTiles.Utils
                 var cs = db.CurrentSpaceId.GetObject(OpenMode.ForWrite) as BlockTableRecord;
                 foreach (var idBlRef in IdBlRefs)
                 {
+                    if (!idBlRef.IsValidEx()) continue;
                     var blRef = idBlRef.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     if (blRef == null) continue;
                     if (blRef.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName))

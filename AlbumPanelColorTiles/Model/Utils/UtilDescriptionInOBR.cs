@@ -8,6 +8,7 @@ using AlbumPanelColorTiles.Options;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Utils
 {
@@ -30,6 +31,7 @@ namespace AlbumPanelColorTiles.Utils
                 Point3d pt = Point3d.Origin;
                 foreach (var idBtr in bt)
                 {
+                    if (!idBtr.IsValidEx()) continue;
                     var btr = idBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord;
                     if (Panels.MarkSb.IsBlockNamePanel(btr.Name))
                     {
@@ -90,7 +92,7 @@ namespace AlbumPanelColorTiles.Utils
                     var btrObr = blRefObr.BlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
                     foreach (var item in btrObr)
                     {
-                        if (item.ObjectClass.Name != "AcDbMText") continue;
+                        if (!item.IsValidEx() || item.ObjectClass.Name != "AcDbMText") continue;
                         var mtextDesc = item.GetObject(OpenMode.ForRead, false, true) as MText;
                         if (mtextDesc.Text.StartsWith("Примечан"))
                         {

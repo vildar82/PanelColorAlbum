@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Utils
 {
@@ -26,11 +27,13 @@ namespace AlbumPanelColorTiles.Utils
                 
                 foreach (var idBtr in bt)
                 {
+                    if (!idBtr.IsValidEx()) continue;
                     var btr = idBtr.GetObject(OpenMode.ForWrite) as BlockTableRecord;
                     if (btr.Name.StartsWith("ОБР", StringComparison.OrdinalIgnoreCase))
                     {
                         foreach (var idEnt in btr)
                         {
+                            if (!idEnt.IsValidEx()) continue;
                             var ent = idEnt.GetObject(OpenMode.ForRead, false, true) as Entity;
                             if (ent is Dimension) continue;
 

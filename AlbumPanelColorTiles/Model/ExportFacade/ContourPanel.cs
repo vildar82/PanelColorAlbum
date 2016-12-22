@@ -128,14 +128,14 @@ namespace AlbumPanelColorTiles.ExportFacade
             // дерево границ плиток
             TreeTiles = new RTree<Tuple<ObjectId, Extents3d>>();
             panelBtr.Tiles.ForEach(t =>
-                           {
-                               try
-                               {
-                                   var r = new Rectangle(t.Item2.MinPoint.X, t.Item2.MinPoint.Y, t.Item2.MaxPoint.X, t.Item2.MaxPoint.Y, 0, 0);
-                                   TreeTiles.Add(r, t);
-                               }
-                               catch { }
-                           });
+            {
+                try
+                {
+                    var r = new Rectangle(t.Item2.MinPoint.X, t.Item2.MinPoint.Y, t.Item2.MaxPoint.X, t.Item2.MaxPoint.Y, 0, 0);
+                    TreeTiles.Add(r, t);
+                }
+                catch { }
+            });
 
             // Первый угол панели - левый нижний
             var pt1 = getCoordTileNoEnd(panelBtr.ExtentsByTile.MinPoint, EnumCorner.LeftLower);

@@ -9,6 +9,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using RTreeLib;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -490,7 +491,7 @@ namespace AlbumPanelColorTiles.Panels
             var btrMarkSb = _idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
             foreach (ObjectId idEnt in btrMarkSb)
             {
-                if (idEnt.ObjectClass.Name == "AcDbBlockReference")
+                if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                 {
                     var blRef = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     string blName = blRef.GetEffectiveName();

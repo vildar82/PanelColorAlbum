@@ -7,6 +7,7 @@ using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.PanelLibrary
 {
@@ -88,6 +89,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             //libLoadServ.AllPanelsSB.AddRange(PanelSB.GetPanels(ms.Id, Point3d.Origin, Matrix3d.Identity));
             foreach (ObjectId idEnt in ms)
             {
+                if (!idEnt.IsValidEx()) continue;
                 var blRefMounting = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                 if (blRefMounting == null) continue;
 
@@ -187,6 +189,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 }
                 numberPart = arrSplit[1];
             }
+        }
+        public override string ToString()
+        {
+            return BlRefName;
         }
     }
 }

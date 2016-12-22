@@ -65,6 +65,7 @@ namespace AlbumPanelColorTiles.Select
             {
                 foreach (ObjectId idEnt in bt)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     using (var btr = idEnt.Open(OpenMode.ForRead) as BlockTableRecord)
                     {
                         if (btr == null) continue;

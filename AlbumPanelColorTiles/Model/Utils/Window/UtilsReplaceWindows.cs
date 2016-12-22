@@ -12,6 +12,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using AcadLib;
 
 namespace AlbumPanelColorTiles.Utils
 {
@@ -80,6 +81,7 @@ namespace AlbumPanelColorTiles.Utils
             var bt = Db.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;            
             foreach (ObjectId idBtr in bt)
             {
+                if (!idBtr.IsValidEx()) continue;
                 var btr = idBtr.GetObject(OpenMode.ForRead) as BlockTableRecord;
                 if (btr.Name.StartsWith(Settings.Default.BlockPanelAkrPrefixName))
                 {
@@ -93,10 +95,11 @@ namespace AlbumPanelColorTiles.Utils
         {
             List<WindowRedefine> redefines = new List<WindowRedefine>();
             foreach (var idBtrPanel in idsBtrPanels)
-            {
+            {                
                 var btrPanel = idBtrPanel.GetObject(OpenMode.ForRead) as BlockTableRecord;
                 foreach (ObjectId idEnt in btrPanel)
                 {
+                    if (!idEnt.IsValidEx()) continue;
                     var blRefWindowOld = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     if (blRefWindowOld == null) continue;
 
