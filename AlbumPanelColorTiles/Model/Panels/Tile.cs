@@ -7,6 +7,7 @@ using RTreeLib;
 using AcadLib.Blocks;
 using AcadLib;
 using System.Collections.Generic;
+using AlbumPanelColorTiles.Base;
 
 namespace AlbumPanelColorTiles.Panels
 {
@@ -111,7 +112,8 @@ namespace AlbumPanelColorTiles.Panels
         public static void TilesNormalize(ObjectId idBtrMarkSb)
         {
             // Перенос блоков плиток на слой                 
-            var layerTile = LayerExt.CheckLayerState(new LayerInfo("АР_Плитка"));
+            var layerTile = LayerExt.CheckLayerState(new LayerInfo(Settings.Default.LayerTile));//"АР_Плитка"
+            var layerWindow = LayerExt.CheckLayerState(new LayerInfo(Settings.Default.LayerWindows));//"АР_Окна"
             var btrMarkSb = idBtrMarkSb.GetObject(OpenMode.ForRead) as BlockTableRecord;
 
             var tilesDict = new Dictionary<Extents3d, BlockReference>(AcadLib.Comparers.Extents3dComparer.Default1);
@@ -140,6 +142,14 @@ namespace AlbumPanelColorTiles.Panels
                         //blRef.Normalize(); // Есть плитки с подрезкой - как ее нормализовать, пока непонтно!!!???
                         Tile.FillTileArticle(blRef, "");
                         blRef.DowngradeOpen();
+                    }
+                }
+                else if (BlockWindow.IsblockWindow(blRef.GetEffectiveName()))
+                {
+                    if (!string.Equals(blRef.Layer, Settings.Default.LayerWindows))
+                    {
+                        blRef.UpgradeOpen();
+                        blRef.LayerId = layerWindow;
                     }
                 }
             }
