@@ -81,7 +81,8 @@ namespace AlbumPanelColorTiles.Sheets
             // Папка альбома панелей
             if (string.IsNullOrEmpty(dir))
             {
-                string albumFolderName = ("АКР_" + Path.GetFileNameWithoutExtension(Album.DwgFacade)).Trim();
+                var fileNamwWithoutExt = Path.GetFileNameWithoutExtension(Album.DwgFacade).Trim();
+                string albumFolderName = ((fileNamwWithoutExt.StartsWith("АКР")?"": "АКР_") + fileNamwWithoutExt);
                 string curDwgFacadeFolder = Path.GetDirectoryName(Album.DwgFacade);
                 dir = Path.Combine(curDwgFacadeFolder, albumFolderName);
             }
