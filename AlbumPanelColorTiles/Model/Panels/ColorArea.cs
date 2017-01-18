@@ -20,7 +20,7 @@ namespace AlbumPanelColorTiles.Panels
         {
             _idblRef = blRef.ObjectId;
             // Определение габаритов
-            _bounds = blRef.GeometricExtents;
+            _bounds = blRef.GeometricExtentsСlean();
             _bounds.TransformBy(trans);
             _paint = album.GetPaint(blRef.Layer);
             _size = (_bounds.MaxPoint.X - _bounds.MinPoint.X) * (_bounds.MaxPoint.Y - _bounds.MinPoint.Y);
@@ -121,9 +121,9 @@ namespace AlbumPanelColorTiles.Panels
                     var blRefColorArea = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference;
                     if (!lvs.IsVisible(blRefColorArea)) continue;
                     var blName = getBlNameWithoutXrefPrefix(blRefColorArea.GetEffectiveName(), xrefName);
-                    if (string.Equals(blName, Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
+                    if (blName.StartsWith(Settings.Default.BlockColorAreaName, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        ColorArea colorArea = new ColorArea(blRefColorArea, album, matrix);
+                        var colorArea = new ColorArea(blRefColorArea, album, matrix);
                         colorAreas.Add(colorArea);
                     }
                     else

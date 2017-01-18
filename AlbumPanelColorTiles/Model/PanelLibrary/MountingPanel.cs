@@ -159,7 +159,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
                     if (panelAkrLib == null)
                     {
                         // Не найден блок в библиотеке
-                        Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - '{panelSb.MarkSbWithoutElectric}', на этаже {panelSb.Floor}",
+                        Inspector.AddError($"Не найдена панель в библиотеке соответствующая монтажке - '{panelSb.MarkSbWithoutElectric}'",
                                           panelSb.ExtTransToModel, panelSb.IdBlRef, icon: System.Drawing.SystemIcons.Error);
                     }
                     else
