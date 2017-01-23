@@ -70,53 +70,16 @@ namespace AlbumPanelColorTiles.PanelLibrary
             PanelLibraryLoadService libLoadServ, FloorMounting floor)
         {
             // Поиск всех панелей СБ в определении блока
-            List<MountingPanel> panelsSB = new List<MountingPanel>();
+            var panelsSB = new List<MountingPanel>();
             foreach (ObjectId idEnt in btr)
             {
                 if (idEnt.IsValidEx() && idEnt.ObjectClass.Name == "AcDbBlockReference")
                 {
                     using (var blRefPanelSB = idEnt.GetObject(OpenMode.ForRead, false, true) as BlockReference)
                     {
-                        // как определить что это блок панели СБ?
-                        // По набору атрибутов: Покраска, МАРКА
-                        string mark = string.Empty;
-                        string paint = string.Empty;
-                        if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
-                        {
-                            List<AttributeRefDetail> attrsDet = new List<AttributeRefDetail>();
-                            foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
-                            {
-                                using (var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference)
-                                {
-                                    // ПОКРАСКА
-                                    if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
-                                    {
-                                        var atrDet = new AttributeRefDetail(atrRef);
-                                        attrsDet.Add(atrDet);
-                                        paint = atrRef.TextString.Trim();
-                                        // Если выполняется создание альбома и выключена опция проверки покраски, то стираем марку покраски из монтажной панели
-                                        if (libLoadServ?.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
-                                        {
-                                            // Удаление старой марки покраски из блока монтажной панели
-                                            atrRef.UpgradeOpen();
-                                            atrRef.TextString = string.Empty;
-                                        }
-                                    }
-                                    // МАРКА
-                                    else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
-                                    {
-                                        var atrDet = new AttributeRefDetail(atrRef);
-                                        attrsDet.Add(atrDet);
-                                        mark = atrRef.TextString.Trim();
-                                    }
-                                }
-                            }
-                            if (attrsDet.Count == 2)
-                            {
-                                MountingPanel panelSb = new MountingPanel(blRefPanelSB, attrsDet, transform, mark, paint, floor);                                
-                                panelsSB.Add(panelSb);
-                            }
-                        }
+                        var panelSb = DefinePanel(blRefPanelSB, transform, libLoadServ, floor);
+                        if (panelSb != null)
+                            panelsSB.Add(panelSb);
                     }
                 }
             }
@@ -128,6 +91,60 @@ namespace AlbumPanelColorTiles.PanelLibrary
                                   btr.Id, icon: System.Drawing.SystemIcons.Error);
             }
             return panelsSB;
+        }
+
+        public static MountingPanel DefinePanel(BlockReference blRef, Matrix3d transform, PanelLibraryLoadService libLoadServ = null, 
+            FloorMounting floor = null)
+        {
+            // как определить что это блок панели СБ?
+            // По набору атрибутов: Покраска, МАРКА
+            string mark;
+            string paint;
+            List<AttributeRefDetail> attrsDet;
+            if (IsMountingPanel(blRef, out mark, out paint, out attrsDet, libLoadServ))
+            {
+                return new MountingPanel(blRef, attrsDet, transform, mark, paint, floor);                
+            }
+            return null;
+        }
+
+        public static bool IsMountingPanel(BlockReference blRefPanelSB, 
+            out string mark, out string paint, out List<AttributeRefDetail> attrsDet, PanelLibraryLoadService libLoadServ = null)
+        {
+            mark = null;
+            paint = null;
+            attrsDet = null;
+            if (!blRefPanelSB.IsDynamicBlock && blRefPanelSB.AttributeCollection != null)
+            {
+                attrsDet = new List<AttributeRefDetail>();
+                foreach (ObjectId idAtrRef in blRefPanelSB.AttributeCollection)
+                {
+                    var atrRef = idAtrRef.GetObject(OpenMode.ForRead, false, true) as AttributeReference;
+                    // ПОКРАСКА
+                    if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbPaint, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        var atrDet = new AttributeRefDetail(atrRef);
+                        attrsDet.Add(atrDet);
+                        paint = atrRef.TextString.Trim();
+                        // Если выполняется создание альбома и выключена опция проверки покраски, то стираем марку покраски из монтажной панели
+                        if (libLoadServ?.Album != null && !libLoadServ.Album.StartOptions.CheckMarkPainting)
+                        {
+                            // Удаление старой марки покраски из блока монтажной панели
+                            atrRef.UpgradeOpen();
+                            atrRef.TextString = string.Empty;
+                        }
+                    }
+                    // МАРКА
+                    else if (string.Equals(atrRef.Tag, Settings.Default.AttributePanelSbMark, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        var atrDet = new AttributeRefDetail(atrRef);
+                        attrsDet.Add(atrDet);
+                        mark = atrRef.TextString.Trim();
+                    }
+                }
+                return attrsDet.Count == 2;                
+            }
+            return false;
         }
 
         /// <summary>

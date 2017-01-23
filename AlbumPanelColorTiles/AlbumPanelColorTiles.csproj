@@ -193,6 +193,9 @@
     <Compile Include="Model\ImagePainting\ImagePaintingService.cs" />
     <Compile Include="Model\AkrHelper.cs" />
     <Compile Include="Model\Lib\DictNOD.cs" />
+    <Compile Include="Model\MountingsPlans\AutoGeneratePlans.cs" />
+    <Compile Include="Model\MountingsPlans\Axis.cs" />
+    <Compile Include="Model\MountingsPlans\Workspace.cs" />
     <Compile Include="Model\Options\SerializerXml.cs" />
     <Compile Include="Model\PanelLibrary\LibEditor\UI\PanelAkrView.cs" />
     <Compile Include="Model\PanelLibrary\LibEditor\UI\PanelsAkrView.cs" />
@@ -219,7 +222,7 @@
       <DependentUpon>FormPanelDesc.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\PanelLibrary\LibEditor\LibraryEditor.cs" />
-    <Compile Include="Model\PanelLibrary\BlockPlans.cs" />
+    <Compile Include="Model\MountingsPlans\BlockPlans.cs" />
     <Compile Include="Model\PanelLibrary\PanelAKR.cs" />
     <Compile Include="Model\PanelLibrary\PanelAkrFacade.cs" />
     <Compile Include="Model\PanelLibrary\PanelLibraryLoadService.cs" />
@@ -315,7 +318,7 @@
     <Compile Include="Model\Utils\TileTable\UtilsTileTable.cs" />
     <Compile Include="Model\Utils\UtilDescriptionInOBR.cs" />
     <Compile Include="Model\Utils\UtilsCopyColorArea.cs" />
-    <Compile Include="Model\Utils\UtilsPutBlocksTogether.cs" />
+    <Compile Include="Model\MountingsPlans\UtilsPutBlocksTogether.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDash.cs" />
     <Compile Include="Model\Utils\UtilsRemoveDescrInObr.cs" />
     <Compile Include="Model\Utils\Navigator\UtilsSelectPanelsByHeight.cs" />

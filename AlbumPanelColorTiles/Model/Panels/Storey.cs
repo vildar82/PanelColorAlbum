@@ -40,14 +40,21 @@ namespace AlbumPanelColorTiles.Panels
             _layer = getLayer();
         }
 
-        public Storey (string name)
+        public Storey (string blMountPlanName)
         {
-            if (string.Equals(name, Settings.Default.PaintIndexUpperStorey, StringComparison.OrdinalIgnoreCase))
+            var indexFloor = blMountPlanName.IndexOf("эт-");
+            string nameStorey = string.Empty;
+            if (indexFloor == -1)
+                nameStorey = blMountPlanName.Substring(Settings.Default.BlockPlaneMountingPrefixName.Length);
+            else
+                nameStorey = blMountPlanName.Substring(indexFloor + "эт-".Length);
+
+            if (string.Equals(nameStorey, Settings.Default.PaintIndexUpperStorey, StringComparison.OrdinalIgnoreCase))
             {
                 _type = EnumStorey.Upper;
                 _number = 100;
             }
-            else if (string.Equals(name, Settings.Default.PaintIndexParapet, StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(nameStorey, Settings.Default.PaintIndexParapet, StringComparison.OrdinalIgnoreCase))
             {
                 _type = EnumStorey.Parapet;
                 _number = 101;
@@ -56,7 +63,7 @@ namespace AlbumPanelColorTiles.Panels
             {
                 // число
                 _type = EnumStorey.Number;
-                if (!int.TryParse(name, out _number))
+                if (!int.TryParse(nameStorey, out _number))
                 {
                     throw new Exception("Не определен номер этажа по блоку монтажного плана ");
                 }

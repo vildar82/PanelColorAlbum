@@ -497,7 +497,7 @@ namespace AlbumPanelColorTiles
         {
             CommandStart.Start(doc =>
             {
-                BlockPlans mountingPlans = new BlockPlans();
+                var mountingPlans = new MountingsPlans.BlockPlans();
                 mountingPlans.CreateBlockPlans();
             });
         }

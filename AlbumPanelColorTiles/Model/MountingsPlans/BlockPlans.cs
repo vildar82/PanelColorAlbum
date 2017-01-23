@@ -8,7 +8,7 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using AcadLib;
 
-namespace AlbumPanelColorTiles.PanelLibrary
+namespace AlbumPanelColorTiles.MountingsPlans
 {
     public enum BlockPlanTypeEnum
     {
@@ -53,6 +53,11 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 _planTypeName = BLOCKARCHITECT;
                 _prefixBlockName = Settings.Default.BlockPlaneArchitectPrefixName;
             }
+        }
+
+        internal static void CreateBlock(List<ObjectId> idsElementInWS, string floorBlockName, object axisPosition)
+        {
+            throw new NotImplementedException();
         }
 
         // создание блоков монтажных планов из выбранных планов монтажек пользователем
@@ -102,14 +107,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
         }
 
         // создаение блока монтажки
-        private void createBlock(List<ObjectId> idsFloor, string floorBlockName)
+        public static ObjectId CreateBlock(List<ObjectId> idsFloor, string floorBlockName, Point3d location)
         {
-            Point3d location = getPoint($"Точка вставки блока {_planTypeName} плана {floorBlockName}").TransformBy(_ed.CurrentUserCoordinateSystem);
-            using (var t = _db.TransactionManager.StartTransaction())
+            var idBlRefMountRes = ObjectId.Null;
+            if (idsFloor == null || !idsFloor.Any()) return idBlRefMountRes;
+            var db = idsFloor[0].Database;
+            using (var t = db.TransactionManager.StartTransaction())
             {
-                var bt = t.GetObject(_db.BlockTableId, OpenMode.ForWrite) as BlockTable;
+                var bt = t.GetObject(db.BlockTableId, OpenMode.ForWrite) as BlockTable;
                 ObjectId idBtr;
                 BlockTableRecord btr;
+                AcadLib.Layers.LayerExt.CheckLayerState(SymbolUtilityServices.LayerZeroName);
                 // создание определения блока
                 using (btr = new BlockTableRecord())
                 {
@@ -118,10 +126,10 @@ namespace AlbumPanelColorTiles.PanelLibrary
                     t.AddNewlyCreatedDBObject(btr, true);
                 }
                 // копирование выбранных объектов в блок
-                ObjectIdCollection ids = new ObjectIdCollection(idsFloor.ToArray());
+                var ids = new ObjectIdCollection(idsFloor.ToArray());
                 using (IdMapping mapping = new IdMapping())
                 {
-                    _db.DeepCloneObjects(ids, idBtr, mapping, false);
+                    db.DeepCloneObjects(ids, idBtr, mapping, false);
                 }
                 // перемещение объектов в блоке
                 btr = t.GetObject(idBtr, OpenMode.ForRead) as BlockTableRecord;
@@ -142,15 +150,15 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 }
 
                 // вставка блока
-                using (var blRef = new BlockReference(location, idBtr))
-                {
-                    blRef.SetDatabaseDefaults(_db);
-                    var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-                    ms.AppendEntity(blRef);
-                    t.AddNewlyCreatedDBObject(blRef, true);
-                }
+                var blRef = new BlockReference(location, idBtr);
+                blRef.Layer = SymbolUtilityServices.LayerZeroName;
+                var ms = t.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                idBlRefMountRes = ms.AppendEntity(blRef);
+                t.AddNewlyCreatedDBObject(blRef, true);
+
                 t.Commit();
             }
+            return idBlRefMountRes;
         }
 
         private void createFloor()
@@ -169,22 +177,32 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 indexFloor = _nameFloor;
             }
             string floorBlockName;
-            if (string.IsNullOrEmpty(_section))
-            {
-                floorBlockName = $"{_prefixBlockName}эт-{indexFloor}";
-            }
-            else
-            {
-                floorBlockName = $"{_prefixBlockName}С{_section}_эт-{indexFloor}";
-            }
+            floorBlockName = GetFloorBlockName(indexFloor, _section, _prefixBlockName);
             if (!checkBlock(floorBlockName))
             {
                 // запрос объектов плана этажа
                 var idsFloor = selectFloor(indexFloor);
-                createBlock(idsFloor, floorBlockName);
+                var location = getPoint($"Точка вставки блока {_planTypeName} плана {floorBlockName}").TransformBy(_ed.CurrentUserCoordinateSystem);
+                CreateBlock(idsFloor, floorBlockName, location);
             }
             // создание следующего этажа
             createFloor();
+        }
+
+        public static string GetFloorBlockName(string floor, string sec, string prefix = null)
+        {
+            if (prefix == null)
+                prefix = Settings.Default.BlockPlaneMountingPrefixName;
+            string floorBlockName;
+            if (string.IsNullOrEmpty(sec))
+            {
+                floorBlockName = $"{prefix}эт-{floor}";
+            }
+            else
+            {
+                floorBlockName = $"{prefix}С{sec}_эт-{floor}";
+            }
+            return floorBlockName;
         }
 
         // Запрос номера этажа
@@ -198,6 +216,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             opt.Keywords.Add("Чердак");
             opt.Keywords.Add("Парапет");
             opt.Keywords.Add("сБорка");
+            opt.Keywords.Add("Авто");
             var res = _ed.GetInteger(opt);
             if (res.Status == PromptStatus.OK)
             {
@@ -227,12 +246,19 @@ namespace AlbumPanelColorTiles.PanelLibrary
                 else if (res.StringResult == "сБорка")
                 {
                     // Собрать все блоки в одну точку.
-                    Utils.UtilsPlanBlocksTogether.Together();
-                    throw new Exception(AcadLib.General.CanceledByUser);
+                    UtilsPlanBlocksTogether.Together();
+                    throw new Exception(General.CanceledByUser);
+                }
+                else if (res.StringResult == "Авто")
+                {
+                    // Собрать все монтажки по рабочим областям
+                    var auto = new AutoGeneratePlans();
+                    auto.GenerateMountPlans();
+                    throw new Exception(General.CanceledByUser);
                 }
                 else
                 {
-                    throw new Exception("Отменено пользователем.");
+                    throw new Exception(General.CanceledByUser);
                 }
             }
             else

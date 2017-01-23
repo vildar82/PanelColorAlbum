@@ -46,7 +46,7 @@ namespace AlbumPanelColorTiles.PanelLibrary
             IdBlRefMounting = blRefMounting.Id;
             BlRefName = blRefMounting.Name;
             Transform = blRefMounting.BlockTransform;
-            definePlanSection(blRefMounting);
+            Section = DefinePlanSection(blRefMounting);
 
             try
             {
@@ -122,23 +122,17 @@ namespace AlbumPanelColorTiles.PanelLibrary
         }
 
         public void DefineStorey(List<Storey> storeysNumbersTypeInAllFacades)
-        {
-            var indexFloor = BlRefName.IndexOf("эт-");
-            string nameStorey = string.Empty;
-            if (indexFloor == -1)
-                nameStorey = BlRefName.Substring(Settings.Default.BlockPlaneMountingPrefixName.Length);
-            else
-                nameStorey = BlRefName.Substring(indexFloor + "эт-".Length);
+        {            
             try
             {
-                var storey = new Storey(nameStorey);
+                var storey = new Storey(BlRefName);
                 if (storey.Type == EnumStorey.Number)
                 {
                     // поиск в общем списке этажей. Номерные этажи всех фасадов должны быть на одном уровне
-                    var storeyAllFacades = storeysNumbersTypeInAllFacades.Find(s => s.Number == storey.Number);
+                    var storeyAllFacades = storeysNumbersTypeInAllFacades?.Find(s => s.Number == storey.Number);
                     if (storeyAllFacades == null)
                     {
-                        storeysNumbersTypeInAllFacades.Add(storey);
+                        storeysNumbersTypeInAllFacades?.Add(storey);
                     }
                     else
                     {
@@ -169,26 +163,20 @@ namespace AlbumPanelColorTiles.PanelLibrary
             return AllPanelsSbInFloor.Min(p => p.ExtTransToModel.MinPoint.X);
         }        
 
-        private void definePlanSection(BlockReference blRefMountPlan)
-        {
-            // Номер плана и номер секции
-            var val = blRefMountPlan.Name.Substring(Settings.Default.BlockPlaneMountingPrefixName.Length);
-            var arrSplit = val.Split('_');
-            string numberPart;
-            if (arrSplit.Length > 1)
+        public static int DefinePlanSection(BlockReference blRefMountPlan)
+        {            
+            var indexSec = blRefMountPlan.Name.IndexOf("_С");
+            if (indexSec == -1)
+                return 0;
+            try
             {
-                int section;
-                string sectionPart = arrSplit[0].Substring(1);
-                if (int.TryParse(sectionPart, out section))
-                {
-                    Section = section;
-                }
-                else
-                {
-                    Inspector.AddError($"Монтажный план {blRefMountPlan.Name}. Не определен номер секции {sectionPart}.", icon: System.Drawing.SystemIcons.Error);
-                }
-                numberPart = arrSplit[1];
+                return blRefMountPlan.Name.Substring(indexSec + 2).GetStartInt();
             }
+            catch (Exception ex)
+            {
+                Inspector.AddError($"Монтажный план {blRefMountPlan.Name}. Не определен номер секции. {ex.Message}", icon: System.Drawing.SystemIcons.Error);
+            }
+            return 0;            
         }
         public override string ToString()
         {
