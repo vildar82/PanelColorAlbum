@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System;
 using AcadLib.Errors;
+using AlbumPanelColorTiles.Options;
 
 namespace AlbumPanelColorTiles.ExportFacade
 {
@@ -55,25 +56,30 @@ namespace AlbumPanelColorTiles.ExportFacade
         private void createBlock ()
         {
             // создание определения блока
-            using (var bt = CPS.DbExport.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable)
-            {
-                IdBtrEnd = getIdBtrEnd(bt);
-            }
+            var bt = CPS.DbExport.BlockTableId.GetObject(OpenMode.ForRead) as BlockTable;
+            IdBtrEnd = getIdBtrEnd(bt);            
 
             // для каждой панели - копирование объектв торца с преобразование в координаты модели
             // список копируемых объектов торуа с привязкой к объекту блока панели для дальнейшего перемещения объектов в 0,0 в блоке торца
             foreach (var panelBlRef in itemLefEndsByY)
             {
-                Dictionary<ObjectId, PanelBlRefExport> dictIdsEndEnts = new Dictionary<ObjectId, PanelBlRefExport>();
+                var dictIdsEndEnts = new Dictionary<ObjectId, PanelBlRefExport>();
                 if (isLeftSide)
                 {
-                    panelBlRef.PanelBtrExport.IdsEndsLeftEntity.ForEach(e => dictIdsEndEnts.Add(e, panelBlRef));
+                    panelBlRef.PanelBtrExport.IdsEndsLeftEntity.ForEach(e => {
+                        if (e.ObjectClass.Name == "AcDbBlockReference")                        
+                            dictIdsEndEnts.Add(e, panelBlRef);                        
+                    });
                 }
                 else
                 {
-                    panelBlRef.PanelBtrExport.IdsEndsRightEntity.ForEach(e => dictIdsEndEnts.Add(e, panelBlRef));
+                    panelBlRef.PanelBtrExport.IdsEndsRightEntity.ForEach(e =>
+                    {
+                        if (e.ObjectClass.Name == "AcDbBlockReference")
+                            dictIdsEndEnts.Add(e, panelBlRef);
+                    });
                 }
-                ObjectIdCollection ids = new ObjectIdCollection(dictIdsEndEnts.Keys.ToArray());
+                var ids = new ObjectIdCollection(dictIdsEndEnts.Keys.ToArray());
                 using (IdMapping mapping = new IdMapping())
                 {
                     CPS.DbExport.DeepCloneObjects(ids, IdBtrEnd, mapping, false);
@@ -89,14 +95,36 @@ namespace AlbumPanelColorTiles.ExportFacade
             }
 
             // перемещение вех объектов торца в 0
-            var btr = IdBtrEnd.GetObject(OpenMode.ForRead) as BlockTableRecord;
-            Extents3d extFull = new Extents3d();
-            extFull.AddBlockExtents(btr);
-            foreach (ObjectId idEnt in btr)
+            var btrEnd = IdBtrEnd.GetObject(OpenMode.ForRead) as BlockTableRecord;
+            var extFull = new Extents3d();
+            extFull.AddBlockExtents(btrEnd);
+            var tiles = new List<BlockReference>();
+            foreach (ObjectId idEnt in btrEnd)
             {
-                using (var ent = idEnt.GetObject(OpenMode.ForWrite, false, true) as Entity)
-                {
+                var ent = idEnt.GetObject(OpenMode.ForWrite, false, true) as Entity;                
                     ent.TransformBy(Matrix3d.Displacement(new Vector3d(-extFull.MinPoint.X, 0, 0)));
+                if (ent is BlockReference)
+                {
+                    var blRefTile = ent as BlockReference;
+                    var blName = blRefTile.GetEffectiveName();
+                    if (blName.Equals(Settings.Default.BlockTileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        tiles.Add(blRefTile);
+                    }
+                }                
+            }
+            // Выравнивание блоков плиток
+            if (tiles.Any())
+            {
+                var xTile = tiles.First().Position.X;
+                foreach (var item in tiles)
+                {
+                    if (item.Position.X != xTile)
+                    {
+                        item.UpgradeOpen();
+                        var moveMatrixTileX = Matrix3d.Displacement(new Vector3d(xTile - item.Position.X, 0, 0));
+                        item.TransformBy(moveMatrixTileX);
+                    }
                 }
             }
 

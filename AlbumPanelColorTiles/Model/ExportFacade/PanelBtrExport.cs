@@ -77,7 +77,7 @@ namespace AlbumPanelColorTiles.ExportFacade
                 iterateEntInBlock(btr);
 
                 // Контур панели (так же определяется граница панели без торцов)
-                ContourPanel contourPanel = new ContourPanel(this);
+                var contourPanel = new ContourPanel(this);
                 contourPanel.CreateContour2(btr);
 
                 // Определение торцевых объектов (плитки и полилинии контура торца)
@@ -91,7 +91,7 @@ namespace AlbumPanelColorTiles.ExportFacade
                 }
 
                 // Повортот подписи марки (Марки СБ и Марки Покраски) и добавление фоновой штриховки
-                ConvertCaption caption = new ConvertCaption(this);
+                var caption = new ConvertCaption(this);
                 caption.Convert(btr);
 
                 //Если есть ошибки при конвертации, то подпись заголовка этих ошибок
@@ -172,7 +172,7 @@ namespace AlbumPanelColorTiles.ExportFacade
                 //var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.X, true);
                 if (endTiles.Count > 0)
                 {
-                    HashSet<ObjectId> idsEndRightEntsHash = new HashSet<ObjectId>();
+                    var idsEndRightEntsHash = new HashSet<ObjectId>();
                     endTiles.ForEach(t => idsEndRightEntsHash.Add(t));
                     IdsEndsRightEntity = idsEndRightEntsHash.ToList();
                 }
@@ -186,7 +186,7 @@ namespace AlbumPanelColorTiles.ExportFacade
                 //var idsEndEntsTemp = getEndEntsInCoord(ExtentsByTile.MaxPoint.Y, false);
                 if (endTiles.Count > 0)
                 {
-                    HashSet<ObjectId> idsEndTopEntsHash = new HashSet<ObjectId>();
+                    var idsEndTopEntsHash = new HashSet<ObjectId>();
                     endTiles.ForEach(t => idsEndTopEntsHash.Add(t));
                     IdsEndsTopEntity = idsEndTopEntsHash.ToList();
                 }
@@ -269,33 +269,48 @@ namespace AlbumPanelColorTiles.ExportFacade
                             CaptionLayerId = textCaption.LayerId;
                         }
                         continue;
+                    }                   
+                    // Если блок - плитка или окно
+                    else if (ent is BlockReference)
+                    {                        
+                        var blRef = ent as BlockReference;
+                        var blName = blRef.GetEffectiveName();
+                        if (blName.Equals(Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            var ext = blRef.GeometricExtentsСlean();
+                            _extentsByTile.AddExtents(ext);
+
+                            try
+                            {
+                                tilesDict.Add(ext, new Tuple<ObjectId, Extents3d>(blRef.Id, ext));
+                            }
+                            catch (ArgumentException)
+                            {
+                                // Ошибка - плитка с такими границами уже есть
+                                ErrMsg += "Наложение плиток. ";
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
+                            }
+                            continue;
+                        }
+                        else if (blName.StartsWith(Settings.Default.BlockWindowName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Окно оставляем
+                            continue;
+                        }
                     }
 
-                    // Удаление лишних объектов (мусора)
-                    if (_deleteWaste && deleteWaste(ent)) continue; // Если объект удален, то переход к новому объекту в блоке
+                    //// Удаление лишних объектов (мусора)
+                    //if (_deleteWaste && deleteWaste(ent)) continue; // Если объект удален, то переход к новому объекту в блоке                    
 
-                    // Если это плитка, то определение размеров панели по габаритам всех плиток
-                    if (ent is BlockReference && string.Equals(((BlockReference)ent).GetEffectiveName(),
-                               Settings.Default.BlockTileName, StringComparison.CurrentCultureIgnoreCase))
+                    if (_deleteWaste &&
+                        (string.Equals(ent.Layer, Settings.Default.LayerDimensionFacade, StringComparison.CurrentCultureIgnoreCase) ||
+                        string.Equals(ent.Layer, Settings.Default.LayerDimensionForm, StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        var blRef = ent as BlockReference;
-                        var ext = blRef.GeometricExtentsСlean();
-                        _extentsByTile.AddExtents(ext);
-
-                        try
-                        {
-                            tilesDict.Add(ext, new Tuple<ObjectId, Extents3d>(blRef.Id, ext));
-                        }
-                        catch (ArgumentException)
-                        {
-                            // Ошибка - плитка с такими границами уже есть
-                            ErrMsg += "Наложение плиток. ";
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Log.Error(ex, "iterateEntInBlock - tilesDict.Add(ent.GeometricExtents, ent.GeometricExtents);");
-                        }
-                        continue;
+                        ent.UpgradeOpen();
+                        ent.Erase();
                     }                    
                 }
             }

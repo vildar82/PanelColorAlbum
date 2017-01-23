@@ -3,7 +3,6 @@ using System.Linq;
 using AcadLib.Comparers;
 using AcadLib.Errors;
 using AlbumPanelColorTiles.Panels;
-using AlbumPanelColorTiles.Panels;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
 
@@ -30,8 +29,6 @@ namespace AlbumPanelColorTiles.ExportFacade
                 return _idLayerContour;
             }
         }
-
-
 
         public List<PanelBtrExport> PanelsBtrExport { get; private set; }
         public ExportFacadeService Service { get; private set; }

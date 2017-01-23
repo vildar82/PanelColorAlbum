@@ -38,7 +38,7 @@ namespace AlbumPanelColorTiles.ExportFacade
          if (string.IsNullOrEmpty(fileExportFullName) || !File.Exists(fileExportFullName))
          {  
             var fileAkrName = Path.GetFileNameWithoutExtension(FileAkrFacade.Name);
-            string fileExportName = fileAkrName + "_Экспорт";
+            string fileExportName = fileAkrName + "_ЭкспортФасада";
             fileExportFullName = Path.Combine(FileAkrFacade.DirectoryName, fileExportName + ".dwg");
          }
          FileExportFacade = new FileInfo(fileExportFullName);
