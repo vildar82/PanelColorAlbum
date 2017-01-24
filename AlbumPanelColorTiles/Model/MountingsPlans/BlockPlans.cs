@@ -246,14 +246,14 @@ namespace AlbumPanelColorTiles.MountingsPlans
                 else if (res.StringResult == "сБорка")
                 {
                     // Собрать все блоки в одну точку.
-                    UtilsPlanBlocksTogether.Together();
+                    UtilsPlanBlocksTogether.AKR_CollectMountPlansTogether();
                     throw new Exception(General.CanceledByUser);
                 }
                 else if (res.StringResult == "Авто")
                 {
                     // Собрать все монтажки по рабочим областям
                     var auto = new AutoGeneratePlans();
-                    auto.GenerateMountPlans();
+                    auto.AKR_AutoGenerateMountPlans();
                     throw new Exception(General.CanceledByUser);
                 }
                 else

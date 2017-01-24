@@ -11,6 +11,7 @@ using AcadLib;
 using AcadLib.Jigs;
 using Autodesk.AutoCAD.Geometry;
 using AlbumPanelColorTiles.PanelLibrary;
+using AcadLib.Statistic;
 
 namespace AlbumPanelColorTiles.MountingsPlans
 {
@@ -19,16 +20,17 @@ namespace AlbumPanelColorTiles.MountingsPlans
     /// </summary>
     public static class UtilsPlanBlocksTogether
     {        
-        public static void Together(IEnumerable<ObjectId> ids = null)
+        public static void AKR_CollectMountPlansTogether(IEnumerable<ObjectId> ids = null)
         {
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
-            Editor ed = doc.Editor;            
+            Editor ed = doc.Editor;                                      
 
             // Выбор блоков
             if (ids == null)
             {
                 ids = ed.SelectBlRefs("\nВыбор блоков:").ToArray();
+                PluginStatisticsHelper.AddStatistic();
             }
             //// Точка соединения всех блоков (точка вставки).            
             //var ptInsert = ed.GetPointWCS("\nТочка вставки:");

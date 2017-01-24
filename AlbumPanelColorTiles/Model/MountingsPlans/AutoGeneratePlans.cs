@@ -1,6 +1,7 @@
 ﻿using AcadLib;
 using AcadLib.Errors;
 using AcadLib.RTree.SpatialIndex;
+using AcadLib.Statistic;
 using AlbumPanelColorTiles.Options;
 using AlbumPanelColorTiles.PanelLibrary;
 using Autodesk.AutoCAD.ApplicationServices;
@@ -24,11 +25,13 @@ namespace AlbumPanelColorTiles.MountingsPlans
         Database db;
         Editor ed;        
 
-        public void GenerateMountPlans()
+        public void AKR_AutoGenerateMountPlans()
         {
             doc = Application.DocumentManager.MdiActiveDocument;
             db = doc.Database;
             ed = doc.Editor;
+
+            PluginStatisticsHelper.AddStatistic();
 
             // Проверка - не должно быть определено блоков монтажек в файле
             CheckFileHasAnyMountBlock();
@@ -51,7 +54,7 @@ namespace AlbumPanelColorTiles.MountingsPlans
             var idsMountFloorsBlRefs = CreateMountingPlanBlocks(wsList);
 
             // Создание сборок монтажек
-            UtilsPlanBlocksTogether.Together(idsMountFloorsBlRefs);
+            UtilsPlanBlocksTogether.AKR_CollectMountPlansTogether(idsMountFloorsBlRefs);
         }        
 
         private List<ObjectId> CreateMountingPlanBlocks(List<Workspace> wsList)
