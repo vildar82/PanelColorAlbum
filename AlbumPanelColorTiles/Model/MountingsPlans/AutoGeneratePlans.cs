@@ -217,10 +217,12 @@ namespace AlbumPanelColorTiles.MountingsPlans
             {
                 foreach (var item in bt)
                 {
-                    var btr = item.Open(OpenMode.ForRead) as BlockTableRecord;
-                    if (btr.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName))
+                    using (var btr = item.Open(OpenMode.ForRead) as BlockTableRecord)
                     {
-                        throw new Exception("В файле не должно быть определений блоков монтажных планов.");
+                        if (btr.Name.StartsWith(Settings.Default.BlockPlaneMountingPrefixName))
+                        {
+                            throw new Exception("В файле не должно быть определений блоков монтажных планов.");
+                        }
                     }
                 }
             }
