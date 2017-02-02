@@ -140,7 +140,7 @@ namespace AlbumPanelColorTiles.Panels
                         blRef.LayerId = layerTile;
                         // Нормализация плитки (зеркальность, поворот)
                         //blRef.Normalize(); // Есть плитки с подрезкой - как ее нормализовать, пока непонтно!!!???
-                        Tile.FillTileArticle(blRef, "");
+                        FillTileArticle(blRef, "");
                         blRef.DowngradeOpen();
                     }
                 }
@@ -167,19 +167,20 @@ namespace AlbumPanelColorTiles.Panels
                 foreach (ObjectId atrId in blRef.AttributeCollection)
                 {
                     if (!atrId.IsValidEx()) continue;
-                    using (var atr = atrId.Open(OpenMode.ForRead) as AttributeReference)
+                    using (var atr = atrId.Open(OpenMode.ForWrite) as AttributeReference)
                     {
-                        if (atr == null) continue;
-                        if (atr.Tag.Equals(Tile.PropArticle, StringComparison.OrdinalIgnoreCase))
-                        {
-                            atr.UpgradeOpen();
-                            atr.TextString = article;
-                            if (atr.Rotation!=0)
-                            {
-                                atr.Rotation = 0;
-                            }
-                            break;
-                        }
+                        atr.Erase();
+                        //if (atr == null) continue;
+                        //if (atr.Tag.Equals(PropArticle, StringComparison.OrdinalIgnoreCase))
+                        //{
+                        //    atr.UpgradeOpen();
+                        //    atr.TextString = article;
+                        //    if (atr.Rotation!=0)
+                        //    {
+                        //        atr.Rotation = 0;
+                        //    }
+                        //    break;
+                        //}
                     }
                 }
             }

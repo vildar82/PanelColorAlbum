@@ -27,6 +27,13 @@ namespace AlbumPanelColorTiles
         [DefaultValue(2)]
         public int NumberFirstFloor { get; set; } = 2;
 
+        [Category("Важно")]
+        [DisplayName("Артикулы")]
+        [Description("Подписи артикулов на каждой плитке в альбоме.")]
+        [DefaultValue(true)]
+        [TypeConverter(typeof(BooleanTypeConverter))]
+        public bool IsTileArticle { get; set; } = true;
+
 
         [Browsable(false)]
         [Category("Важно")]
@@ -83,6 +90,7 @@ namespace AlbumPanelColorTiles
             NumberFirstFloor = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTFLOOR, 2);
             NumberFirstSheet = loadNumberFromDict(Album.KEYNAMENUMBERFIRSTSHEET, 0);
             NumberAddSheetContent= loadNumberFromDict(Album.KEYNAMENUMBERADDSHEETCONTENT, 0);
+            IsTileArticle = DictNOD.LoadBool(Album.KEYNAMEISTILEARTICLE, true);
             //SortPanels = true; //DictNOD.LoadBool(Album.KEYNAMESORTPANELS, true);
             //EndsInPainting = DictNOD.LoadBool(Album.KEYNAMEENDSINPAINTING, false);
             //SplitIndexPainting = DictNOD.LoadString(Album.KEYNAMESPLITINDEXPAINTING, "_");
@@ -105,6 +113,7 @@ namespace AlbumPanelColorTiles
                 saveNumberToDict(resVal.NumberFirstSheet, Album.KEYNAMENUMBERFIRSTSHEET);
                 saveNumberToDict(resVal.NumberAddSheetContent, Album.KEYNAMENUMBERADDSHEETCONTENT);                
                 DictNOD.SaveBool(resVal.CheckMarkPainting, Album.KEYNAMECHECKMARKPAINTING);
+                DictNOD.SaveBool(resVal.IsTileArticle, Album.KEYNAMEISTILEARTICLE);
                 //DictNOD.SaveBool(resVal.SortPanels, Album.KEYNAMESORTPANELS);
                 //DictNOD.SaveBool(resVal.NewMode, Album.KEYNAMENEWMODE);
                 //DictNOD.SaveBool(resVal.EndsInPainting, Album.KEYNAMEENDSINPAINTING);

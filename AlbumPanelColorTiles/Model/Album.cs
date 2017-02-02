@@ -31,6 +31,7 @@ namespace AlbumPanelColorTiles
         public const string KEYNAMENUMBERFIRSTFLOOR = "NumberFirstFloor";
         public const string KEYNAMENUMBERFIRSTSHEET = "NumberFirstSheet";
         public const string KEYNAMENUMBERADDSHEETCONTENT = "NumberAddSheetContent";
+        public const string KEYNAMEISTILEARTICLE = "IsTileArticle";
         public const string REGAPPPATH = @"Software\Vildar\AKR";
         public const string REGKEYABBREVIATE = "Abbreviate";
 
@@ -80,7 +81,7 @@ namespace AlbumPanelColorTiles
         /// <summary>
         /// Включена/выключена подпись артикла в плитке (в альбома панелей)
         /// </summary>
-        public bool IsTileArticleOn { get; set; }
+        //public bool IsTileArticleOn { get; set; }
 
         /// <summary>
         /// Общий расход плитки на альбом.
@@ -248,7 +249,7 @@ namespace AlbumPanelColorTiles
             //}
 
             // Определение включен ли артикул подписи в плитке (по состоянию замороженности слоя - Артикул пдлитки)
-            IsTileArticleOn = GetTileArticleState();
+            //IsTileArticleOn = GetTileArticleState();
 
             // Подсчет общего кол плитки на альбом
             TotalTilesCalc = TileCalc.CalcAlbum(this);

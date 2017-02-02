@@ -100,6 +100,9 @@ namespace AlbumPanelColorTiles.Sheets
             // Заполнение штампа
             FillingStampMarkAr(idBtrLayoutMarkAR, true);
 
+            // Вставка артиклов цвета
+            InsertTileArticlesToPanelInForm(idBlRefMarkAR);
+
             //
             // Создание листа "в Форме" (зеркально)
             //
@@ -128,7 +131,7 @@ namespace AlbumPanelColorTiles.Sheets
         /// </summary>        
         private void InsertTileArticlesToPanelInForm(ObjectId idBlRefMarkArForm)
         {            
-            if (!_markAR.Album.IsTileArticleOn) return;
+            if (!_markAR.Album.StartOptions.IsTileArticle) return;
 
             var blRefPanel = idBlRefMarkArForm.GetObject(OpenMode.ForRead) as BlockReference;
             // трансформация блока панели

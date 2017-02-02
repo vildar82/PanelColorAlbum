@@ -174,16 +174,16 @@ namespace AlbumPanelColorTiles.Sheets
                     LayerOn(idLay);
                     layersToFreezeOnFormSheet.Add(idLay);
                 }
-                // Слой артикула плитки
-                if (_markSB.Album.IsTileArticleOn)
-                {
-                    if (lt.Has(Settings.Default.LayerTileArticle))
-                    {
-                        var idLay = lt[Settings.Default.LayerTileArticle];
-                        LayerOn(idLay);
-                        layersToFreezeOnFormSheet.Add(idLay);
-                    }
-                }
+                //// Слой артикула плитки
+                //if (_markSB.Album.IsTileArticleOn)
+                //{
+                //    if (lt.Has(Settings.Default.LayerTileArticle))
+                //    {
+                //        var idLay = lt[Settings.Default.LayerTileArticle];
+                //        LayerOn(idLay);
+                //        layersToFreezeOnFormSheet.Add(idLay);
+                //    }
+                //}
                 // Слой размеров в форме
                 if (lt.Has(Settings.Default.LayerDimensionForm))
                 {
