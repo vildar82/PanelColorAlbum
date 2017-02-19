@@ -116,7 +116,7 @@ namespace AlbumPanelColorTiles
                 Editor ed = doc.Editor;
                 ed.WriteMessage("\n{0}", MsgHelp);
                 // Открытие папки с инструкциями в проводнике                
-                System.Diagnostics.Process.Start("explorer", @"\\picompany.ru\root\ecp_sapr_exchange\01_Публикация\02_Справочные материалы и инструкции\02_AutoCAD");
+                System.Diagnostics.Process.Start("explorer", @"\\picompany.ru\root\ecp_sapr_exchange\01_Публикация\02_Справочные материалы и инструкции\02_AutoCAD\АР\АКР");
                 //"\\dsk2.picompany.ru\project\CAD_Settings\_Шаблоны & типовые решения\30_АР\3.01_Обучение_АКР"                
             });
         }
